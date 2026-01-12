@@ -38,9 +38,6 @@ export class TimeoutError extends Error {
   }
 }
 
-/**
- * Sleep for specified milliseconds
- */
 const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
