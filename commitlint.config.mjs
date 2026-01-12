@@ -1,4 +1,4 @@
-// https://medium.com/@michadrabikowski/automated-releases-with-nx-and-github-actions-07f574041293
+// https://github.com/conventional-changelog/commitlint/#what-is-commitlint
 export default {
   extends: ['@commitlint/config-conventional', '@commitlint/config-nx-scopes'],
 };

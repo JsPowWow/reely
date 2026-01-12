@@ -81,6 +81,5 @@
         "packageRoot": "dist/libs/{projectName}"
       }
     }
-  },
-  "nxCloudId": "6964de874c60534cec061e5b"
+  }
 }
