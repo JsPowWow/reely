@@ -55,19 +55,31 @@
     }
   ],
   "release": {
-    "projects": [
-      "!utils",
-      "!@reely/source"
-    ],
+    "projectsRelationship": "independent",
+    "projects": ["!utils", "!@reely/source"],
+    "git": {
+      "commitMessage": "chore: updated version [no ci]"
+    },
     "version": {
+      "conventionalCommits": true,
       "preVersionCommand": "npx nx run-many -t build"
+    },
+    "changelog": {
+      "projectChangelogs": {
+        "file": false,
+        "createRelease": "github"
+      }
     }
   },
   "targetDefaults": {
     "test": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
+    },
+    "nx-release-publish": {
+      "dependsOn": ["build"],
+      "options": {
+        "packageRoot": "dist/libs/{projectName}"
+      }
     }
   },
   "nxCloudId": "6964de874c60534cec061e5b"
