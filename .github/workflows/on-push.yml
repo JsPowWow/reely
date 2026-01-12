@@ -39,7 +39,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
 
       - name: Install packages
-        run: npm ci --verbose
+        run: npm ci
 
       - name: Sets the base and head SHAs for the nx affected commands in CI
         uses: nrwl/nx-set-shas@v4
