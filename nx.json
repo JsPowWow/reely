@@ -55,6 +55,9 @@
     }
   ],
   "release": {
+    "releaseTag": {
+      "pattern": "release/{projectName}/{version}"
+    },
     "projectsRelationship": "independent",
     "projects": ["!utils", "!@reely/source"],
     "git": {
