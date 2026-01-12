@@ -39,6 +39,10 @@
     "vite": "^7.0.0",
     "vitest": "4.0.9"
   },
+  "optionalDependencies": {
+    "@nx/nx-linux-arm64-gnu": "21.6.10",
+    "@nx/nx-linux-x64-gnu": "21.6.10"
+  },
   "workspaces": [
     "packages/*"
   ],
