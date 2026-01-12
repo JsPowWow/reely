@@ -79,7 +79,6 @@ export async function retry<T>(
       // Wait before retrying
       await sleep(currentDelay);
 
-      // Calculate next delay with exponential backoff
       currentDelay = Math.min(currentDelay * factor, maxDelay);
     }
   }
