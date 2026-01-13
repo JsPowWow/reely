@@ -42,7 +42,7 @@
   "optionalDependencies": {
     "@nx/nx-linux-arm64-gnu": "21.6.10",
     "@nx/nx-linux-x64-gnu": "21.6.10",
-    "@rollup/rollup-linux-x64-musl": "4.55.1"
+    "@rollup/rollup-linux-x64-gnu": "4.55.1"
   },
   "workspaces": [
     "packages/*"
