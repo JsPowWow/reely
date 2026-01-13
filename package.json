@@ -28,10 +28,12 @@
     "eslint": "~8.57.0",
     "husky": "^9.1.7",
     "jiti": "2.4.2",
+    "jsdom": "~22.1.0",
     "jsonc-eslint-parser": "^2.1.0",
     "lint-staged": "^16.2.7",
     "nx": "22.3.3",
     "prettier": "^2.6.2",
+    "swc-loader": "0.1.15",
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.40.0",
@@ -45,7 +47,8 @@
     "@rollup/rollup-linux-x64-gnu": "4.55.1"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/rss-async-race/web"
   ],
   "nx": {
     "includedScripts": [],
@@ -59,5 +62,6 @@
         }
       }
     }
-  }
+  },
+  "dependencies": {}
 }
