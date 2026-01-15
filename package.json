@@ -26,6 +26,7 @@
     "@vitest/coverage-v8": "4.0.9",
     "@vitest/ui": "4.0.9",
     "eslint": "~8.57.0",
+    "eslint-plugin-import": "^2.32.0",
     "husky": "^9.1.7",
     "jiti": "2.4.2",
     "jsdom": "~22.1.0",
@@ -62,6 +63,5 @@
         }
       }
     }
-  },
-  "dependencies": {}
+  }
 }

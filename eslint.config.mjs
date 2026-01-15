@@ -1,16 +1,15 @@
 import nx from '@nx/eslint-plugin';
+import importPlugin from 'eslint-plugin-import';
 
 export default [
   ...nx.configs['flat/base'],
   ...nx.configs['flat/typescript'],
   ...nx.configs['flat/javascript'],
+  // https://github.com/import-js/eslint-plugin-import/
+  importPlugin.flatConfigs.recommended,
+  importPlugin.flatConfigs.typescript,
   {
-    ignores: [
-      '**/dist',
-      '**/build',
-      '**/vite.config.*.timestamp*',
-      '**/vitest.config.*.timestamp*',
-    ],
+    ignores: ['**/dist', '**/build', '**/vite.config.*.timestamp*', '**/vitest.config.*.timestamp*'],
   },
   {
     files: ['**/*.ts', '**/*.js'],
@@ -40,18 +39,74 @@ export default [
           ],
         },
       ],
+      '@typescript-eslint/consistent-type-definitions': 'off',
+      '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/explicit-function-return-type': 'error',
+      '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
+      '@typescript-eslint/explicit-member-accessibility': [
+        'error',
+        { accessibility: 'explicit', overrides: { constructors: 'off' } },
+      ],
+      '@typescript-eslint/member-ordering': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          varsIgnorePattern: '[iI]gnored',
+        },
+      ],
+      'import/no-cycle': 'error',
+      'import/max-dependencies': ['error', { max: 10, ignoreTypeImports: true }],
+      // 'import/no-default-export': 'warn', TODO AR
+      // https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/order.md
+      'import/order': [
+        'error',
+        {
+          groups: ['builtin', 'external', 'internal', ['parent', 'sibling'], 'index', 'object', 'type'],
+          pathGroups: [
+            {
+              group: 'sibling',
+              pattern: './*.{css,scss}',
+              position: 'after',
+            },
+            {
+              group: 'parent',
+              pattern: '../**/*.{css,scss}',
+              position: 'after',
+            },
+            {
+              group: 'internal',
+              pattern: '@reely/**',
+              position: 'after',
+            },
+          ],
+          pathGroupsExcludedImportTypes: ['builtin'],
+          'newlines-between': 'always',
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: true,
+          },
+        },
+      ],
     },
   },
   {
-    files: [
-      '**/*.ts',
-      '**/*.cts',
-      '**/*.mts',
-      '**/*.js',
-      '**/*.cjs',
-      '**/*.mjs',
-    ],
+    files: ['**/*.ts', '**/*.cts', '**/*.mts', '**/*.js', '**/*.cjs', '**/*.mjs'],
     // Override or add rules here
     rules: {},
+  },
+  {
+    files: ['**/*spec.js', '**/*spec.ts'],
+    // Override or add rules here
+    rules: {
+      'no-magic-numbers': 'off',
+      '@typescript-eslint/consistent-type-assertions': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      'max-lines-per-function': 'off',
+      '@typescript-eslint/no-base-to-string': 'off',
+      'import/no-cycle': 'error',
+    },
   },
 ];
