@@ -14,8 +14,6 @@ describe('AppElement', () => {
   it('should have a greeting', () => {
     app.connectedCallback();
 
-    expect(app.querySelector('h1').innerHTML).toContain(
-      'Welcome rss-async-race'
-    );
+    expect(app.querySelector('h1').innerHTML).toContain('Welcome FreeDOM');
   });
 });

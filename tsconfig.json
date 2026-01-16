@@ -17,6 +17,9 @@
     },
     {
       "path": "./apps/rss-async-race/web"
+    },
+    {
+      "path": "./apps/free-dom"
     }
   ]
 }

@@ -49,7 +49,8 @@
   },
   "workspaces": [
     "packages/*",
-    "apps/rss-async-race/web"
+    "apps/rss-async-race/web",
+    "apps/free-dom"
   ],
   "nx": {
     "includedScripts": [],
@@ -63,5 +64,6 @@
         }
       }
     }
-  }
+  },
+  "dependencies": {}
 }
