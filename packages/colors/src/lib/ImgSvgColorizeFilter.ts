@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 'use strict';
 
 /**
@@ -9,9 +11,9 @@
  *  - https://stackoverflow.com/questions/42966641/how-to-transform-black-into-any-given-color-using-only-css-filters/43960991#43960991
  */
 export class ImgSvgColorizeFilter {
-  private r = 0;
-  private g = 0;
-  private b = 0;
+  public r = 0;
+  public g = 0;
+  public b = 0;
 
   constructor(r: number, g: number, b: number) {
     this.set(r, g, b);
@@ -45,7 +47,7 @@ export class ImgSvgColorizeFilter {
     ]);
   }
 
-  grayscale(value = 1) {
+  public grayscale(value = 1): void {
     this.multiply([
       0.2126 + 0.7874 * (1 - value),
       0.7152 - 0.7152 * (1 - value),
@@ -59,7 +61,7 @@ export class ImgSvgColorizeFilter {
     ]);
   }
 
-  sepia(value = 1) {
+  public sepia(value = 1): void {
     this.multiply([
       0.393 + 0.607 * (1 - value),
       0.769 - 0.769 * (1 - value),
@@ -73,7 +75,7 @@ export class ImgSvgColorizeFilter {
     ]);
   }
 
-  saturate(value = 1) {
+  public saturate(value = 1): void {
     this.multiply([
       0.213 + 0.787 * value,
       0.715 - 0.715 * value,
@@ -87,7 +89,7 @@ export class ImgSvgColorizeFilter {
     ]);
   }
 
-  multiply(matrix) {
+  public multiply(matrix: number[]): void {
     const newR = this.clamp(this.r * matrix[0] + this.g * matrix[1] + this.b * matrix[2]);
     const newG = this.clamp(this.r * matrix[3] + this.g * matrix[4] + this.b * matrix[5]);
     const newB = this.clamp(this.r * matrix[6] + this.g * matrix[7] + this.b * matrix[8]);
@@ -96,26 +98,27 @@ export class ImgSvgColorizeFilter {
     this.b = newB;
   }
 
-  brightness(value = 1) {
+  public brightness(value = 1): void {
     this.linear(value);
   }
-  contrast(value = 1) {
+
+  public contrast(value = 1): void {
     this.linear(value, -(0.5 * value) + 0.5);
   }
 
-  linear(slope = 1, intercept = 0) {
+  public linear(slope = 1, intercept = 0): void {
     this.r = this.clamp(this.r * slope + intercept * 255);
     this.g = this.clamp(this.g * slope + intercept * 255);
     this.b = this.clamp(this.b * slope + intercept * 255);
   }
 
-  invert(value = 1) {
+  public invert(value = 1): void {
     this.r = this.clamp((value + (this.r / 255) * (1 - 2 * value)) * 255);
     this.g = this.clamp((value + (this.g / 255) * (1 - 2 * value)) * 255);
     this.b = this.clamp((value + (this.b / 255) * (1 - 2 * value)) * 255);
   }
 
-  hsl() {
+  public hsl(): { h: number; s: number; l: number } {
     // Code taken from https://stackoverflow.com/a/9493060/2688027, licensed under CC BY-SA.
     const r = this.r / 255;
     const g = this.g / 255;
@@ -124,6 +127,7 @@ export class ImgSvgColorizeFilter {
     const min = Math.min(r, g, b);
     let h,
       s,
+      // eslint-disable-next-line prefer-const
       l = (max + min) / 2;
 
     if (max === min) {
@@ -164,14 +168,18 @@ export class ImgSvgColorizeFilter {
   }
 }
 
-class Solver {
-  constructor(target, baseColor) {
+export class Solver {
+  private target: ImgSvgColorizeFilter;
+  private targetHSL: { h: number; s: number; l: number };
+  private readonly reusedColor: ImgSvgColorizeFilter;
+
+  constructor(target: ImgSvgColorizeFilter) {
     this.target = target;
     this.targetHSL = target.hsl();
-    this.reusedColor = new Color(0, 0, 0);
+    this.reusedColor = new ImgSvgColorizeFilter(0, 0, 0);
   }
 
-  solve() {
+  public solve(): { values: number[] | null; loss: number; filter: string } {
     const result = this.solveNarrow(this.solveWide());
     return {
       values: result.values,
@@ -180,12 +188,12 @@ class Solver {
     };
   }
 
-  solveWide() {
+  public solveWide(): { loss: number; values: number[] | null } {
     const A = 5;
     const c = 15;
     const a = [60, 180, 18000, 600, 1.2, 1.2];
 
-    let best = { loss: Infinity };
+    let best = { loss: Infinity, values: null };
     for (let i = 0; best.loss > 25 && i < 3; i++) {
       const initial = [50, 20, 3750, 50, 100, 100];
       const result = this.spsa(A, a, c, initial, 1000);
@@ -196,7 +204,7 @@ class Solver {
     return best;
   }
 
-  solveNarrow(wide) {
+  public solveNarrow(wide: { loss: number; values: number[] | null }): { values: number[] | null; loss: number } {
     const A = wide.loss;
     const c = 2;
     const A1 = A + 1;
@@ -204,7 +212,13 @@ class Solver {
     return this.spsa(A, a, c, wide.values, 500);
   }
 
-  spsa(A, a, c, values, iters) {
+  public spsa(
+    A: number,
+    a: number[],
+    c: number,
+    values: number[] | null,
+    iters: number
+  ): { values: number[] | null; loss: number } {
     const alpha = 1;
     const gamma = 0.16666666666666666;
 
@@ -237,7 +251,7 @@ class Solver {
     }
     return { values: best, loss: bestLoss };
 
-    function fix(value, idx) {
+    function fix(value: number, idx: number): number {
       let max = 100;
       if (idx === 2 /* saturate */) {
         max = 7500;
@@ -260,7 +274,7 @@ class Solver {
     }
   }
 
-  loss(filters) {
+  public loss(filters: number[]): number {
     // Argument is array of percentages.
     const color = this.reusedColor;
     color.set(0, 0, 0);
@@ -283,8 +297,8 @@ class Solver {
     );
   }
 
-  css(filters) {
-    function fmt(idx, multiplier = 1) {
+  public css(filters: number[]): string {
+    function fmt(idx: number, multiplier = 1): number {
       return Math.round(filters[idx] * multiplier);
     }
     return `filter: invert(${fmt(0)}%) sepia(${fmt(1)}%) saturate(${fmt(2)}%) hue-rotate(${fmt(
@@ -294,7 +308,7 @@ class Solver {
   }
 }
 
-function hexToRgb(hex) {
+export function hexToRgb(hex: string): number[] | null {
   // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
   const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
   hex = hex.replace(shorthandRegex, (m, r, g, b) => {
@@ -304,33 +318,33 @@ function hexToRgb(hex) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
 }
-
-$(document).ready(() => {
-  $('button.execute').click(() => {
-    const rgb = hexToRgb($('input.target').val());
-    if (rgb.length !== 3) {
-      alert('Invalid format!');
-      return;
-    }
-
-    const color = new Color(rgb[0], rgb[1], rgb[2]);
-    const solver = new Solver(color);
-    const result = solver.solve();
-
-    let lossMsg;
-    if (result.loss < 1) {
-      lossMsg = 'This is a perfect result.';
-    } else if (result.loss < 5) {
-      lossMsg = 'The is close enough.';
-    } else if (result.loss < 15) {
-      lossMsg = 'The color is somewhat off. Consider running it again.';
-    } else {
-      lossMsg = 'The color is extremely off. Run it again!';
-    }
-
-    $('.realPixel').css('background-color', color.toString());
-    $('.filterPixel').attr('style', result.filter);
-    $('.filterDetail').text(result.filter);
-    $('.lossDetail').html(`Loss: ${result.loss.toFixed(1)}. <b>${lossMsg}</b>`);
-  });
-});
+//
+// $(document).ready(() => {
+//   $('button.execute').click(() => {
+//     const rgb = hexToRgb($('input.target').val());
+//     if (rgb.length !== 3) {
+//       alert('Invalid format!');
+//       return;
+//     }
+//
+//     const color = new Color(rgb[0], rgb[1], rgb[2]);
+//     const solver = new Solver(color);
+//     const result = solver.solve();
+//
+//     let lossMsg;
+//     if (result.loss < 1) {
+//       lossMsg = 'This is a perfect result.';
+//     } else if (result.loss < 5) {
+//       lossMsg = 'The is close enough.';
+//     } else if (result.loss < 15) {
+//       lossMsg = 'The color is somewhat off. Consider running it again.';
+//     } else {
+//       lossMsg = 'The color is extremely off. Run it again!';
+//     }
+//
+//     $('.realPixel').css('background-color', color.toString());
+//     $('.filterPixel').attr('style', result.filter);
+//     $('.filterDetail').text(result.filter);
+//     $('.lossDetail').html(`Loss: ${result.loss.toFixed(1)}. <b>${lossMsg}</b>`);
+//   });
+// });

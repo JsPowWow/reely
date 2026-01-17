@@ -27,7 +27,7 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
-      "path": "../../../packages/utils/tsconfig.lib.json"
+      "path": "../../../packages/dommy/tsconfig.lib.json"
     }
   ]
 }
