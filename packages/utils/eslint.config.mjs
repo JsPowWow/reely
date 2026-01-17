@@ -7,8 +7,4 @@ export default [
     // Override or add rules here
     rules: {},
   },
-  {
-    files: ['**/index.ts', '**/index.cts', '**/index.mts', '**/index.js', '**/index.cjs', '**/index.mjs'],
-    rules: { 'import/max-dependencies': ['error', { max: 60, ignoreTypeImports: true }] },
-  },
 ];

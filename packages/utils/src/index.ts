@@ -28,12 +28,6 @@ export { default as stubNull } from './lib/fp/stubNull';
 export { default as toggle } from './lib/fp/toggle';
 export { tap } from './lib/fp/tap';
 
-// dommy
-export * from './lib/dommy/tags';
-export { appendTo, appendChildren } from './lib/dommy/utils/element.children';
-export { createElement } from './lib/dommy/createElement';
-export { addListener, addListeners } from './lib/dommy/utils/element.addListeners';
-
 export { default as isNil } from './lib/objects/isNil';
 export { hasSome } from './lib/objects/hasSome';
 export { toNonNullableItems } from './lib/objects/toNonNullableItems';
@@ -41,7 +35,8 @@ export { default as isInstanceOf } from './lib/objects/isInstanceOf';
 export { isSomeFunction } from './lib/objects/isSomeFunction';
 export { default as isString } from './lib/objects/isString';
 export { default as isNumber } from './lib/objects/isNumber';
-export { default as isBoolean } from './lib/objects/isBoolean';
+export { isBigInt } from './lib/objects/isBigInt';
+export { isBoolean } from './lib/objects/isBoolean';
 export { default as isSymbol } from './lib/objects/isSymbol';
 export { default as isError } from './lib/objects/isError';
 export { default as isValidRecordKey } from './lib/objects/isValidRecordKey';
