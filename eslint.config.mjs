@@ -36,6 +36,15 @@ export default [
               sourceTag: 'scope:strings',
               onlyDependOnLibsWithTags: ['scope:shared', 'scope:strings'],
             },
+            {
+              sourceTag: 'scope:dommy',
+              onlyDependOnLibsWithTags: ['scope:shared', 'scope:dommy'],
+            },
+            // *************** Apps settings ****************************
+            {
+              sourceTag: 'scope:free-dom',
+              onlyDependOnLibsWithTags: ['scope:shared', 'scope:dommy', 'scope:async', 'scope:colors', 'scope:strings'],
+            },
           ],
         },
       ],
@@ -95,6 +104,10 @@ export default [
     files: ['**/*.ts', '**/*.cts', '**/*.mts', '**/*.js', '**/*.cjs', '**/*.mjs'],
     // Override or add rules here
     rules: {},
+  },
+  {
+    files: ['**/index.ts', '**/index.cts', '**/index.mts', '**/index.js', '**/index.cjs', '**/index.mjs'],
+    rules: { 'import/max-dependencies': ['error', { max: 60, ignoreTypeImports: true }] },
   },
   {
     files: ['**/*spec.js', '**/*spec.ts'],

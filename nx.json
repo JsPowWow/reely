@@ -56,13 +56,13 @@
       "pattern": "release/{projectName}/{version}"
     },
     "projectsRelationship": "independent",
-    "projects": ["!utils", "!@reely/source"],
+    "projects": ["*", "!utils", "!@reely/source"],
     "git": {
       "commitMessage": "chore: updated version [no ci]"
     },
     "version": {
-      "conventionalCommits": true,
-      "preVersionCommand": "npx nx run-many -t build"
+      "preVersionCommand": "npx nx run-many -t build",
+      "conventionalCommits": true
     },
     "changelog": {
       "projectChangelogs": {

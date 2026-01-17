@@ -1,0 +1,10 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(10, 10)">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M0 10C0 4.47715 4.47715 0 10 0H24C35.0457 0 44 8.9543 44 20C44 31.0457 35.0457 40 24 40H10C4.47715 40 0 35.5228 0 30V10ZM24 10H12V30H24C29.5228 30 34 25.5228 34 20C34 14.4772 29.5228 10 24 10Z" fill="#2C3E50"/>
+    <rect x="16" y="14" width="12" height="12" rx="4" fill="#4FD1C5"/>
+  </g>
+
+  <text x="70" y="40" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="500" font-size="34" fill="#2C3E50">
+    dommy
+  </text>
+</svg>

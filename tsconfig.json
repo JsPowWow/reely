@@ -20,6 +20,9 @@
     },
     {
       "path": "./apps/free-dom"
+    },
+    {
+      "path": "./packages/dommy"
     }
   ]
 }

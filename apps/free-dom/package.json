@@ -5,7 +5,7 @@
   "nx": {
     "name": "free-dom",
     "tags": [
-      "free-dom"
+      "scope:free-dom"
     ]
   }
 }

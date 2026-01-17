@@ -1,0 +1,13 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(10, 5)">
+    <rect x="15" y="0" width="20" height="20" rx="6" fill="#007AFF"/>
+    <rect x="0" y="30" width="20" height="20" rx="6" fill="#5AC8FA"/>
+    <rect x="30" y="30" width="20" height="20" rx="6" fill="#5AC8FA"/>
+    <path d="M25 20V25C25 27.7614 22.7614 30 20 30H10" stroke="#007AFF" stroke-width="3" stroke-linecap="round"/>
+    <path d="M25 20V25C25 27.7614 27.2386 30 30 30H40" stroke="#007AFF" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <text x="70" y="38" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="bold" font-size="32" fill="#5AC8FA">
+    dommy
+  </text>
+</svg>
