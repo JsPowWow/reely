@@ -1,5 +1,4 @@
-import hasProperty from '../../../objects/hasProperty';
-import { hasSome } from '../../../objects/hasSome';
+import { hasProperty, hasSome } from '@reely/utils';
 
 /**
  * Determines if the given props object contains a valid `aria` attribute.

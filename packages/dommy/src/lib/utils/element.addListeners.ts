@@ -1,10 +1,6 @@
-import hasProperty from '../../objects/hasProperty';
-import { hasSome } from '../../objects/hasSome';
-import { isNonEmpty } from '../../objects/isNonEmpty';
-import { isSomeFunction } from '../../objects/isSomeFunction';
-import { toNonNullableItems } from '../../objects/toNonNullableItems';
+import { hasProperty, hasSome, isNonEmpty, isSomeFunction, toNonNullableItems } from '@reely/utils';
+import type { Prettify, WithRequiredNonNullable } from '@reely/utils';
 
-import type { Prettify, WithRequiredNonNullable } from '../../types/utility.types';
 import type {
   DOMElementEventHandler,
   DOMElementEventHandlerDescriptor,

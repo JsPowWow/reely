@@ -1,4 +1,4 @@
-import { hasSome } from '../../../objects/hasSome';
+import { hasSome } from '@reely/utils';
 
 const mappedAttributes = [
   ['className', 'class'],

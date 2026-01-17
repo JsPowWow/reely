@@ -1,8 +1,9 @@
-import { hasSome } from '../../objects/hasSome';
-import isInstanceOf from '../../objects/isInstanceOf';
+import type { Nil, PipeableFunction } from '@reely/utils';
+import { isNil, isInstanceOf } from '@reely/utils';
 
-import type { PipeableFunction } from '../../types/function.types';
 import type { DOMNode } from '../types/hyperscript.types';
+
+export const isFalsyElement = (element: unknown): element is Nil | false => isNil(element) || element === false;
 
 /**
  * Appends a list of DOM nodes to a given parent HTML element.
@@ -34,7 +35,7 @@ export const appendChildren =
 export const appendTo =
   <Element extends HTMLElement>(parent: Element): PipeableFunction<DOMNode> =>
   (child) => {
-    if (hasSome(child)) {
+    if (!isFalsyElement(child)) {
       parent.append(isInstanceOf(Node, child) ? child : String(child));
     }
 

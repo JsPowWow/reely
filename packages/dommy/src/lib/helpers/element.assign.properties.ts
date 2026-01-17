@@ -1,6 +1,6 @@
-import hasProperty from '../../objects/hasProperty';
-import isNil from '../../objects/isNil';
-import isValidRecordKey from '../../objects/isValidRecordKey';
+import { hasProperty, isNil, isSomeFunction, isValidRecordKey } from '@reely/utils';
+import type { Nullable, PipeableFunction } from '@reely/utils';
+
 import { hasAriaAttribute, setAriaAttributes } from '../utils/attributes/element.aria.attributes';
 import { isSafeAttributeEntry, setAttribute } from '../utils/attributes/element.attributes';
 import { isBooleanAttribute, setBoolAttribute } from '../utils/attributes/element.bool.attributes';
@@ -9,8 +9,6 @@ import { isMappedAttribute, setMappedAttribute } from '../utils/attributes/eleme
 import { hasStylesAttribute, setStyleAttributes } from '../utils/attributes/element.style.attributes';
 import { addEventListenerHandler, isEventListenerHandler } from '../utils/element.addListeners';
 
-import type { Nullable } from '../../types/core.types';
-import type { PipeableFunction } from '../../types/function.types';
 import type {
   DOMElement,
   DOMElementFactoryOptionsProps,
@@ -21,11 +19,30 @@ import type {
 const elementFactoryOptionsProps = {
   children: true,
   eventsAbortSignal: true,
-} satisfies Record<keyof Required<DOMElementFactoryOptionsProps>, boolean>;
+  elementRef: true,
+} satisfies Record<keyof Required<DOMElementFactoryOptionsProps<HtmlElementTag>>, boolean>;
 
-export const isElementFactoryOptionProp = (property: unknown): property is DOMElementFactoryOptionsProps => {
+export const isElementFactoryOptionProp = (
+  property: unknown
+): property is DOMElementFactoryOptionsProps<HtmlElementTag> => {
   return isValidRecordKey(property) && hasProperty(property, elementFactoryOptionsProps);
 };
+
+export const assignElementRef =
+  <Tag extends HtmlElementTag, Element extends DOMElement<Tag> = DOMElement<Tag>>(
+    props: Nullable<DOMElementFactoryProps<Tag>>
+  ): PipeableFunction<Element> =>
+  (element: Element) => {
+    if (hasProperty('elementRef', props)) {
+      const { elementRef } = props;
+      if (isSomeFunction(elementRef)) {
+        elementRef(element);
+      } else if (hasProperty('current', elementRef)) {
+        elementRef.current = element;
+      }
+    }
+    return element;
+  };
 
 export const assignProperties =
   <Tag extends HtmlElementTag, Element extends DOMElement<Tag> = DOMElement<Tag>>(

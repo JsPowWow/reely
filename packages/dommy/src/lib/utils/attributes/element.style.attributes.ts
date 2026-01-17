@@ -1,5 +1,4 @@
-import hasProperty from '../../../objects/hasProperty';
-import { hasSome } from '../../../objects/hasSome';
+import { hasProperty, hasSome } from '@reely/utils';
 
 /**
  * Determines whether the given object has a `styles` attribute that is a partial implementation of `CSSStyleDeclaration`.

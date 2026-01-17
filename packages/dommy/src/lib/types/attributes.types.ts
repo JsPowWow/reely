@@ -1,5 +1,6 @@
+import type { AnyFunction } from '@reely/utils';
+
 import type { HtmlElementEvent } from './hyperscript.types';
-import type { AnyFunction } from '../../types/function.types';
 
 export type DOMElementAttributes<T extends HTMLElement> = Exclude<Partial<SafeAttributes<T>>, HtmlElementEvent> & {
   styles?: Partial<CSSStyleDeclaration>;

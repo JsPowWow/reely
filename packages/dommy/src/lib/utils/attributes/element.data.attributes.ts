@@ -1,4 +1,4 @@
-import { hasSome } from '../../../objects/hasSome';
+import { hasSome } from '@reely/utils';
 
 export const isDataAttribute = (attributeName: string): attributeName is `data-${string}` =>
   hasSome(attributeName) && attributeName.startsWith('data-');

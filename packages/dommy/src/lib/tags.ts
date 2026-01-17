@@ -1,13 +1,9 @@
-import { createElement } from './createElement';
+import { isBigInt, isBoolean, isInstanceOf, isNumber, isString } from '@reely/utils';
 
-import type { Nullable } from '../types/core.types';
-import type {
-  DOMNode,
-  DOMElementFactoryFunction,
-  DOMElementFactoryProps,
-  HtmlElementTag,
-  DOMElement,
-} from './types/hyperscript.types';
+import { createElement } from './createElement';
+import { createTextNode } from './createTextNode';
+
+import type { DOMElementFactoryFunction, HtmlElementTag } from './types/hyperscript.types';
 
 export const a = createElementFromTag('a');
 
@@ -233,8 +229,16 @@ export const video = createElementFromTag('video');
 
 export const wbr = createElementFromTag('wbr');
 
+export const text = createTextNode;
+
 function createElementFromTag<Tag extends HtmlElementTag>(tag: Tag): DOMElementFactoryFunction<Tag> {
-  return (props: Nullable<DOMElementFactoryProps<Tag>>, ...children: DOMNode[]): DOMElement<Tag> => {
+  return (props, ...children) => {
+    if (isString(props) || isNumber(props) || isBigInt(props) || isBoolean(props) || isInstanceOf(Node, props)) {
+      return createElement(tag, null, ...[props, ...children]);
+    }
+    if (Array.isArray(props)) {
+      return createElement(tag, null, ...[...props, ...children]);
+    }
     return createElement(tag, props, ...children);
   };
 }

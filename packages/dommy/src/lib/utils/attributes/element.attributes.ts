@@ -1,8 +1,4 @@
-import { hasSome } from '../../../objects/hasSome';
-import isBoolean from '../../../objects/isBoolean';
-import isNil from '../../../objects/isNil';
-import isNumber from '../../../objects/isNumber';
-import isString from '../../../objects/isString';
+import { hasSome, isBoolean, isNil, isNumber, isString } from '@reely/utils';
 
 export const isSafeAttributeEntry = (attributeName: string, value: unknown): value is string => {
   return isString(attributeName) && (isString(value) || isNumber(value) || isBoolean(value));
