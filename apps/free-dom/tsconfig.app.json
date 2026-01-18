@@ -33,6 +33,9 @@
       "path": "../../packages/utils/tsconfig.lib.json"
     },
     {
+      "path": "../../packages/logger/tsconfig.lib.json"
+    },
+    {
       "path": "../../packages/dommy/tsconfig.lib.json"
     }
   ]

@@ -1,3 +1,4 @@
+export { defineDommyConfig } from './lib/config';
 export { createElement } from './lib/createElement';
 export { createTextNode } from './lib/createTextNode';
 export { createElementRef } from './lib/utils/ref/elementRef';

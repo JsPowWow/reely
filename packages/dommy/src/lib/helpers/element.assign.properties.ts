@@ -1,6 +1,7 @@
-import { hasProperty, isNil, isSomeFunction, isValidRecordKey } from '@reely/utils';
 import type { Nullable, PipeableFunction } from '@reely/utils';
+import { hasProperty, isNil, isSomeFunction, isValidRecordKey } from '@reely/utils';
 
+import { getDommyLogger } from '../config';
 import { hasAriaAttribute, setAriaAttributes } from '../utils/attributes/element.aria.attributes';
 import { isSafeAttributeEntry, setAttribute } from '../utils/attributes/element.attributes';
 import { isBooleanAttribute, setBoolAttribute } from '../utils/attributes/element.bool.attributes';
@@ -21,6 +22,8 @@ const elementFactoryOptionsProps = {
   eventsAbortSignal: true,
   elementRef: true,
 } satisfies Record<keyof Required<DOMElementFactoryOptionsProps<HtmlElementTag>>, boolean>;
+
+const dommyLogger = getDommyLogger();
 
 export const isElementFactoryOptionProp = (
   property: unknown
@@ -89,8 +92,7 @@ export const assignProperties =
           break;
         }
         default: {
-          // TODO AR via logger (scoped)
-          console.warn('The create element option was not proceed: ', property, value);
+          dommyLogger?.warn('The create element option was not proceed: ', property, value);
         }
       }
     }

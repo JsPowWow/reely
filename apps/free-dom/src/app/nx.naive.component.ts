@@ -1,5 +1,6 @@
 import './nx.naive.css';
-import { a, appendTo, details, div, h1, h2, img, p, pre, span, summary, text } from '@reely/dommy';
+import { a, appendTo, details, div, h1, h2, img, p, pre, span, summary, text, defineDommyConfig } from '@reely/dommy';
+import { scopedLogger } from '@reely/logger';
 import { pipe } from '@reely/utils';
 
 export class NxNaiveComponent extends HTMLElement {
@@ -212,4 +213,9 @@ export class NxNaiveComponent extends HTMLElement {
     this.render();
   }
 }
+
 customElements.define('free-dom-root', NxNaiveComponent);
+defineDommyConfig({
+  debug: true,
+  logger: scopedLogger('dommy'),
+});

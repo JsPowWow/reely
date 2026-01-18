@@ -1,5 +1,6 @@
 import './app.element.css';
 import { addListener, addListeners, appendTo, createElement, div, h1, input, span } from '@reely/dommy';
+import { pipe } from '@reely/utils';
 
 import { HeaderComponent } from './components/Header.component';
 
