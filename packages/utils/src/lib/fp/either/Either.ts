@@ -91,7 +91,7 @@ export class Either<Left, Right> {
     return isLeft(this.wrapper) ? Either.Left(this.wrapper.value) : f(this.wrapper.value);
   }
 
-  public tap(f: (wrapped: Left | Right) => void): typeof this {
+  public tap(f: (wrapped: Left | Right) => void): this {
     f(this.wrapper.value);
     return this;
   }

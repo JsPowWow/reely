@@ -40,6 +40,10 @@ export default [
               sourceTag: 'scope:dommy',
               onlyDependOnLibsWithTags: ['scope:shared', 'scope:dommy'],
             },
+            {
+              sourceTag: 'scope:logger',
+              onlyDependOnLibsWithTags: ['scope:shared', 'scope:logger'],
+            },
             // *************** Apps settings ****************************
             {
               sourceTag: 'scope:free-dom',
@@ -120,6 +124,12 @@ export default [
       'max-lines-per-function': 'off',
       '@typescript-eslint/no-base-to-string': 'off',
       'import/no-cycle': 'error',
+    },
+  },
+  {
+    files: ['**/vitest.config.mts'],
+    rules: {
+      'import/no-unresolved': 'off',
     },
   },
 ];

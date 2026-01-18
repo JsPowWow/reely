@@ -23,6 +23,9 @@
     },
     {
       "path": "./packages/dommy"
+    },
+    {
+      "path": "./packages/logger"
     }
   ]
 }
