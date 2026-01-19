@@ -64,7 +64,7 @@ class ConsoleScopedLogger<S extends string> implements ScopedLogger<S> {
 
   public log: ScopedLogger<S>['log'] = (message, ...optionalParams): void => {
     if (isLoggerEnabled(this)) {
-      console.warn(`[[${this.loggerScope}]]\t`, message, ...optionalParams);
+      console.log(`[[${this.loggerScope}]]\t`, message, ...optionalParams);
     }
   };
 
