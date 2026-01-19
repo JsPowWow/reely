@@ -1,7 +1,13 @@
 import './nx.naive.css';
-import { a, appendTo, details, div, h1, h2, img, p, pre, span, summary, text, defineDommyConfig } from '@reely/dommy';
+import { a, appendTo, defineDommyConfig, details, div, h1, h2, img, p, pre, span, summary } from '@reely/dommy';
 import { scopedLogger } from '@reely/logger';
 import { pipe } from '@reely/utils';
+
+import { ConditionalBinding } from '../components/Conditional.reactive.component';
+import { Counter } from '../components/counter.component';
+import { ReactiveCounter } from '../components/counter.reactive.component';
+import { DoubleCounter } from '../components/doubleCounter.component';
+import { EditableList } from '../components/EditableList.reactive.component';
 
 export class NxNaiveComponent extends HTMLElement {
   public static observedAttributes = [];
@@ -10,10 +16,16 @@ export class NxNaiveComponent extends HTMLElement {
 
   public render(): void {
     const pageContent = div({ className: 'container' }, [
+      EditableList(),
+      ConditionalBinding(),
+      DoubleCounter({ initialValue: 4 }),
+      ReactiveCounter({ initialValue: 10 }),
+      Counter({ initialValue: 20 }),
+      Counter({ initialValue: 20 }),
       div({
         id: 'welcome',
         children: h1({
-          children: [span({ children: ' Hello there, ' }), text('Welcome Free - DOM 👋')],
+          children: [span({ children: ' Hello there, ' }), 'Welcome Free - DOM 👋'],
         }),
       }),
       div({ id: 'hero', className: 'rounded' }, [
@@ -21,7 +33,7 @@ export class NxNaiveComponent extends HTMLElement {
           h2({
             children: [img({ className: 'tick', src: 'assets/tick.svg' }), span({ children: 'You"re up and running' })],
           }),
-          a({ href: '#commands' }, text(" What's next? ")),
+          a({ href: '#commands' }, " What's next? "),
         ]),
         div({ className: 'logo-container' }, [img({ className: 'logo', src: 'assets/logo1.svg' })]),
       ]),
@@ -128,7 +140,7 @@ export class NxNaiveComponent extends HTMLElement {
             pre({ children: 'nx connect' }),
             a(
               { href: 'https://nx.app/?utm_source=nx-project', target: '_blank', rel: 'noreferrer' },
-              text('What is Nx Cloud?')
+              'What is Nx Cloud?'
             ),
           ]),
           a({

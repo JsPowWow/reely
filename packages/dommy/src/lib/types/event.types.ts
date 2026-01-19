@@ -12,10 +12,10 @@ export type DOMElementEventHandler<Evt extends Event, Elt extends HTMLElement> =
 export type DOMElementEventHandlerOptions = AddEventListenerOptions & EventListenerOptions;
 
 export type DOMElementEventHandlerDescriptor<Evt extends Event, Elt extends HTMLElement> = {
-  handler: DOMElementEventHandler<Evt, Elt>;
+  handleEvent: DOMElementEventHandler<Evt, Elt>;
 } & DOMElementEventHandlerOptions;
 
 export type DOMElementEventHandlerProp<Evt extends Event, Elt extends HTMLElement> =
   | DOMElementEventHandler<Evt, Elt>
   | DOMElementEventHandlerDescriptor<Evt, Elt>
-  | DOMElementEventHandlerProp<Evt, Elt>[];
+  | readonly DOMElementEventHandlerProp<Evt, Elt>[];

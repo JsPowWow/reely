@@ -1,5 +1,5 @@
+import type { WithRequiredNonNullable } from '@reely/utils';
 import { hasProperty, hasSome, isNonEmpty, isSomeFunction, toNonNullableItems } from '@reely/utils';
-import type { Prettify, WithRequiredNonNullable } from '@reely/utils';
 
 import type {
   DOMElementEventHandler,
@@ -8,10 +8,10 @@ import type {
 } from '../types/event.types';
 
 type ValidEventListenerDescriptor<Evt extends Event, Elt extends HTMLElement> = Omit<
-  Prettify<WithRequiredNonNullable<DOMElementEventHandlerDescriptor<Evt, Elt>, 'handler'>>,
-  'handler'
+  WithRequiredNonNullable<DOMElementEventHandlerDescriptor<Evt, Elt>, 'handleEvent'>,
+  'handleEvent'
 > & {
-  handler: EventListener;
+  handleEvent: EventListener;
 };
 
 export function isEventListenerHandler<Evt extends Event, Elt extends HTMLElement>(
@@ -24,10 +24,10 @@ export function isEventListenerHandler<Evt extends Event, Elt extends HTMLElemen
 }
 
 export function addListener<Evt extends Event, Elt extends HTMLElement>(
-  handler: DOMElementEventHandler<Evt, Elt>,
+  handleEvent: DOMElementEventHandler<Evt, Elt>,
   options?: AddEventListenerOptions
 ): DOMElementEventHandlerDescriptor<Evt, Elt>[] {
-  return [{ handler, ...options }];
+  return [{ handleEvent, ...options }];
 }
 
 export function addListeners<Evt extends Event, Elt extends HTMLElement>(
@@ -40,11 +40,11 @@ export function addListeners<Evt extends Event, Elt extends HTMLElement>(
   return toNonNullableItems(
     args.map((entry) => {
       if (Array.isArray(entry)) {
-        const [handler, options] = entry;
-        return { handler, ...options };
+        const [handleEvent, options] = entry;
+        return { handleEvent, ...options };
       }
       if (isSomeFunction(entry)) {
-        return { handler: entry };
+        return { handleEvent: entry };
       }
       return null;
     })
@@ -54,8 +54,16 @@ export function addListeners<Evt extends Event, Elt extends HTMLElement>(
 function isEventListenerDescriptor<Evt extends Event, Elt extends HTMLElement>(
   maybeDescriptor: unknown
 ): maybeDescriptor is ValidEventListenerDescriptor<Evt, Elt> {
-  return hasSome(maybeDescriptor) && hasProperty('handler', maybeDescriptor) && isSomeFunction(maybeDescriptor.handler);
+  return (
+    hasSome(maybeDescriptor) &&
+    hasProperty('handleEvent', maybeDescriptor) &&
+    isSomeFunction(maybeDescriptor.handleEvent)
+  );
 }
+
+// function isEventListenerOrEventListenerObject(value: unknown): value is EventListenerOrEventListenerObject {
+//   return isSomeFunction(value) || (hasProperty('handleEvent', value) && isSomeFunction(value.handleEvent));
+// }
 
 export function addEventListenerHandler<Evt extends Event, Elt extends HTMLElement>(
   element: Elt,
@@ -69,14 +77,16 @@ export function addEventListenerHandler<Evt extends Event, Elt extends HTMLEleme
     );
     return true;
   }
-  if (isSomeFunction(eventHandler)) {
-    element.addEventListener(eventType, eventHandler, { signal: eventListenersAbortSignal });
+  if (isSomeFunction<EventListener>(eventHandler)) {
+    element.addEventListener(eventType, eventHandler, {
+      signal: eventListenersAbortSignal,
+    });
     return true;
   }
 
   if (isEventListenerDescriptor(eventHandler)) {
-    const { handler, signal: handlerSignal, once, capture, passive } = eventHandler;
-    element.addEventListener(eventType, handler, {
+    const { handleEvent, signal: handlerSignal, once, capture, passive } = eventHandler;
+    element.addEventListener(eventType, handleEvent, {
       signal: AbortSignal.any(toNonNullableItems([handlerSignal, eventListenersAbortSignal])),
       once,
       capture,

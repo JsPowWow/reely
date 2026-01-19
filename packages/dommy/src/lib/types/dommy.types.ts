@@ -2,16 +2,23 @@ import type { Nullable, PrimitiveValue } from '@reely/utils';
 
 import type { DOMElementAttributes } from './attributes.types';
 import type { DOMElementEvents } from './event.types';
+import type { State } from '../reactive/dommy';
 
 export type HtmlElementTag = keyof HTMLElementTagNameMap;
 export type HtmlElementEvent = keyof GlobalEventHandlers;
 
 export type DOMElement<Tag extends HtmlElementTag> = HTMLElementTagNameMap[Tag];
-export type DOMNode = Nullable<Node | PrimitiveValue | bigint>;
+
+export type ValidChildDOMNode = Nullable<Node | PrimitiveValue>;
+
+export type BindingFunc = ((dom?: Node) => ValidChildDOMNode) | ((dom?: Element) => Element);
+
+export type StateView<T> = Readonly<State<T>>;
+export type ChildDOM = ValidChildDOMNode | StateView<Nullable<PrimitiveValue>> | BindingFunc | readonly ChildDOM[];
 
 export type DOMElementFactoryFunction<Tag extends HtmlElementTag> = (
-  props?: Nullable<DOMElementFactoryProps<Tag>> | DOMNode | (DOMNode | DOMNode[])[],
-  ...children: (DOMNode | DOMNode[])[]
+  props?: Nullable<DOMElementFactoryProps<Tag>> | ChildDOM,
+  ...children: ChildDOM[]
 ) => DOMElement<Tag>;
 
 export type DOMElementFactoryProps<Tag extends HtmlElementTag, Elt extends HTMLElement = DOMElement<Tag>> =
@@ -24,7 +31,7 @@ export type DOMElementRefCallback<T> = { bivarianceHack(instance: T | null): voi
 export type DOMElementRef<T> = DOMElementRefCallback<T> | DOMElementRefObject<T> | null;
 
 export type DOMElementFactoryOptionsProps<Tag extends HtmlElementTag> = {
-  children?: DOMNode | DOMNode[];
+  children?: ChildDOM;
   eventsAbortSignal?: AbortSignal;
   elementRef?: DOMElementRef<DOMElement<Tag>>;
 };

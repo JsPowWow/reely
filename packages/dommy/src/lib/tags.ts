@@ -1,9 +1,10 @@
-import { isBigInt, isBoolean, isInstanceOf, isNumber, isString } from '@reely/utils';
+import { isBigInt, isBoolean, isInstanceOf, isNumber, isSomeFunction, isString } from '@reely/utils';
 
 import { createElement } from './createElement';
-import { createTextNode } from './createTextNode';
+import { isStateProto } from './reactive/dommy';
 
-import type { DOMElementFactoryFunction, HtmlElementTag } from './types/hyperscript.types';
+import type { State } from './reactive/dommy';
+import type { BindingFunc, ChildDOM, DOMElementFactoryFunction, HtmlElementTag } from './types/dommy.types';
 
 export const a = createElementFromTag('a');
 
@@ -229,16 +230,29 @@ export const video = createElementFromTag('video');
 
 export const wbr = createElementFromTag('wbr');
 
-export const text = createTextNode;
+const isState = (value: unknown): value is State<unknown> => {
+  return isStateProto(value);
+};
+
+const isChildren = (value: unknown): value is readonly ChildDOM[] => {
+  return Array.isArray(value);
+};
 
 function createElementFromTag<Tag extends HtmlElementTag>(tag: Tag): DOMElementFactoryFunction<Tag> {
   return (props, ...children) => {
     if (isString(props) || isNumber(props) || isBigInt(props) || isBoolean(props) || isInstanceOf(Node, props)) {
       return createElement(tag, null, ...[props, ...children]);
     }
-    if (Array.isArray(props)) {
+    if (isChildren(props)) {
       return createElement(tag, null, ...[...props, ...children]);
     }
+    if (isState(props)) {
+      throw new Error('Under construction: Cannot create element from state.');
+    }
+    if (isSomeFunction<BindingFunc>(props)) {
+      throw new Error('Under construction: Cannot create element from function.');
+    }
+
     return createElement(tag, props, ...children);
   };
 }

@@ -15,7 +15,7 @@ import type {
   DOMElementFactoryOptionsProps,
   DOMElementFactoryProps,
   HtmlElementTag,
-} from '../types/hyperscript.types';
+} from '../types/dommy.types';
 
 const elementFactoryOptionsProps = {
   children: true,
@@ -92,7 +92,7 @@ export const assignProperties =
           break;
         }
         default: {
-          dommyLogger?.warn('The create element option was not proceed: ', property, value);
+          dommyLogger?.warn(`The element property was not assigned: `, property, value);
         }
       }
     }
