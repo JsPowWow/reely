@@ -53,6 +53,7 @@ export default [
         },
       ],
       '@typescript-eslint/consistent-type-definitions': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/explicit-function-return-type': 'error',
       '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
