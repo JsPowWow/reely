@@ -10,6 +10,7 @@ export const ConditionalBinding = (): HTMLDivElement => {
   return dommy.tags.div(
     dommy.tags.div(
       'formula: ',
+      dommy.tags.div('_AA_', a),
       dommy.tags.select(
         { oninput: (e) => (formula.val = e.target.value) },
         dommy.tags.option({ selected: () => formula.val === 'a + b' }, 'a + b'),

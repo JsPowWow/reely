@@ -22,6 +22,7 @@ export class NxNaiveComponent extends HTMLElement {
       ReactiveCounter({ initialValue: 10 }),
       Counter({ initialValue: 20 }),
       Counter({ initialValue: 20 }),
+      // div(() => 'OOOOOOOO'), // TODO AR
       div({
         id: 'welcome',
         children: h1({

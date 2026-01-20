@@ -1,9 +1,9 @@
 import { isBigInt, isBoolean, isInstanceOf, isNumber, isSomeFunction, isString } from '@reely/utils';
 
 import { createElement } from './createElement';
-import { isStateProto } from './reactive/dommy';
+import { isStateProto } from './reactive/_internals';
 
-import type { State } from './reactive/dommy';
+import type { State } from './reactive/state';
 import type { BindingFunc, ChildDOM, DOMElementFactoryFunction, HtmlElementTag } from './types/dommy.types';
 
 export const a = createElementFromTag('a');

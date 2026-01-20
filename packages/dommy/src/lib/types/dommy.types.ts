@@ -2,7 +2,7 @@ import type { Nullable, PrimitiveValue } from '@reely/utils';
 
 import type { DOMElementAttributes } from './attributes.types';
 import type { DOMElementEvents } from './event.types';
-import type { State } from '../reactive/dommy';
+import type { State } from '../reactive/state';
 
 export type HtmlElementTag = keyof HTMLElementTagNameMap;
 export type HtmlElementEvent = keyof GlobalEventHandlers;
