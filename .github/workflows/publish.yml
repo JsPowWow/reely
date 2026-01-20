@@ -14,7 +14,7 @@ jobs:
     name: Publish
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       id-token: write
     steps:
       - name: Checkout repository
@@ -31,23 +31,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build packages
-        run: npx nx run-many -t build
-
-      - name: Create package tarballs
-        run: |
-          mkdir -p dist-packages
-          for pkg in packages/*/package.json; do
-            if [ -f "$pkg" ]; then
-              pkg_dir=$(dirname "$pkg")
-              echo "Packing $pkg_dir..."
-              cd "$pkg_dir"
-              npm pack --pack-destination ../../dist-packages
-              cd ../..
-            fi
-          done
-          ls -lh dist-packages/
-
       - name: Publish packages
         run: |
           git config --global user.email "js.developer.powwow@gmail.com"
@@ -56,37 +39,3 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload artifacts to GitHub Releases
-        if: ${{ inputs.dry-run == false }}
-        run: |
-          # Get all release tags created by nx release
-          for tarball in dist-packages/*.tgz; do
-            if [ -f "$tarball" ]; then
-              # Extract package name and version from tarball filename
-              filename=$(basename "$tarball")
-              echo "Processing $filename..."
-
-              # Find the matching release tag
-              # This assumes your release tags follow the pattern from nx.json
-              pkg_name=$(echo "$filename" | sed 's/-[0-9].*//' | sed 's/^reely-/@reely\//')
-              pkg_version=$(echo "$filename" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-
-              if [ -n "$pkg_version" ]; then
-                # Try to find the release by tag pattern
-                release_tag="release/${pkg_name}/${pkg_version}"
-                echo "Looking for release: $release_tag"
-
-                # Upload to release if it exists
-                if gh release view "$release_tag" &> /dev/null; then
-                  echo "Uploading $filename to release $release_tag..."
-                  gh release upload "$release_tag" "$tarball" --clobber
-                else
-                  echo "Release $release_tag not found, skipping..."
-                fi
-              fi
-            fi
-          done
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
