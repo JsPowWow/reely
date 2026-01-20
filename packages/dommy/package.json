@@ -26,10 +26,29 @@
   "nx": {
     "tags": [
       "scope:dommy"
-    ]
+    ],
+    "projectType": "library",
+    "sourceRoot": "packages/dommy/src",
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "vite build",
+          "cwd": "packages/dommy"
+        },
+        "dependsOn": [
+          "^build"
+        ],
+        "outputs": [
+          "{projectRoot}/dist"
+        ]
+      }
+    }
   },
   "dependencies": {
-    "tslib": "^2.3.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
     "@reely/utils": "*",
     "@reely/logger": "*"
   }
