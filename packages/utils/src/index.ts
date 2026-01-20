@@ -51,3 +51,4 @@ export { default as hasProperty } from './lib/objects/hasProperty';
 export { default as hasPropertyRecord } from './lib/objects/hasPropertyRecord';
 export { default as objectsKeysMap } from './lib/objects/objectsKeysMap';
 export { default as toRemovedProperty } from './lib/objects/toRemovedProperty';
+export { getPropertyDescriptor } from './lib/objects/getPropertyDescriptor';
