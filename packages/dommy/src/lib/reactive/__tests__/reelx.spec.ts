@@ -1,6 +1,6 @@
 import { noop } from '@reely/utils';
 
-import { reelx } from '../reelx';
+import { reelx, reelxDebug } from '../reelx';
 
 it('should get the fresh state outside an effect', () => {
   const a = reelx(0);
@@ -82,7 +82,7 @@ test('should not store duplicated computed(s)', () => {
     for (let i = 0; i < 10; i++) a();
   }).subscribe(noop);
 
-  expect(a._s.size).toBe(1);
+  expect(reelxDebug(a).subs()?.size).toBe(1);
 });
 
 test('should not have stale subscription', () => {
@@ -90,10 +90,10 @@ test('should not have stale subscription', () => {
   const b = reelx(0);
   reelx(() => b() || a()).subscribe(noop);
 
-  expect(a._s.size).toBe(1);
+  expect(reelxDebug(a).subs()?.size).toBe(1);
   b(123);
   reelx.notify();
-  expect(a._s.size).toBe(0);
+  expect(reelxDebug(a).subs()?.size).toBe(0);
 });
 
 test('prevState for a subscriber', async () => {

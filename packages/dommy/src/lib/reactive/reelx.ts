@@ -1,33 +1,18 @@
-import { isSomeFunction } from '@reely/utils';
+import type { Nullable } from '@reely/utils';
+import { hasProperty, hasSome, isSomeFunction } from '@reely/utils';
 
-export interface Reelx {
-  <S>(computed: () => S, equal?: (prev: S, next: S) => boolean): ReelxComputed<S>;
-  <S>(initial: S): ReelxValue<S>;
-  <S>(initial?: S): ReelxValue<S>;
-  notify: {
-    (): void;
-    schedule?: null | VoidFunction;
-  };
-}
+import type { Reelx, RlxComputedState, RlxValueState } from './reelx.types';
 
-export interface ReelxValue<S = unknown> {
-  (newState?: S): S;
+type WithSubscribers<T> = {
   _s: Set<Subscriber>;
-  subscribe(cb: (value: S, prevValue?: S) => void): VoidFunction;
-}
-
-export interface ReelxComputed<S = unknown> {
-  (): S;
-  _s: Set<Subscriber>;
-  subscribe(cb: (state: S, prevState?: S) => void): VoidFunction;
-}
+} & T;
 
 interface Subscriber {
   (): void;
-  _v: Array<ReelxValue>;
+  _values: Array<WithSubscribers<RlxValueState<unknown>>>;
 }
 
-type Dependencies<T> = [] | [ReelxValue<T> | ReelxComputed<T>, unknown];
+type Dependencies<T> = [] | [RlxValueState<T> | RlxComputedState<T>, T];
 
 /** subscribers from all touched signals */
 let QUEUE: Array<Set<Subscriber>> = [];
@@ -44,28 +29,31 @@ let SUBSCRIBER_VERSION = 0;
 /** stack-based parent ref to silently link nodes */
 let DEPS: null | Dependencies<unknown> = null;
 
+const emptyArray = Object.freeze([]);
+
 export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) => boolean) => {
   let queueVersion = -1;
   let subscriberVersion = -1;
   let stateVal: T;
-  let theReelx: ReelxValue<T> & ReelxComputed<T>;
+  let reelxInstance: WithSubscribers<RlxValueState<T> & RlxComputedState<T>>;
 
   if (isSomeFunction(init)) {
     const deps: Dependencies<T> = [];
-    // @ts-expect-error expected properties declared below
-    theReelx = (): T => {
+    // @ts-expect-error expected properties assigned below
+    reelxInstance = (): T => {
       if (subscriberVersion !== SUBSCRIBER_VERSION) {
-        if (queueVersion === QUEUE_VERSION && SUBSCRIBER !== null && theReelx._s.size !== 0) {
-          // for (const s of theReelx._s) {
-          //   for (const { _s } of s._v) if (_s.size !== _s.add(SUBSCRIBER).size) SUBSCRIBER._v.push(theReelx);
+        if (queueVersion === QUEUE_VERSION && SUBSCRIBER !== null && reelxInstance._s.size !== 0) {
+          // for (const s of reelxInstance._s) {
+          //   for (const { _s } of s._values)
+          //     if (_s.size !== _s.add(SUBSCRIBER).size) SUBSCRIBER._values.push(reelxInstance);
           //   break;
           // }
-          const [firstS] = theReelx._s ?? [];
+          const [firstS] = reelxInstance._s ?? emptyArray;
 
           if (firstS) {
-            for (const { _s } of firstS._v) {
+            for (const { _s } of firstS._values) {
               if (_s.size !== _s.add(SUBSCRIBER).size) {
-                SUBSCRIBER._v.push(theReelx);
+                SUBSCRIBER._values.push(reelxInstance);
               }
             }
           }
@@ -103,40 +91,40 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
       }
 
       // @ts-expect-error can't type a structure
-      DEPS?.push(theReelx, stateVal);
+      DEPS?.push(reelxInstance, stateVal);
 
       return stateVal;
     };
   } else {
     stateVal = init;
-    // @ts-expect-error expected properties declared below
-    theReelx = (newState: T): T => {
+    // @ts-expect-error expected properties assigned below
+    reelxInstance = (newState: T): T => {
       if (newState !== undefined && !Object.is(newState, stateVal)) {
         // mark all computed(s) dirty
         ++SUBSCRIBER_VERSION;
 
         stateVal = newState;
 
-        if (QUEUE.push(theReelx._s) === 1) {
+        if (QUEUE.push(reelxInstance._s) === 1) {
           QUEUE_VERSION++;
           reelx.notify.schedule?.();
         }
 
-        theReelx._s = new Set();
+        reelxInstance._s = new Set();
       }
 
-      if (SUBSCRIBER !== null && theReelx._s.size !== theReelx._s.add(SUBSCRIBER).size) {
-        SUBSCRIBER._v.push(theReelx);
+      if (SUBSCRIBER !== null && reelxInstance._s.size !== reelxInstance._s.add(SUBSCRIBER).size) {
+        SUBSCRIBER._values.push(reelxInstance);
       }
 
       // @ts-expect-error can't type a structure
-      DEPS?.push(theReelx, stateVal);
+      DEPS?.push(reelxInstance, stateVal);
 
       return stateVal;
     };
   }
 
-  theReelx.subscribe = (cb) => {
+  reelxInstance.subscribe = (cb) => {
     let queueVersion = -1;
     let lastState: unknown;
     let prevState: T | undefined;
@@ -146,13 +134,13 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
         try {
           queueVersion = QUEUE_VERSION;
 
-          for (const { _s } of subscriber._v.splice(0)) _s.delete(subscriber);
+          for (const { _s } of subscriber._values.splice(0)) _s.delete(subscriber);
 
           SUBSCRIBER = subscriber;
 
           SUBSCRIBER_VERSION++;
 
-          if (theReelx() !== lastState) {
+          if (reelxInstance() !== lastState) {
             cb((lastState = stateVal), prevState);
             prevState = stateVal;
           }
@@ -161,23 +149,34 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
         }
       }
     };
-    subscriber._v = [];
+    subscriber._values = [];
 
     subscriber();
-    theReelx._s.add(subscriber);
+    reelxInstance._s.add(subscriber);
 
     return (): void => {
-      theReelx._s.delete(subscriber);
-      if (theReelx._s.size === 0) {
-        for (const { _s } of subscriber._v) _s.delete(subscriber);
+      reelxInstance._s.delete(subscriber);
+      if (reelxInstance._s.size === 0) {
+        for (const { _s } of subscriber._values) _s.delete(subscriber);
       }
     };
   };
 
-  theReelx._s = new Set();
+  reelxInstance._s = new Set();
 
-  return theReelx;
+  return reelxInstance;
 };
+
+export function reelxDebug<S>(rlx: RlxValueState<S> | RlxComputedState<S>): {
+  subs: () => Nullable<Set<Subscriber>>;
+} {
+  return {
+    subs: (): Nullable<Set<Subscriber>> => {
+      const subs: unknown = hasProperty('_s', rlx) ? rlx._s : undefined;
+      return hasSome<Set<Subscriber>>(subs) ? subs : undefined;
+    },
+  };
+}
 
 reelx.notify = (): void => {
   const iterator = QUEUE;
