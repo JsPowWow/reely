@@ -1,5 +1,5 @@
 import { Maybe } from './Maybe';
-import hasPropertyRecord from '../../objects/hasPropertyRecord';
+import { hasPropertyRecord } from '../../objects/hasPropertyRecord';
 
 const maybePropertyRecordOf =
   <T extends Record<string | number | symbol, unknown>>(object: T) =>

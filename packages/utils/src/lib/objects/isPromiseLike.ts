@@ -1,4 +1,4 @@
-import hasProperty from './hasProperty';
+import { hasProperty } from './hasProperty';
 import { hasSome } from './hasSome';
 import { isSomeFunction } from './isSomeFunction';
 

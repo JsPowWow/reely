@@ -1,4 +1,4 @@
-import hasProperty from '../objects/hasProperty';
+import { hasProperty } from '../objects/hasProperty';
 import isPlainObject from '../objects/isPlainObject';
 import isString from '../objects/isString';
 
