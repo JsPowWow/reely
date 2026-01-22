@@ -1,18 +1,19 @@
 import type { Nullable } from '@reely/utils';
 import { hasProperty, hasSome, isSomeFunction } from '@reely/utils';
 
-import type { Reelx, RlxComputedState, RlxValueState } from './reelx.types';
+import type { Reelx, RlxDerived, RlxValue } from './reelx.types';
 
 type WithSubscribers<T> = {
-  _s: Set<Subscriber>;
+  _subscribers: Set<Subscriber>;
 } & T;
 
 interface Subscriber {
   (): void;
-  _values: Array<WithSubscribers<RlxValueState<unknown>>>;
+  _values: Array<WithSubscribers<RlxValue<unknown>>>;
 }
 
-type Dependencies<T> = [] | [RlxValueState<T> | RlxComputedState<T>, T];
+/** node dependencies list */
+type Dependencies<T> = { c: RlxValue<T> | RlxDerived<T>; v: T }[];
 
 /** subscribers from all touched signals */
 let QUEUE: Array<Set<Subscriber>> = [];
@@ -31,28 +32,22 @@ let DEPS: null | Dependencies<unknown> = null;
 
 const emptyArray = Object.freeze([]);
 
-export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) => boolean) => {
+export const reelxCore: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) => boolean) => {
   let queueVersion = -1;
   let subscriberVersion = -1;
   let stateVal: T;
-  let reelxInstance: WithSubscribers<RlxValueState<T> & RlxComputedState<T>>;
+  let reelxInstance: WithSubscribers<RlxValue<T> & RlxDerived<T>>;
 
   if (isSomeFunction(init)) {
     const deps: Dependencies<T> = [];
     // @ts-expect-error expected properties assigned below
     reelxInstance = (): T => {
       if (subscriberVersion !== SUBSCRIBER_VERSION) {
-        if (queueVersion === QUEUE_VERSION && SUBSCRIBER !== null && reelxInstance._s.size !== 0) {
-          // for (const s of reelxInstance._s) {
-          //   for (const { _s } of s._values)
-          //     if (_s.size !== _s.add(SUBSCRIBER).size) SUBSCRIBER._values.push(reelxInstance);
-          //   break;
-          // }
-          const [firstS] = reelxInstance._s ?? emptyArray;
-
+        if (queueVersion === QUEUE_VERSION && SUBSCRIBER !== null && reelxInstance._subscribers.size !== 0) {
+          const [firstS] = reelxInstance._subscribers ?? emptyArray;
           if (firstS) {
-            for (const { _s } of firstS._values) {
-              if (_s.size !== _s.add(SUBSCRIBER).size) {
+            for (const { _subscribers } of firstS._values) {
+              if (_subscribers.size !== _subscribers.add(SUBSCRIBER).size) {
                 SUBSCRIBER._values.push(reelxInstance);
               }
             }
@@ -64,8 +59,7 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
           try {
             let isActual = deps.length > 0;
             for (let i = 0; isActual && i < deps.length; i += 2) {
-              // @ts-expect-error can't type a structure
-              isActual = Object.is(deps[i + 1], deps[i]());
+              isActual = Object.is(deps[i + 1]?.v, deps[i]?.c());
             }
 
             if (!isActual) {
@@ -90,8 +84,7 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
         subscriberVersion = SUBSCRIBER_VERSION;
       }
 
-      // @ts-expect-error can't type a structure
-      DEPS?.push(reelxInstance, stateVal);
+      DEPS?.push({ c: reelxInstance, v: stateVal });
 
       return stateVal;
     };
@@ -105,20 +98,19 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
 
         stateVal = newState;
 
-        if (QUEUE.push(reelxInstance._s) === 1) {
+        if (QUEUE.push(reelxInstance._subscribers) === 1) {
           QUEUE_VERSION++;
-          reelx.notify.schedule?.();
+          reelxCore.notify.schedule?.();
         }
 
-        reelxInstance._s = new Set();
+        reelxInstance._subscribers = new Set();
       }
 
-      if (SUBSCRIBER !== null && reelxInstance._s.size !== reelxInstance._s.add(SUBSCRIBER).size) {
+      if (SUBSCRIBER !== null && reelxInstance._subscribers.size !== reelxInstance._subscribers.add(SUBSCRIBER).size) {
         SUBSCRIBER._values.push(reelxInstance);
       }
 
-      // @ts-expect-error can't type a structure
-      DEPS?.push(reelxInstance, stateVal);
+      DEPS?.push({ c: reelxInstance, v: stateVal });
 
       return stateVal;
     };
@@ -134,7 +126,7 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
         try {
           queueVersion = QUEUE_VERSION;
 
-          for (const { _s } of subscriber._values.splice(0)) _s.delete(subscriber);
+          for (const { _subscribers } of subscriber._values.splice(0)) _subscribers.delete(subscriber);
 
           SUBSCRIBER = subscriber;
 
@@ -152,33 +144,33 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
     subscriber._values = [];
 
     subscriber();
-    reelxInstance._s.add(subscriber);
+    reelxInstance._subscribers.add(subscriber);
 
     return (): void => {
-      reelxInstance._s.delete(subscriber);
-      if (reelxInstance._s.size === 0) {
-        for (const { _s } of subscriber._values) _s.delete(subscriber);
+      reelxInstance._subscribers.delete(subscriber);
+      if (reelxInstance._subscribers.size === 0) {
+        for (const { _subscribers } of subscriber._values) _subscribers.delete(subscriber);
       }
     };
   };
 
-  reelxInstance._s = new Set();
+  reelxInstance._subscribers = new Set();
 
   return reelxInstance;
 };
 
-export function reelxDebug<S>(rlx: RlxValueState<S> | RlxComputedState<S>): {
+export function reelxDebug<S>(rlx: RlxValue<S> | RlxDerived<S>): {
   subs: () => Nullable<Set<Subscriber>>;
 } {
   return {
     subs: (): Nullable<Set<Subscriber>> => {
-      const subs: unknown = hasProperty('_s', rlx) ? rlx._s : undefined;
+      const subs: unknown = hasProperty('_subscribers', rlx) ? rlx._subscribers : undefined;
       return hasSome<Set<Subscriber>>(subs) ? subs : undefined;
     },
   };
 }
 
-reelx.notify = (): void => {
+reelxCore.notify = (): void => {
   const iterator = QUEUE;
 
   QUEUE = [];
@@ -188,4 +180,4 @@ reelx.notify = (): void => {
   }
 };
 
-reelx.notify.schedule = (): Promise<void> => Promise.resolve().then(reelx.notify);
+reelxCore.notify.schedule = (): Promise<void> => Promise.resolve().then(reelxCore.notify);
