@@ -1,9 +1,17 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-//@ts-nocheck
-import type { AnyFunction, Nullable } from '@reely/utils';
-import { hasSome } from '@reely/utils';
+//@ts -nocheck
 
-import { updateSetter } from './state';
+import type { AnyFunction, Nullable } from '@reely/utils';
+import { hasSome, isInstanceOf, isSomeFunction } from '@reely/utils';
+
+import { addAndScheduleOnFirst, addStatesToGc, keepConnected } from './_gc';
+import { isState, state, updateSetter } from './state';
+import { assignElementRef, isElementFactoryOptionProp } from '../helpers/element.assign.properties';
+import { extractChildrenFromProps } from '../utils/element.children';
+
+import type { TagFunc, Tags } from './dommy';
+import type { Binding, Deps, InternalState, Listener, State } from './state';
+import type { BindingFunc, ChildDOM, DOMElement, HtmlElementTag, ValidChildDOMNode } from '../types/dommy.types';
 
 const protoOf = Object.getPrototypeOf;
 
@@ -11,19 +19,10 @@ let changedStates: Nullable<Set<InternalState>> = undefined;
 let derivedStates: Nullable<Set<InternalState>> = undefined;
 let curNewDerives: Nullable<Listener[]> = undefined;
 
-const gcCycleInMs = 1000;
-
 const _undefined = void 0;
 
-const addAndScheduleOnFirst = (
-  set: Nullable<Set<InternalState>>,
-  s: InternalState,
-  f: VoidFunction,
-  waitMs?: number
-): Set<InternalState> => (set ?? (waitMs ? setTimeout(f, waitMs) : queueMicrotask(f), new Set())).add(s);
-
 let curDeps: Nullable<Deps> = undefined;
-const runAndCaptureDeps = (f: AnyFunction, deps: Deps, arg: Node): Node => {
+const runAndCaptureDeps = <E extends Nullable<ValidChildDOMNode>>(f: AnyFunction, deps: Deps, arg: E): E => {
   const prevDeps = curDeps;
   curDeps = deps;
   try {
@@ -35,24 +34,6 @@ const runAndCaptureDeps = (f: AnyFunction, deps: Deps, arg: Node): Node => {
     curDeps = prevDeps;
   }
 };
-
-const keepConnected = <T extends Binding>(l: T[]): T[] => l.filter((b) => b._dom?.isConnected);
-
-let statesToGc: Nullable<Set<InternalState>> = undefined;
-const addStatesToGc = (d: InternalState): Set<InternalState> =>
-  (statesToGc = addAndScheduleOnFirst(
-    statesToGc,
-    d,
-    () => {
-      if (!statesToGc) return;
-
-      for (const s of statesToGc)
-        (s._bindings = keepConnected(s._bindings)), (s._listeners = keepConnected(s._listeners));
-
-      statesToGc = _undefined;
-    },
-    gcCycleInMs
-  ));
 
 export const stateProto: ThisType<InternalState> = {
   get val() {
@@ -66,7 +47,6 @@ export const stateProto: ThisType<InternalState> = {
   },
 
   set val(v) {
-    console.log('v', v);
     curDeps?._setters?.add(this);
     if (v !== this.rawVal) {
       this.rawVal = v;
@@ -86,42 +66,12 @@ export const isFuncProto = (value: unknown): value is AnyFunction => {
 };
 const alwaysConnectedDom = { isConnected: 1 };
 const objProto = protoOf(alwaysConnectedDom);
+
 const isAlwaysConnectedDom = (value: unknown): value is typeof alwaysConnectedDom => {
   return value === objProto;
 };
 
-export function state<S>(): State<S>;
-export function state<S>(initVal: S): State<S>;
-export function state<S>(initVal?: S): State<S | undefined> {
-  const result = {
-    rawVal: initVal,
-    _oldVal: initVal,
-    _bindings: [],
-    _listeners: [],
-  };
-  Reflect.setPrototypeOf(result, stateProto);
-
-  // TODO AR some
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return result as unknown as State<S | undefined>;
-}
-
-// export type Val<T> = State<T> | T;
-
-// export type PropValue = Primitive | ((e: any) => void) | null;
-
-// export type PropValueOrDerived = PropValue | StateView<PropValue> | (() => PropValue);
-
-// export type Props = Record<string, PropValueOrDerived> & { class?: PropValueOrDerived; is?: string };
-
-// export type PropsWithKnownKeys<ElementType> = Partial<{ [K in keyof ElementType]: PropValueOrDerived }>;
-
-export type TagFunc<Result> = (
-  first?: (Props & PropsWithKnownKeys<Result>) | ChildDOM,
-  ...rest: readonly ChildDOM[]
-) => Result;
-
-export const bind = <E extends Nullable<Node>>(f: AnyFunction, dom: E): E => {
+export const bind = <E extends Nullable<Node>>(f: BindingFunc, dom?: E): E => {
   const deps = { _getters: new Set<InternalState>(), _setters: new Set<InternalState>() },
     binding: Binding = { f },
     prevNewDerives = curNewDerives;
@@ -137,7 +87,11 @@ export const bind = <E extends Nullable<Node>>(f: AnyFunction, dom: E): E => {
   return newDom;
 };
 
-export const derive = <T>(f: () => T, s = state<Node>(), dom?: Node): State<T> => {
+const deriveInternal = <E extends Nullable<ValidChildDOMNode>>(
+  f: () => E,
+  s: State<unknown> = state<E>(),
+  dom?: E
+): State<E> => {
   const deps: Deps = { _getters: new Set(), _setters: new Set() };
   const listener: Listener = { f, s };
   listener._dom = dom ?? curNewDerives?.push(listener) ?? alwaysConnectedDom;
@@ -146,30 +100,46 @@ export const derive = <T>(f: () => T, s = state<Node>(), dom?: Node): State<T> =
   return s;
 };
 
+export const derive = <S>(f: () => S): State<S> => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  return deriveInternal(f as () => ValidChildDOMNode) as State<S>;
+};
+
 export const add = <E extends Element | DocumentFragment>(dom: E, ...children: readonly ChildDOM[]): E => {
   // for (const c of children.flat(Infinity)) { // TODO AR why ?
   for (const c of children.flat()) {
-    const protoOfC = protoOf(c ?? 0);
-    const child = isStateProto(protoOfC) ? bind(() => c.val) : isFuncProto(protoOfC) ? bind(c) : c;
-    hasSome(child) && dom.append(child);
+    const child = isState<ValidChildDOMNode>(c) ? bind(() => c.val) : isSomeFunction(c) ? bind(c) : c;
+    hasSome(child) && dom.append(isInstanceOf(Node, child) ? child : String(child));
   }
   return dom;
 };
 
-type CreateFromTagFn = ((ns: string, name: string, ...args: unknown[]) => Element) & {
-  [key: string]: AnyFunction;
-};
+// type CreateFromTagFn = ((ns: string, name: string, ...args: unknown[]) => Element) & {
+//   [key: string]: AnyFunction;
+// };
 
-const tag: CreateFromTagFn = (ns, name, ...args): Element => {
-  const [{ is, ...props }, ...children] = isAlwaysConnectedDom(protoOf(args[0] ?? 0)) ? args : [{}, ...args];
+const tag = (ns: Nullable<string>, tagName: HtmlElementTag, ...args: ChildDOM[]): Element => {
+  const [{ is, ...props }, ...children] = isAlwaysConnectedDom(protoOf(args[0] ?? 0))
+    ? args
+    : [Object.create({}), ...args];
 
-  const dom = ns ? document.createElementNS(ns, name, { is }) : document.createElement(name, { is });
+  const dom: DOMElement<HtmlElementTag> | Element = ns
+    ? document.createElementNS(ns, tagName, { is })
+    : document.createElement<HtmlElementTag>(tagName, { is });
 
-  for (const entry of Object.entries(props)) {
+  const [elementProps, elementChildren] = extractChildrenFromProps(props, children);
+
+  isInstanceOf(HTMLElement, dom) && assignElementRef(props)(dom);
+
+  for (const entry of Object.entries(elementProps)) {
+    if (isElementFactoryOptionProp(entry[0])) {
+      continue;
+    }
+
     updateSetter(dom, ...entry);
   }
 
-  return add(dom, children);
+  return add(dom, elementChildren);
 };
 
 const update = (dom: Element, newDom?: Node): void | false =>
@@ -181,7 +151,7 @@ const updateDoms = (): void => {
   do {
     derivedStates = new Set();
     for (const l of new Set(derivedStatesArray.flatMap((s) => (s._listeners = keepConnected(s._listeners)))))
-      derive(l.f, l.s, l._dom), (l._dom = _undefined);
+      deriveInternal(l.f, l.s, l._dom), (l._dom = _undefined);
   } while (++iter < 100 && (derivedStatesArray = [...derivedStates]).length);
   const changedStatesArray = changedStates ? [...changedStates].filter((s) => s.rawVal !== s._oldVal) : [];
   changedStates = _undefined;
@@ -190,9 +160,19 @@ const updateDoms = (): void => {
   for (const s of changedStatesArray) s._oldVal = s.rawVal;
 };
 
-export const handler = (ns: string): ProxyHandler<typeof tag> => ({ get: (_, name) => tag.bind(null, ns, name) });
+// const handler = (ns?: string): ProxyHandler<Tags> => ({
+//   get: (_, tagName: HtmlElementTag) => tag.bind(null, ns, tagName),
+// });
 
-export const tags: Tags & ((namespaceURI: string) => Readonly<Record<string, TagFunc<Element>>>) = new Proxy(
-  (ns) => new Proxy(tag, handler(ns)),
-  handler()
-);
+type BoundNamespaceTagFn = (...args: readonly ChildDOM[]) => Element;
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+export const tags = new Proxy(
+  (ns: string) =>
+    new Proxy(tag, {
+      get: (_, tagName: HtmlElementTag): BoundNamespaceTagFn => tag.bind(null, ns, tagName),
+    }),
+  {
+    get: (_, tagName: HtmlElementTag): BoundNamespaceTagFn => tag.bind(null, undefined, tagName),
+  }
+) as unknown as Tags & ((namespaceURI: string) => Readonly<Record<string, TagFunc<Element>>>);
