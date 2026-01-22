@@ -46,10 +46,8 @@
     }
   },
   "dependencies": {
-    "tslib": "^2.3.0"
+    "@reely/logger": "*",
+    "@reely/utils": "*"
   },
-  "devDependencies": {
-    "@reely/utils": "*",
-    "@reely/logger": "*"
-  }
+  "devDependencies": {}
 }

@@ -1,4 +1,4 @@
-import type { Nullable, PrimitiveValue } from '@reely/utils';
+import type { Nullable, PrimitiveValue, Ref } from '@reely/utils';
 
 import type { DOMElementAttributes } from './attributes.types';
 import type { DOMElementEvents } from './event.types';
@@ -22,14 +22,8 @@ export type DOMElementFactoryFunction<Tag extends HtmlElementTag> = (
 export type DOMElementFactoryProps<Tag extends HtmlElementTag, Elt extends HTMLElement = DOMElement<Tag>> =
   | DOMElementAttributes<Elt> & DOMElementEvents<Elt> & DOMElementFactoryOptionsProps<Tag>;
 
-export interface DOMElementRefObject<T> {
-  current: T | null;
-}
-export type DOMElementRefCallback<T> = { bivarianceHack(instance: T | null): void }['bivarianceHack'];
-export type DOMElementRef<T> = DOMElementRefCallback<T> | DOMElementRefObject<T> | null;
-
 export type DOMElementFactoryOptionsProps<Tag extends HtmlElementTag> = {
   children?: ChildDOM;
   eventsAbortSignal?: AbortSignal;
-  elementRef?: DOMElementRef<DOMElement<Tag>>;
+  elementRef?: Ref<DOMElement<Tag>>;
 };
