@@ -115,7 +115,7 @@ export default [
     rules: { 'import/max-dependencies': ['error', { max: 60, ignoreTypeImports: true }] },
   },
   {
-    files: ['**/*spec.js', '**/*spec.ts'],
+    files: ['**/*spec.js', '**/*spec.ts', '**/*test.js', '**/*test.ts'],
     // Override or add rules here
     rules: {
       'no-magic-numbers': 'off',
@@ -124,7 +124,7 @@ export default [
       '@typescript-eslint/no-unsafe-assignment': 'off',
       'max-lines-per-function': 'off',
       '@typescript-eslint/no-base-to-string': 'off',
-      'import/no-cycle': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'off',
     },
   },
   {
