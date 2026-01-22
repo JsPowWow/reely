@@ -1,6 +1,6 @@
 import { noop } from '@reely/utils';
 
-import { reelx } from './reelx';
+import { reelx } from '../reelx';
 
 it('should get the fresh state outside an effect', () => {
   const a = reelx(0);

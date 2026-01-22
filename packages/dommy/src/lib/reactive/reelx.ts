@@ -1,24 +1,33 @@
 import { isSomeFunction } from '@reely/utils';
 
+export interface Reelx {
+  <S>(computed: () => S, equal?: (prev: S, next: S) => boolean): ReelxComputed<S>;
+  <S>(initial: S): ReelxValue<S>;
+  <S>(initial?: S): ReelxValue<S>;
+  notify: {
+    (): void;
+    schedule?: null | VoidFunction;
+  };
+}
+
+export interface ReelxValue<S = unknown> {
+  (newState?: S): S;
+  _s: Set<Subscriber>;
+  subscribe(cb: (value: S, prevValue?: S) => void): VoidFunction;
+}
+
+export interface ReelxComputed<S = unknown> {
+  (): S;
+  _s: Set<Subscriber>;
+  subscribe(cb: (state: S, prevState?: S) => void): VoidFunction;
+}
+
 interface Subscriber {
   (): void;
-  _v: Array<StateValue>;
+  _v: Array<ReelxValue>;
 }
 
-export interface StateValue<T = unknown> {
-  (newState?: T): T;
-  _s: Set<Subscriber>;
-  subscribe(cb: (value: T, prevValue?: T) => void): VoidFunction;
-}
-export interface ComputedState<T = unknown> {
-  (): T;
-  _s: Set<Subscriber>;
-  subscribe(cb: (state: T, prevState?: T) => void): VoidFunction;
-}
-
-export type Reelx<T = unknown> = StateValue<T> | ComputedState<T>;
-
-type Dependencies = [] | [Reelx, unknown];
+type Dependencies<T> = [] | [ReelxValue<T> | ReelxComputed<T>, unknown];
 
 /** subscribers from all touched signals */
 let QUEUE: Array<Set<Subscriber>> = [];
@@ -33,30 +42,32 @@ let SUBSCRIBER: null | Subscriber = null;
 let SUBSCRIBER_VERSION = 0;
 
 /** stack-based parent ref to silently link nodes */
-let DEPS: null | Dependencies = null;
+let DEPS: null | Dependencies<unknown> = null;
 
-export const reelx: {
-  <S>(computed: () => S, equal?: (prev: S, next: S) => boolean): ComputedState<S>;
-  <S>(initState: S): StateValue<S>;
-  notify: {
-    (): void;
-    schedule?: null | VoidFunction;
-  };
-} = <T>(init: (() => T) | T, equal?: (prev: T, next: T) => boolean) => {
+export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) => boolean) => {
   let queueVersion = -1;
   let subscriberVersion = -1;
   let stateVal: T;
-  let theReelx: StateValue<T> & ComputedState<T>;
+  let theReelx: ReelxValue<T> & ReelxComputed<T>;
 
   if (isSomeFunction(init)) {
-    const deps: Dependencies = [];
+    const deps: Dependencies<T> = [];
     // @ts-expect-error expected properties declared below
-    theReelx = (): unknown => {
+    theReelx = (): T => {
       if (subscriberVersion !== SUBSCRIBER_VERSION) {
         if (queueVersion === QUEUE_VERSION && SUBSCRIBER !== null && theReelx._s.size !== 0) {
-          for (const s of theReelx._s) {
-            for (const { _s } of s._v) if (_s.size !== _s.add(SUBSCRIBER).size) SUBSCRIBER._v.push(theReelx);
-            break;
+          // for (const s of theReelx._s) {
+          //   for (const { _s } of s._v) if (_s.size !== _s.add(SUBSCRIBER).size) SUBSCRIBER._v.push(theReelx);
+          //   break;
+          // }
+          const [firstS] = theReelx._s ?? [];
+
+          if (firstS) {
+            for (const { _s } of firstS._v) {
+              if (_s.size !== _s.add(SUBSCRIBER).size) {
+                SUBSCRIBER._v.push(theReelx);
+              }
+            }
           }
         } else {
           const prevDeps = DEPS;
@@ -99,7 +110,7 @@ export const reelx: {
   } else {
     stateVal = init;
     // @ts-expect-error expected properties declared below
-    theReelx = (newState: T): unknown => {
+    theReelx = (newState: T): T => {
       if (newState !== undefined && !Object.is(newState, stateVal)) {
         // mark all computed(s) dirty
         ++SUBSCRIBER_VERSION;
@@ -127,8 +138,7 @@ export const reelx: {
 
   theReelx.subscribe = (cb) => {
     let queueVersion = -1;
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    let lastState: T = {} as T;
+    let lastState: unknown;
     let prevState: T | undefined;
 
     const subscriber: Subscriber = () => {
