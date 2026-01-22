@@ -15,32 +15,27 @@ export class NxNaiveComponent extends HTMLElement {
   private root: HTMLElement = div({ className: 'wrapper' });
 
   public render(): void {
-    const pageContent = div({ className: 'container' }, [
+    const pageContent = div(
+      { className: 'container' },
       EditableList(),
       ConditionalBinding(),
       DoubleCounter({ initialValue: 4 }),
       ReactiveCounter({ initialValue: 10 }),
       Counter({ initialValue: 20 }),
       Counter({ initialValue: 20 }),
-      // div(() => 'OOOOOOOO'), // TODO AR
-      div({
-        id: 'welcome',
-        children: h1({
-          children: [span({ children: ' Hello there, ' }), 'Welcome Free - DOM 👋'],
-        }),
-      }),
+      //
+      div({ id: 'welcome' }, h1(span(' Hello there, '), 'Welcome Free - DOM 👋')),
       div({ id: 'hero', className: 'rounded' }, [
-        div({ className: 'text-container' }, [
-          h2({
-            children: [img({ className: 'tick', src: 'assets/tick.svg' }), span({ children: 'You"re up and running' })],
-          }),
-          a({ href: '#commands' }, " What's next? "),
-        ]),
+        div(
+          { className: 'text-container' },
+          h2(img({ className: 'tick', src: 'assets/tick.svg' }), span('You"re up and running')),
+          a({ href: '#commands' }, " What's next? ")
+        ),
         div({ className: 'logo-container' }, [img({ className: 'logo', src: 'assets/logo1.svg' })]),
       ]),
       div({ id: 'middle-content' }, [
         div({ id: 'learning-materials', className: 'rounded shadow' }, [
-          h2({ children: 'Learning materials' }),
+          h2('Learning materials'),
           a({
             href: 'https://nx.dev/getting-started/intro?utm_source=nx-project',
             target: '_blank',
@@ -213,8 +208,8 @@ export class NxNaiveComponent extends HTMLElement {
           ],
         }),
       ]),
-      p({ id: 'love' }, ['Carefully crafted with', img({ src: 'assets/love.svg' })]),
-    ]);
+      p({ id: 'love' }, ['Carefully crafted with', img({ src: 'assets/love.svg' })])
+    );
 
     pipe(pageContent, appendTo(this.root));
 

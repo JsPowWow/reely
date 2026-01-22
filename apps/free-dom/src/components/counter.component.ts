@@ -1,4 +1,4 @@
-import { button, createElementRef, div, replaceChildrenOf, dommy } from '@reely/dommy';
+import { button, createElementRef, div, replaceChildrenOf, dommy, span } from '@reely/dommy';
 import { scopedLogger } from '@reely/logger';
 import { pipe } from '@reely/utils';
 
@@ -11,20 +11,25 @@ export function Counter(props?: CounterProps): HTMLDivElement {
   const ref = createElementRef<HTMLDivElement>();
 
   dommy.derive(() => {
-    console.log('counter.val: ', counter.val);
+    scopedLogger().log('counter.val: ', counter.val);
   });
 
   return div(
-    div({
-      id: 'counter',
-      elementRef: ref,
-      children: counter.val,
-      styles: { width: '30px', height: '30px', display: 'inline-block' },
-    }),
+    div(
+      {
+        id: 'counter',
+        elementRef: ref,
+        styles: { width: '30px', height: '30px', display: 'inline-block' },
+      },
+      () => counter.val
+      // () => div(counter.val) TODO AR error ?
+    ),
     ' ',
     button(
       {
         click: () => {
+          // ++counter.val;
+          scopedLogger().log('click !', ref.current);
           ref.current && pipe(++counter.val, replaceChildrenOf(ref.current));
         },
       },
@@ -32,9 +37,10 @@ export function Counter(props?: CounterProps): HTMLDivElement {
     ),
     button(
       {
-        click: () => {
+        onclick: () => {
+          --counter.val;
           scopedLogger().log('decrement counter by 1');
-          ref.current && pipe(--counter.val, replaceChildrenOf(ref.current));
+          //ref.current && pipe(--counter.val, replaceChildrenOf(ref.current));
         },
       },
       '👎'

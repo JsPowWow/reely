@@ -3,6 +3,9 @@
   "compilerOptions": {
     "outDir": "./out-tsc/vitest",
     "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "vitest"],
+    "moduleResolution": "node",
+    "module": "esnext",
+    "lib": ["es2021", "dom"],
     "forceConsistentCasingInFileNames": true
   },
   "include": [

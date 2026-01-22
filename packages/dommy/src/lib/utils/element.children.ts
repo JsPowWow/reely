@@ -1,7 +1,7 @@
-import type { Nil, PipeableFunction } from '@reely/utils';
-import { isBigInt, isBoolean, isNumber, isString, isInstanceOf, isNil } from '@reely/utils';
+import type { Nil, PipeableFunction, Nullable } from '@reely/utils';
+import { isBigInt, isBoolean, isNumber, isNonEmpty, isString, isInstanceOf, isNil, Maybe } from '@reely/utils';
 
-import type { ValidChildDOMNode } from '../types/dommy.types';
+import type { ChildDOM, DOMElementFactoryProps, HtmlElementTag, ValidChildDOMNode } from '../types/dommy.types';
 
 export const isFalsyElement = (element: unknown): element is Nil | false => isNil(element) || element === false;
 
@@ -58,3 +58,17 @@ export const replaceChildrenOf =
     parent.replaceChildren(...newChildren);
     return parent;
   };
+
+export const extractChildrenFromProps = (
+  props: Nullable<DOMElementFactoryProps<HtmlElementTag>>,
+  children: ChildDOM[]
+): [props: DOMElementFactoryProps<HtmlElementTag>, ChildDOM[]] => {
+  const elementChildren = children.flat();
+  const childrenToAdd = isNonEmpty(elementChildren)
+    ? elementChildren
+    : Maybe.from(props)
+        .map(({ children }) => (Array.isArray(children) ? children : [children]))
+        .getOrDefault([]);
+  const { children: _ignored, ...restProps } = props ?? {};
+  return [restProps, childrenToAdd];
+};
