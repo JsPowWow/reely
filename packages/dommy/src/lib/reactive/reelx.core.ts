@@ -14,6 +14,14 @@ interface Subscriber {
 /** node dependencies list */
 type Dependencies<T> = { computation: RlxState<T> | RlxDerivedState<T>; value: T }[];
 
+type RlxSelfInstance<T> = WithSubscribers<
+  RlxState<T> &
+    RlxDerivedState<T> & {
+      toString(): string;
+      toJSON(): T;
+    }
+>;
+
 /** subscribers from all touched signals */
 let QUEUE: Array<Set<Subscriber>> = [];
 
@@ -33,7 +41,7 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
   let queueVersion = -1;
   let subscriberVersion = -1;
   let state: T;
-  let rlxSelf: WithSubscribers<RlxState<T> & RlxDerivedState<T>>;
+  let rlxSelf: RlxSelfInstance<T>;
 
   if (isSomeFunction(init)) {
     const deps: Dependencies<T> = [];
@@ -152,6 +160,10 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
   };
 
   rlxSelf._subscribers = new Set();
+  rlxSelf.toString = (): string => state + '';
+  // @ts-expect-error state as object
+  rlxSelf.valueOf = (): object => state;
+  rlxSelf.toJSON = (): T => state;
 
   return rlxSelf;
 };

@@ -14,5 +14,13 @@ export default defineConfig(() => ({
       reportsDirectory: './test-output/vitest/coverage',
       provider: 'v8' as const,
     },
+    env: {
+      NODE_OPTIONS: '--expose-gc',
+    },
+    // poolOptions: {
+    //   forks: {
+    //     execArgv: ['--expose-gc'],
+    //   },
+    // },
   },
 }));
