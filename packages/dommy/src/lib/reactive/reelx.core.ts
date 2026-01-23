@@ -1,19 +1,18 @@
 import type { Nullable } from '@reely/utils';
 import { hasProperty, hasSome, isSomeFunction } from '@reely/utils';
 
-import type { Reelx, RlxDerived, RlxValue } from './reelx.types';
+import type { Reelx, RlxDerivedState, RlxState } from './reelx.types';
 
-type WithSubscribers<T> = {
-  _subscribers: Set<Subscriber>;
-} & T;
+type WithSubscribers<T> = T & { _subscribers: Set<Subscriber> };
 
+/** value subscriber */
 interface Subscriber {
   (): void;
-  _values: Array<WithSubscribers<RlxValue<unknown>>>;
+  _values: Array<WithSubscribers<RlxState<unknown>>>;
 }
 
 /** node dependencies list */
-type Dependencies<T> = { c: RlxValue<T> | RlxDerived<T>; v: T }[];
+type Dependencies<T> = { computation: RlxState<T> | RlxDerivedState<T>; value: T }[];
 
 /** subscribers from all touched signals */
 let QUEUE: Array<Set<Subscriber>> = [];
@@ -30,25 +29,24 @@ let SUBSCRIBER_VERSION = 0;
 /** stack-based parent ref to silently link nodes */
 let DEPS: null | Dependencies<unknown> = null;
 
-const emptyArray = Object.freeze([]);
-
-export const reelxCore: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) => boolean) => {
+export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) => boolean) => {
   let queueVersion = -1;
   let subscriberVersion = -1;
-  let stateVal: T;
-  let reelxInstance: WithSubscribers<RlxValue<T> & RlxDerived<T>>;
+  let state: T;
+  let rlxSelf: WithSubscribers<RlxState<T> & RlxDerivedState<T>>;
 
   if (isSomeFunction(init)) {
     const deps: Dependencies<T> = [];
     // @ts-expect-error expected properties assigned below
-    reelxInstance = (): T => {
+    rlxSelf = (): T => {
       if (subscriberVersion !== SUBSCRIBER_VERSION) {
-        if (queueVersion === QUEUE_VERSION && SUBSCRIBER !== null && reelxInstance._subscribers.size !== 0) {
-          const [firstS] = reelxInstance._subscribers ?? emptyArray;
+        if (queueVersion === QUEUE_VERSION && SUBSCRIBER !== null && rlxSelf._subscribers.size !== 0) {
+          const [firstS] = rlxSelf._subscribers ?? [];
+          // console.log(new Set([1, 2, 3]).values().next().value);
           if (firstS) {
             for (const { _subscribers } of firstS._values) {
               if (_subscribers.size !== _subscribers.add(SUBSCRIBER).size) {
-                SUBSCRIBER._values.push(reelxInstance);
+                SUBSCRIBER._values.push(rlxSelf);
               }
             }
           }
@@ -58,10 +56,9 @@ export const reelxCore: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next:
 
           try {
             let isActual = deps.length > 0;
-            for (let i = 0; isActual && i < deps.length; i += 2) {
-              isActual = Object.is(deps[i + 1]?.v, deps[i]?.c());
+            for (let i = 0; isActual && i < deps.length; i++) {
+              isActual = Object.is(deps[i]?.value, deps[i]?.computation());
             }
-
             if (!isActual) {
               (DEPS = deps).length = 0;
 
@@ -70,10 +67,10 @@ export const reelxCore: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next:
               if (
                 equal === undefined ||
                 // first call
-                stateVal === undefined ||
-                !equal(stateVal, newState)
+                state === undefined ||
+                !equal(state, newState)
               ) {
-                stateVal = newState;
+                state = newState;
               }
             }
           } finally {
@@ -84,39 +81,39 @@ export const reelxCore: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next:
         subscriberVersion = SUBSCRIBER_VERSION;
       }
 
-      DEPS?.push({ c: reelxInstance, v: stateVal });
+      DEPS?.push({ computation: rlxSelf, value: state });
 
-      return stateVal;
+      return state;
     };
   } else {
-    stateVal = init;
+    state = init;
     // @ts-expect-error expected properties assigned below
-    reelxInstance = (newState: T): T => {
-      if (newState !== undefined && !Object.is(newState, stateVal)) {
+    rlxSelf = (newState: T): T => {
+      if (newState !== undefined && !Object.is(newState, state)) {
         // mark all computed(s) dirty
         ++SUBSCRIBER_VERSION;
 
-        stateVal = newState;
+        state = newState;
 
-        if (QUEUE.push(reelxInstance._subscribers) === 1) {
+        if (QUEUE.push(rlxSelf._subscribers) === 1) {
           QUEUE_VERSION++;
-          reelxCore.notify.schedule?.();
+          reelx.schedule?.();
         }
 
-        reelxInstance._subscribers = new Set();
+        rlxSelf._subscribers = new Set();
       }
 
-      if (SUBSCRIBER !== null && reelxInstance._subscribers.size !== reelxInstance._subscribers.add(SUBSCRIBER).size) {
-        SUBSCRIBER._values.push(reelxInstance);
+      if (SUBSCRIBER !== null && rlxSelf._subscribers.size !== rlxSelf._subscribers.add(SUBSCRIBER).size) {
+        SUBSCRIBER._values.push(rlxSelf);
       }
 
-      DEPS?.push({ c: reelxInstance, v: stateVal });
+      DEPS?.push({ computation: rlxSelf, value: state });
 
-      return stateVal;
+      return state;
     };
   }
 
-  reelxInstance.subscribe = (cb) => {
+  rlxSelf.subscribe = (cb) => {
     let queueVersion = -1;
     let lastState: unknown;
     let prevState: T | undefined;
@@ -132,9 +129,9 @@ export const reelxCore: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next:
 
           SUBSCRIBER_VERSION++;
 
-          if (reelxInstance() !== lastState) {
-            cb((lastState = stateVal), prevState);
-            prevState = stateVal;
+          if (rlxSelf() !== lastState) {
+            cb((lastState = state), prevState);
+            prevState = state;
           }
         } finally {
           SUBSCRIBER = null;
@@ -144,22 +141,22 @@ export const reelxCore: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next:
     subscriber._values = [];
 
     subscriber();
-    reelxInstance._subscribers.add(subscriber);
+    rlxSelf._subscribers.add(subscriber);
 
     return (): void => {
-      reelxInstance._subscribers.delete(subscriber);
-      if (reelxInstance._subscribers.size === 0) {
+      rlxSelf._subscribers.delete(subscriber);
+      if (rlxSelf._subscribers.size === 0) {
         for (const { _subscribers } of subscriber._values) _subscribers.delete(subscriber);
       }
     };
   };
 
-  reelxInstance._subscribers = new Set();
+  rlxSelf._subscribers = new Set();
 
-  return reelxInstance;
+  return rlxSelf;
 };
 
-export function reelxDebug<S>(rlx: RlxValue<S> | RlxDerived<S>): {
+export function reelxDebug<S>(rlx: RlxState<S> | RlxDerivedState<S>): {
   subs: () => Nullable<Set<Subscriber>>;
 } {
   return {
@@ -170,7 +167,7 @@ export function reelxDebug<S>(rlx: RlxValue<S> | RlxDerived<S>): {
   };
 }
 
-reelxCore.notify = (): void => {
+reelx.flushSync = (): void => {
   const iterator = QUEUE;
 
   QUEUE = [];
@@ -180,4 +177,4 @@ reelxCore.notify = (): void => {
   }
 };
 
-reelxCore.notify.schedule = (): Promise<void> => Promise.resolve().then(reelxCore.notify);
+reelx.schedule = (): Promise<void> => Promise.resolve().then(reelx.flushSync);

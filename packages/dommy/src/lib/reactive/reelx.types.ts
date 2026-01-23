@@ -1,19 +1,19 @@
 export interface Reelx {
-  <S>(computed: () => S, equal?: (prev: S, next: S) => boolean): RlxDerived<S>;
-  <S>(initial: S): RlxValue<S>;
-  <S>(initial?: S): RlxValue<S>;
-  notify: {
-    (): void;
-    schedule?: null | VoidFunction;
-  };
+  <S>(computed: () => S, equal?: (prev: S, next: S) => boolean): RlxDerivedState<S>;
+  <S>(initial: S): RlxState<S>;
+  <S>(initial?: S): RlxState<S>;
+  flushSync: VoidFunction;
+  schedule?: null | VoidFunction;
 }
 
-export interface RlxValue<S> {
-  (newState?: S): S;
+export interface RlxSubscribe<S> {
   subscribe(cb: (value: S, prevValue?: S) => void): VoidFunction;
 }
 
-export interface RlxDerived<S> {
+export interface RlxState<S> extends RlxSubscribe<S> {
+  (newState?: S): S;
+}
+
+export interface RlxDerivedState<S> extends RlxSubscribe<S> {
   (): S;
-  subscribe(cb: (state: S, prevState?: S) => void): VoidFunction;
 }
