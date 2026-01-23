@@ -58,3 +58,4 @@ export {
   type ReferenceCallback,
   type Ref,
 } from './lib/objects/createObjectReference';
+export { setPrototype } from './lib/objects/setPrototype';

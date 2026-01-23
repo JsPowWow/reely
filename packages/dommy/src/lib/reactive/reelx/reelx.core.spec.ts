@@ -1,6 +1,6 @@
 import { noop } from '@reely/utils';
 
-import { reelx, reelxDebug } from '../reelx.core';
+import { reelx, reelxDebug } from './reelx.core';
 
 describe('reelx tests', () => {
   test('should handle basics dependencies', () => {

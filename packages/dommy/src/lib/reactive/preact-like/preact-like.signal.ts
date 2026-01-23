@@ -1,6 +1,8 @@
-import { reelx } from './reelx.core';
+import { setPrototype } from '@reely/utils';
 
-import type { Reelx, RlxDerivedState, RlxState, RlxSubscribe } from './reelx.types';
+import { reelx } from '../reelx/reelx.core';
+
+import type { Reelx, RlxDerivedState, RlxState, RlxSubscribe } from '../reelx/reelx.types';
 
 export interface Signal<T> extends RlxSubscribe<T> {
   (initial: T): RlxState<T>;
@@ -15,20 +17,14 @@ export interface Computed<T> extends RlxSubscribe<T> {
 }
 
 export function signal<T>(init: T): Signal<T> {
-  const s = reelx(init);
-  Reflect.setPrototypeOf(s, signalProto);
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return s as unknown as Signal<T>;
+  return setPrototype<Signal<T>>(signalProto, reelx(init));
 }
 
 export function computed<T>(fn: () => T): Computed<T> {
-  const s = reelx(fn);
-  Reflect.setPrototypeOf(s, computedProto);
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return s as unknown as Computed<T>;
+  return setPrototype<Computed<T>>(computedProto, reelx(fn));
 }
 
-const signalProto: ThisType<Reelx> = {
+const signalProto: ThisType<RlxState<unknown>> = {
   get value() {
     return this();
   },

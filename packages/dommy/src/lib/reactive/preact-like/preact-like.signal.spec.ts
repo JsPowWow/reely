@@ -1,9 +1,5 @@
-import { reelx } from '../reelx.core';
-import { computed, signal } from '../reelx.preact.signal';
-
-import type { Signal } from '../reelx.preact.signal';
-
-// import type { ReadonlySignal} from "../reelx.core";
+import { computed, signal, type Signal } from './preact-like.signal';
+import { reelx } from '../reelx/reelx.core';
 
 describe('signal', () => {
   it('should return value', () => {
@@ -122,7 +118,7 @@ describe('signal', () => {
         a.subscribe(spy);
         expect(spy).toHaveBeenNthCalledWith(1, 1, undefined);
         a.value = 2;
-        reelx.flushSync();
+        reelx.flushSync(); // // TODO different behavior, need .flushSync();
         expect(spy).toHaveBeenNthCalledWith(2, 2, 1);
       });
 
@@ -1249,7 +1245,7 @@ describe('computed', () => {
     a.value = 1;
     expect(c.value).to.be.undefined;
     // expect(spy).toHaveBeenCalledOnce();
-    expect(spy).toHaveBeenCalledTimes(2); // TODO different behavior
+    expect(spy).toHaveBeenCalledTimes(2); // TODO different behavior, 2 vs 1
   });
   //
   it('should not leak errors raised by dependencies', () => {
