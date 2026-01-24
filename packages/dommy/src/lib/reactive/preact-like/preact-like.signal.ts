@@ -9,11 +9,13 @@ export interface Signal<T> extends RlxSubscribe<T> {
   (initial?: T): RlxState<T>;
   get value(): T;
   set value(value: T);
+  // peek(): T;
 }
 
 export interface Computed<T> extends RlxSubscribe<T> {
   (fn: () => T, equal?: (prev: T, next: T) => boolean): RlxDerivedState<T>;
   get value(): T;
+  // peek(): T;
 }
 
 export function signal<T>(init: T): Signal<T> {
@@ -22,6 +24,31 @@ export function signal<T>(init: T): Signal<T> {
 
 export function computed<T>(fn: () => T): Computed<T> {
   return setPrototype<Computed<T>>(computedProto, reelx(fn));
+}
+
+export function effect(fn: VoidFunction): VoidFunction {
+  const context: { dispose?: VoidFunction } = {};
+  // let cleanup: VoidFunction | undefined;
+
+  const effectFn = fn.bind(context);
+  // let effectFn = function (): ReturnType<typeof fn> {
+  //   if (isSomeFunction(cleanup)) {
+  //     cleanup();
+  //   }
+  //   const result = fn();
+  //   if (isSomeFunction(result)) {
+  //     cleanup = result;
+  //   }
+  //   return result;
+  // };
+  // effectFn = effectFn.bind(context);
+
+  const s = computed<void>(() => {
+    effectFn();
+  });
+  const dispose = s.subscribe(effectFn);
+  context.dispose = dispose;
+  return dispose;
 }
 
 const signalProto: ThisType<RlxState<unknown>> = {

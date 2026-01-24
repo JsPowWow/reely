@@ -12,8 +12,10 @@ export interface RlxSubscribe<S> {
 
 export interface RlxState<S> extends RlxSubscribe<S> {
   (newState?: S): S;
+  // peek(): S;
 }
 
 export interface RlxDerivedState<S> extends RlxSubscribe<S> {
   (): S;
+  // peek(): S;
 }

@@ -164,6 +164,9 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
   // @ts-expect-error state as object
   rlxSelf.valueOf = (): object => state;
   rlxSelf.toJSON = (): T => state;
+  // rlxSelf.peek = (): T => {
+  //   throw new Error('Mot implemented');
+  // };
 
   return rlxSelf;
 };
@@ -190,3 +193,4 @@ reelx.flushSync = (): void => {
 };
 
 reelx.schedule = (): Promise<void> => Promise.resolve().then(reelx.flushSync);
+// schedule = () => requestAnimationFrame(reelx.flushSync)
