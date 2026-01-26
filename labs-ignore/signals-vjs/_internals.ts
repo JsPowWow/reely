@@ -106,7 +106,7 @@ export const derive = <S>(f: () => S): State<S> => {
 };
 
 export const add = <E extends Element | DocumentFragment>(dom: E, ...children: readonly ChildDOM[]): E => {
-  // for (const c of children.flat(Infinity)) { // TODO AR why ?
+  // for (const c of children.flat(Infinity)) { // TODO AR why ? flatChildren
   for (const c of children.flat()) {
     const child = isState<ValidChildDOMNode>(c) ? bind(() => c.val) : isSomeFunction(c) ? bind(c) : c;
     hasSome(child) && dom.append(isInstanceOf(Node, child) ? child : String(child));
