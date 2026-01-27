@@ -71,8 +71,8 @@ export const assignProperties =
         case isElementFactoryOptionProp(property): {
           break;
         }
-        case isEventListenerHandler(value): {
-          addEventListenerHandler(element, property, value, restProps.eventsAbortSignal);
+        case isEventListenerHandler(property, value): {
+          addEventListenerHandler(element, property.slice(2), value, restProps.eventsAbortSignal);
           break;
         }
         case isBooleanAttribute(property): {

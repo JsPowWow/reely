@@ -5,9 +5,10 @@ export { addListener, addListeners } from './lib/utils/element.addListeners';
 export { appendTo, appendChildren, replaceChildrenOf } from './lib/utils/element.children';
 
 export * from './lib/types/dommy.types';
+export * from './lib/types/event.types';
 export { dommy } from './lib/tags';
 export { jsx } from './lib/jsx-runtime';
-export * from './lib/tag.predefined.functions';
+export * from './lib/tags.predefined';
 export { setAttribute, removeAttribute, isSafeAttributeEntry } from './lib/utils/attributes/element.attributes';
 export { setStyleAttributes, hasStylesAttribute } from './lib/utils/attributes/element.style.attributes';
 

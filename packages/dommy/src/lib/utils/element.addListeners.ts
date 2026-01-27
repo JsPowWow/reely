@@ -5,32 +5,34 @@ import type {
   DOMElementEventHandler,
   DOMElementEventHandlerDescriptor,
   DOMElementEventHandlerProp,
+  DOMElementEventType,
 } from '../types/event.types';
 
-type ValidEventListenerDescriptor<Evt extends Event, Elt extends HTMLElement> = Omit<
+type ValidEventListenerDescriptor<Evt extends DOMElementEventType, Elt extends HTMLElement> = Omit<
   WithRequiredNonNullable<DOMElementEventHandlerDescriptor<Evt, Elt>, 'handleEvent'>,
   'handleEvent'
 > & {
   handleEvent: EventListener;
 };
 
-export function isEventListenerHandler<Evt extends Event, Elt extends HTMLElement>(
+export function isEventListenerHandler<Evt extends DOMElementEventType, Elt extends HTMLElement>(
+  maybeEventType: string,
   maybeListener: unknown
 ): maybeListener is DOMElementEventHandlerProp<Evt, Elt> {
   if (Array.isArray(maybeListener)) {
-    return maybeListener.every(isEventListenerHandler);
+    return maybeListener.every((listener) => isEventListenerHandler(maybeEventType, listener));
   }
-  return isSomeFunction(maybeListener) || isEventListenerDescriptor(maybeListener);
+  return maybeEventType.startsWith('on') && (isSomeFunction(maybeListener) || isEventListenerDescriptor(maybeListener));
 }
 
-export function addListener<Evt extends Event, Elt extends HTMLElement>(
+export function addListener<Evt extends DOMElementEventType, Elt extends HTMLElement>(
   handleEvent: DOMElementEventHandler<Evt, Elt>,
   options?: AddEventListenerOptions
 ): DOMElementEventHandlerDescriptor<Evt, Elt>[] {
   return [{ handleEvent, ...options }];
 }
 
-export function addListeners<Evt extends Event, Elt extends HTMLElement>(
+export function addListeners<Evt extends DOMElementEventType, Elt extends HTMLElement>(
   ...args: (
     | [DOMElementEventHandler<Evt, Elt>, AddEventListenerOptions]
     | [DOMElementEventHandler<Evt, Elt>]
@@ -51,21 +53,7 @@ export function addListeners<Evt extends Event, Elt extends HTMLElement>(
   );
 }
 
-function isEventListenerDescriptor<Evt extends Event, Elt extends HTMLElement>(
-  maybeDescriptor: unknown
-): maybeDescriptor is ValidEventListenerDescriptor<Evt, Elt> {
-  return (
-    hasSome(maybeDescriptor) &&
-    hasProperty('handleEvent', maybeDescriptor) &&
-    isSomeFunction(maybeDescriptor.handleEvent)
-  );
-}
-
-// function isEventListenerOrEventListenerObject(value: unknown): value is EventListenerOrEventListenerObject {
-//   return isSomeFunction(value) || (hasProperty('handleEvent', value) && isSomeFunction(value.handleEvent));
-// }
-
-export function addEventListenerHandler<Evt extends Event, Elt extends HTMLElement>(
+export function addEventListenerHandler<Evt extends DOMElementEventType, Elt extends HTMLElement>(
   element: Elt,
   eventType: string,
   eventHandler: DOMElementEventHandlerProp<Evt, Elt>,
@@ -97,4 +85,14 @@ export function addEventListenerHandler<Evt extends Event, Elt extends HTMLEleme
   }
 
   return false;
+}
+
+function isEventListenerDescriptor<Evt extends DOMElementEventType, Elt extends HTMLElement>(
+  maybeDescriptor: unknown
+): maybeDescriptor is ValidEventListenerDescriptor<Evt, Elt> {
+  return (
+    hasSome(maybeDescriptor) &&
+    hasProperty('handleEvent', maybeDescriptor) &&
+    isSomeFunction(maybeDescriptor.handleEvent)
+  );
 }
