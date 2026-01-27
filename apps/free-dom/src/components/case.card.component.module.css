@@ -1,0 +1,18 @@
+.case-view-container {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 1px solid #ccc;
+}
+
+.case-view-container h1 {
+    margin-right: auto;
+}
+
+.case-view-container .case-content {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 5px;
+}

@@ -1,5 +1,8 @@
 /// <reference types='vitest' />
 import { defineConfig } from 'vite';
+import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
@@ -12,7 +15,11 @@ export default defineConfig(() => ({
     port: 4300,
     host: 'localhost',
   },
-  plugins: [],
+  plugins: [
+    nxViteTsPaths(),
+    nxCopyAssetsPlugin(['*.md', 'netlify.toml', '*.svg']),
+    viteStaticCopy({ targets: [{ src: 'src/assets/*', dest: 'assets' }] }),
+  ],
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [],
@@ -25,6 +32,11 @@ export default defineConfig(() => ({
       transformMixedEsModules: true,
     },
   },
+  css: {
+    modules: {
+      localsConvention: 'camelCase',
+    },
+  } as const,
   test: {
     name: 'free-dom',
     watch: false,
@@ -36,5 +48,12 @@ export default defineConfig(() => ({
       reportsDirectory: './test-output/vitest/coverage',
       provider: 'v8' as const,
     },
+  },
+  esbuild: {
+    jsx: 'transform' as const,
+    jsxDev: false,
+    jsxImportSource: '@reely/dommy',
+    jsxInject: `import { jsx } from '@reely/dommy'`,
+    jsxFactory: 'jsx',
   },
 }));

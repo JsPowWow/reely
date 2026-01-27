@@ -1,13 +1,6 @@
 import './nx.naive.css';
-import { a, appendTo, defineDommyConfig, details, div, h1, h2, img, p, pre, span, summary } from '@reely/dommy';
-import { scopedLogger } from '@reely/logger';
+import { a, appendTo, details, div, h1, h2, img, p, pre, span, summary } from '@reely/dommy';
 import { pipe } from '@reely/utils';
-
-import { ConditionalBinding } from '../components/Conditional.reactive.component';
-import { Counter } from '../components/counter.component';
-import { ReactiveCounter } from '../components/counter.reactive.component';
-import { DoubleCounter } from '../components/doubleCounter.component';
-import { EditableList } from '../components/EditableList.reactive.component';
 
 export class NxNaiveComponent extends HTMLElement {
   public static observedAttributes = [];
@@ -17,13 +10,6 @@ export class NxNaiveComponent extends HTMLElement {
   public render(): void {
     const pageContent = div(
       { className: 'container' },
-      EditableList(),
-      ConditionalBinding(),
-      DoubleCounter({ initialValue: 4 }),
-      ReactiveCounter({ initialValue: 10 }),
-      Counter({ initialValue: 20 }),
-      Counter({ initialValue: 20 }),
-      //
       div({ id: 'welcome' }, h1(span(' Hello there, '), 'Welcome Free - DOM 👋')),
       div({ id: 'hero', className: 'rounded' }, [
         div(
@@ -221,9 +207,5 @@ export class NxNaiveComponent extends HTMLElement {
     this.render();
   }
 }
-
 customElements.define('free-dom-root', NxNaiveComponent);
-defineDommyConfig({
-  debug: true,
-  logger: scopedLogger('dommy'),
-});
+document.body.appendChild(document.createElement('free-dom-root'));
