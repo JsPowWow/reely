@@ -36,5 +36,5 @@ export type TernaryFunction<A = unknown, B = unknown, C = unknown, R = unknown> 
 export type PromiseResolve<Result> = (value: PromiseLike<Result> | Result) => void;
 export type PromiseReject<Reason> = (reason: Reason) => void;
 
-export type MapFunction<From, To> = (v: From) => To;
-export type PipeableFunction<Input, Output = Input> = (v: Input) => Output;
+export type MapFn<From, To> = (v: From) => To;
+export type PipeableFn<Input, Output = Input> = (v: Input) => Output;

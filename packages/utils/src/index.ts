@@ -16,6 +16,9 @@ export { default as maybePropertyRecordOf } from './lib/fp/maybe/maybePropertyRe
 export { Maybe } from './lib/fp/maybe/Maybe';
 export { from, some, none } from './lib/fp/maybe/Maybe';
 
+export { mapNullable } from './lib/nullable/mapNullable';
+export { withDefault } from './lib/nullable/withDefault';
+
 export { pipe } from './lib/fp/pipe';
 export { default as flow } from './lib/fp/flow';
 export { default as flowRight } from './lib/fp/flowRight';
