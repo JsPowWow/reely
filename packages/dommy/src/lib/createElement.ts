@@ -1,28 +1,22 @@
 import type { Nullable } from '@reely/utils';
-import { isNonEmpty, Maybe, pipe } from '@reely/utils';
+import { pipe } from '@reely/utils';
 
-import { assignElementRef, assignProperties } from './helpers/element.assign.properties';
-import { appendChildren } from './utils/element.children';
+import { appendChildren, normalizeChildrenProps } from './utils/element.children';
+import { assignElementRef, assignProperties } from './utils/element.properties';
 
-import type { ChildDOM, DOMElement, DOMElementFactoryProps, HtmlElementTag } from './types/dommy.types';
+import type { ChildDOMElement, DOMElement, DOMElementFactoryProps, HtmlElementTag } from './types/dommy.types';
 
 export const createElement = <Tag extends HtmlElementTag>(
   tag: Tag,
   props?: Nullable<DOMElementFactoryProps<Tag>>,
-  ...children: ChildDOM[]
+  ...children: ChildDOMElement[]
 ): DOMElement<Tag> => {
-  const elementChildren = children.flat();
+  const [elementProps, elementChildren] = normalizeChildrenProps(props, children);
 
   return pipe(
     document.createElement(tag),
-    assignElementRef(props),
-    assignProperties(props),
-    appendChildren(
-      isNonEmpty(elementChildren)
-        ? elementChildren
-        : Maybe.from(props)
-            .map(({ children }) => (Array.isArray(children) ? children : [children]))
-            .getOrDefault([])
-    )
+    assignElementRef(elementProps), // TODO AR expose ref on last phase ?
+    assignProperties(elementProps),
+    appendChildren(elementChildren)
   );
 };

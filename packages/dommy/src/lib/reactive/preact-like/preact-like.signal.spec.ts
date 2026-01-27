@@ -61,7 +61,7 @@ describe('signal', () => {
     expect(spy3).not.toHaveBeenCalledTimes(2); // TODO AR, originally called
   });
 
-  describe('.peek()', () => {
+  describe.skip('.peek()', () => {
     // it('should get value', () => {
     //   const s = signal(1);
     //   expect(s.peek()).equal(1);

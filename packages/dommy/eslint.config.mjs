@@ -21,6 +21,12 @@ export default [
     },
   },
   {
+    files: ['**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-namespace': 'off',
+    },
+  },
+  {
     ignores: ['**/out-tsc'],
   },
 ];

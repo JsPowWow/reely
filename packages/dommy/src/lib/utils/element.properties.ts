@@ -1,14 +1,14 @@
-import type { Nullable, PipeableFunction } from '@reely/utils';
-import { hasProperty, isNil, isSomeFunction, isValidRecordKey } from '@reely/utils';
+import type { Nullable, PipeableFn } from '@reely/utils';
+import { hasProperty, isInstanceOf, isNil, isPrimitiveValue, isSomeFunction, isValidRecordKey } from '@reely/utils';
 
 import { getDommyLogger } from '../config';
-import { hasAriaAttribute, setAriaAttributes } from '../utils/attributes/element.aria.attributes';
-import { isSafeAttributeEntry, setAttribute } from '../utils/attributes/element.attributes';
-import { isBooleanAttribute, setBoolAttribute } from '../utils/attributes/element.bool.attributes';
-import { isDataAttribute, setDataAttribute } from '../utils/attributes/element.data.attributes';
-import { isMappedAttribute, setMappedAttribute } from '../utils/attributes/element.mapped.attributes';
-import { hasStylesAttribute, setStyleAttributes } from '../utils/attributes/element.style.attributes';
-import { addEventListenerHandler, isEventListenerHandler } from '../utils/element.addListeners';
+import { hasAriaAttribute, setAriaAttributes } from './attributes/element.aria.attributes';
+import { isSafeAttributeEntry, setAttribute } from './attributes/element.attributes';
+import { isBooleanAttribute, setBoolAttribute } from './attributes/element.bool.attributes';
+import { isDataAttribute, setDataAttribute } from './attributes/element.data.attributes';
+import { isMappedAttribute, setMappedAttribute } from './attributes/element.mapped.attributes';
+import { hasStylesAttribute, setStyleAttributes } from './attributes/element.style.attributes';
+import { addEventListenerHandler, isEventListenerHandler } from './element.addListeners';
 
 import type {
   DOMElement,
@@ -34,7 +34,7 @@ export const isElementFactoryOptionProp = (
 export const assignElementRef =
   <Tag extends HtmlElementTag, Element extends DOMElement<Tag> = DOMElement<Tag>>(
     props: Nullable<DOMElementFactoryProps<Tag>>
-  ): PipeableFunction<Element> =>
+  ): PipeableFn<Element> =>
   (element: Element) => {
     if (hasProperty('elementRef', props)) {
       const { elementRef } = props;
@@ -50,9 +50,9 @@ export const assignElementRef =
 export const assignProperties =
   <Tag extends HtmlElementTag, Element extends DOMElement<Tag> = DOMElement<Tag>>(
     props: Nullable<DOMElementFactoryProps<Tag>>
-  ): PipeableFunction<Element> =>
+  ): PipeableFn<Element> =>
   (element: Element) => {
-    if (isNil(props)) {
+    if (isNil(props) || isPrimitiveValue(props) || isInstanceOf(Node, props)) {
       return element;
     }
 
