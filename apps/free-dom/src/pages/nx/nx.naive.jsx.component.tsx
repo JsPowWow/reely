@@ -2,20 +2,20 @@ import './nx.naive.css';
 import { appendTo, div } from '@reely/dommy';
 import { pipe } from '@reely/utils';
 
-import tickSvg from '../assets/tick.svg';
-import logo1Svg from '../assets/logo1.svg';
-import docSvg from '../assets/doc.svg';
-import arrowSvg from '../assets/arrow.svg';
-import blogSvg from '../assets/blog.svg';
-import youtubeSvg from '../assets/youtube.svg';
-import clickSvg from '../assets/click.svg';
-import teachSvg from '../assets/teach.svg';
-import vscodeSvg from '../assets/vscode.svg';
-import jetbrainsSvg from '../assets/jetbrains.svg';
-import nxCloudSvg from '../assets/nx-cloud.svg';
-import githubSvg from '../assets/github.svg';
-import terminalSvg from '../assets/terminal.svg';
-import loveSvg from '../assets/love.svg';
+import tickSvg from '../../assets/tick.svg';
+import logo1Svg from '../../assets/logo1.svg';
+import docSvg from '../../assets/doc.svg';
+import arrowSvg from '../../assets/arrow.svg';
+import blogSvg from '../../assets/blog.svg';
+import youtubeSvg from '../../assets/youtube.svg';
+import clickSvg from '../../assets/click.svg';
+import teachSvg from '../../assets/teach.svg';
+import vscodeSvg from '../../assets/vscode.svg';
+import jetbrainsSvg from '../../assets/jetbrains.svg';
+import nxCloudSvg from '../../assets/nx-cloud.svg';
+import githubSvg from '../../assets/github.svg';
+import terminalSvg from '../../assets/terminal.svg';
+import loveSvg from '../../assets/love.svg';
 
 export class NxNaiveJsxComponent extends HTMLElement {
   public static observedAttributes = [];
@@ -35,7 +35,7 @@ export class NxNaiveJsxComponent extends HTMLElement {
           <div className='text-container'>
             <h2>
               <img className='tick' src={tickSvg} alt='tick' />
-              <span>You're up and running</span>
+              <span>You're up and running the jsx version of component</span>
             </h2>
             <a href='#commands'> What's next? </a>
           </div>
@@ -250,5 +250,11 @@ export class NxNaiveJsxComponent extends HTMLElement {
     this.render();
   }
 }
-customElements.define('free-dom-root-jsx', NxNaiveJsxComponent);
-document.body.appendChild(document.createElement('free-dom-root-jsx'));
+customElements.define('free-dom-nx-naive-jsx', NxNaiveJsxComponent);
+// document.body.appendChild(document.createElement('free-dom-nx-naive-jsx'));
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'free-dom-nx-naive-jsx': NxNaiveJsxComponent;
+  }
+}

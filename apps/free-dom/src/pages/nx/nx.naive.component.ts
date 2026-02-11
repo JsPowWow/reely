@@ -2,6 +2,8 @@ import './nx.naive.css';
 import { a, appendTo, details, div, h1, h2, img, p, pre, span, summary } from '@reely/dommy';
 import { pipe } from '@reely/utils';
 
+import type { NxNaiveJsxComponent } from './nx.naive.jsx.component';
+
 export class NxNaiveComponent extends HTMLElement {
   public static observedAttributes = [];
 
@@ -14,7 +16,10 @@ export class NxNaiveComponent extends HTMLElement {
       div({ id: 'hero', className: 'rounded' }, [
         div(
           { className: 'text-container' },
-          h2(img({ className: 'tick', src: 'assets/tick.svg' }), span('You"re up and running')),
+          h2(
+            img({ className: 'tick', src: 'assets/tick.svg' }),
+            span(`You're up and running the naive component approach.`)
+          ),
           a({ href: '#commands' }, " What's next? ")
         ),
         div({ className: 'logo-container' }, [img({ className: 'logo', src: 'assets/logo1.svg' })]),
@@ -207,5 +212,11 @@ export class NxNaiveComponent extends HTMLElement {
     this.render();
   }
 }
-customElements.define('free-dom-root', NxNaiveComponent);
-document.body.appendChild(document.createElement('free-dom-root'));
+customElements.define('free-dom-nx-naive', NxNaiveComponent);
+//document.body.appendChild(document.createElement('free-dom-nx-naive'));
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'free-dom-nx-naive': NxNaiveJsxComponent;
+  }
+}

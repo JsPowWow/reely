@@ -1,12 +1,9 @@
-import './nx.naive.css';
 import { type ChildDOMElement } from '@reely/dommy';
-import { pipe } from '@reely/utils';
-import { appendTo } from '@reely/dommy';
-import { CounterNaiveRef } from '../components/_1_counter.naiveRef.component';
-import { CounterNaiveReelx } from '../components/_2_counter.naiveReelx.component';
-import { CounterReelxHandmade } from '../components/_3_counter.reactive.handmade.reelx.component';
-import { CaseCard } from '../components/case.card.component';
-import { CounterSignalsHandmade } from '../components/_4_counter.reactive.handmade.signals.component';
+import { CounterNaiveRef } from './_1_counter.naiveRef.component';
+import { CounterNaiveReelx } from './_2_counter.naiveReelx.component';
+import { CounterReelxHandmade } from './_3_counter.reactive.handmade.reelx.component';
+import { CaseCard } from './case.card.component';
+import { CounterSignalsHandmade } from './_4_counter.reactive.handmade.signals.component';
 
 const Counters = (props: { children: ChildDOMElement }) => {
   return (
@@ -27,9 +24,9 @@ const Counters = (props: { children: ChildDOMElement }) => {
   );
 };
 
-const App = (
+export const CountersPlayground = () => (
   <div styles={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-    <h1 styles={{ margin: '15px' }}>Hello World</h1>
+    <h1 styles={{ margin: '15px' }}>Counters</h1>
     <Counters>
       <CounterNaiveRef initialValue={11} />
       <CounterNaiveReelx initialValue={12} />
@@ -42,5 +39,3 @@ const App = (
     </Counters>
   </div>
 );
-
-pipe(App, appendTo(document.body));

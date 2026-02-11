@@ -7,6 +7,11 @@ interface CounterProps {
   initialValue?: number;
 }
 
+// // eslint-disable-next-line import/no-unresolved
+// import cccc from './_3_counter.reactive.handmade.reelx.component.tsx?raw';
+//
+// console.log('AAAAAAAAA', cccc);
+
 export function CounterSignalsHandmade(props: CounterProps) {
   const counter = signal(props.initialValue ?? 0);
 
@@ -38,6 +43,13 @@ export function CounterSignalsHandmade(props: CounterProps) {
       >
         Reset
       </button>
+
+      {/*<details>*/}
+      {/*  <summary>*/}
+      {/*    Source::*/}
+      {/*    <pre>{cccc}</pre>*/}
+      {/*  </summary>*/}
+      {/*</details>*/}
     </div>
   );
 }
