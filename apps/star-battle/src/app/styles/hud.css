@@ -1,0 +1,94 @@
+#hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 10px 16px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.hs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+}
+
+.hr {
+  align-items: flex-end;
+}
+
+.sn {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.s1 .sn {
+  color: var(--p1);
+}
+
+.s2 .sn {
+  color: var(--p2);
+}
+
+.hb {
+  width: 140px;
+  height: 9px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.hbf {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.08s;
+}
+
+.s1 .hbf {
+  background: linear-gradient(90deg, #00cc99, #00ffcc);
+}
+
+.s2 .hbf {
+  background: linear-gradient(90deg, #cc2244, #ff4466);
+}
+
+.eb {
+  width: 140px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ebf {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #cc9900, #ffe066);
+  transition: width 0.08s;
+}
+
+.hc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+#timer {
+  font-size: 24px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 4px;
+}
+
+#rl {
+  font-size: 9px;
+  color: #445;
+  letter-spacing: 3px;
+}

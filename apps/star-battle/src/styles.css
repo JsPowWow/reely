@@ -1,1 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
+@import './app/styles/variables.css';
+@import './app/styles/base.css';
+@import './app/styles/hud.css';
+@import './app/styles/controls.css';
+@import './app/styles/screens.css';
+@import './app/styles/keyboard.css';

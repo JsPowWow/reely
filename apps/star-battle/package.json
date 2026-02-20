@@ -1,5 +1,11 @@
 {
   "name": "@reely/star-battle",
   "version": "0.0.1",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "partykit": "0.0.115"
+  },
+  "dependencies": {
+    "partysocket": "1.1.14"
+  }
 }

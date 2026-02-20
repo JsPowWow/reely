@@ -1,0 +1,6 @@
+{
+  "$schema": "https://www.partykit.io/schema.json",
+  "name": "reely-star-battle-party",
+  "main": "party/index.ts",
+  "compatibilityDate": "2026-02-20"
+}
