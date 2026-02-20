@@ -53,7 +53,8 @@
   "workspaces": [
     "packages/*",
     "apps/rss-async-race/web",
-    "apps/free-dom"
+    "apps/free-dom",
+    "apps/star-battle"
   ],
   "nx": {
     "includedScripts": [],
@@ -67,5 +68,6 @@
         }
       }
     }
-  }
+  },
+  "dependencies": {}
 }

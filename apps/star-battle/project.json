@@ -1,0 +1,9 @@
+{
+  "name": "star-battle",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/star-battle/src",
+  "tags": ["star-battle"],
+  "// targets": "to see all targets run: nx show project star-battle --web",
+  "targets": {}
+}
