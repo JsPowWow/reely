@@ -24,6 +24,9 @@ import { initScreens, showWinScreen, sel } from './app/ui/screens';
 const canvas = document.getElementById('c') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
 let W = 0, H = 0;
+let lastTime = performance.now();
+let frames = 0;
+const fpsEl = document.getElementById('fps');
 
 function resize() {
   W = canvas.width = window.innerWidth;
@@ -73,6 +76,18 @@ function onGameWin() {
 }
 
 function loop() {
+  const now = performance.now();
+  frames++;
+  if (now >= lastTime + 1000) {
+    const fps = Math.round((frames * 1000) / (now - lastTime));
+    if (fpsEl) {
+      fpsEl.textContent = `FPS: ${fps}`;
+      if (fps < 20) fpsEl.classList.add('low-fps');
+      else fpsEl.classList.remove('low-fps');
+    }
+    lastTime = now;
+    frames = 0;
+  }
   W = canvas.width;
   H = canvas.height;
   ctx.clearRect(0, 0, W, H);
