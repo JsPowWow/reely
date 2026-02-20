@@ -17,7 +17,7 @@ declare global {
     interface IntrinsicAttributes {
       key?: PropertyKey;
     }
-    type Element = Node | GlobalDOMElement | HTMLElement | PrimitiveValue | Nil;
+    type Element = Node | GlobalDOMElement | HTMLElement | PrimitiveValue | Nil; // | JSX.Element[];
   }
 }
 

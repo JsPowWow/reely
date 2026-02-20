@@ -15,3 +15,6 @@ export { setStyleAttributes, hasStylesAttribute } from './lib/utils/attributes/e
 export { reelx } from './lib/reactive/reelx/reelx.core';
 export * from './lib/reactive/reelx/reelx.types';
 export { type Signal, signal, type Computed, computed, effect } from './lib/reactive/preact-like/preact-like.signal';
+
+export * from './lib/router/router.types';
+export { createAsyncRouter } from './lib/router/async.router';

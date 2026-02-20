@@ -12,9 +12,9 @@ export const createElement = <Tag extends HtmlElementTag>(
   ...children: ChildDOMElement[]
 ): DOMElement<Tag> => {
   const [elementProps, elementChildren] = normalizeChildrenProps(props, children);
-
+  const newElement = document.createElement(tag);
   return pipe(
-    document.createElement(tag),
+    newElement,
     assignElementRef(elementProps), // TODO AR expose ref on last phase ?
     assignProperties(elementProps),
     appendChildren(elementChildren)
