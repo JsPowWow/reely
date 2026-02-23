@@ -1,7 +1,11 @@
 {
   "name": "@reely/star-battle",
   "version": "0.0.1",
-  "private": true,
+  "private": false,
+  "scripts": {
+    "dev": "partykit dev",
+    "deploy": "partykit deploy"
+  },
   "devDependencies": {
     "partykit": "0.0.115"
   },
