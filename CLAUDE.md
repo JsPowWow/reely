@@ -36,6 +36,7 @@ Always through Nx (caching, `^build` deps): `npx nx test dommy`, `npx nx lint do
 ## Git and release
 
 - Conventional Commits with the Nx project as scope, checked by commitlint + husky: `feat(dommy): add \`For\` with keyed reorder`, `fix(utils): …`, `chore(source): …`. Identifiers in backticks. Linear history on `main`, no merge commits.
+- The course (`apps/free-dom`) deploys to https://reely-free-dom.netlify.app from `main` via `.github/workflows/deploy-free-dom.yml` (secrets `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`).
 - Release — `nx release` (independent versions, tags `release/{projectName}/{version}`); publishing — manual workflow `.github/workflows/publish.yml`. Pre-releases of dommy: `0.1.0-next.N` with dist-tag `next`. The default npm registry on the author's machine is a corporate one — **publish only to `https://registry.npmjs.org`**, and never without the author.
 
 Area rules — `.claude/rules/*.md` (loaded by path).
