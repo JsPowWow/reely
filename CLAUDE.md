@@ -28,6 +28,25 @@ Always through Nx (caching, `^build` deps): `npx nx test dommy`, `npx nx lint do
 
 Area rules — `.claude/rules/*.md` (loaded by path).
 
+## Agent skills
+
+Skills from mattpocock/skills (`c55ee46`, MIT) live in `.claude/skills/` and are mandatory:
+`tdd` for every feature and fix, `codebase-design` for module interfaces,
+`diagnosing-bugs` for bugs, `code-review` before committing code.
+
+### Issue tracker
+
+GitHub Issues in `JsPowWow/reely` via `gh`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five roles, label = role name. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Multi-context: `CONTEXT-MAP.md` → `packages/<pkg>/CONTEXT.md`; ADRs in `docs/adr/`
+(system-wide) and `packages/<pkg>/docs/adr/`. See `docs/agents/domain.md`.
+
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
 
