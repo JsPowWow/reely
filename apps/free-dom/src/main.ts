@@ -1,8 +1,3 @@
-import './pages/nx/nx.naive.component';
-import './pages/nx/nx.naive.jsx.component';
-
-// import './app/nx.playground.jsx.component';
-
 import { createAsyncRouter, defineDommyConfig } from '@reely/dommy';
 import { scopedLogger } from '@reely/logger';
 import { isInstanceOf } from '@reely/utils';

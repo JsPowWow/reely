@@ -31,6 +31,16 @@ describe('tutorial', () => {
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
+  it('renders the same card from factories, JSX and components', () => {
+    const [factories, jsx, components] = ['factories', 'jsx', 'components'].map(
+      (slug) => renderStep(slug).querySelector('section')?.outerHTML
+    );
+
+    expect(factories).toContain('Everything is in there');
+    expect(jsx).toBe(factories);
+    expect(components).toBe(factories);
+  });
+
   describe('step "dom"', () => {
     it('counts and replaces the output text node on every click', async () => {
       const meter = renderStep('dom');
@@ -86,7 +96,7 @@ describe('tutorial', () => {
       const page = renderPage();
 
       expect(page.querySelector('h1')?.textContent).toBe(`Step 1. ${tutorialSteps[0]?.title}`);
-      expect(page.querySelector('nav a[href="/tutorial/dom"]')?.getAttribute('aria-current')).toBe('step');
+      expect(page.querySelector('nav a[href="/tutorial/factories"]')?.getAttribute('aria-current')).toBe('step');
     });
 
     it('explains an unknown step instead of rendering a demo', () => {

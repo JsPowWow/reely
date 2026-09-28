@@ -1,0 +1,48 @@
+.card {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 28rem;
+}
+
+.card h2 {
+  margin: 0 0 0.5rem;
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.link {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr 1rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.5rem;
+  border-radius: 4px;
+  color: var(--graphite);
+  text-decoration: none;
+}
+
+.link img {
+  width: 100%;
+}
+
+.link:hover {
+  background: var(--asphalt);
+}
+
+.link:focus-visible {
+  outline: 3px solid var(--graphite);
+  outline-offset: 2px;
+}
+
+.text {
+  font-weight: 700;
+}
+
+.hint {
+  display: block;
+  color: var(--slate);
+  font-size: 0.9375rem;
+  font-weight: 400;
+}

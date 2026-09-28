@@ -1,6 +1,5 @@
 import type { JSX, Routes } from '@reely/dommy';
 import { MainPage } from '../pages/mainPage';
-import { NxPage } from '../pages/nx/nxPage';
 import { Layout } from './Layout';
 import { TutorialPage } from '../pages/tutorial/tutorial.page';
 
@@ -12,47 +11,6 @@ export const routes = [
         <MainPage />
       </Layout>
     ),
-  },
-  {
-    path: '/nx',
-    children: [
-      {
-        path: '',
-        action: () => {
-          return (
-            <Layout>
-              <NxPage>
-                <free-dom-nx-naive />
-              </NxPage>
-            </Layout>
-          );
-        },
-      },
-      {
-        path: '/:mode',
-        action: (ctx, { mode }) => {
-          if (mode === 'naive') {
-            return (
-              <Layout>
-                <NxPage>
-                  <free-dom-nx-naive />
-                </NxPage>
-              </Layout>
-            );
-          }
-          if (mode === 'jsx') {
-            return (
-              <Layout>
-                <NxPage>
-                  <free-dom-nx-naive-jsx />
-                </NxPage>
-              </Layout>
-            );
-          }
-          return <h1>Not Found</h1>;
-        },
-      },
-    ],
   },
   {
     path: '/tutorial',
