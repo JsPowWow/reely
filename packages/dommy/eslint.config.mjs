@@ -12,6 +12,7 @@ export default [
             '{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}',
             '{projectRoot}/vite.config.{js,ts,mjs,mts}',
             '{projectRoot}/vitest.config.{js,ts,mjs,mts}',
+            '{projectRoot}/consumer/**',
           ],
           // bundled into dist with their types, so a consumer installs nothing but dommy
           ignoredDependencies: ['@reely/utils', '@reely/logger'],

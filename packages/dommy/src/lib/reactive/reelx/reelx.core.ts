@@ -12,7 +12,22 @@ interface Subscriber {
 }
 
 /** node dependencies list */
-type Dependencies<T> = { computation: RlxState<T> | RlxDerivedState<T>; value: T }[];
+interface Dependency<T> {
+  readonly computation: RlxState<T> | RlxDerivedState<T>;
+  /** What the read gave: the value, or what it threw. */
+  readonly value: unknown;
+  readonly threw: boolean;
+}
+type Dependencies<T> = Dependency<T>[];
+
+/** Whether a dependency would give the same as when it was read: the same value, or the same throw. */
+const isUnchanged = <T>({ computation, value, threw }: Dependency<T>): boolean => {
+  try {
+    return !threw && Object.is(value, computation());
+  } catch (error) {
+    return threw && Object.is(value, error);
+  }
+};
 
 type RlxSelfInstance<T> = WithSubscribers<
   RlxState<T> &
@@ -57,6 +72,8 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
     const deps: Dependencies<T> = [];
     // a computation that tracked nothing is a constant once it has run
     let hasRun = false;
+    // what the last run threw: kept like a result and thrown on every read until a dependency changes
+    let thrown: Nullable<{ readonly error: unknown }> = null;
     // @ts-expect-error expected properties assigned below
     rlxSelf = (): T => {
       if (subscriberVersion !== SUBSCRIBER_VERSION) {
@@ -74,24 +91,24 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
           DEPS = null;
 
           try {
-            let isActual = hasRun;
-            for (let i = 0; isActual && i < deps.length; i++) {
-              isActual = Object.is(deps[i]?.value, deps[i]?.computation());
-            }
-            if (!isActual) {
+            if (!hasRun || !deps.every(isUnchanged)) {
               (DEPS = deps).length = 0;
 
-              const newState = init();
-              hasRun = true;
-
-              if (
-                equal === undefined ||
-                // first call
-                state === undefined ||
-                !equal(state, newState)
-              ) {
-                state = newState;
+              try {
+                const newState = init();
+                thrown = null;
+                if (
+                  equal === undefined ||
+                  // first call
+                  state === undefined ||
+                  !equal(state, newState)
+                ) {
+                  state = newState;
+                }
+              } catch (error) {
+                thrown = { error };
               }
+              hasRun = true;
             }
           } finally {
             DEPS = prevDeps;
@@ -101,8 +118,11 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
         subscriberVersion = SUBSCRIBER_VERSION;
       }
 
-      DEPS?.push({ computation: rlxSelf, value: state });
+      DEPS?.push({ computation: rlxSelf, value: hasSome(thrown) ? thrown.error : state, threw: hasSome(thrown) });
 
+      if (hasSome(thrown)) {
+        throw thrown.error;
+      }
       return state;
     };
   } else {
@@ -131,7 +151,7 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
         SUBSCRIBER._values.push(rlxSelf);
       }
 
-      DEPS?.push({ computation: rlxSelf, value: state });
+      DEPS?.push({ computation: rlxSelf, value: state, threw: false });
 
       return state;
     };

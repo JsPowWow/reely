@@ -55,11 +55,11 @@ export const untracked = <T>(fn: () => T): T => reelx.untracked(fn);
  * @returns {VoidFunction} Disposes the effect; it is also disposed with the owner it was created in.
  */
 export function effect(fn: VoidFunction): VoidFunction {
-  const context: { dispose?: VoidFunction } = {};
   let disposeRun: VoidFunction = noop;
   let running = false;
   let disposed = false;
   let unsubscribe: VoidFunction = noop;
+  let body: VoidFunction = noop;
 
   // cleanups read and write signals like any code outside the effect: untracked, in one batch
   const releaseRun = (): void => {
@@ -70,12 +70,19 @@ export function effect(fn: VoidFunction): VoidFunction {
 
   const dispose = (): void => {
     disposed = true;
-    unsubscribe();
+    // a kept `dispose` must not keep the body or the effect's last dependencies alive
+    body = noop;
+    const release = unsubscribe;
+    unsubscribe = noop;
+    release();
     // a run that disposes its own effect releases its cleanups once it has finished
     if (!running) {
       releaseRun();
     }
   };
+
+  // `this` in the body: a run can dispose its own effect, the first run included
+  body = fn.bind({ dispose });
 
   // the body runs as the computation; writes inside it are grouped, so its dependants run once
   const s = computed<void>(() => {
@@ -87,7 +94,7 @@ export function effect(fn: VoidFunction): VoidFunction {
     try {
       withOwner((disposeOwner) => {
         disposeRun = disposeOwner;
-        reelx.batch(fn.bind(context));
+        reelx.batch(body);
       }, null);
     } finally {
       running = false;
@@ -97,10 +104,10 @@ export function effect(fn: VoidFunction): VoidFunction {
     }
   });
   unsubscribe = s.subscribe(noop);
+  // the first run disposed the effect before its subscription existed
   if (disposed) {
-    unsubscribe();
+    dispose();
   }
-  context.dispose = dispose;
   onCleanup(dispose);
   return dispose;
 }
