@@ -2,8 +2,8 @@ import { createAsyncRouter, Routes } from '@reely/dommy';
 import { MainPage } from '../pages/mainPage';
 import { NxPage } from '../pages/nx/nxPage';
 import { Layout } from './Layout';
-import { TutorialPage } from '../pages/tutorial/tutorialPage';
-import { CountersPlayground } from '../pages/tutorial/counters/counters.playground.jsx.component';
+import { TutorialPage } from '../pages/tutorial/tutorial.page';
+import { findTutorialStep } from '../pages/tutorial/tutorial.steps';
 
 const routes = [
   {
@@ -58,31 +58,12 @@ const routes = [
   {
     path: '/tutorial',
     children: [
+      { path: '', action: () => <TutorialPage index={0} /> },
       {
-        path: '',
-        action: () => {
-          return (
-            <Layout>
-              <TutorialPage>
-                <CountersPlayground />
-              </TutorialPage>
-            </Layout>
-          );
-        },
-      },
-      {
-        path: '/:mode',
-        action: (ctx, { mode }) => {
-          if (mode === 'counters') {
-            return (
-              <Layout>
-                <TutorialPage>
-                  <CountersPlayground />
-                </TutorialPage>
-              </Layout>
-            );
-          }
-          return <h1>Not Found</h1>;
+        path: '/:step',
+        action: (_ctx, { step }) => {
+          const index = findTutorialStep(String(step));
+          return index < 0 ? <h1>Not Found</h1> : <TutorialPage index={index} />;
         },
       },
     ],

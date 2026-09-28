@@ -1,0 +1,41 @@
+.counter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.value {
+  min-width: 3ch;
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+  font-family: var(--display);
+  font-size: 3.5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+}
+
+.counter button {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--graphite);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--graphite);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.counter button:hover {
+  background: var(--graphite);
+  color: var(--asphalt);
+}
+
+.counter button:focus-visible {
+  outline: 3px solid var(--signal);
+  outline-offset: 2px;
+}
