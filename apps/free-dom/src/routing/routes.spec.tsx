@@ -2,10 +2,16 @@ import { createAsyncRouter } from '@reely/dommy';
 
 import { routes } from './routes';
 
-const headingAt = async (pathname: string): Promise<string | null | undefined> => {
+const renderAt = async (pathname: string): Promise<Element> => {
   const page = await createAsyncRouter(routes).resolve(pathname);
-  return page instanceof Element ? page.querySelector('h1')?.textContent : undefined;
+  if (!(page instanceof Element)) {
+    throw new Error(`No page at ${pathname}`);
+  }
+  return page;
 };
+
+const headingAt = async (pathname: string): Promise<string | null | undefined> =>
+  (await renderAt(pathname)).querySelector('h1')?.textContent;
 
 describe('routes', () => {
   it('opens the course at the root and at a step', async () => {
@@ -14,6 +20,9 @@ describe('routes', () => {
   });
 
   it('answers an unknown URL with a page that says what is missing', async () => {
-    expect(await headingAt('/nope/deeper')).toBe('There is no page at /nope/deeper');
+    const page = await renderAt('/nope/deeper');
+
+    expect(page.querySelector('h1')?.textContent).toBe('There is no page at /nope/deeper');
+    expect(page.querySelector('main a[href="/tutorial/factories"]')?.textContent).toBe('Start with step 1');
   });
 });

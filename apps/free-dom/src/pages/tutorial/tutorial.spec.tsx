@@ -71,7 +71,18 @@ describe('tutorial', () => {
       clickButton(meter, '+1');
       await flushMutations();
 
-      expect(readAnnouncement(meter)).toBe('Last change: 2 nodes added or removed.');
+      expect(readAnnouncement(meter)).toBe('Last change: 2 nodes added or removed. 2 writes since the first render.');
+    });
+
+    it('announces every click, even when it changes the same as the last one', async () => {
+      const meter = renderStep('dom');
+
+      clickButton(meter, '+1');
+      await flushMutations();
+      clickButton(meter, '+1');
+      await flushMutations();
+
+      expect(readAnnouncement(meter)).toBe('Last change: 2 nodes added or removed. 4 writes since the first render.');
     });
   });
 

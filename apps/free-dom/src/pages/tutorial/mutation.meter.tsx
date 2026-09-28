@@ -59,12 +59,18 @@ const countNodes = (root: Node): number => {
   return count;
 };
 
-/** "Last change: 1 text edit, 2 nodes added or removed." — empty when nothing changed yet. */
-const describeChange = (delta: Readonly<Record<WriteKind, number>>): string => {
+/**
+ * "Last change: 2 nodes added or removed. 4 writes since the first render." The running total
+ * keeps the text different on every change, so a live region announces repeated clicks too.
+ * Empty when nothing changed.
+ */
+const describeChange = (delta: Readonly<Record<WriteKind, number>>, total: number): string => {
   const parts = writeKinds
     .filter((kind) => delta[kind] > 0)
     .map((kind) => `${delta[kind]} ${writeNouns[kind][delta[kind] === 1 ? 0 : 1]}`);
-  return parts.length === 0 ? '' : `Last change: ${parts.join(', ')}.`;
+  return parts.length === 0
+    ? ''
+    : `Last change: ${parts.join(', ')}. ${total} ${total === 1 ? 'write' : 'writes'} since the first render.`;
 };
 
 const prefersReducedMotion = (): boolean =>
@@ -117,7 +123,10 @@ export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => 
         totals[kind].value += delta[kind];
         deltas[kind].value = delta[kind];
       }
-      announcement.value = describeChange(delta);
+      announcement.value = describeChange(
+        delta,
+        writeKinds.reduce((sum, kind) => sum + totals[kind].value, 0)
+      );
     });
     records.forEach(flash);
   }).observe(stage, { subtree: true, childList: true, attributes: true, characterData: true });
@@ -129,7 +138,9 @@ export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => 
       dd(
         null,
         totals[kind],
-        span({ className: css.delta }, () => (deltas[kind].value > 0 ? `+${deltas[kind].value}` : ''))
+        span({ className: css.delta, aria: { ariaHidden: 'true' } }, () =>
+          deltas[kind].value > 0 ? `+${deltas[kind].value}` : ''
+        )
       )
     );
 
