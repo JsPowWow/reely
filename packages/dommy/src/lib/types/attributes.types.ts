@@ -13,10 +13,27 @@ export type DOMElementAttributes<T extends HTMLElement> = Exclude<Partial<SafeAt
 };
 
 /**
- * ARIA values by `ARIAMixin` property name (`role`, `ariaLabel`, `ariaCurrent`…), each static or reactive.
+ * ID-reference ARIA attributes: `ARIAMixin` has them only as element arrays (`ariaLabelledByElements`),
+ * so here they take space-separated ids, named so that they map to `aria-labelledby` and the like.
+ */
+type AriaIdReference =
+  | 'ariaActivedescendant'
+  | 'ariaControls'
+  | 'ariaDescribedby'
+  | 'ariaDetails'
+  | 'ariaErrormessage'
+  | 'ariaFlowto'
+  | 'ariaLabelledby'
+  | 'ariaOwns';
+
+/**
+ * ARIA values by `ARIAMixin` property name (`role`, `ariaLabel`, `ariaCurrent`…) or ID-reference
+ * name (`ariaLabelledby`), each static or reactive.
  */
 export type DOMElementAria = {
   [K in keyof ARIAMixin as ARIAMixin[K] extends Nullable<string> ? K : never]?: MaybeReactive<string>;
+} & {
+  [K in AriaIdReference]?: MaybeReactive<string>;
 };
 
 /**

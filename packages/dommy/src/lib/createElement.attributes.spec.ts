@@ -63,6 +63,13 @@ describe('createElement: properties and attributes', () => {
     expect(element.hasAttribute('aria')).toBe(false);
   });
 
+  it('renders ID-reference `aria` props, which `ARIAMixin` has only as element arrays', () => {
+    const listing = createElement('pre', { aria: { ariaLabelledby: 'title caption', ariaDescribedby: 'hint' } });
+
+    expect(listing.getAttribute('aria-labelledby')).toBe('title caption');
+    expect(listing.getAttribute('aria-describedby')).toBe('hint');
+  });
+
   it('does not render `children` or `eventsAbortSignal` as attributes', () => {
     const element = createElement('div', {
       children: 'text',
