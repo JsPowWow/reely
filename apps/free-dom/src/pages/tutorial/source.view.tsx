@@ -4,6 +4,8 @@ import { isNil } from '@reely/utils';
 
 import css from './tutorial.module.css';
 
+import type { SourceLines, SourceToken } from './source.types';
+
 /**
  * Marks the lines of `current` that are not part of the longest common subsequence with
  * `previous`: the lines a student would type to get from one step to the next.
@@ -57,10 +59,15 @@ const markBlankLines = (lines: readonly string[], inserted: readonly boolean[]):
 };
 
 interface SourceViewProps {
-  source: string;
+  source: SourceLines;
   /** The source of the step this one grows from, with its number; nothing is marked without it. */
-  previous?: Nullable<{ source: string; number: number }>;
+  previous?: Nullable<{ source: SourceLines; number: number }>;
 }
+
+const toText = (line: readonly SourceToken[]): string => line.map((token) => token.content).join('');
+
+const renderToken = ({ content, color }: SourceToken): HTMLSpanElement =>
+  span(isNil(color) ? null : { styles: { color } }, content);
 
 let sourceViews = 0;
 
@@ -72,10 +79,10 @@ export const SourceView = ({ source, previous }: SourceViewProps): HTMLElement =
   // ids unique per view, for the listing's accessible name
   const titleId = `source-title-${++sourceViews}`;
   const captionId = `source-caption-${sourceViews}`;
-  const lines = source.trimEnd().split('\n');
+  const lines = source.map(toText);
   const inserted = isNil(previous)
     ? lines.map(() => false)
-    : markBlankLines(lines, markInsertedLines(previous.source.trimEnd().split('\n'), lines));
+    : markBlankLines(lines, markInsertedLines(previous.source.map(toText), lines));
   return div(
     { className: css.sourcePanel },
     p(
@@ -90,8 +97,10 @@ export const SourceView = ({ source, previous }: SourceViewProps): HTMLElement =
       { className: css.source, aria: { ariaLabelledby: `${titleId} ${captionId}` } },
       code(
         null,
-        lines.map((line, index) =>
-          inserted[index] ? ins({ className: css.added }, line, '\n') : span({ className: css.line }, line, '\n')
+        source.map((line, index) =>
+          inserted[index]
+            ? ins({ className: css.added }, line.map(renderToken), '\n')
+            : span({ className: css.line }, line.map(renderToken), '\n')
         )
       )
     )

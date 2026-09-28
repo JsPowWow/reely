@@ -1,7 +1,11 @@
+import { isInstanceOf } from '@reely/utils';
+
 import { MutationMeter } from './mutation.meter';
 import { SourceView } from './source.view';
 import { TutorialPage } from './tutorial.page';
 import { tutorialSteps } from './tutorial.steps';
+
+import type { SourceLines } from './source.types';
 
 const flushMutations = (): Promise<void> => new Promise((resolve) => setTimeout(resolve));
 
@@ -133,10 +137,13 @@ describe('tutorial', () => {
   });
 
   describe('SourceView', () => {
+    // a source without colors, one token per line
+    const plain = (text: string): SourceLines => text.split('\n').map((line) => [{ content: line }]);
+
     it('marks lines that the previous step did not have', () => {
       const view = SourceView({
-        source: 'const a = 1;\nconst b = 2;',
-        previous: { source: 'const a = 1;', number: 1 },
+        source: plain('const a = 1;\nconst b = 2;'),
+        previous: { source: plain('const a = 1;'), number: 1 },
       });
 
       expect(Array.from(view.querySelectorAll('ins')).map((line) => line.textContent)).toEqual(['const b = 2;\n']);
@@ -144,8 +151,8 @@ describe('tutorial', () => {
 
     it('marks structural lines too, by a line diff rather than a lookup', () => {
       const view = SourceView({
-        source: 'run(() => {\n  one();\n});\nrun(() => {\n  two();\n});',
-        previous: { source: 'run(() => {\n  one();\n});', number: 1 },
+        source: plain('run(() => {\n  one();\n});\nrun(() => {\n  two();\n});'),
+        previous: { source: plain('run(() => {\n  one();\n});'), number: 1 },
       });
 
       expect(Array.from(view.querySelectorAll('ins')).map((line) => line.textContent)).toEqual([
@@ -157,8 +164,8 @@ describe('tutorial', () => {
 
     it('marks blank lines inside an inserted block, but not around it', () => {
       const view = SourceView({
-        source: 'const a = 1;\n\nconst b = 2;\n\nconst c = 3;',
-        previous: { source: 'const a = 1;\n', number: 1 },
+        source: plain('const a = 1;\n\nconst b = 2;\n\nconst c = 3;'),
+        previous: { source: plain('const a = 1;\n'), number: 1 },
       });
 
       expect(Array.from(view.querySelectorAll('ins')).map((line) => line.textContent)).toEqual([
@@ -168,8 +175,19 @@ describe('tutorial', () => {
       ]);
     });
 
+    it('colors each token with its theme color', () => {
+      const view = SourceView({
+        source: [[{ content: 'const', color: '#9CC3FF' }, { content: ' count = 0;' }]],
+      });
+      const [keyword, rest] = Array.from(view.querySelectorAll('code span span'));
+
+      expect(keyword?.textContent).toBe('const');
+      expect(isInstanceOf(HTMLElement, keyword) && keyword.style.color).toBe('rgb(156, 195, 255)');
+      expect(rest?.textContent).toBe(' count = 0;');
+    });
+
     it('marks nothing for the first step', () => {
-      const view = SourceView({ source: 'const a = 1;' });
+      const view = SourceView({ source: plain('const a = 1;') });
 
       expect(view.querySelectorAll('ins')).toHaveLength(0);
     });

@@ -1,26 +1,28 @@
 import type { JSX } from '@reely/dommy';
 
 import { ReelyLinks as FactoryLinks } from './steps/step1.factories';
-import factoriesSource from './steps/step1.factories.ts?raw';
+import factoriesSource from './steps/step1.factories.ts?highlight';
 import { Counter as BatchCounter } from './steps/step10.batch';
-import batchSource from './steps/step10.batch.ts?raw';
+import batchSource from './steps/step10.batch.ts?highlight';
 import { ReelyLinks as JsxLinks } from './steps/step2.jsx';
-import jsxSource from './steps/step2.jsx.tsx?raw';
+import jsxSource from './steps/step2.jsx.tsx?highlight';
 import { ReelyLinks as ComponentLinks } from './steps/step3.components';
-import componentsSource from './steps/step3.components.tsx?raw';
+import componentsSource from './steps/step3.components.tsx?highlight';
 import { Counter as DomCounter } from './steps/step4.dom';
-import domSource from './steps/step4.dom.ts?raw';
+import domSource from './steps/step4.dom.ts?highlight';
 import { Counter as SignalCounter } from './steps/step5.signal';
-import signalSource from './steps/step5.signal.ts?raw';
+import signalSource from './steps/step5.signal.ts?highlight';
 import { Counter as BoundCounter } from './steps/step6.bind';
-import bindSource from './steps/step6.bind.ts?raw';
+import bindSource from './steps/step6.bind.ts?highlight';
 import { Counter as DerivedCounter } from './steps/step7.derived';
-import derivedSource from './steps/step7.derived.ts?raw';
+import derivedSource from './steps/step7.derived.ts?highlight';
 import { Counter as GetterCounter } from './steps/step8.getter';
-import getterSource from './steps/step8.getter.ts?raw';
+import getterSource from './steps/step8.getter.ts?highlight';
 import { Counter as TwoSignalCounter } from './steps/step9.two-signals';
-import twoSignalsSource from './steps/step9.two-signals.ts?raw';
+import twoSignalsSource from './steps/step9.two-signals.ts?highlight';
 
+
+import type { SourceLines } from './source.types';
 /**
  * One step of the lesson: the markup steps build the same card three ways, then every step
  * builds the same counter with one more reely feature.
@@ -32,7 +34,8 @@ export interface TutorialStep {
   title: string;
   lead: string;
   Demo: () => JSX.Element;
-  source: string;
+  /** The module that renders the demo, highlighted at build time. */
+  source: SourceLines;
 }
 
 export const tutorialSteps: readonly TutorialStep[] = [

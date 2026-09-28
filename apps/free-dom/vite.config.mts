@@ -3,6 +3,8 @@ import { defineConfig } from 'vite';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
+import { sourceHighlight } from './src/highlight/source.highlight';
+
 export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/apps/free-dom',
@@ -14,7 +16,7 @@ export default defineConfig(() => ({
     port: 4300,
     host: 'localhost',
   },
-  plugins: [nxViteTsPaths(), nxCopyAssetsPlugin(['netlify.toml'])],
+  plugins: [nxViteTsPaths(), nxCopyAssetsPlugin(['netlify.toml']), sourceHighlight()],
   build: {
     outDir: './dist',
     emptyOutDir: true,

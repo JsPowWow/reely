@@ -22,7 +22,7 @@ No virtual DOM and no re-render: tag factories and JSX return real DOM nodes, a 
 
 - Shown on a projector or shared screen during a talk, then read alone on a laptop or phone.
 - Deployed by Netlify from the repo: `main` to https://reely-free-dom.netlify.app, every pull request to a deploy preview.
-- The course is built with `@reely/dommy` itself; the step sources shown on the page are the modules that render the demos (imported with `?raw`), so the code on screen is always the code that runs.
+- The course is built with `@reely/dommy` itself; the step sources shown on the page are the modules that render the demos (imported with `?highlight`: Shiki colors them at build time, so the page ships no highlighter), so the code on screen is always the code that runs.
 
 ## Capabilities and Constraints
 
