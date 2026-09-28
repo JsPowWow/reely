@@ -24,8 +24,6 @@ const elementFactoryOptionsProps = {
   elementRef: true,
 } satisfies Record<keyof Required<DOMElementFactoryOptionsProps<HtmlElementTag>>, boolean>;
 
-const dommyLogger = getDommyLogger();
-
 export const isElementFactoryOptionProp = (
   property: unknown
 ): property is DOMElementFactoryOptionsProps<HtmlElementTag> => {
@@ -97,7 +95,7 @@ export const assignProperties =
           break;
         }
         default: {
-          dommyLogger?.warn(`The element property was not assigned: `, property, value);
+          getDommyLogger()?.warn(`The element property was not assigned: `, property, value);
         }
       }
     }

@@ -1,4 +1,6 @@
-import { addListener, addListeners, createElement } from '../index';
+import type { ILogger } from '@reely/logger';
+
+import { addListener, addListeners, createElement, defineDommyConfig } from '../index';
 
 import type { DOMElementFactoryProps } from '../index';
 
@@ -31,6 +33,21 @@ describe('createElement: events', () => {
     const button = createElement('button', props);
 
     expect(button.attributes).toHaveLength(0);
+  });
+
+  it('reports a rejected string handler to the logger configured after import', () => {
+    const warn = vi.fn();
+    const logger = { info: vi.fn(), warn, error: vi.fn(), log: vi.fn(), logWith: vi.fn() } as unknown as ILogger;
+    defineDommyConfig({ useLogger: true, logger });
+    const props = { onclick: 'alert(1)' } as Record<string, unknown> as DOMElementFactoryProps<'button'>;
+
+    try {
+      createElement('button', props);
+    } finally {
+      defineDommyConfig({ useLogger: false });
+    }
+
+    expect(warn).toHaveBeenCalledWith(expect.any(String), 'onclick', 'alert(1)');
   });
 
   it('calls every handler of an array', () => {
