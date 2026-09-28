@@ -11,6 +11,13 @@ interface Subscriber {
   _values: Array<WithSubscribers<RlxState<unknown>>>;
 }
 
+/** Unlinks a subscriber from every value it read, so none of them runs it again. */
+const unlink = (subscriber: Subscriber): void => {
+  for (const { _subscribers } of subscriber._values.splice(0)) {
+    _subscribers.delete(subscriber);
+  }
+};
+
 /** node dependencies list */
 interface Dependency<T> {
   readonly computation: RlxState<T> | RlxDerivedState<T>;
@@ -174,7 +181,7 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
         try {
           queueVersion = QUEUE_VERSION;
 
-          for (const { _subscribers } of subscriber._values.splice(0)) _subscribers.delete(subscriber);
+          unlink(subscriber);
 
           SUBSCRIBER = subscriber;
 
@@ -196,7 +203,7 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
       subscriber();
     } catch (error) {
       // a first run that throws leaves no subscription behind
-      for (const { _subscribers } of subscriber._values) _subscribers.delete(subscriber);
+      unlink(subscriber);
       throw error;
     }
     rlxSelf._subscribers.add(subscriber);
@@ -205,7 +212,7 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
       isDisposed = true;
       rlxSelf._subscribers.delete(subscriber);
       if (rlxSelf._subscribers.size === 0) {
-        for (const { _subscribers } of subscriber._values) _subscribers.delete(subscriber);
+        unlink(subscriber);
       }
     };
   };

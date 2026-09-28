@@ -1,4 +1,6 @@
-import { For, mount, onCleanup, Show, signal } from '../../index';
+import { effect, For, mount, onCleanup, Show, signal } from '../../index';
+import { getOwner, withOwner } from './owner';
+import { reelxDebug } from './reelx/reelx.core';
 
 describe('onCleanup', () => {
   it('runs when the mounted view is disposed, not before', () => {
@@ -48,5 +50,40 @@ describe('onCleanup', () => {
     shown.value = false;
 
     expect(released).toHaveBeenCalledOnce();
+  });
+
+  it('runs the other cleanups when one throws, then throws its error', () => {
+    const released = vi.fn();
+    const dispose = mount(document.createElement('div'), () => {
+      onCleanup(released);
+      onCleanup(() => {
+        throw new Error('stuck timer');
+      });
+      return <canvas />;
+    });
+
+    expect(dispose).toThrow('stuck timer');
+    expect(released).toHaveBeenCalledOnce();
+  });
+
+  it('releases what a render created when the render throws', () => {
+    const lap = signal(1);
+
+    expect(() =>
+      mount(document.createElement('div'), () => {
+        effect(() => lap.value);
+        throw new Error('broken view');
+      })
+    ).toThrow('broken view');
+    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+  });
+
+  it('forgets an effect disposed before its owner', () => {
+    const held = withOwner(() => {
+      effect(() => undefined)();
+      return getOwner()?.cleanups.size;
+    }, null);
+
+    expect(held).toBe(0);
   });
 });

@@ -1,5 +1,6 @@
 import { batch, computed, effect, signal, type Signal, untracked } from './preact-like.signal';
 import { onCleanup } from '../owner';
+import { reelxDebug } from '../reelx/reelx.core';
 
 describe('signal', () => {
   it('should return value', () => {
@@ -179,6 +180,41 @@ describe('signal', () => {
 });
 
 describe('effect()', () => {
+  it('should release what its first run created when that run throws', () => {
+    const lap = signal(0);
+
+    expect(() =>
+      effect(() => {
+        effect(() => lap.value);
+        throw new Error('first run');
+      })
+    ).toThrow('first run');
+    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+  });
+
+  it('should dispose the effect when a cleanup throws, running its other cleanups', () => {
+    const a = signal(0);
+    const lap = signal(0);
+    const released = vi.fn();
+    const spy = vi.fn();
+
+    effect(() => {
+      spy(a.value);
+      effect(() => lap.value);
+      onCleanup(released);
+      onCleanup(() => {
+        throw new Error('cleanup');
+      });
+    });
+
+    expect(() => (a.value = 1)).toThrow('cleanup');
+    expect(released).toHaveBeenCalledOnce();
+    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+    expect(reelxDebug(a).subscriberCount()).toBe(0);
+    a.value = 2;
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
   it('should run the callback immediately', () => {
     const s = signal(123);
     const spy = vi.fn(() => {

@@ -1,4 +1,4 @@
-import { mount, Show, signal } from '../index';
+import { effect, mount, Show, signal } from '../index';
 import { reelxDebug } from './reactive/reelx/reelx.core';
 
 describe('Show', () => {
@@ -57,5 +57,21 @@ describe('Show', () => {
     expect(afterSwitch).toBe(1);
     expect(reelxDebug(lap).subscriberCount()).toBe(0);
     expect(reelxDebug(shown).subscriberCount()).toBe(0);
+  });
+
+  it('releases what a branch created when its render throws', () => {
+    const shown = signal(false);
+    const lap = signal(1);
+    mount(document.createElement('div'), () => (
+      <Show when={shown}>
+        {() => {
+          effect(() => lap.value);
+          throw new Error('broken branch');
+        }}
+      </Show>
+    ));
+
+    expect(() => (shown.value = true)).toThrow('broken branch');
+    expect(reelxDebug(lap).subscriberCount()).toBe(0);
   });
 });
