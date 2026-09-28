@@ -48,7 +48,6 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
   ): Promise<RouteResult<unknown>> {
     const baseContext = {
       router: this,
-      // ...this.options.context,
       ...(isString(pathnameOrContext) ? { pathname: pathnameOrContext } : pathnameOrContext),
       baseUrl: this.baseUrl,
     } satisfies ResolveContext;
@@ -65,9 +64,7 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
 
     for (const matchedRoute of matchedRoutes) {
       // TODO AR here
-      //const matchedRoute = toRouteMatchingResult(matchedRoutes, searchUrl);
 
-      //if (matchedRoute.success) {
       const matchedCfgRoute = routesConfig[matchedRoute.pathname];
       const resolver = this.options.resolveRoute ?? resolveRoute;
       const gen = routeChainFromRoot(matchedCfgRoute);
@@ -77,7 +74,6 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
         const pp = result.value;
         if (visited.has(pp)) {
           result = gen.next();
-          // pp = result.value;
           continue;
         }
 
@@ -94,12 +90,6 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
             params,
           },
           next: async function (): Promise<unknown> {
-            // const { value, done } = gen.next();
-            // const res = await resolver(currentContext, currParams);
-            // if (hasSome(res)) {
-            //   return res;
-            // }
-            // visited.add(pp);
             return 'aa'; //currentContext.route.action(currentContext, currentContext.params);
           },
         };
@@ -111,166 +101,11 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
         }
         visited.add(pp);
         result = gen.next();
-
       }
-      // throw new Error('Route not found'); //Error('No route resolved');
-      // } else throw matchedRoute.error;
     }
     throw new Error('Route not found'); //Error('No route resolved');
-    // for (const pp of routeChainFromRoot(matchedCfgRoute)) {
-    // }
-
-    // const matchedRoute = findMatchingRoute(routePathList, context.pathname.substring(this.baseUrl.length));
-
-    // if (matchedRoute.success) {
-    //   const matchedCfgRoute = routesConfig[matchedRoute.route.pathname];
-    //   const resolve = this.options.resolveRoute ?? resolveRoute;
-    //
-    //   for (const pp of routeChainFromRoot(matchedCfgRoute)) {
-    //   }
-    //
-    //   const currentContext = {
-    //     ...context,
-    //     path: matchedRoute.route.pathname,
-    //     ...{
-    //       route: { ...matchedCfgRoute },
-    //       params: Object.fromEntries(
-    //         Object.entries(matchedRoute.route.params).map(([key, value]) => [key, decode(value)])
-    //       ),
-    //     },
-    //   };
-    //   return Promise.resolve(resolve(currentContext, matchedRoute.route.params));
-    //   // .then((result) => {
-    //   // if (result !== null && result !== undefined) {
-    //   //   return result;
-    //   // }
-    //   // return next(resume, parent, result);
-    // } else {
-    //   throw matchedRoute.error;
-    // }
-
-    // const matchResult = matchRoute(this.root, this.baseUrl, this.options, context.pathname.substr(this.baseUrl.length));
-    // const resolve = this.options.resolveRoute || resolveRoute;
-    // let matches: IteratorResult<RouteMatch<R, C>, false>;
-    // let nextMatches: IteratorResult<RouteMatch<R, C>, false> | null;
-    // let currentContext = context;
-    //
-    // function next(
-    //   resume: boolean,
-    //   parent: Route<R, C> | false = !matches.done && matches.value.route,
-    //   prevResult?: RouteResult<R>
-    // ): Promise<RouteResult<R>> {
-    //   const routeToSkip = prevResult === null && !matches.done && matches.value.route;
-    //   matches = nextMatches || matchResult.next(routeToSkip);
-    //   nextMatches = null;
-    //
-    //   if (!resume) {
-    //     if (matches.done || !isChildRoute(parent, matches.value.route)) {
-    //       nextMatches = matches;
-    //       return Promise.resolve(null);
-    //     }
-    //   }
-    //
-    //   if (matches.done) {
-    //     const error: RouteError = new Error('Route not found');
-    //     error.status = 404;
-    //     return Promise.reject(error);
-    //   }
-    //
-    //   currentContext = { ...context, ...matches.value };
-    //
-    //   return Promise.resolve(resolve(currentContext as RouteContext<R, C>, matches.value.params)).then((result) => {
-    //     if (result !== null && result !== undefined) {
-    //       return result;
-    //     }
-    //     return next(resume, parent, result);
-    //   });
-    // }
-    //
-    // context['next'] = next;
-    //
-    // try {
-    //   //await Promise.resolve();
-    //   return await next(true, this.root);
-    // } catch (error_1) {
-    //   if (this.options.errorHandler) {
-    //     return this.options.errorHandler(error_1, currentContext);
-    //   }
-    //   throw error_1;
-    // }
   }
 }
-
-// function matchRoute<R, C extends RouterContext>(
-//   route: Route<R, C>,
-//   baseUrl: string,
-//   options: RouterOptions<R, C>,
-//   pathname: string,
-//   parentParams?: RouteParams
-// ): Iterator<RouteMatch<R, C>, false, Route<R, C> | false> {
-//   let matchResult: Match<RouteParams>;
-//   let childMatches: Iterator<RouteMatch<R, C>, false, Route<R, C> | false> | null;
-//   let childIndex = 0;
-//
-//   return {
-//     next(routeToSkip: Route<R, C> | false): IteratorResult<RouteMatch<R, C>, false> {
-//       if (route === routeToSkip) {
-//         return { done: true, value: false };
-//       }
-//
-//       if (!matchResult) {
-//         const rt = route;
-//         const end = !rt.children;
-//         if (!rt.match) {
-//           rt.match = match<RouteParams>(rt.path || '', { end, ...options });
-//         }
-//         matchResult = rt.match(pathname);
-//
-//         if (matchResult) {
-//           const { path } = matchResult;
-//           matchResult.path = !end && path.charAt(path.length - 1) === '/' ? path.substr(1) : path;
-//           matchResult.params = { ...parentParams, ...matchResult.params };
-//           return {
-//             done: false,
-//             value: {
-//               route,
-//               baseUrl,
-//               path: matchResult.path,
-//               params: matchResult.params,
-//             },
-//           };
-//         }
-//       }
-//
-//       if (matchResult && route.children) {
-//         while (childIndex < route.children.length) {
-//           if (!childMatches) {
-//             const childRoute = route.children[childIndex]!;
-//             childRoute.parent = route;
-//
-//             childMatches = matchRoute<R, C>(
-//               childRoute,
-//               baseUrl + matchResult.path,
-//               options,
-//               pathname.substr(matchResult.path.length),
-//               matchResult.params
-//             );
-//           }
-//
-//           const childMatch = childMatches.next(routeToSkip);
-//           if (!childMatch.done) {
-//             return { done: false, value: childMatch.value };
-//           }
-//
-//           childMatches = null;
-//           childIndex++;
-//         }
-//       }
-//
-//       return { done: true, value: false };
-//     },
-//   };
-// }
 
 function resolveRoute<R = any, C extends RouterContext = object>(
   context: RouteContext<R, C>,
@@ -304,20 +139,6 @@ function extractParamsFromPath(path: string, params: RouteParams): RouteParams {
   return result;
 }
 
-// function isChildRoute<R = any, C extends RouterContext = object>(
-//   parentRoute: Route<R, C> | false,
-//   childRoute: Route<R, C>
-// ): boolean {
-//   let route: Route<R, C> | null | undefined = childRoute;
-//   while (route) {
-//     route = route.parent;
-//     if (route === parentRoute) {
-//       return true;
-//     }
-//   }
-//   return false;
-// }
-
 function decode(val: string): string {
   return Either.tryCatch(() => decodeURIComponent(val)).getOrDefault(val);
 }
@@ -348,38 +169,3 @@ function* routeChainFromRoot(route: ParsedRoute<RouteResolver>): Generator<Parse
   }
   yield route;
 }
-
-// function* routeChain(route) {
-//   while (route) {
-//     yield route;
-//     route = route.parentRoute;
-//   }
-// }
-
-// v1
-// const matchedRoute = findMatchingRoute(routePathList, context.pathname.substring(this.baseUrl.length));
-//
-// if (matchedRoute.success) {
-//   const matchedCfgRoute = routesConfig[matchedRoute.route.pathname];
-//   const resolve = this.options.resolveRoute ?? resolveRoute;
-//
-//   for (const pp of routeChainFromRoot(matchedCfgRoute)) {
-//   }
-//
-//   const currentContext = {
-//     ...context,
-//     path: matchedRoute.route.pathname,
-//     ...{
-//       route: { ...matchedCfgRoute },
-//       params: Object.fromEntries(Object.entries(matchedRoute.route.params).map(([key, value]) => [key, decode(value)])),
-//     },
-//   };
-//   return Promise.resolve(resolve(currentContext, matchedRoute.route.params));
-//   // .then((result) => {
-//   // if (result !== null && result !== undefined) {
-//   //   return result;
-//   // }
-//   // return next(resume, parent, result);
-// } else {
-//   throw matchedRoute.error;
-// }
