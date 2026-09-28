@@ -38,8 +38,16 @@ const mappedAttributeNamesMap: Map<string, string> = new Map<string, string>(map
 
 export const isMappedAttribute = (attributeName: string): boolean => mappedAttributeNamesMap.has(attributeName);
 
+/**
+ * Converts a DOM property name to its attribute name: `className` → `class`; other names stay.
+ *
+ * @param {string} property - The prop name.
+ * @returns {string} The attribute name.
+ */
+export const toAttributeName = (property: string): string => mappedAttributeNamesMap.get(property) ?? property;
+
 export const setMappedAttribute = <Element extends HTMLElement>(
   element: Element,
   attributeName: string,
   value: string
-): Element => setAttribute(element, mappedAttributeNamesMap.get(attributeName) ?? attributeName, value);
+): Element => setAttribute(element, toAttributeName(attributeName), value);

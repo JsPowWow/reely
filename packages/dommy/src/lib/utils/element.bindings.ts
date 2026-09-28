@@ -3,7 +3,21 @@ import { isSomeFunction } from '@reely/utils';
 import { isFalsyElement } from './element.utils';
 import { computed } from '../reactive/preact-like/preact-like.signal';
 
-import type { ReactiveChildDOMElement, ValidChildDOMElement } from '../types/dommy.types';
+import type { ReactiveChildDOMElement, ReactiveValue, ValidChildDOMElement } from '../types/dommy.types';
+
+/**
+ * Calls `write` with the current value of `read`, then again on every change of the
+ * signals `read` depends on.
+ *
+ * @template T - The value type.
+ * @param {ReactiveValue<T>} read - A signal or a getter.
+ * @param {(value: T) => void} write - Applies the value to the DOM.
+ * @returns {void}
+ */
+export const bindValue = <T>(read: ReactiveValue<T>, write: (value: T) => void): void => {
+  // TODO AR register the subscription in the owner (JsPowWow/reely#1, step 2)
+  computed(read).subscribe(write);
+};
 
 /**
  * Converts a child value to text node data: `null`, `undefined` and `false` render nothing.
@@ -22,8 +36,7 @@ const toTextData = (value: unknown): string => (isFalsyElement(value) ? '' : Str
  */
 export const toBoundTextNode = (read: ReactiveChildDOMElement): Text => {
   const text = document.createTextNode('');
-  // TODO AR register the subscription in the owner (JsPowWow/reely#1, step 2)
-  computed(read).subscribe((value) => {
+  bindValue(read, (value) => {
     text.data = toTextData(value);
   });
   return text;
