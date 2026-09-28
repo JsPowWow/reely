@@ -1,9 +1,5 @@
-import { hasSome, noop } from '@reely/utils';
-
-import { getOwner, withOwner } from './reactive/owner';
 import { bindValue } from './utils/element.bindings';
-import { toNodes } from './utils/element.children';
-import { createAnchors, insertBefore, rangeOf, removeNodes } from './utils/element.range';
+import { createFlowSlot } from './utils/flow.slot';
 
 import type { ReactiveValue, ReelyNode } from './types/dommy.types';
 
@@ -25,22 +21,10 @@ export interface ShowProps {
  * @returns {DocumentFragment} The shown branch between the two anchors it keeps its place by.
  */
 export const Show = ({ when, children, fallback }: ShowProps): DocumentFragment => {
-  const owner = getOwner();
-  const { fragment, start, end } = createAnchors('Show');
-  let disposeBranch: VoidFunction = noop;
-
-  const showBranch = (shown: boolean): void => {
-    disposeBranch();
-    removeNodes(rangeOf(start, end).slice(1, -1));
-    const render = shown ? children : fallback;
-    disposeBranch = withOwner((dispose) => {
-      if (hasSome(render)) {
-        insertBefore(end, toNodes(render()));
-      }
-      return dispose;
-    }, owner);
-  };
-
-  bindValue(() => Boolean(when()), showBranch);
-  return fragment;
+  const slot = createFlowSlot('Show');
+  bindValue(
+    () => Boolean(when()),
+    (shown) => slot.show(shown ? children : fallback)
+  );
+  return slot.fragment;
 };

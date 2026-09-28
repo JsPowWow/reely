@@ -81,7 +81,7 @@ const Laps = (): ReelyNode => () => `${laps.value} laps`;
 document.body.append(<Link href="/race"><Laps /></Link>);
 ```
 
-A fragment, whether from such a component, `<>…</>`, `Show` or `For`, empties into its parent on `append`, so place it once. To move or remove it later, keep it inside an element, or render it with `mount`.
+A fragment, whether from such a component, `<>…</>`, `Show`, `Await` or `For`, empties into its parent on `append`, so place it once. To move or remove it later, keep it inside an element, or render it with `mount`.
 
 ## Signals
 
@@ -180,6 +180,57 @@ const banner = (
 );
 ```
 
+## Async
+
+`Await` renders `fallback` while a promise is pending, then `children` with its value, or `catch` with the reason as an `Error`. Like `Show`, each branch is a function, built when it is shown and released when it is hidden.
+
+```tsx
+import { Await } from '@reely/dommy';
+
+interface Final {
+  winner: string;
+  laps: number;
+}
+
+const loadFinal = (): Promise<Final> => fetch('/final.json').then((response) => response.json());
+
+const result = (
+  <Await promise={loadFinal()} fallback={() => <p>Loading the final…</p>} catch={(error) => <p>{error.message}</p>}>
+    {(final) => (
+      <p>
+        {final.winner} wins after {final.laps} laps
+      </p>
+    )}
+  </Await>
+);
+```
+
+`promise` can also be a getter: it is tracked, so a change of a signal it reads loads again. Only the latest promise renders; the result of one it replaced is dropped, and so is everything that settles after the view is disposed.
+
+```tsx
+import { Await, signal } from '@reely/dommy';
+
+const loadLap = (lap: number): Promise<string[]> => fetch(`/laps/${lap}.json`).then((response) => response.json());
+
+const lap = signal(1);
+
+const standings = (
+  <Await promise={() => loadLap(lap.value)} fallback={() => <p>Loading lap {lap}…</p>}>
+    {(cars) => (
+      <ol>
+        {cars.map((car) => (
+          <li>{car}</li>
+        ))}
+      </ol>
+    )}
+  </Await>
+);
+
+lap.value = 2; // the fallback again, then lap 2; a late answer for lap 1 is dropped
+```
+
+`promise={loadFinal}` starts the load when the view renders. Without `catch`, a rejection clears the fallback and stays unhandled, so the browser reports it; to retry, read a signal in the getter and change it.
+
 ## Mount and clean up
 
 `mount(parent, render)` appends a view and returns the function that removes it and releases every binding and effect created while rendering it. `onCleanup` adds your own release: a timer, an animation frame, an observer, an outside subscription.
@@ -198,7 +249,7 @@ const unmount = mount(document.body, () => <Clock />);
 unmount(); // the timer stops, the bindings are released, the view is gone
 ```
 
-A row of `For` and a branch of `Show` run their cleanups when they go away.
+A row of `For` and a branch of `Show` or `Await` run their cleanups when they go away.
 
 ## SVG
 
