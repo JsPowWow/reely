@@ -1,0 +1,161 @@
+.board {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 32rem;
+}
+
+/* The standings: one row per car, the place on a graphite plate, like a timing tower. */
+.tower,
+.scroller {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  list-style: none;
+}
+
+.scroller {
+  max-height: 22rem;
+  overflow-y: auto;
+  scrollbar-color: var(--slate) transparent;
+  scrollbar-width: thin;
+}
+
+.scroller:focus-visible {
+  outline: 3px solid var(--graphite);
+  outline-offset: 2px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding-right: 0.75rem;
+  border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.place {
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  padding: 0.3rem 0;
+  background: var(--graphite);
+  color: var(--asphalt);
+  font-family: var(--display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* The leader's plate is signal yellow; it moves with whichever row is first, with no binding. */
+.row:first-child .place {
+  background: var(--signal);
+  color: var(--graphite);
+}
+
+.name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.distance {
+  color: var(--slate);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+}
+
+.controls button {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--graphite);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--graphite);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  background: var(--graphite);
+  color: var(--asphalt);
+}
+
+.controls button:focus-visible,
+.controls input:focus-visible {
+  outline: 3px solid var(--graphite);
+  outline-offset: 2px;
+}
+
+.controls input {
+  accent-color: var(--graphite);
+}
+
+.status {
+  margin: 0;
+  color: var(--slate);
+  font-variant-numeric: tabular-nums;
+}
+
+.sizes {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.sizes legend {
+  float: left;
+  margin-right: 0.25rem;
+  color: var(--slate);
+}
+
+.sizes label,
+.mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Timings measured in this browser, in the display face of the write counter below. */
+.timing {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 0;
+}
+
+.timing div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.timing dt {
+  order: 1;
+  color: var(--slate);
+  font-size: 0.875rem;
+}
+
+.timing dd {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}

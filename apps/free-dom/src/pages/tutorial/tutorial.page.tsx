@@ -114,8 +114,8 @@ export const TutorialPage = ({ slug, missingPath }: TutorialPageProps): JSX.Elem
                 <section className={css.ending} aria={{ ariaLabelledby: 'ending-title' }}>
                   <h2 id='ending-title'>What comes next</h2>
                   <p>
-                    Keyed lists that keep their nodes when rows move, then the race scoreboard of ai-race. @reely/dommy
-                    0.1 is not on npm yet: the code in this course runs from the repo.
+                    The race scoreboard of ai-race, built on these same lists. @reely/dommy 0.1 is not on npm yet: the
+                    code in this course runs from the repo.
                   </p>
                   <a href='https://github.com/JsPowWow/reely'>Follow reely on GitHub</a>
                 </section>

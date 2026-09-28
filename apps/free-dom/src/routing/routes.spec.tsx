@@ -1,10 +1,11 @@
 import { createAsyncRouter } from '@reely/dommy/router';
-import { isInstanceOf } from '@reely/utils';
+import { isInstanceOf, isSomeFunction } from '@reely/utils';
 
 import { routes } from './routes';
 
 const renderAt = async (pathname: string): Promise<Element> => {
-  const page = await createAsyncRouter(routes).resolve(pathname);
+  const render = await createAsyncRouter(routes).resolve(pathname);
+  const page = isSomeFunction(render) ? render() : null;
   if (!isInstanceOf(Element, page)) {
     throw new Error(`No page at ${pathname}`);
   }

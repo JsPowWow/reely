@@ -1,3 +1,4 @@
+import { mount } from '@reely/dommy';
 import { isInstanceOf } from '@reely/utils';
 
 import { MutationMeter } from './mutation.meter';
@@ -134,6 +135,167 @@ describe('tutorial', () => {
       await flushMutations();
 
       expect(readAnnouncement(meter)).toBe('Last change: 2 nodes added or removed. 4 writes since the first render.');
+    });
+  });
+
+  describe('board steps', () => {
+    const rowsOf = (root: Element): HTMLLIElement[] => Array.from(root.querySelectorAll('li'));
+    const distanceOf = (row: Element): number => Number.parseFloat(row.querySelector('data')?.value ?? 'NaN');
+    const readNodeWrites = (meter: Element): number => Number.parseInt(readWrites(meter)[3] ?? '', 10);
+
+    it('step "keyed-list" keeps every row and moves fewer rows than a rebuild would', async () => {
+      const meter = renderStep('keyed-list');
+      const before = rowsOf(meter);
+
+      clickButton(meter, 'Race a lap');
+      await flushMutations();
+      const after = rowsOf(meter);
+
+      expect(before).toHaveLength(8);
+      expect(new Set(after)).toEqual(new Set(before));
+      expect(after.map(distanceOf)).toEqual(after.map(distanceOf).toSorted((x, y) => y - x));
+      expect(after.map((row) => row.querySelector('b')?.textContent)).toEqual(['1', '2', '3', '4', '5', '6', '7', '8']);
+      expect(readNodeWrites(meter)).toBeGreaterThan(0);
+      // a rebuild removes and adds every row: 16 node writes
+      expect(readNodeWrites(meter)).toBeLessThan(16);
+    });
+
+    describe('step "five-hundred"', () => {
+      beforeEach(() => {
+        vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+      });
+      afterEach(() => {
+        vi.useRealTimers();
+        document.body.replaceChildren();
+      });
+
+      // a radio or a checkbox changes on click only while it is in the document
+      const renderConnected = (): HTMLElement => {
+        const meter = renderStep('five-hundred');
+        document.body.append(meter);
+        return meter;
+      };
+
+      const findButton = (root: Element, label: string): HTMLButtonElement | undefined =>
+        Array.from(root.querySelectorAll('button')).find((item) => item.textContent === label);
+      const findField = (root: Element, label: string): HTMLInputElement | undefined =>
+        Array.from(root.querySelectorAll('label')).find((item) => item.textContent?.includes(label))?.querySelector('input') ??
+        undefined;
+      const lapOf = (root: Element): string =>
+        Array.from(root.querySelectorAll('p')).find((item) => item.textContent?.startsWith('Lap '))?.textContent ?? '';
+      const readoutOf = (root: Element, label: string): string =>
+        Array.from(root.querySelectorAll('dt')).find((item) => item.textContent === label)?.nextElementSibling?.textContent ?? '';
+
+      it('races five hundred rows, moving the rows it keeps', async () => {
+        const meter = renderStep('five-hundred');
+        const before = new Set(rowsOf(meter));
+
+        clickButton(meter, 'Start');
+        vi.advanceTimersToNextTimer();
+        vi.advanceTimersToNextTimer();
+        await flushMutations();
+
+        expect(before.size).toBe(500);
+        expect(lapOf(meter)).toBe('Lap 2');
+        expect(readoutOf(meter, 'Last lap')).toMatch(/ms$/);
+        // two laps say nothing about a percentile yet
+        expect(readoutOf(meter, '95th percentile')).toBe('–');
+        expect(new Set(rowsOf(meter))).toEqual(before);
+        expect(findButton(meter, 'Stop')).toBeDefined();
+      });
+
+      it('builds every row again when the keys change every lap, and writes more nodes than moving them', async () => {
+        const moving = renderConnected();
+        const rebuilding = renderConnected();
+        findField(rebuilding, 'New keys every lap')?.click();
+        const before = rowsOf(rebuilding);
+
+        for (const meter of [moving, rebuilding]) {
+          clickButton(meter, 'Start');
+        }
+        vi.advanceTimersToNextTimer();
+        await flushMutations();
+
+        expect(rowsOf(rebuilding).some((row) => before.includes(row))).toBe(false);
+        expect(readNodeWrites(rebuilding)).toBe(1000);
+        expect(readNodeWrites(moving)).toBeLessThan(1000);
+      });
+
+      it('times each key mode on its own, and gives a median once 20 laps are timed', () => {
+        const meter = renderConnected();
+        clickButton(meter, 'Start');
+        for (let lap = 0; lap < 20; lap++) {
+          vi.advanceTimersToNextTimer();
+        }
+        const medianOf20 = readoutOf(meter, 'Median');
+
+        findField(meter, 'New keys every lap')?.click();
+
+        expect(medianOf20).toMatch(/ms$/);
+        expect(readoutOf(meter, 'Median')).toBe('–');
+      });
+
+      it('changes the field size between races', () => {
+        const meter = renderConnected();
+
+        findField(meter, '100')?.click();
+
+        expect(rowsOf(meter)).toHaveLength(100);
+      });
+
+      it('stops racing when stopped, and when the page is taken down', () => {
+        const host = document.createElement('div');
+        const dispose = mount(host, () => renderStep('five-hundred'));
+        clickButton(host, 'Start');
+        vi.advanceTimersToNextTimer();
+        clickButton(host, 'Stop');
+        vi.advanceTimersToNextTimer();
+        const afterStop = lapOf(host);
+        clickButton(host, 'Start');
+
+        dispose();
+
+        expect(afterStop).toBe('Lap 1');
+        expect(vi.getTimerCount()).toBe(0);
+      });
+    });
+  });
+
+  describe('MutationMeter', () => {
+    afterEach(() => {
+      Reflect.deleteProperty(Element.prototype, 'animate');
+    });
+
+    it('flashes the rows a lap moved, not the list that holds them', async () => {
+      const animate = vi.fn();
+      Element.prototype.animate = animate;
+      const meter = renderStep('keyed-list');
+
+      clickButton(meter, 'Race a lap');
+      await flushMutations();
+      const flashed = new Set<unknown>(animate.mock.contexts);
+
+      expect(flashed.has(meter.querySelector('ol'))).toBe(false);
+      expect([...flashed].some((element) => isInstanceOf(HTMLLIElement, element))).toBe(true);
+    });
+
+    it('flashes the nodes a small change touched, and leaves a large change to the counts', async () => {
+      const animate = vi.fn();
+      Element.prototype.animate = animate;
+      const small = renderStep('bind');
+      const large = renderStep('keyed-list');
+
+      clickButton(small, '+1');
+      await flushMutations();
+      const flashedForSmall = animate.mock.calls.length;
+      animate.mockClear();
+      for (let lap = 0; lap < 12; lap++) {
+        clickButton(large, 'Race a lap');
+      }
+      await flushMutations();
+
+      expect(flashedForSmall).toBe(1);
+      expect(animate).not.toHaveBeenCalled();
     });
   });
 

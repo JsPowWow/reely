@@ -1,5 +1,5 @@
 import type { ChildDOMElement, Signal } from '@reely/dommy';
-import { batch, dd, div, dl, dt, figcaption, figure, p, signal, span } from '@reely/dommy';
+import { batch, dd, div, dl, dt, figcaption, figure, onCleanup, p, signal, span } from '@reely/dommy';
 import { exhaustiveGuard, isInstanceOf, isNil, isSomeFunction } from '@reely/utils';
 
 import css from './tutorial.module.css';
@@ -73,28 +73,40 @@ const describeChange = (delta: Readonly<Record<WriteKind, number>>, total: numbe
     : `Last change: ${parts.join(', ')}. ${total} ${total === 1 ? 'write' : 'writes'} since the first render.`;
 };
 
+/** More records than this in one change are shown by the counts alone: flashing them all would cost the frame. */
+const flashLimit = 100;
+
 const prefersReducedMotion = (): boolean =>
   isSomeFunction(window.matchMedia) && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
- * Outlines the element a mutation touched, in the page's `--signal-ink` or `--flag` color;
- * with reduced motion the outline shows and hides without fading.
+ * What a mutation left to see: the nodes it added, so a moved row lights up itself, or the node it
+ * edited. A removed node is gone, so only the counts show it.
+ */
+const touchedBy = (record: MutationRecord): Node[] =>
+  record.type === 'childList' ? Array.from(record.addedNodes) : [record.target];
+
+/**
+ * Outlines the elements a mutation touched (a text node's element for text), in the page's
+ * `--signal-ink` or `--flag` color; with reduced motion the outline shows and hides without fading.
  */
 const flash = (record: MutationRecord): void => {
-  const element = isInstanceOf(Element, record.target) ? record.target : record.target.parentElement;
-  if (isNil(element) || !isSomeFunction(element.animate)) {
-    return;
-  }
   const token = toDomWrite(record).kind === 'node' ? '--flag' : '--signal-ink';
-  const outline = `3px solid ${getComputedStyle(element).getPropertyValue(token)}`;
-  const fadeOut = prefersReducedMotion() ? outline : '3px solid transparent';
-  element.animate(
-    [
-      { outline, outlineOffset: '2px' },
-      { outline: fadeOut, outlineOffset: '2px' },
-    ],
-    { duration: 700, easing: 'ease-out' }
-  );
+  for (const node of touchedBy(record)) {
+    const element = isInstanceOf(Element, node) ? node : node.parentElement;
+    if (isNil(element) || !isSomeFunction(element.animate)) {
+      continue;
+    }
+    const outline = `3px solid ${getComputedStyle(element).getPropertyValue(token)}`;
+    const fadeOut = prefersReducedMotion() ? outline : '3px solid transparent';
+    element.animate(
+      [
+        { outline, outlineOffset: '2px' },
+        { outline: fadeOut, outlineOffset: '2px' },
+      ],
+      { duration: 700, easing: 'ease-out' }
+    );
+  }
 };
 
 interface MutationMeterProps {
@@ -103,8 +115,8 @@ interface MutationMeterProps {
 
 /**
  * Wraps a demo: counts the nodes it builds on the first render, then the DOM writes it makes
- * by kind, flashes every node it touches, and announces what the last change did.
- * The observer lives as long as the page: tutorial links navigate with a full reload.
+ * by kind, flashes the nodes a small change touches, and announces what the last change did.
+ * The observer is disconnected when the page is taken down.
  */
 export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => {
   const totals = countSignals();
@@ -113,7 +125,7 @@ export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => 
 
   const stage = div({ className: css.stage }, children);
 
-  new MutationObserver((records) => {
+  const observer = new MutationObserver((records) => {
     const delta = { text: 0, attribute: 0, node: 0 } satisfies Record<WriteKind, number>;
     for (const { kind, count } of records.map(toDomWrite)) {
       delta[kind] += count;
@@ -128,8 +140,12 @@ export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => 
         writeKinds.reduce((sum, kind) => sum + totals[kind].value, 0)
       );
     });
-    records.forEach(flash);
-  }).observe(stage, { subtree: true, childList: true, attributes: true, characterData: true });
+    if (records.length <= flashLimit) {
+      records.forEach(flash);
+    }
+  });
+  observer.observe(stage, { subtree: true, childList: true, attributes: true, characterData: true });
+  onCleanup(() => observer.disconnect());
 
   const readout = (kind: WriteKind): HTMLElement =>
     div(

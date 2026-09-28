@@ -6,6 +6,10 @@ import { Counter as TwoSignalCounter } from './steps/step10.two-signals';
 import twoSignalsSource from './steps/step10.two-signals.ts?highlight';
 import { Counter as BatchCounter } from './steps/step11.batch';
 import batchSource from './steps/step11.batch.ts?highlight';
+import { Board as KeyedBoard } from './steps/step12.keyed-list';
+import keyedListSource from './steps/step12.keyed-list.tsx?highlight';
+import { Board as LiveBoard } from './steps/step13.five-hundred';
+import fiveHundredSource from './steps/step13.five-hundred.tsx?highlight';
 import { ReelyLinks as JsxLinks } from './steps/step2.jsx';
 import jsxSource from './steps/step2.jsx.tsx?highlight';
 import { ReelyLinks as ComponentLinks } from './steps/step3.components';
@@ -26,13 +30,13 @@ import getterSource from './steps/step9.getter.ts?highlight';
 import type { SourceLines } from '../../highlight/source.types';
 
 /**
- * One step of the lesson: the markup steps build the same card three ways, then every step
- * builds the same counter with one more reely feature.
+ * One step of the lesson: the markup steps build the same card three ways, the counter steps
+ * add one reely feature at a time, and the board steps race a keyed list.
  */
 export interface TutorialStep {
   slug: string;
   /** Steps that build the same demo share a track; a step's source is diffed against the previous step on its track. */
-  track: 'links' | 'counter';
+  track: 'links' | 'counter' | 'board';
   title: string;
   lead: string;
   Demo: () => JSX.Element;
@@ -128,5 +132,21 @@ export const tutorialSteps: readonly TutorialStep[] = [
     lead: 'batch applies both changes first and runs each binding once when it returns. The summary is written once, so a click costs two text edits instead of three.',
     Demo: BatchCounter,
     source: batchSource,
+  },
+  {
+    slug: 'keyed-list',
+    track: 'board',
+    title: 'A keyed list',
+    lead: 'For renders one row per key, once. After a lap the board is in a new order: the rows that kept their key keep their nodes, and only the rows that changed places are moved. The board counts two node writes per moved row, and a text edit for every place and distance that changed.',
+    Demo: KeyedBoard,
+    source: keyedListSource,
+  },
+  {
+    slug: 'five-hundred',
+    track: 'board',
+    title: 'Five hundred rows',
+    lead: 'The same race on a field of hundreds, timed in your browser: each lap is measured from the write to the finished layout, and the median and 95th percentile appear once 20 laps are timed. Then give every row a new key on every lap: For throws each row away and builds it again, and the board and the timings show what that costs.',
+    Demo: LiveBoard,
+    source: fiveHundredSource,
   },
 ];

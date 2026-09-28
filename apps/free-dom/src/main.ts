@@ -1,10 +1,11 @@
 import { a, defineDommyConfig, p } from '@reely/dommy';
 import { createAsyncRouter } from '@reely/dommy/router';
 import { scopedLogger } from '@reely/logger';
-import { isInstanceOf } from '@reely/utils';
+import { isInstanceOf, isSomeFunction } from '@reely/utils';
 
 import { followPagerKey } from './pages/tutorial/pager.keys';
 import { navigateInPage } from './routing/page.navigation';
+import { createPageView } from './routing/page.view';
 import { routes } from './routing/routes';
 
 defineDommyConfig({
@@ -13,6 +14,7 @@ defineDommyConfig({
 });
 
 const router = createAsyncRouter(routes);
+const showPage = createPageView(document.body);
 // the pathname asked for last; a slower page resolved for an older one is dropped
 let latestPathname = '';
 
@@ -20,17 +22,15 @@ let latestPathname = '';
 const renderPage = async (pathname: string): Promise<boolean> => {
   latestPathname = pathname;
   try {
-    const page = await router.resolve({ pathname });
-    if (pathname !== latestPathname || !isInstanceOf(Node, page)) {
+    const render = await router.resolve({ pathname });
+    if (pathname !== latestPathname || !isSomeFunction(render)) {
       return false;
     }
-    document.body.replaceChildren(page);
+    showPage(render);
   } catch (error: unknown) {
     // every URL has a route, so this is a bug: say so instead of leaving a blank page
     scopedLogger('free-dom').error(error);
-    document.body.replaceChildren(
-      p(null, 'This page failed to load. ', a({ href: '/tutorial' }, 'Open the course from step 1'), '.')
-    );
+    showPage(() => p(null, 'This page failed to load. ', a({ href: '/tutorial' }, 'Open the course from step 1'), '.'));
   }
   return true;
 };
