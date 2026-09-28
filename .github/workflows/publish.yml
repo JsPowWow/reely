@@ -51,18 +51,11 @@ jobs:
         env:
           PROJECTS: ${{ inputs.projects }}
 
-      # `npm publish` itself, not `nx release publish`: npm's own output (OIDC included) stays visible
       - name: Publish packages
-        run: |
-          for project in ${PROJECTS//,/ }; do
-            root=$(npx nx show project "$project" --json | node -e "process.stdout.write(JSON.parse(require('fs').readFileSync(0, 'utf8')).root)")
-            npm publish "./$root" --tag "$DIST_TAG" --access public ${{ inputs.dry-run == true && '--dry-run' || '' }}
-          done
+        run: npx nx release publish --projects "$PROJECTS" --tag "$DIST_TAG" ${{ inputs.dry-run == true && '--dry-run --verbose' || '--verbose' }}
         env:
           PROJECTS: ${{ inputs.projects }}
           DIST_TAG: ${{ inputs.dist-tag }}
           NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
-          # npm says why an OIDC exchange failed only at this level
-          NPM_CONFIG_LOGLEVEL: verbose
           # npm trusts this workflow (npmjs.com → package settings → Trusted Publisher) and adds provenance itself
           NPM_CONFIG_PROVENANCE: true
