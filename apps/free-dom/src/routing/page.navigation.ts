@@ -12,7 +12,8 @@ const opensInPlace = (link: HTMLAnchorElement): boolean =>
   (link.target === '' || link.target === '_self') && !link.hasAttribute('download') && link.origin === location.origin;
 
 /** A link to a place on the page already shown: the browser scrolls to it, nothing is redrawn. */
-const isPlaceOnPage = (link: HTMLAnchorElement): boolean => link.pathname === location.pathname && link.hash !== '';
+const isPlaceOnPage = (link: HTMLAnchorElement): boolean =>
+  link.pathname === location.pathname && link.search === location.search && link.hash !== '';
 
 /**
  * Follows same-site links without reloading the document: the URL goes to the history and
@@ -46,9 +47,15 @@ export const navigateInPage = (render: (pathname: string) => void): VoidFunction
     { signal: controller.signal }
   );
   // moving between places on the same page keeps the page
-  window.addEventListener('popstate', () => location.pathname !== shownPathname && show(), {
-    signal: controller.signal,
-  });
+  window.addEventListener(
+    'popstate',
+    () => {
+      if (location.pathname !== shownPathname) {
+        show();
+      }
+    },
+    { signal: controller.signal }
+  );
 
   return () => controller.abort();
 };

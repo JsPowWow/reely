@@ -11,7 +11,7 @@ import type { Plugin } from 'vite';
  * yellow tint of new lines. Yellow itself is left out: on the panel it means "new since the last step".
  */
 export const reelyCodeTheme = {
-  /** The panel itself: mirrors `--graphite` in the tutorial styles. */
+  /** The panel itself: mirrors `--graphite` in the site styles. */
   background: '#1F2933',
   text: '#E4E7EB',
   comment: '#B3BDC7',

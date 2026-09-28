@@ -6,7 +6,7 @@ const title = computed(() => `Lap ${lap.value}: ${leader.value} leads`);
 
 // Runs now, and again after every change of what it read.
 const stop = effect(() => {
-  const timer = setTimeout(() => console.log(`${title.value}, still`), 30_000);
+  const timer = setTimeout(() => (document.title = title.value), 1_000);
   onCleanup(() => clearTimeout(timer)); // before the next run, and on stop()
 });
 

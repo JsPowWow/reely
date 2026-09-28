@@ -1,18 +1,9 @@
 import { mount } from '@reely/dommy';
 
+import { clickButton, flushMutations } from '../../testing/dom.testing';
 import { MutationMeter } from '../../demo/mutation.meter';
 import { EvolutionPage } from './evolution.page';
 import { evolutionSteps } from './evolution.steps';
-
-const flushMutations = (): Promise<void> => new Promise((resolve) => setTimeout(resolve));
-
-const clickButton = (root: Element, label: string): void => {
-  const button = Array.from(root.querySelectorAll('button')).find((item) => item.textContent === label);
-  if (!button) {
-    throw new Error(`No "${label}" button`);
-  }
-  button.click();
-};
 
 // the first-render node count, then text edits, attribute edits, nodes added or removed
 const readWrites = (meter: Element): string[] =>
@@ -71,7 +62,7 @@ describe('evolution', () => {
       ['getter', ['7', '3+1', '4+1', '0']],
       ['two-signals', ['9', '9+3', '4+1', '0']],
       ['batch', ['9', '6+2', '4+1', '0']],
-    ])('step "%s" makes the writes its lesson is about', async (slug, expected) => {
+    ])('step "%s" makes the writes it shows', async (slug, expected) => {
       const meter = renderStep(slug);
 
       await clickInTurn(meter, ['+1', '+1', '−1']);

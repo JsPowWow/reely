@@ -12,7 +12,11 @@ export interface LapSector {
   id: string;
   name: string;
   claim: string;
+  /** What the board under the demo shows, in a few words. */
   split: string;
+  /** The split, shorter: posted on the sector bar once the sector is driven. */
+  mark: string;
+  /** The module's file, as the source caption names it. */
   file: string;
   Demo: () => Node;
   source: SourceLines;
@@ -25,7 +29,8 @@ export const lapSectors: readonly LapSector[] = [
     claim:
       'Tag factories and JSX return real elements. A component is a function that runs once: the grid was built when the page loaded, and the board under it has counted no writes since.',
     split: '0 writes after render',
-    file: 'grid.tsx',
+    mark: '0 writes',
+    file: 'markup.grid.tsx',
     Demo: Grid,
     source: gridSource,
   },
@@ -35,7 +40,8 @@ export const lapSectors: readonly LapSector[] = [
     claim:
       'A signal in the markup is bound to the one text node that shows it. Complete a lap: the count and the note are edited in place, and the button is disabled only when the flag falls.',
     split: '2 text edits a lap',
-    file: 'laps.tsx',
+    mark: '2 edits',
+    file: 'signals.laps.tsx',
     Demo: Laps,
     source: lapsSource,
   },
@@ -43,9 +49,10 @@ export const lapSectors: readonly LapSector[] = [
     id: 'lists',
     name: 'Lists',
     claim:
-      'For keeps one row per car. Race a lap: the rows that changed places move, the others stay where they are, and every new distance is one text edit.',
-    split: 'Only moved rows move',
-    file: 'race.tsx',
+      'For keeps one row per car. On lap 1 two of the five cars change places: the board counts 4 node writes, a removal and an insertion for each moved row, and a text edit for every place and distance that changed.',
+    split: '2 rows moved',
+    mark: '2 moved',
+    file: 'lists.race.tsx',
     Demo: Race,
     source: raceSource,
   },

@@ -1,15 +1,8 @@
 import { mount } from '@reely/dommy';
 
+import { clickButton, flushMutations } from '../../testing/dom.testing';
 import { LandingPage } from './landing.page';
 import { lapSectors } from './landing.sectors';
-
-const clickButton = (root: Element, label: string): void => {
-  const button = Array.from(root.querySelectorAll('button')).find((item) => item.textContent === label);
-  if (!button) {
-    throw new Error(`No "${label}" button`);
-  }
-  button.click();
-};
 
 describe('LandingPage', () => {
   let host: HTMLElement;
@@ -59,5 +52,23 @@ describe('LandingPage', () => {
     expect(lists.textContent).toContain('Lap 1');
     expect(lists.querySelectorAll('li')).toHaveLength(5);
     expect(lists.querySelector('li')).not.toBe(leader);
+  });
+
+  it('shows on the board the split the lists sector claims for lap 1', async () => {
+    const lists = host.querySelector('section#lists');
+    if (!lists) {
+      throw new Error('No lists sector');
+    }
+    await flushMutations();
+
+    clickButton(lists, 'Race a lap');
+    await flushMutations();
+    // the first-render node count, then text edits, attribute edits, nodes added or removed
+    const [, text, attributes, nodes] = Array.from(lists.querySelectorAll('figcaption dd')).map(
+      (count) => count.firstChild?.textContent
+    );
+
+    expect([text, attributes, nodes]).toEqual(['10', '0', '4']);
+    expect(lists.querySelector('header')?.textContent).toContain('2 rows moved');
   });
 });

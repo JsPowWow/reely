@@ -25,8 +25,10 @@ import mountSource from './snippets/start.mount.tsx?highlight';
 
 import type { SourceLines } from '../../highlight/source.types';
 
-/** A group of topics in the docs rail. */
-export type DocGroup = 'Start' | 'Markup' | 'Reactivity' | 'Structure' | 'Measure';
+/** The groups of the docs rail, in the order the library is layered. */
+export const docGroups = ['Start', 'Markup', 'Reactivity', 'Structure', 'Measure'] as const;
+
+export type DocGroup = (typeof docGroups)[number];
 
 /**
  * One docs page: it answers one question, shows the answer running with its DOM writes

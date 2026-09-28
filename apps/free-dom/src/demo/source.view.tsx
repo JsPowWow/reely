@@ -92,7 +92,8 @@ export const SourceView = ({ source, caption, previous }: SourceViewProps): HTML
       span({ id: captionId }, caption)
     ),
     pre(
-      { className: css.source, aria: { ariaLabelledby: `${titleId} ${captionId}` } },
+      // focusable, so a keyboard can scroll a long line into view
+      { className: css.source, tabIndex: 0, aria: { ariaLabelledby: `${titleId} ${captionId}` } },
       code(
         null,
         source.map((line, index) =>

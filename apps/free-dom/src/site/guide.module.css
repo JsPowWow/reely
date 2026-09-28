@@ -35,7 +35,7 @@
   grid-template-columns: 2rem 1fr;
   align-items: baseline;
   padding: 0.4rem 0.5rem;
-  border-left: 4px solid transparent;
+  border-radius: 4px;
   color: var(--slate);
   text-decoration: none;
 }
@@ -44,18 +44,11 @@
   color: var(--graphite);
 }
 
+/* The current page is a signal-yellow plate, on the rail as on the timing tower. */
 .stepLink[aria-current='step'] {
-  border-left-color: var(--signal);
+  background: var(--signal);
   color: var(--graphite);
   font-weight: 700;
-}
-
-/* Focus is graphite: every focusable element sits on a light surface. */
-.stepLink:focus-visible,
-.pager a:focus-visible,
-.home:focus-visible {
-  outline: 3px solid var(--graphite);
-  outline-offset: 2px;
 }
 
 
@@ -104,11 +97,6 @@
   background: var(--slate);
 }
 
-.start:focus-visible {
-  outline: 3px solid var(--graphite);
-  outline-offset: 2px;
-}
-
 .bigNumber {
   grid-row: span 2;
   font-family: var(--display);
@@ -131,6 +119,12 @@
   max-width: 62ch;
   margin: 0.5rem 0 0;
   color: var(--slate);
+}
+
+/* The live demo stays in view beside a long source while it is read. */
+.panels > :first-child {
+  position: sticky;
+  top: 1rem;
 }
 
 .panels {
@@ -211,6 +205,10 @@
 @media (max-width: 68.75em) {
   .panels {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panels > :first-child {
+    position: static;
   }
 }
 

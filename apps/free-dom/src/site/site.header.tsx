@@ -9,16 +9,17 @@ const sections = [
 ] as const satisfies readonly { section: SiteSection; href: string; label: string }[];
 
 /**
- * The bar on top of every page: the reely wordmark home, the two guides, and the source.
+ * The bar on top of every page: the reely wordmark home, the two guides, and the source. The part
+ * of the site the page belongs to is marked; a page outside them marks nothing.
  */
-export const SiteHeader = ({ current }: { current: SiteSection }): Node => (
+export const SiteHeader = ({ current }: { current?: SiteSection }): Node => (
   <header className={css.header}>
     <a className={css.wordmark} href='/' aria={current === 'home' ? { ariaCurrent: 'page' } : {}}>
       reely
     </a>
     <nav className={css.nav} aria={{ ariaLabel: 'Site' }}>
       {sections.map(({ section, href, label }) => (
-        <a className={css.link} href={href} aria={section === current ? { ariaCurrent: 'page' } : {}}>
+        <a className={css.link} href={href} aria={section === current ? { ariaCurrent: 'true' } : {}}>
           {label}
         </a>
       ))}

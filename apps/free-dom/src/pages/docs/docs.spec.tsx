@@ -1,17 +1,10 @@
 import { mount } from '@reely/dommy';
 
+import { clickButton } from '../../testing/dom.testing';
 import { LapClock } from './demos/lap.clock';
 import { RaceFinish } from './demos/race.finish';
 import { DocsPage } from './docs.page';
 import { docTopics } from './docs.topics';
-
-const clickButton = (root: Element, label: string): void => {
-  const button = Array.from(root.querySelectorAll('button')).find((item) => item.textContent === label);
-  if (!button) {
-    throw new Error(`No "${label}" button`);
-  }
-  button.click();
-};
 
 const renderPage = (slug?: string): Element => {
   const host = document.createElement('div');

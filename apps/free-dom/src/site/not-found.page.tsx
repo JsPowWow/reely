@@ -6,7 +6,7 @@ export const NotFoundPage = ({ pathname }: { pathname: string }): Node => {
   document.title = 'Not found | reely';
   return (
     <>
-      <SiteHeader current='home' />
+      <SiteHeader />
       <main className={guide.main}>
         <header className={guide.missing}>
           <h1 className={guide.title}>There is no page at {pathname}</h1>

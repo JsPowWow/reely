@@ -1,5 +1,5 @@
 import { createObjectReference, mount, onCleanup, signal } from '@reely/dommy';
-import { noop } from '@reely/utils';
+import { hasSome, noop } from '@reely/utils';
 
 import css from './demos.module.css';
 
@@ -25,10 +25,11 @@ export const LapClock = (): Node => {
   const toggle = (): void => {
     if (running.value) {
       unmount();
-    } else if (slot.current) {
+      running.value = false;
+    } else if (hasSome(slot.current)) {
       unmount = mount(slot.current, () => <Stopwatch />);
+      running.value = true;
     }
-    running.value = !running.value;
   };
   onCleanup(() => unmount());
 

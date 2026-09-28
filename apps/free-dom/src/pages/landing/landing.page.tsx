@@ -33,13 +33,17 @@ const Sector = ({ sector, number }: { sector: LapSector; number: number }): Node
  * The landing page: one lap of reely. The start straight says what it is, three sectors prove it
  * live, and the finish gives the times and the way into the docs.
  */
+const finishId = 'finish';
+
+/** The sector bar: every sector, then the finish, each with the split it posts once driven. */
+const segments = [
+  ...lapSectors.map((sector, index) => ({ id: sector.id, number: `S${index + 1}`, name: sector.name, mark: sector.mark })),
+  { id: finishId, number: 'F', name: 'Finish', mark: '6.3 kB' },
+];
+
 export const LandingPage = (): Node => {
   document.title = 'reely: real DOM, one write per change';
-  const fills = trackLap([...lapSectors.map((sector) => sector.id), 'finish']);
-  const segments = [
-    ...lapSectors.map((sector, index) => ({ href: `#${sector.id}`, number: `S${index + 1}`, name: sector.name })),
-    { href: '#finish', number: 'F', name: 'Finish' },
-  ];
+  const fills = trackLap(segments.map((segment) => segment.id));
 
   return (
     <>
@@ -51,8 +55,8 @@ export const LandingPage = (): Node => {
               Real DOM. One write per change.
             </h1>
             <p className={css.pitch}>
-              reely’s @reely/dommy builds real DOM from tag factories and JSX, and binds each signal to the one node it
-              changes. No virtual DOM, no re-render, no dependencies.
+              @reely/dommy builds real DOM from tag factories and JSX, and binds each signal to the one node it changes.
+              No virtual DOM, no re-render, no dependencies.
             </p>
             <div className={css.actions}>
               <a className={css.primary} href='/docs'>
@@ -70,25 +74,30 @@ export const LandingPage = (): Node => {
         </section>
         <nav className={css.sectorBar} aria={{ ariaLabel: 'The lap' }}>
           <ol className={css.segments}>
-            {segments.map((segment, index) => (
-              <li>
-                <a
-                  className={css.segment}
-                  href={segment.href}
-                  styles={{ '--fill': () => String(fills[index]?.() ?? 0) }}
-                >
-                  <span className={css.segmentNumber}>{segment.number}</span>
-                  <span className={css.segmentName}>{segment.name}</span>
-                  <span className={css.track} aria={{ ariaHidden: 'true' }} />
-                </a>
-              </li>
-            ))}
+            {segments.map((segment, index) => {
+              const fill = (): number => fills[index]?.() ?? 0;
+              return (
+                <li>
+                  <a
+                    className={css.segment}
+                    href={`#${segment.id}`}
+                    data-driven={() => String(fill() === 1)}
+                    styles={{ '--fill': () => String(fill()) }}
+                  >
+                    <span className={css.segmentNumber}>{segment.number}</span>
+                    <span className={css.segmentName}>{segment.name}</span>
+                    <span className={css.segmentMark}>{segment.mark}</span>
+                    <span className={css.track} aria={{ ariaHidden: 'true' }} />
+                  </a>
+                </li>
+              );
+            })}
           </ol>
         </nav>
         {lapSectors.map((sector, index) => (
           <Sector sector={sector} number={index + 1} />
         ))}
-        <section id='finish' className={css.finish} aria={{ ariaLabelledby: 'finish-title' }}>
+        <section id={finishId} className={css.finish} aria={{ ariaLabelledby: 'finish-title' }}>
           <div className={css.finishInner}>
             <h2 id='finish-title' className={css.finishTitle}>
               Finish

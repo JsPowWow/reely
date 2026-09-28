@@ -35,8 +35,8 @@ describe('routes', () => {
     const docs = await renderAt('/docs/lists');
     const evolution = await renderAt('/evolution/batch');
 
-    expect(docs.querySelector('header nav [aria-current="page"]')?.textContent).toBe('Docs');
-    expect(evolution.querySelector('header nav [aria-current="page"]')?.textContent).toBe('Evolution');
+    expect(docs.querySelector('header nav [aria-current="true"]')?.textContent).toBe('Docs');
+    expect(evolution.querySelector('header nav [aria-current="true"]')?.textContent).toBe('Evolution');
   });
 
   it('answers an unknown URL with a page that says what is missing', async () => {
@@ -44,5 +44,6 @@ describe('routes', () => {
 
     expect(page.querySelector('h1')?.textContent).toBe('There is no page at /nope/deeper');
     expect(page.querySelector('main a[href="/docs"]')?.textContent).toBe('Open the docs');
+    expect(page.querySelector('[aria-current]')).toBeNull();
   });
 });

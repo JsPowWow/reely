@@ -1,17 +1,21 @@
 import { hasSome, isNil } from '@reely/utils';
+import type { Nullable } from '@reely/utils';
 
 import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
+import { Pager } from '../../site/pager';
 import { SiteHeader } from '../../site/site.header';
 import guide from '../../site/guide.module.css';
 import css from './docs.module.css';
-import { docTopics } from './docs.topics';
+import { docGroups, docTopics } from './docs.topics';
 
-import type { DocGroup, DocTopic } from './docs.topics';
+import type { PagerLink } from '../../site/pager';
+import type { DocTopic } from './docs.topics';
 
 const topicHref = (topic: DocTopic): string => `/docs/${topic.slug}`;
 
-const groups: readonly DocGroup[] = ['Start', 'Markup', 'Reactivity', 'Structure', 'Measure'];
+const toPagerLink = (topic: DocTopic | undefined): Nullable<PagerLink> =>
+  hasSome(topic) ? { href: topicHref(topic), title: topic.title } : null;
 
 /**
  * A docs page: the topic rail, the answer with its live demo and source, the details, and the
@@ -34,7 +38,7 @@ export const DocsPage = ({ slug }: { slug?: string }): Node => {
           <a className={guide.home} href='/docs'>
             Docs
           </a>
-          {groups.map((group) => (
+          {docGroups.map((group) => (
             <section className={css.group} aria={{ ariaLabel: group }}>
               <h2 className={css.groupName}>{group}</h2>
               <ul className={css.topics}>
@@ -84,22 +88,11 @@ export const DocsPage = ({ slug }: { slug?: string }): Node => {
               <article className={css.details}>
                 <topic.Details />
               </article>,
-              <footer className={guide.pager}>
-                {hasSome(previous) && (
-                  <a href={topicHref(previous)} rel='prev' aria={{ ariaKeyShortcuts: 'ArrowLeft' }}>
-                    Previous: {previous.title}
-                  </a>
-                )}
-                {hasSome(next) ? (
-                  <a className={guide.next} href={topicHref(next)} rel='next' aria={{ ariaKeyShortcuts: 'ArrowRight' }}>
-                    Next: {next.title}
-                  </a>
-                ) : (
-                  <a className={guide.next} href='/evolution'>
-                    See it built step by step: reely evolution
-                  </a>
-                )}
-              </footer>,
+              <Pager previous={toPagerLink(previous)} next={toPagerLink(next)}>
+                <a className={guide.next} href='/evolution'>
+                  See it built step by step: reely evolution
+                </a>
+              </Pager>,
             ]
           )}
         </main>

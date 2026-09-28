@@ -28,11 +28,6 @@
   color: var(--asphalt);
 }
 
-.stage :where(button):focus-visible {
-  outline: 3px solid var(--graphite);
-  outline-offset: 2px;
-}
-
 .stage :where(button):disabled {
   border-color: var(--line);
   color: var(--slate);
@@ -125,15 +120,27 @@
 .source {
   margin: 0;
   padding: 1.25rem 0;
-  overflow: visible;
+  overflow-x: auto;
   border-radius: 6px;
   background: var(--graphite);
   color: var(--code-text);
   font-family: var(--mono);
   font-size: 0.8125rem;
   line-height: 1.6;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  white-space: pre;
+  scrollbar-color: var(--slate) var(--graphite);
+  scrollbar-width: thin;
+}
+
+/* A code line keeps its indent: long lines scroll instead of wrapping to column 0. */
+.source code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+}
+
+.source:focus-visible {
+  outline-color: var(--signal);
 }
 
 .line,

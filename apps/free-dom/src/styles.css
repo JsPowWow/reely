@@ -39,6 +39,12 @@ body {
   white-space: nowrap;
 }
 
+/* Focus is graphite on the light surfaces; dark bands set their own. */
+:focus-visible {
+  outline: 3px solid var(--graphite);
+  outline-offset: 2px;
+}
+
 /* A heading focused after a move to another page is a reading position, not a control. */
 h1[tabindex='-1']:focus {
   outline: none;

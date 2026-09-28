@@ -3,9 +3,9 @@ import { createAsyncRouter } from '@reely/dommy/router';
 import { scopedLogger } from '@reely/logger';
 import { isInstanceOf, isSomeFunction } from '@reely/utils';
 
-import { followPagerKey } from './demo/pager.keys';
 import { navigateInPage } from './routing/page.navigation';
 import { createPageView } from './routing/page.view';
+import { followPagerKey } from './routing/pager.keys';
 import { routes } from './routing/routes';
 
 defineDommyConfig({

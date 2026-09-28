@@ -1,20 +1,11 @@
 import { isInstanceOf } from '@reely/utils';
 
+import { clickButton, flushMutations } from '../testing/dom.testing';
 import { evolutionSteps } from '../pages/evolution/evolution.steps';
 import { MutationMeter } from './mutation.meter';
 import { SourceView } from './source.view';
 
 import type { SourceLines } from '../highlight/source.types';
-
-const flushMutations = (): Promise<void> => new Promise((resolve) => setTimeout(resolve));
-
-const clickButton = (root: Element, label: string): void => {
-  const button = Array.from(root.querySelectorAll('button')).find((item) => item.textContent === label);
-  if (!button) {
-    throw new Error(`No "${label}" button`);
-  }
-  button.click();
-};
 
 const renderStep = (slug: string): HTMLElement => {
   const step = evolutionSteps.find((item) => item.slug === slug);
