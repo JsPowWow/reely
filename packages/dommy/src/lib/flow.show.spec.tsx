@@ -1,10 +1,6 @@
 import { mount, Show, signal } from '../index';
 import { reelxDebug } from './reactive/reelx/reelx.core';
 
-import type { Signal } from '../index';
-
-const subscribersOf = (source: Signal<unknown>): number => reelxDebug(source).subs()?.size ?? 0;
-
 describe('Show', () => {
   it('renders the children while `when` is truthy and the fallback otherwise', () => {
     const finished = signal(false);
@@ -55,11 +51,11 @@ describe('Show', () => {
     ));
 
     shown.value = false;
-    const afterSwitch = subscribersOf(lap);
+    const afterSwitch = reelxDebug(lap).subscriberCount();
     dispose();
 
     expect(afterSwitch).toBe(1);
-    expect(subscribersOf(lap)).toBe(0);
-    expect(subscribersOf(shown)).toBe(0);
+    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+    expect(reelxDebug(shown).subscriberCount()).toBe(0);
   });
 });

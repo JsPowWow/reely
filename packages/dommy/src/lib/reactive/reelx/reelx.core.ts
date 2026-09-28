@@ -206,13 +206,14 @@ reelx.state = <T>(initial: T): RlxState<T> => createReelx({ kind: 'state', initi
 
 export function reelxDebug<S>(rlx: RlxState<S> | RlxDerivedState<S>): {
   subs: () => Nullable<Set<Subscriber>>;
+  /** How many subscriptions read it now: tests count them to prove that `dispose` released them. */
+  subscriberCount: () => number;
 } {
-  return {
-    subs: (): Nullable<Set<Subscriber>> => {
-      const subs: unknown = hasProperty('_subscribers', rlx) ? rlx._subscribers : undefined;
-      return hasSome<Set<Subscriber>>(subs) ? subs : undefined;
-    },
+  const subs = (): Nullable<Set<Subscriber>> => {
+    const maybeSubs: unknown = hasProperty('_subscribers', rlx) ? rlx._subscribers : undefined;
+    return hasSome<Set<Subscriber>>(maybeSubs) ? maybeSubs : undefined;
   };
+  return { subs, subscriberCount: (): number => subs()?.size ?? 0 };
 }
 
 reelx.flushSync = (): void => {

@@ -1,4 +1,7 @@
-import { circle, path, signal, svg } from '../index';
+import { circle, mount, path, signal, svg } from '../index';
+import { reelxDebug } from './reactive/reelx/reelx.core';
+
+import type { SvgElementFactoryProps } from '../index';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -52,5 +55,24 @@ describe('createElement: SVG', () => {
 
     expect(onClick).toHaveBeenCalledOnce();
     expect(dot.style.opacity).toBe('0.5');
+  });
+
+  it('never renders a string `on*` as an inline handler', () => {
+    const props = { onclick: 'alert(1)', onClick: 'alert(2)' } as Record<string, unknown> as SvgElementFactoryProps<'circle'>;
+
+    const dot = circle(props);
+
+    expect(dot.attributes).toHaveLength(0);
+  });
+
+  it('releases its bindings when the view is disposed', () => {
+    const color = signal('red');
+    const dispose = mount(document.createElement('div'), () => <circle fill={color} className={() => color.value} />);
+    const whileMounted = reelxDebug(color).subscriberCount();
+
+    dispose();
+
+    expect(whileMounted).toBe(2);
+    expect(reelxDebug(color).subscriberCount()).toBe(0);
   });
 });

@@ -10,8 +10,6 @@ interface Racer {
 
 const racer = (id: string, name = id.toUpperCase()): Racer => ({ id, name });
 
-const subscribersOf = (source: Signal<unknown>): number => reelxDebug(source).subs()?.size ?? 0;
-
 /** Renders a board of racers, one `li` per racer with its place and name. */
 const renderBoard = (racers: Signal<readonly Racer[]>, lap = signal(1)): { board: HTMLUListElement; dispose: VoidFunction } => {
   const board = ul();
@@ -94,16 +92,16 @@ describe('For', () => {
     const lap = signal(1);
     const racers = signal<readonly Racer[]>([racer('a'), racer('b')]);
     const { dispose } = renderBoard(racers, lap);
-    const withTwoRows = subscribersOf(lap);
+    const withTwoRows = reelxDebug(lap).subscriberCount();
 
     racers.value = [racer('a')];
-    const withOneRow = subscribersOf(lap);
+    const withOneRow = reelxDebug(lap).subscriberCount();
     dispose();
 
     expect(withTwoRows).toBe(2);
     expect(withOneRow).toBe(1);
-    expect(subscribersOf(lap)).toBe(0);
-    expect(subscribersOf(racers)).toBe(0);
+    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+    expect(reelxDebug(racers).subscriberCount()).toBe(0);
   });
 
   it('moves a row of several nodes as one, and takes all of them away with it', () => {

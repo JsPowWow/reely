@@ -1,10 +1,6 @@
 import { div, effect, li, mount, signal, span, ul } from '../index';
 import { reelxDebug } from './reactive/reelx/reelx.core';
 
-import type { Signal } from '../index';
-
-const subscribersOf = (source: Signal<unknown>): number => reelxDebug(source).subs()?.size ?? 0;
-
 describe('mount', () => {
   it('appends the rendered view to the parent', () => {
     const parent = div();
@@ -31,8 +27,8 @@ describe('mount', () => {
     leader.value = 'Flash';
 
     expect(parent.childNodes).toHaveLength(0);
-    expect(subscribersOf(leader)).toBe(0);
-    expect(subscribersOf(lap)).toBe(0);
+    expect(reelxDebug(leader).subscriberCount()).toBe(0);
+    expect(reelxDebug(lap).subscriberCount()).toBe(0);
     expect(laps).toEqual([1]);
   });
 
