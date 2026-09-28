@@ -1,4 +1,4 @@
-import { hasSome } from '@reely/utils';
+import { setAttribute } from './element.attributes';
 
 const mappedAttributes = [
   ['className', 'class'],
@@ -36,17 +36,10 @@ const mappedAttributes = [
 
 const mappedAttributeNamesMap: Map<string, string> = new Map<string, string>(mappedAttributes);
 
-export const isMappedAttribute = (attributeName: string): boolean =>
-  hasSome(attributeName) && mappedAttributeNamesMap.has(attributeName);
+export const isMappedAttribute = (attributeName: string): boolean => mappedAttributeNamesMap.has(attributeName);
 
 export const setMappedAttribute = <Element extends HTMLElement>(
   element: Element,
   attributeName: string,
   value: string
-): Element => {
-  if (hasSome(attributeName)) {
-    const attrName = mappedAttributeNamesMap.get(attributeName) ?? attributeName;
-    element.setAttribute(attrName, String(value));
-  }
-  return element;
-};
+): Element => setAttribute(element, mappedAttributeNamesMap.get(attributeName) ?? attributeName, value);

@@ -5,7 +5,7 @@ import { getDommyLogger } from '../config';
 import { hasAriaAttribute, setAriaAttributes } from './attributes/element.aria.attributes';
 import { isSafeAttributeEntry, setAttribute } from './attributes/element.attributes';
 import { isBooleanAttribute, setBoolAttribute } from './attributes/element.bool.attributes';
-import { isDataAttribute, setDataAttribute } from './attributes/element.data.attributes';
+import { isDataAttribute } from './attributes/element.data.attributes';
 import { isLiveProperty, setLiveProperty } from './attributes/element.live.properties';
 import { isMappedAttribute, setMappedAttribute } from './attributes/element.mapped.attributes';
 import { hasStylesAttribute, setStyleAttributes } from './attributes/element.style.attributes';
@@ -83,7 +83,7 @@ export const assignProperties =
           break;
         }
         case isDataAttribute(property): {
-          setDataAttribute(element, property, String(value));
+          setAttribute(element, property, String(value));
           break;
         }
         case isMappedAttribute(property): {
