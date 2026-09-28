@@ -5,11 +5,12 @@ import { isSafeAttributeEntry, removeAttribute, setAttribute } from './attribute
 import { isBooleanAttribute, setBoolAttribute } from './attributes/element.bool.attributes';
 import { isDataAttribute } from './attributes/element.data.attributes';
 import { isLiveProperty, setLiveProperty } from './attributes/element.live.properties';
-import { isMappedAttribute, setMappedAttribute, toAttributeName } from './attributes/element.mapped.attributes';
+import { toAttributeName } from './attributes/element.mapped.attributes';
 
 /**
  * Applies one static prop value: live state as a property, a boolean attribute,
  * a `null`/`undefined` as a removed attribute, a primitive as an attribute.
+ * DOM property names map to attribute names first (`className` → `class`, `readOnly` → `readonly`).
  *
  * @template Element - The type of the HTML element being modified.
  * @param {Element} element - The target element.
@@ -22,24 +23,20 @@ export const assignProperty = <Element extends HTMLElement>(
   property: string,
   value: unknown
 ): Element => {
+  const attributeName = toAttributeName(property);
   switch (true) {
     case isLiveProperty(property): {
       return setLiveProperty(element, property, value);
     }
-    case isBooleanAttribute(property): {
-      return setBoolAttribute(element, property, Boolean(value));
+    case isBooleanAttribute(attributeName): {
+      return setBoolAttribute(element, attributeName, Boolean(value));
     }
     case isNil(value): {
-      return removeAttribute(element, toAttributeName(property));
+      return removeAttribute(element, attributeName);
     }
-    case isDataAttribute(property): {
-      return setAttribute(element, property, String(value));
-    }
-    case isMappedAttribute(property): {
-      return setMappedAttribute(element, property, String(value));
-    }
-    case isSafeAttributeEntry(property, value): {
-      return setAttribute(element, property, String(value));
+    case isDataAttribute(property):
+    case isSafeAttributeEntry(attributeName, value): {
+      return setAttribute(element, attributeName, String(value));
     }
     default: {
       getDommyLogger()?.warn(`The element property was not assigned: `, property, value);

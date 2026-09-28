@@ -1,4 +1,4 @@
-import { isSomeFunction } from '@reely/utils';
+import { isInstanceOf, isSomeFunction } from '@reely/utils';
 
 import { isFalsyElement } from './element.utils';
 import { computed } from '../reactive/preact-like/preact-like.signal';
@@ -17,6 +17,22 @@ import type { ReactiveChildDOMElement, ReactiveValue, ValidChildDOMElement } fro
 export const bindValue = <T>(read: ReactiveValue<T>, write: (value: T) => void): void => {
   // TODO AR register the subscription in the owner (JsPowWow/reely#1, step 2)
   computed(read).subscribe(write);
+};
+
+/**
+ * Writes a static value once, or binds a reactive one (a signal or a getter): the single
+ * place where a prop value turns reactive.
+ *
+ * @param {unknown} value - A static value or a reactive value.
+ * @param {(value: unknown) => void} write - Applies the value to the DOM.
+ * @returns {void}
+ */
+export const applyValue = (value: unknown, write: (value: unknown) => void): void => {
+  if (isSomeFunction(value)) {
+    bindValue(value, write);
+  } else {
+    write(value);
+  }
 };
 
 /**
@@ -52,5 +68,5 @@ export const toChildNode = (child: ValidChildDOMElement): Node | string => {
   if (isSomeFunction(child)) {
     return toBoundTextNode(child);
   }
-  return child instanceof Node ? child : toTextData(child);
+  return isInstanceOf(Node, child) ? child : toTextData(child);
 };

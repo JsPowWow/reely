@@ -54,9 +54,23 @@ describe('createElement: reactive bindings', () => {
       const busy = signal(true);
       const button = createElement('button', { disabled: busy });
 
-      busy.value = false;
+      const records = recordMutations(button, () => {
+        busy.value = false;
+      });
 
       expect(button.disabled).toBe(false);
+      expect(records).toHaveLength(1);
+    });
+
+    it('toggles camelCase boolean props, such as `readOnly`', () => {
+      const locked = signal(true);
+      const input = createElement('input', { readOnly: locked, autofocus: false });
+
+      locked.value = false;
+
+      expect(input.readOnly).toBe(false);
+      expect(input.hasAttribute('readonly')).toBe(false);
+      expect(input.hasAttribute('autofocus')).toBe(false);
     });
 
     it('sets a bound live property over the user input', () => {
@@ -64,17 +78,23 @@ describe('createElement: reactive bindings', () => {
       const input = createElement('input', { value: name });
       input.value = 'typed by the user';
 
-      name.value = 'Flash';
+      const records = recordMutations(input, () => {
+        name.value = 'Flash';
+      });
 
       expect(input.value).toBe('Flash');
+      expect(records).toHaveLength(0);
     });
 
     it('updates a bound style key, leaving the others', () => {
       const color = signal('gold');
       const cell = createElement('td', { styles: { color, fontWeight: 'bold' } });
 
-      color.value = 'silver';
+      const records = recordMutations(cell, () => {
+        color.value = 'silver';
+      });
 
+      expect(records).toHaveLength(1);
       expect(cell.style.color).toBe('silver');
       expect(cell.style.fontWeight).toBe('bold');
     });
@@ -83,8 +103,11 @@ describe('createElement: reactive bindings', () => {
       const flip = signal('0deg');
       const cell = createElement('td', { styles: { '--flip': flip } });
 
-      flip.value = '90deg';
+      const records = recordMutations(cell, () => {
+        flip.value = '90deg';
+      });
 
+      expect(records).toHaveLength(1);
       expect(cell.style.getPropertyValue('--flip')).toBe('90deg');
     });
   });

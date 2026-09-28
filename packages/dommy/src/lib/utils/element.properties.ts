@@ -4,7 +4,7 @@ import { hasProperty, isInstanceOf, isNil, isPrimitiveValue, isSomeFunction, isV
 import { hasAriaAttribute, setAriaAttributes } from './attributes/element.aria.attributes';
 import { hasStylesAttribute, setStyleAttributes } from './attributes/element.style.attributes';
 import { addEventListenerHandler, isEventListenerHandler, toEventType } from './element.addListeners';
-import { bindValue } from './element.bindings';
+import { applyValue } from './element.bindings';
 import { assignProperty } from './element.property';
 
 import type {
@@ -70,12 +70,8 @@ export const assignProperties =
           addEventListenerHandler(element, toEventType(property), value, restProps.eventsAbortSignal);
           break;
         }
-        case isSomeFunction(value): {
-          bindValue(value, (current) => assignProperty(element, property, current));
-          break;
-        }
         default: {
-          assignProperty(element, property, value);
+          applyValue(value, (current) => assignProperty(element, property, current));
         }
       }
     }

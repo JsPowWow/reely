@@ -1,6 +1,6 @@
-import { hasProperty, hasSome, isNil, isSomeFunction } from '@reely/utils';
+import { hasProperty, hasSome, isNil } from '@reely/utils';
 
-import { bindValue } from '../element.bindings';
+import { applyValue } from '../element.bindings';
 
 import type { DOMElementStyles } from '../../types/attributes.types';
 
@@ -46,11 +46,7 @@ export const setStyleAttributes = <Element extends HTMLElement>(
   styles: DOMElementStyles
 ): Element => {
   for (const [name, value] of Object.entries(styles)) {
-    if (isSomeFunction(value)) {
-      bindValue(value, (current) => setStyle(element.style, name, current));
-    } else {
-      setStyle(element.style, name, value);
-    }
+    applyValue(value, (current) => setStyle(element.style, name, current));
   }
   return element;
 };
