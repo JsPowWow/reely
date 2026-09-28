@@ -52,3 +52,5 @@ vitest.config.*.timestamp*
 .nx/self-healing
 .nx/migrate-runs
 .claude/settings.local.json
+# impeccable engine binary, downloaded per machine by `impeccable install`
+.claude/skills/impeccable/scripts/bin

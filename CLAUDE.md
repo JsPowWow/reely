@@ -47,6 +47,11 @@ Skills from mattpocock/skills (`c55ee46`, MIT) live in `.claude/skills/` and are
 `tdd` for every feature and fix, `codebase-design` for module interfaces,
 `diagnosing-bugs` for bugs, `code-review` before committing code.
 
+`impeccable` (pbakaus/impeccable, Apache-2.0; installed with
+`npx --registry https://registry.npmjs.org impeccable@4.1.0 install --providers=claude --project`,
+skill v4.3.1) — for design work on `apps/free-dom`. Its engine binary is per machine
+(`scripts/bin`, ignored); its hooks go to the untracked `.claude/settings.local.json`.
+
 ### Issue tracker
 
 GitHub Issues in `JsPowWow/reely` via `gh`. See `docs/agents/issue-tracker.md`.
