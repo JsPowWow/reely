@@ -10,7 +10,7 @@
     "types": ["node", "vite/client", "vitest/globals", "vitest/importMeta", "vitest"],
     "moduleResolution": "node",
     "module": "esnext",
-    "lib": ["es2021", "dom"],
+    "lib": ["es2024", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "ignoreDeprecations": "6.0"
