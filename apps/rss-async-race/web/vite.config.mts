@@ -28,6 +28,8 @@ export default defineConfig(() => ({
   test: {
     name: 'rss-async-race',
     watch: false,
+    // a sandbox without specs yet: no tests is not a failure
+    passWithNoTests: true,
     globals: true,
     environment: 'jsdom',
     include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
