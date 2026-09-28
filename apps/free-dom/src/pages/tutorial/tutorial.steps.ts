@@ -1,10 +1,10 @@
 import type { JSX } from '@reely/dommy';
 
-import { LearningLinks as FactoryLinks } from './steps/step1.factories';
+import { ReelyLinks as FactoryLinks } from './steps/step1.factories';
 import factoriesSource from './steps/step1.factories.ts?raw';
-import { LearningLinks as JsxLinks } from './steps/step2.jsx';
+import { ReelyLinks as JsxLinks } from './steps/step2.jsx';
 import jsxSource from './steps/step2.jsx.tsx?raw';
-import { LearningLinks as ComponentLinks } from './steps/step3.components';
+import { ReelyLinks as ComponentLinks } from './steps/step3.components';
 import componentsSource from './steps/step3.components.tsx?raw';
 import { Counter as DomCounter } from './steps/step4.dom';
 import domSource from './steps/step4.dom.tsx?raw';
@@ -28,7 +28,7 @@ export const tutorialSteps: readonly TutorialStep[] = [
     slug: 'factories',
     track: 'links',
     title: 'Markup with tag factories',
-    lead: 'Every HTML tag is a function that returns a real DOM element: props first, children after. No template language and no virtual DOM, so what you build is what the browser shows. Nothing changes after the first render, so the counters below the demo stay at zero.',
+    lead: 'Every HTML tag is a function that returns a real DOM element: props first, children after. No template language and no virtual DOM, so what you build is what the browser shows. The board under the demo counts the nodes the card built once; nothing is written to the DOM after that.',
     Demo: FactoryLinks,
     source: factoriesSource,
   },
@@ -52,7 +52,7 @@ export const tutorialSteps: readonly TutorialStep[] = [
     slug: 'dom',
     track: 'counter',
     title: 'Interactivity by hand',
-    lead: 'An element keeps its listeners, so a click can change the page. Here the counter keeps its number in a variable and redraws the output after every click. Watch the counters below the demo: each click removes one text node and adds another.',
+    lead: 'An element keeps its listeners, so a click can change the page. Here the counter keeps its number in a variable and redraws the output after every click. Watch the board under the demo: each click removes one text node and adds another.',
     Demo: DomCounter,
     source: domSource,
   },

@@ -1,33 +1,33 @@
 import { a, h2, img, section, span } from '@reely/dommy';
 
 import arrowIcon from '../../../assets/arrow.svg';
-import blogIcon from '../../../assets/blog.svg';
+import codeIcon from '../../../assets/code.svg';
 import docIcon from '../../../assets/doc.svg';
-import youtubeIcon from '../../../assets/youtube.svg';
+import flagIcon from '../../../assets/flag.svg';
 
 import css from './links.module.css';
 
 // Every tag is a function: `a(props, ...children)` returns a real `HTMLAnchorElement`.
-export const LearningLinks = (): HTMLElement =>
+export const ReelyLinks = (): HTMLElement =>
   section(
     { className: css.card },
-    h2('Learning materials'),
+    h2('Where reely lives'),
     a(
-      { className: css.link, href: 'https://nx.dev/getting-started/intro', target: '_blank', rel: 'noreferrer' },
+      { className: css.link, href: 'https://github.com/JsPowWow/reely' },
+      img({ src: codeIcon, alt: '' }),
+      span({ className: css.text }, 'reely on GitHub', span({ className: css.hint }, 'Source, tests and issues')),
+      img({ src: arrowIcon, alt: '' })
+    ),
+    a(
+      { className: css.link, href: 'https://github.com/JsPowWow/reely/tree/main/packages/dommy' },
       img({ src: docIcon, alt: '' }),
-      span({ className: css.text }, 'Documentation', span({ className: css.hint }, 'Everything is in there')),
+      span({ className: css.text }, '@reely/dommy', span({ className: css.hint }, 'Tag factories, JSX and signals')),
       img({ src: arrowIcon, alt: '' })
     ),
     a(
-      { className: css.link, href: 'https://nx.dev/blog', target: '_blank', rel: 'noreferrer' },
-      img({ src: blogIcon, alt: '' }),
-      span({ className: css.text }, 'Blog', span({ className: css.hint }, 'Changelog, features and events')),
-      img({ src: arrowIcon, alt: '' })
-    ),
-    a(
-      { className: css.link, href: 'https://www.youtube.com/@NxDevtools/videos', target: '_blank', rel: 'noreferrer' },
-      img({ src: youtubeIcon, alt: '' }),
-      span({ className: css.text }, 'YouTube channel', span({ className: css.hint }, 'Nx Show, talks and tutorials')),
+      { className: css.link, href: 'https://github.com/JsPowWow/ai-race' },
+      img({ src: flagIcon, alt: '' }),
+      span({ className: css.text }, 'ai-race', span({ className: css.hint }, 'The first app built on dommy')),
       img({ src: arrowIcon, alt: '' })
     )
   );

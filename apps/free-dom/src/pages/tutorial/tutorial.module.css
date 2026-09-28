@@ -325,6 +325,7 @@
 @media (max-width: 720px) {
   .tutorial {
     grid-template-columns: minmax(0, 1fr);
+    align-content: start;
   }
 
   .rail {

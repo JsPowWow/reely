@@ -47,7 +47,7 @@ describe('tutorial', () => {
       (slug) => renderStep(slug).querySelector('section')?.outerHTML
     );
 
-    expect(factories).toContain('Everything is in there');
+    expect(factories).toContain('The first app built on dommy');
     expect(jsx).toBe(factories);
     expect(components).toBe(factories);
   });
