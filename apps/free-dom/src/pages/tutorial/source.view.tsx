@@ -4,7 +4,7 @@ import { isNil } from '@reely/utils';
 
 import css from './tutorial.module.css';
 
-import type { SourceLines, SourceToken } from './source.types';
+import type { SourceLines, SourceToken } from '../../highlight/source.types';
 
 /**
  * Marks the lines of `current` that are not part of the longest common subsequence with

@@ -5,7 +5,7 @@ import { SourceView } from './source.view';
 import { TutorialPage } from './tutorial.page';
 import { tutorialSteps } from './tutorial.steps';
 
-import type { SourceLines } from './source.types';
+import type { SourceLines } from '../../highlight/source.types';
 
 const flushMutations = (): Promise<void> => new Promise((resolve) => setTimeout(resolve));
 
@@ -68,6 +68,7 @@ describe('tutorial', () => {
 
     it.each([
       ['signal', ['7', '0', '0', '6+2']],
+      ['bind-by-hand', ['7', '0', '0', '6+2']],
       ['bind', ['7', '3+1', '0', '0']],
       ['derived', ['7', '3+1', '3+1', '0']],
       ['getter', ['7', '3+1', '4+1', '0']],

@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 
 import { codeToTokens } from 'shiki';
 
-import type { SourceLines } from '../pages/tutorial/source.types';
+import type { SourceLines } from './source.types';
 import type { ThemeRegistration } from 'shiki';
 import type { Plugin } from 'vite';
 
@@ -11,6 +11,8 @@ import type { Plugin } from 'vite';
  * yellow tint of new lines. Yellow itself is left out: on the panel it means "new since the last step".
  */
 export const reelyCodeTheme = {
+  /** The panel itself: mirrors `--graphite` in the tutorial styles. */
+  background: '#1F2933',
   text: '#E4E7EB',
   comment: '#B3BDC7',
   keyword: '#9CC3FF',
@@ -24,7 +26,7 @@ export const reelyCodeTheme = {
 const theme: ThemeRegistration = {
   name: 'reely',
   type: 'dark',
-  colors: { 'editor.foreground': reelyCodeTheme.text, 'editor.background': '#1F2933' },
+  colors: { 'editor.foreground': reelyCodeTheme.text, 'editor.background': reelyCodeTheme.background },
   tokenColors: [
     { scope: ['comment', 'punctuation.definition.comment'], settings: { foreground: reelyCodeTheme.comment } },
     { scope: ['keyword', 'storage', 'variable.language'], settings: { foreground: reelyCodeTheme.keyword } },

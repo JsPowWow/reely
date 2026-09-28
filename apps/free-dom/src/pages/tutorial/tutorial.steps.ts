@@ -2,8 +2,10 @@ import type { JSX } from '@reely/dommy';
 
 import { ReelyLinks as FactoryLinks } from './steps/step1.factories';
 import factoriesSource from './steps/step1.factories.ts?highlight';
-import { Counter as BatchCounter } from './steps/step10.batch';
-import batchSource from './steps/step10.batch.ts?highlight';
+import { Counter as TwoSignalCounter } from './steps/step10.two-signals';
+import twoSignalsSource from './steps/step10.two-signals.ts?highlight';
+import { Counter as BatchCounter } from './steps/step11.batch';
+import batchSource from './steps/step11.batch.ts?highlight';
 import { ReelyLinks as JsxLinks } from './steps/step2.jsx';
 import jsxSource from './steps/step2.jsx.tsx?highlight';
 import { ReelyLinks as ComponentLinks } from './steps/step3.components';
@@ -12,17 +14,17 @@ import { Counter as DomCounter } from './steps/step4.dom';
 import domSource from './steps/step4.dom.ts?highlight';
 import { Counter as SignalCounter } from './steps/step5.signal';
 import signalSource from './steps/step5.signal.ts?highlight';
-import { Counter as BoundCounter } from './steps/step6.bind';
-import bindSource from './steps/step6.bind.ts?highlight';
-import { Counter as DerivedCounter } from './steps/step7.derived';
-import derivedSource from './steps/step7.derived.ts?highlight';
-import { Counter as GetterCounter } from './steps/step8.getter';
-import getterSource from './steps/step8.getter.ts?highlight';
-import { Counter as TwoSignalCounter } from './steps/step9.two-signals';
-import twoSignalsSource from './steps/step9.two-signals.ts?highlight';
+import { Counter as HandBoundCounter } from './steps/step6.bind-by-hand';
+import handBindSource from './steps/step6.bind-by-hand.ts?highlight';
+import { Counter as BoundCounter } from './steps/step7.bind';
+import bindSource from './steps/step7.bind.ts?highlight';
+import { Counter as DerivedCounter } from './steps/step8.derived';
+import derivedSource from './steps/step8.derived.ts?highlight';
+import { Counter as GetterCounter } from './steps/step9.getter';
+import getterSource from './steps/step9.getter.ts?highlight';
 
+import type { SourceLines } from '../../highlight/source.types';
 
-import type { SourceLines } from './source.types';
 /**
  * One step of the lesson: the markup steps build the same card three ways, then every step
  * builds the same counter with one more reely feature.
@@ -75,15 +77,23 @@ export const tutorialSteps: readonly TutorialStep[] = [
     slug: 'signal',
     track: 'counter',
     title: 'State in a signal',
-    lead: 'A signal is a value that knows who reads it. A callback ref gets the output as soon as it exists and subscribes it with an effect: the effect reads count.value, so it runs again after every change and redraws the output. The code no longer redraws by hand, but the board still counts a removed and an added node on every click.',
+    lead: 'A signal is a value that knows who reads it. The number moves from a variable into a signal, and an effect that reads count.value runs again after every change, so the click handlers only write the signal. The effect still redraws the whole output: the board counts a removed and an added node on every click.',
     Demo: SignalCounter,
     source: signalSource,
+  },
+  {
+    slug: 'bind-by-hand',
+    track: 'counter',
+    title: 'Bind by hand',
+    lead: 'A function in elementRef is called once with the element it created. Subscribing that element to the signal is a binding by hand: the effect now lives with the output it writes. Setting textContent still swaps the text node, as the board shows; next, dommy keeps one text node and edits it.',
+    Demo: HandBoundCounter,
+    source: handBindSource,
   },
   {
     slug: 'bind',
     track: 'counter',
     title: 'Bind the signal',
-    lead: 'Pass the signal itself as a child, and dommy binds it to one text node. A click now changes that node’s text and nothing else: one text edit, no nodes added or removed. This is the whole idea of dommy.',
+    lead: 'Pass the signal itself as a child, and dommy does the binding: it creates one text node and edits its text on every change. A click now changes that text and nothing else: one text edit, no nodes added or removed. This is the whole idea of dommy.',
     Demo: BoundCounter,
     source: bindSource,
   },

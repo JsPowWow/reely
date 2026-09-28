@@ -1,23 +1,24 @@
-import { button, div, effect, output, replaceChildrenOf, signal } from '@reely/dommy';
+import { button, createObjectReference, div, effect, output, replaceChildrenOf, signal } from '@reely/dommy';
 
 import css from './counter.module.css';
 
-// A signal holds the state; a callback ref subscribes the output to it and redraws it on every change.
+// A signal holds the state; an effect reads it, so it redraws the output after every change.
 export const Counter = (): HTMLElement => {
+  const result = createObjectReference<HTMLOutputElement>();
   const count = signal(0);
 
-  const redrawOnChange = (element: HTMLOutputElement | null): void => {
-    if (element) {
-      effect(() => {
-        replaceChildrenOf(element)(count.value);
-      });
-    }
-  };
-
-  return div(
+  const view = div(
     { className: css.counter },
-    output({ className: css.value, elementRef: redrawOnChange }),
+    output({ className: css.value, elementRef: result }),
     button({ onClick: () => (count.value += 1) }, '+1'),
     button({ onClick: () => (count.value -= 1) }, '−1')
   );
+
+  effect(() => {
+    if (result.current) {
+      replaceChildrenOf(result.current)(count.value);
+    }
+  });
+
+  return view;
 };
