@@ -20,14 +20,14 @@ export class AppElement extends HTMLElement {
           div(
             {
               id: 'welcome',
-              click: (e) => {
+              onClick: (e) => {
                 console.log('via listener: ', e.type, e.currentTarget);
               },
               eventsAbortSignal: this.testSignal.signal,
             },
             h1(
               {
-                click: addListeners(
+                onClick: addListeners(
                   [
                     // TODO AR just via func, no array wrapped
                     (e): void => {
@@ -47,13 +47,13 @@ export class AppElement extends HTMLElement {
               },
               span(
                 {
-                  mousedown: {
-                    handler: (e) => {
+                  onMousedown: {
+                    handleEvent: (e) => {
                       console.log('via descriptor: ', e.type, e.currentTarget);
                     },
                     signal: this.testSignal.signal,
                   },
-                  mouseleave: addListener((e) => {
+                  onMouseleave: addListener((e) => {
                     console.log('via handleEvent: ', e.type, e.eventPhase, e.currentTarget);
                   }),
                 },
@@ -70,7 +70,7 @@ export class AppElement extends HTMLElement {
                 height: '100px',
                 width: '100px',
               },
-              click: (e) => {
+              onClick: (e) => {
                 console.log(e.currentTarget);
               },
               method: 'POST',
@@ -78,7 +78,7 @@ export class AppElement extends HTMLElement {
             input({ id: 'the-checkbox', type: 'checkbox', checked: true, ['data-sasa']: 'her44e' })
           ),
           createElement('a', {
-            click: (e) => {
+            onClick: (e) => {
               console.log(e.currentTarget);
             },
           }),
