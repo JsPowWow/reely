@@ -2211,3 +2211,52 @@ describe.skip('untracked', () => {
   //     expect(c.value).to.equal(3);
   //   });
 });
+
+describe('reentrancy and errors', () => {
+  it('should keep other effects subscribed when one of them throws', () => {
+    const s = signal(1);
+    const seen: number[] = [];
+    effect(() => {
+      if (s.value === 2) {
+        throw new Error('boom');
+      }
+    });
+    effect(() => {
+      seen.push(s.value);
+    });
+
+    expect(() => (s.value = 2)).toThrow('boom');
+    s.value = 3;
+
+    expect(seen).toEqual([1, 2, 3]);
+  });
+
+  it('should keep tracking an effect after a nested subscription', () => {
+    const a = signal(0);
+    const b = signal(0);
+    const spy = vi.fn(() => {
+      computed(() => a.value).subscribe(() => undefined);
+      b.value;
+    });
+    effect(spy);
+    spy.mockClear();
+
+    b.value = 1;
+    expect(spy).toHaveBeenCalledOnce();
+
+    spy.mockClear();
+    a.value = 1;
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('should accept `undefined` as a new value', () => {
+    const s = signal<string | undefined>('x');
+    const spy = vi.fn();
+    s.subscribe(spy);
+
+    s.value = undefined;
+
+    expect(s.value).toBeUndefined();
+    expect(spy).toHaveBeenLastCalledWith(undefined, 'x');
+  });
+});

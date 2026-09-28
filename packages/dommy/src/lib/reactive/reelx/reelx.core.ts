@@ -102,8 +102,10 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
   } else {
     state = init;
     // @ts-expect-error expected properties assigned below
-    rlxSelf = (newState: T): T => {
-      if (newState !== undefined && !Object.is(newState, state)) {
+    rlxSelf = (...args: [] | [newState: T]): T => {
+      // a call with an argument writes, even `undefined`; a call without one reads
+      if (args.length === 1 && !Object.is(args[0], state)) {
+        const [newState] = args;
         // mark all computed(s) dirty
         ++SUBSCRIBER_VERSION;
 
@@ -138,6 +140,11 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
     const subscriber: Subscriber = () => {
       // a subscriber disposed inside `batch` may still be queued
       if (!isDisposed && queueVersion !== QUEUE_VERSION) {
+        // a subscription made inside another computation is a new root: it must not
+        // steal the outer subscriber or leak into the outer dependencies
+        const prevSubscriber = SUBSCRIBER;
+        const prevDeps = DEPS;
+        DEPS = null;
         try {
           queueVersion = QUEUE_VERSION;
 
@@ -152,7 +159,8 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
             prevState = state;
           }
         } finally {
-          SUBSCRIBER = null;
+          SUBSCRIBER = prevSubscriber;
+          DEPS = prevDeps;
         }
       }
     };
@@ -198,16 +206,27 @@ reelx.flushSync = (): void => {
     return;
   }
   FLUSHING = true;
+  // every subscriber runs even if one throws; the first error is rethrown at the end
+  const errors: unknown[] = [];
   try {
     while (QUEUE.length > 0) {
       const iterator = QUEUE;
       QUEUE = [];
       for (const subscribers of iterator) {
-        for (const subscriber of subscribers) subscriber();
+        for (const subscriber of subscribers) {
+          try {
+            subscriber();
+          } catch (error) {
+            errors.push(error);
+          }
+        }
       }
     }
   } finally {
     FLUSHING = false;
+  }
+  if (errors.length > 0) {
+    throw errors[0];
   }
 };
 
