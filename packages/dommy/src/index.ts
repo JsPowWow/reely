@@ -1,6 +1,7 @@
 export { defineDommyConfig } from './lib/config';
 export { createElement } from './lib/createElement';
 export { mount } from './lib/mount';
+export { onCleanup } from './lib/reactive/owner';
 export { For, type ForProps } from './lib/flow.for';
 export { Show, type ShowProps } from './lib/flow.show';
 export { createObjectReference } from '@reely/utils';
