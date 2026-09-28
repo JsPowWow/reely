@@ -1,0 +1,173 @@
+/* Live demo with its DOM write counter */
+
+.meter {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.stage {
+  padding: 2rem 1.5rem;
+}
+
+/* Buttons in every demo; `:where` keeps this weaker than any rule a demo writes for its own. */
+.stage :where(button) {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--graphite);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--graphite);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.stage :where(button):not(:disabled):hover {
+  background: var(--graphite);
+  color: var(--asphalt);
+}
+
+.stage :where(button):focus-visible {
+  outline: 3px solid var(--graphite);
+  outline-offset: 2px;
+}
+
+.stage :where(button):disabled {
+  border-color: var(--line);
+  color: var(--slate);
+  cursor: not-allowed;
+}
+
+.readouts {
+  padding: 1rem 1.5rem 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+/* The timing board: what the first render built, then every write since. */
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: 1rem 1.5rem;
+  margin: 0;
+}
+
+.board dt {
+  order: 1;
+  color: var(--slate);
+  font-size: 0.875rem;
+  line-height: 1.3;
+}
+
+.board dd {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 2.75rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.readoutBuilt,
+.readoutEdit,
+.readoutNode {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.readoutBuilt dd {
+  color: var(--slate);
+}
+
+.readoutEdit dt::before,
+.readoutNode dt::before {
+  content: '';
+  display: inline-block;
+  width: 0.65em;
+  height: 0.65em;
+  margin-right: 0.4em;
+  border-radius: 50%;
+  background: var(--signal-ink);
+}
+
+.readoutNode dt::before {
+  background: var(--flag);
+}
+
+.delta {
+  margin-left: 0.3em;
+  font-size: 0.5em;
+  vertical-align: 0.6em;
+}
+
+.readoutEdit .delta {
+  color: var(--signal-ink);
+}
+
+.readoutNode .delta {
+  color: var(--flag);
+}
+
+/* Source of the step; lines new since the previous step of the same demo are marked */
+
+.sourcePanel {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.sourceCaption {
+  margin: 0;
+  color: var(--slate);
+  font-size: 0.875rem;
+}
+
+.source {
+  margin: 0;
+  padding: 1.25rem 0;
+  overflow: visible;
+  border-radius: 6px;
+  background: var(--graphite);
+  color: var(--code-text);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.line,
+.added {
+  display: block;
+  padding: 0 1.25rem;
+  border-left: 4px solid transparent;
+  text-decoration: none;
+}
+
+.added {
+  border-left-color: var(--signal);
+  background: rgb(245 197 24 / 0.14);
+}
+
+@media (max-width: 45em) {
+  .stage {
+    padding: 1.25rem 1rem;
+  }
+
+  .readouts {
+    padding: 0.75rem 1rem 1rem;
+  }
+
+  .board dd {
+    font-size: 2.25rem;
+  }
+
+  .source {
+    font-size: 0.75rem;
+  }
+
+  .line,
+  .added {
+    padding: 0 0.75rem;
+  }
+}

@@ -2,13 +2,13 @@ import type { Nullable } from '@reely/utils';
 import { code, div, ins, p, pre, span } from '@reely/dommy';
 import { isNil } from '@reely/utils';
 
-import css from './tutorial.module.css';
+import css from './demo.module.css';
 
-import type { SourceLines, SourceToken } from '../../highlight/source.types';
+import type { SourceLines, SourceToken } from '../highlight/source.types';
 
 /**
  * Marks the lines of `current` that are not part of the longest common subsequence with
- * `previous`: the lines a student would type to get from one step to the next.
+ * `previous`: the lines a reader would type to get from one step to the next.
  */
 const markInsertedLines = (previous: readonly string[], current: readonly string[]): boolean[] => {
   const columns = current.length + 1;
@@ -60,8 +60,10 @@ const markBlankLines = (lines: readonly string[], inserted: readonly boolean[]):
 
 interface SourceViewProps {
   source: SourceLines;
-  /** The source of the step this one grows from, with its number; nothing is marked without it. */
-  previous?: Nullable<{ source: SourceLines; number: number }>;
+  /** Says what the listing shows, and what is marked in it. */
+  caption: string;
+  /** The source this one grows from: lines it lacks are marked; nothing is marked without it. */
+  previous?: Nullable<SourceLines>;
 }
 
 const toText = (line: readonly SourceToken[]): string => line.map((token) => token.content).join('');
@@ -72,26 +74,22 @@ const renderToken = ({ content, color }: SourceToken): HTMLSpanElement =>
 let sourceViews = 0;
 
 /**
- * Shows the source of a step under a caption that says what is marked: the lines added since
- * the previous step of the same demo.
+ * Shows the source of a demo under its caption, marking the lines added since `previous`.
  */
-export const SourceView = ({ source, previous }: SourceViewProps): HTMLElement => {
+export const SourceView = ({ source, caption, previous }: SourceViewProps): HTMLElement => {
   // ids unique per view, for the listing's accessible name
   const titleId = `source-title-${++sourceViews}`;
   const captionId = `source-caption-${sourceViews}`;
   const lines = source.map(toText);
   const inserted = isNil(previous)
     ? lines.map(() => false)
-    : markBlankLines(lines, markInsertedLines(previous.source.map(toText), lines));
+    : markBlankLines(lines, markInsertedLines(previous.map(toText), lines));
   return div(
     { className: css.sourcePanel },
     p(
       { className: css.sourceCaption },
-      span({ id: titleId, className: css.visuallyHidden }, 'Source'),
-      span(
-        { id: captionId },
-        isNil(previous) ? 'A new demo starts here' : `Highlighted: new since step ${previous.number}`
-      )
+      span({ id: titleId, className: 'visually-hidden' }, 'Source'),
+      span({ id: captionId }, caption)
     ),
     pre(
       { className: css.source, aria: { ariaLabelledby: `${titleId} ${captionId}` } },

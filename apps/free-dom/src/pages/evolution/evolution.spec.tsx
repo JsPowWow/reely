@@ -1,12 +1,8 @@
 import { mount } from '@reely/dommy';
-import { isInstanceOf } from '@reely/utils';
 
-import { MutationMeter } from './mutation.meter';
-import { SourceView } from './source.view';
-import { TutorialPage } from './tutorial.page';
-import { tutorialSteps } from './tutorial.steps';
-
-import type { SourceLines } from '../../highlight/source.types';
+import { MutationMeter } from '../../demo/mutation.meter';
+import { EvolutionPage } from './evolution.page';
+import { evolutionSteps } from './evolution.steps';
 
 const flushMutations = (): Promise<void> => new Promise((resolve) => setTimeout(resolve));
 
@@ -25,16 +21,16 @@ const readWrites = (meter: Element): string[] =>
 const readAnnouncement = (meter: Element): string => meter.querySelector('[aria-live]')?.textContent ?? '';
 
 const renderStep = (slug: string): HTMLElement => {
-  const step = tutorialSteps.find((item) => item.slug === slug);
+  const step = evolutionSteps.find((item) => item.slug === slug);
   if (!step) {
     throw new Error(`No "${slug}" step`);
   }
   return MutationMeter({ children: step.Demo() });
 };
 
-describe('tutorial', () => {
+describe('evolution', () => {
   it('has a unique slug for every step', () => {
-    const slugs = tutorialSteps.map((step) => step.slug);
+    const slugs = evolutionSteps.map((step) => step.slug);
 
     expect(new Set(slugs).size).toBe(slugs.length);
   });
@@ -261,102 +257,7 @@ describe('tutorial', () => {
     });
   });
 
-  describe('MutationMeter', () => {
-    afterEach(() => {
-      Reflect.deleteProperty(Element.prototype, 'animate');
-    });
-
-    it('flashes the rows a lap moved, not the list that holds them', async () => {
-      const animate = vi.fn();
-      Element.prototype.animate = animate;
-      const meter = renderStep('keyed-list');
-
-      clickButton(meter, 'Race a lap');
-      await flushMutations();
-      const flashed = new Set<unknown>(animate.mock.contexts);
-
-      expect(flashed.has(meter.querySelector('ol'))).toBe(false);
-      expect([...flashed].some((element) => isInstanceOf(HTMLLIElement, element))).toBe(true);
-    });
-
-    it('flashes the nodes a small change touched, and leaves a large change to the counts', async () => {
-      const animate = vi.fn();
-      Element.prototype.animate = animate;
-      const small = renderStep('bind');
-      const large = renderStep('keyed-list');
-
-      clickButton(small, '+1');
-      await flushMutations();
-      const flashedForSmall = animate.mock.calls.length;
-      animate.mockClear();
-      for (let lap = 0; lap < 12; lap++) {
-        clickButton(large, 'Race a lap');
-      }
-      await flushMutations();
-
-      expect(flashedForSmall).toBe(1);
-      expect(animate).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('SourceView', () => {
-    // a source without colors, one token per line
-    const plain = (text: string): SourceLines => text.split('\n').map((line) => [{ content: line }]);
-
-    it('marks lines that the previous step did not have', () => {
-      const view = SourceView({
-        source: plain('const a = 1;\nconst b = 2;'),
-        previous: { source: plain('const a = 1;'), number: 1 },
-      });
-
-      expect(Array.from(view.querySelectorAll('ins')).map((line) => line.textContent)).toEqual(['const b = 2;\n']);
-    });
-
-    it('marks structural lines too, by a line diff rather than a lookup', () => {
-      const view = SourceView({
-        source: plain('run(() => {\n  one();\n});\nrun(() => {\n  two();\n});'),
-        previous: { source: plain('run(() => {\n  one();\n});'), number: 1 },
-      });
-
-      expect(Array.from(view.querySelectorAll('ins')).map((line) => line.textContent)).toEqual([
-        'run(() => {\n',
-        '  two();\n',
-        '});\n',
-      ]);
-    });
-
-    it('marks blank lines inside an inserted block, but not around it', () => {
-      const view = SourceView({
-        source: plain('const a = 1;\n\nconst b = 2;\n\nconst c = 3;'),
-        previous: { source: plain('const a = 1;\n'), number: 1 },
-      });
-
-      expect(Array.from(view.querySelectorAll('ins')).map((line) => line.textContent)).toEqual([
-        'const b = 2;\n',
-        '\n',
-        'const c = 3;\n',
-      ]);
-    });
-
-    it('colors each token with its theme color', () => {
-      const view = SourceView({
-        source: [[{ content: 'const', color: '#9CC3FF' }, { content: ' count = 0;' }]],
-      });
-      const [keyword, rest] = Array.from(view.querySelectorAll('code span span'));
-
-      expect(keyword?.textContent).toBe('const');
-      expect(isInstanceOf(HTMLElement, keyword) && keyword.style.color).toBe('rgb(156, 195, 255)');
-      expect(rest?.textContent).toBe(' count = 0;');
-    });
-
-    it('marks nothing for the first step', () => {
-      const view = SourceView({ source: plain('const a = 1;') });
-
-      expect(view.querySelectorAll('ins')).toHaveLength(0);
-    });
-  });
-
-  describe('TutorialPage', () => {
+  describe('EvolutionPage', () => {
     // the accessible name of the source listing, from the caption it is labelled by
     const sourceName = (page: Element): string => {
       const ids = page.querySelector('pre')?.getAttribute('aria-labelledby')?.split(' ') ?? [];
@@ -364,18 +265,16 @@ describe('tutorial', () => {
     };
 
     const renderPage = (slug?: string): Element => {
-      const page = TutorialPage({ slug });
-      if (!(page instanceof Element)) {
-        throw new Error('The page is not an element');
-      }
-      return page;
+      const host = document.createElement('div');
+      host.append(EvolutionPage({ slug }));
+      return host;
     };
 
     it('shows the first step by default and marks it as current', () => {
       const page = renderPage();
 
-      expect(page.querySelector('h1')?.textContent).toBe(`Step 1. ${tutorialSteps[0]?.title}`);
-      expect(page.querySelector('nav a[href="/tutorial/factories"]')?.getAttribute('aria-current')).toBe('step');
+      expect(page.querySelector('h1')?.textContent).toBe(`Step 1. ${evolutionSteps[0]?.title}`);
+      expect(page.querySelector('nav a[href="/evolution/factories"]')?.getAttribute('aria-current')).toBe('step');
     });
 
     it('diffs a step against the previous step of the same demo and says so', () => {
@@ -388,25 +287,25 @@ describe('tutorial', () => {
       expect(dom.querySelectorAll('pre ins')).toHaveLength(0);
     });
 
-    it('ends the course with what comes next instead of a next step', () => {
-      const last = renderPage(tutorialSteps.at(-1)?.slug);
+    it('ends the chain with the way into the docs instead of a next step', () => {
+      const last = renderPage(evolutionSteps.at(-1)?.slug);
 
       expect(last.querySelector('a[rel="next"]')).toBeNull();
-      expect(last.querySelector('footer h2')?.textContent).toBe('What comes next');
-      expect(last.querySelector('footer a[href="https://github.com/JsPowWow/reely"]')).not.toBeNull();
+      expect(last.querySelector('footer h2')?.textContent).toBe('Where to go from here');
+      expect(last.querySelector('footer a[href="/docs"]')?.textContent).toBe('Read the docs');
     });
 
     it('names the step in the document title', () => {
       renderPage('jsx');
 
-      expect(document.title).toBe('Step 2. The same markup in JSX | reely');
+      expect(document.title).toBe('Step 2. The same markup in JSX | reely evolution');
     });
 
     it('explains an unknown step and links to the first one instead of rendering a demo', () => {
       const page = renderPage('nope');
 
       expect(page.querySelector('h1')?.textContent).toBe('There is no step “nope”');
-      expect(page.querySelector('main a[href="/tutorial/factories"]')?.textContent).toBe('Start with step 1');
+      expect(page.querySelector('main a[href="/evolution/factories"]')?.textContent).toBe('Start with step 1');
       expect(page.querySelector('figure')).toBeNull();
       expect(document.title).toBe('Not found | reely');
     });

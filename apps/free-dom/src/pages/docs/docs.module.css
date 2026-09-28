@@ -1,0 +1,172 @@
+/* The rail groups topics the way the library is layered: start, markup, reactivity, structure, measure. */
+.group + .group {
+  margin-top: 1.5rem;
+}
+
+.groupName {
+  margin: 0 0 0.35rem 0.5rem;
+  color: var(--slate);
+  font-family: var(--display);
+  font-size: 1.125rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.topics {
+  display: grid;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.topicLink {
+  display: block;
+  padding: 0.35rem 0.5rem;
+  border-left: 4px solid transparent;
+  color: var(--slate);
+  text-decoration: none;
+}
+
+.topicLink:hover {
+  color: var(--graphite);
+}
+
+.topicLink[aria-current='page'] {
+  border-left-color: var(--signal);
+  color: var(--graphite);
+  font-weight: 700;
+}
+
+.topicLink:focus-visible {
+  outline: 3px solid var(--graphite);
+  outline-offset: 2px;
+}
+
+.heading {
+  display: grid;
+  gap: 0.25rem;
+}
+
+/* The details read as prose: one measure, headings closer to what they head than to what came before. */
+.details {
+  display: grid;
+  gap: 1rem;
+  max-width: 68ch;
+}
+
+.details h2 {
+  margin: 1rem 0 0;
+  font-family: var(--display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.details p,
+.details ul {
+  margin: 0;
+}
+
+.details ul {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.25rem;
+}
+
+.details li::marker {
+  color: var(--signal-ink);
+}
+
+.details :not(pre) > code {
+  padding: 0.05em 0.3em;
+  border-radius: 3px;
+  background: var(--panel);
+  font-family: var(--mono);
+  font-size: 0.85em;
+}
+
+.details a {
+  color: var(--graphite);
+  font-weight: 700;
+  text-underline-offset: 0.2em;
+}
+
+.details a:focus-visible {
+  outline: 3px solid var(--graphite);
+  outline-offset: 2px;
+}
+
+/* Sizes as a timing sheet: tabular figures, right-aligned, one rule per row. */
+.details table {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.details caption {
+  padding-bottom: 0.5rem;
+  color: var(--slate);
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.details th,
+.details td {
+  padding: 0.5rem 1.5rem 0.5rem 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: baseline;
+}
+
+.details thead th {
+  color: var(--slate);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.details thead th:last-child {
+  text-align: right;
+}
+
+.details tbody th {
+  font-weight: 400;
+}
+
+.details td {
+  padding-right: 0;
+  font-family: var(--display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+  text-align: right;
+}
+
+/* Phones: each group's topics wrap as plates, so the whole map fits above the page. */
+@media (max-width: 45em) {
+  .group + .group {
+    margin-top: 0.75rem;
+  }
+
+  .groupName {
+    margin-left: 0;
+  }
+
+  .topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .topicLink {
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--panel);
+    font-size: 0.9375rem;
+  }
+
+  .topicLink[aria-current='page'] {
+    border: 2px solid var(--graphite);
+    background: var(--signal);
+  }
+}

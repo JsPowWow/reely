@@ -9,8 +9,8 @@ const isTypingTarget = (target: EventTarget | null): boolean =>
   (target.isContentEditable || typingTags.has(target.tagName));
 
 /**
- * Follows the pager's `rel="prev"` or `rel="next"` link on ← or →, so a presenter can move
- * through the course from the keyboard. Keys with modifiers and keys typed into a field are left alone.
+ * Follows the pager's `rel="prev"` or `rel="next"` link on ← or →, so a reader or a presenter
+ * can move through the pages from the keyboard. Keys with modifiers and keys typed into a field are left alone.
  */
 export const followPagerKey = (event: KeyboardEvent): void => {
   const { key } = event;

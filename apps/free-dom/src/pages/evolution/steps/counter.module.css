@@ -19,33 +19,6 @@
   text-align: center;
 }
 
-.counter button {
-  padding: 0.5rem 0.9rem;
-  border: 1px solid var(--graphite);
-  border-radius: 4px;
-  background: transparent;
-  color: var(--graphite);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.counter button:not(:disabled):hover {
-  background: var(--graphite);
-  color: var(--asphalt);
-}
-
-.counter button:focus-visible {
-  outline: 3px solid var(--graphite);
-  outline-offset: 2px;
-}
-
-.counter button:disabled {
-  border-color: var(--line);
-  color: var(--slate);
-  cursor: not-allowed;
-}
-
 /* An odd count gets the signal mark, so the bound attribute is visible too. */
 .value[data-parity='odd'] {
   border-bottom: 4px solid var(--signal-ink);

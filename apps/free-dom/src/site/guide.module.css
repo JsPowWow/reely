@@ -1,29 +1,10 @@
-.tutorial {
-  --asphalt: #e9edf1;
-  --panel: #ffffff;
-  --graphite: #1f2933;
-  --slate: #5b6b7a;
-  --line: #cbd2d9;
-  --signal: #f5c518;
-  /* signal yellow for marks on light surfaces: 4.6:1 on the panel */
-  --signal-ink: #9c6d00;
-  --flag: #d64545;
-  --code-text: #e4e7eb;
-  --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
-  --body: 'Atkinson Hyperlegible', system-ui, sans-serif;
-  --mono: 'JetBrains Mono', ui-monospace, monospace;
-
+.guide {
   display: grid;
   grid-template-columns: 17rem minmax(0, 1fr);
   min-height: 100vh;
-  background: var(--asphalt);
-  color: var(--graphite);
-  font-family: var(--body);
-  font-size: 1.0625rem;
-  line-height: 1.5;
 }
 
-/* Step rail: the lesson is a sequence, so the steps are numbered. */
+/* The rail: the pages of this guide, the current one marked. */
 
 .rail {
   padding: 2rem 1.25rem;
@@ -72,27 +53,11 @@
 /* Focus is graphite: every focusable element sits on a light surface. */
 .stepLink:focus-visible,
 .pager a:focus-visible,
-.home:focus-visible,
-.back:focus-visible {
+.home:focus-visible {
   outline: 3px solid var(--graphite);
   outline-offset: 2px;
 }
 
-.back {
-  display: inline-block;
-  margin-top: 2rem;
-  color: var(--slate);
-  text-decoration: underline;
-}
-
-.visuallyHidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
 
 .stepNumber {
   font-family: var(--display);
@@ -100,7 +65,7 @@
   font-weight: 800;
 }
 
-/* Step content */
+/* Page content */
 
 .main {
   display: grid;
@@ -118,7 +83,7 @@
   align-items: end;
 }
 
-/* A URL or step that does not exist: title, what to do, and the way back to step 1. */
+/* A page that does not exist: title, what to do, and the way back. */
 .missing {
   display: grid;
   justify-items: start;
@@ -175,129 +140,6 @@
   align-items: start;
 }
 
-/* Live demo with its DOM write counter */
-
-.meter {
-  margin: 0;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--panel);
-}
-
-.stage {
-  padding: 2rem 1.5rem;
-}
-
-.readouts {
-  padding: 1rem 1.5rem 1.25rem;
-  border-top: 1px solid var(--line);
-}
-
-/* The timing board: what the first render built, then every write since. */
-.board {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
-  gap: 1rem 1.5rem;
-  margin: 0;
-}
-
-.board dt {
-  order: 1;
-  color: var(--slate);
-  font-size: 0.875rem;
-  line-height: 1.3;
-}
-
-.board dd {
-  margin: 0;
-  font-family: var(--display);
-  font-size: 2.75rem;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-.readoutBuilt,
-.readoutEdit,
-.readoutNode {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.readoutBuilt dd {
-  color: var(--slate);
-}
-
-.readoutEdit dt::before,
-.readoutNode dt::before {
-  content: '';
-  display: inline-block;
-  width: 0.65em;
-  height: 0.65em;
-  margin-right: 0.4em;
-  border-radius: 50%;
-  background: var(--signal-ink);
-}
-
-.readoutNode dt::before {
-  background: var(--flag);
-}
-
-.delta {
-  margin-left: 0.3em;
-  font-size: 0.5em;
-  vertical-align: 0.6em;
-}
-
-.readoutEdit .delta {
-  color: var(--signal-ink);
-}
-
-.readoutNode .delta {
-  color: var(--flag);
-}
-
-/* Source of the step; lines new since the previous step of the same demo are marked */
-
-.sourcePanel {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.sourceCaption {
-  margin: 0;
-  color: var(--slate);
-  font-size: 0.875rem;
-}
-
-.source {
-  margin: 0;
-  padding: 1.25rem 0;
-  overflow: visible;
-  border-radius: 6px;
-  background: var(--graphite);
-  color: var(--code-text);
-  font-family: var(--mono);
-  font-size: 0.8125rem;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.line,
-.added {
-  display: block;
-  padding: 0 1.25rem;
-  border-left: 4px solid transparent;
-  text-decoration: none;
-}
-
-.added {
-  border-left-color: var(--signal);
-  background: rgb(245 197 24 / 0.14);
-}
-
 .pager {
   display: flex;
   flex-wrap: wrap;
@@ -307,7 +149,7 @@
   border-top: 1px solid var(--line);
 }
 
-/* The last step: where the course goes from here, instead of a next step. */
+/* The last page: where to go from here, instead of a next page. */
 .ending {
   display: grid;
   flex: 1 1 22rem;
@@ -327,6 +169,12 @@
 .ending p {
   margin: 0;
   color: var(--slate);
+}
+
+.ending code {
+  color: var(--graphite);
+  font-family: var(--mono);
+  font-size: 0.9em;
 }
 
 .keys {
@@ -366,9 +214,9 @@
   }
 }
 
-/* Phones: the rail becomes a grid of numbered chips; the heading shows the step title. */
+/* Phones: the rail becomes a grid of chips; the heading shows the page title. */
 @media (max-width: 45em) {
-  .tutorial {
+  .guide {
     grid-template-columns: minmax(0, 1fr);
     align-content: start;
   }
@@ -412,9 +260,6 @@
     white-space: nowrap;
   }
 
-  .back {
-    margin-top: 1rem;
-  }
 
   /* Room for the Netlify badge, which floats over the bottom of the page. */
   .main {
@@ -434,26 +279,5 @@
 
   .lead {
     grid-column: 1 / -1;
-  }
-
-  .stage {
-    padding: 1.25rem 1rem;
-  }
-
-  .readouts {
-    padding: 0.75rem 1rem 1rem;
-  }
-
-  .board dd {
-    font-size: 2.25rem;
-  }
-
-  .source {
-    font-size: 0.75rem;
-  }
-
-  .line,
-  .added {
-    padding: 0 0.75rem;
   }
 }

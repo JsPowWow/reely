@@ -15,8 +15,8 @@ export default [
     },
   },
   {
-    // The step registry imports every step and its source, two modules per step.
-    files: ['src/pages/tutorial/tutorial.steps.ts'],
+    // The registries import every demo and its source, two modules per page.
+    files: ['src/pages/evolution/evolution.steps.ts', 'src/pages/docs/docs.topics.tsx'],
     rules: {
       'import/max-dependencies': 'off',
     },

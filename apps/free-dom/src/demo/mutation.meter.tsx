@@ -2,7 +2,7 @@ import type { ReelyNode, Signal } from '@reely/dommy';
 import { batch, dd, div, dl, dt, figcaption, figure, onCleanup, p, signal, span } from '@reely/dommy';
 import { exhaustiveGuard, isInstanceOf, isNil, isSomeFunction } from '@reely/utils';
 
-import css from './tutorial.module.css';
+import css from './demo.module.css';
 
 type WriteKind = 'text' | 'attribute' | 'node';
 
@@ -170,7 +170,7 @@ export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => 
         div({ className: css.readoutBuilt }, dt(null, 'Built at first render'), dd(null, countNodes(stage))),
         writeKinds.map(readout)
       ),
-      p({ className: css.visuallyHidden, aria: { ariaLive: 'polite' } }, announcement)
+      p({ className: 'visually-hidden', aria: { ariaLive: 'polite' } }, announcement)
     )
   );
 };

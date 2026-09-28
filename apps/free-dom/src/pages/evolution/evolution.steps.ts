@@ -28,10 +28,10 @@ import getterSource from './steps/step9.getter.ts?highlight';
 import type { SourceLines } from '../../highlight/source.types';
 
 /**
- * One step of the lesson: the markup steps build the same card three ways, the counter steps
+ * One step of reely evolution: the markup steps build the same card three ways, the counter steps
  * add one reely feature at a time, and the board steps race a keyed list.
  */
-export interface TutorialStep {
+export interface EvolutionStep {
   slug: string;
   /** Steps that build the same demo share a track; a step's source is diffed against the previous step on its track. */
   track: 'links' | 'counter' | 'board';
@@ -42,7 +42,7 @@ export interface TutorialStep {
   source: SourceLines;
 }
 
-export const tutorialSteps: readonly TutorialStep[] = [
+export const evolutionSteps: readonly EvolutionStep[] = [
   {
     slug: 'factories',
     track: 'links',

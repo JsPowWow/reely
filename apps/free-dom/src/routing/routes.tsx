@@ -1,16 +1,25 @@
 import type { Routes } from '@reely/dommy/router';
-import { TutorialPage } from '../pages/tutorial/tutorial.page';
+import { DocsPage } from '../pages/docs/docs.page';
+import { EvolutionPage } from '../pages/evolution/evolution.page';
+import { NotFoundPage } from '../site/not-found.page';
 
 // A route answers with how to render its page; `createPageView` renders it under an owner.
 export const routes = [
-  // The course is the home page until the reely landing page exists.
-  { path: '/', action: () => () => <TutorialPage /> },
+  // TODO AR the landing page takes `/` once it is built
+  { path: '/', action: () => () => <DocsPage /> },
   {
-    path: '/tutorial',
+    path: '/docs',
     children: [
-      { path: '', action: () => () => <TutorialPage /> },
-      { path: '/:step', action: (_ctx, { step }) => () => <TutorialPage slug={String(step)} /> },
+      { path: '', action: () => () => <DocsPage /> },
+      { path: '/:topic', action: (_ctx, { topic }) => () => <DocsPage slug={String(topic)} /> },
     ],
   },
-  { path: '/*rest', action: (ctx) => () => <TutorialPage missingPath={ctx.pathname} /> },
+  {
+    path: '/evolution',
+    children: [
+      { path: '', action: () => () => <EvolutionPage /> },
+      { path: '/:step', action: (_ctx, { step }) => () => <EvolutionPage slug={String(step)} /> },
+    ],
+  },
+  { path: '/*rest', action: (ctx) => () => <NotFoundPage pathname={ctx.pathname} /> },
 ] as const satisfies Routes<() => Node>;

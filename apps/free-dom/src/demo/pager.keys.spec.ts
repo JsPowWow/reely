@@ -6,7 +6,7 @@ describe('followPagerKey', () => {
   beforeEach(() => {
     followed.length = 0;
     document.body.innerHTML =
-      '<a rel="prev" href="/tutorial/one">Previous</a><a rel="next" href="/tutorial/three">Next</a><input>';
+      '<a rel="prev" href="/evolution/one">Previous</a><a rel="next" href="/evolution/three">Next</a><input>';
     document.querySelectorAll('a').forEach((link) =>
       link.addEventListener('click', (event) => {
         event.preventDefault();
@@ -25,7 +25,7 @@ describe('followPagerKey', () => {
     press('ArrowRight');
     press('ArrowLeft');
 
-    expect(followed).toEqual(['/tutorial/three', '/tutorial/one']);
+    expect(followed).toEqual(['/evolution/three', '/evolution/one']);
   });
 
   it('leaves arrows with modifiers and arrows typed into a field alone', () => {

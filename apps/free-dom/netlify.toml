@@ -1,3 +1,14 @@
+# reely evolution was the course at /tutorial
+[[redirects]]
+from = "/tutorial"
+to = "/evolution"
+status = 301
+
+[[redirects]]
+from = "/tutorial/*"
+to = "/evolution/:splat"
+status = 301
+
 [[redirects]]
 from = "/*"
 to = "/index.html"

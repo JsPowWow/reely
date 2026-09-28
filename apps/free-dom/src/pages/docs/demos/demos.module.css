@@ -1,0 +1,57 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* A read-out in the display face, like a lap time on the tower. */
+.value {
+  min-width: 3ch;
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+  font-family: var(--display);
+  font-size: 3.5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+}
+
+.status {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--slate);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The chequered moment: the winner's plate in signal yellow. */
+.winner {
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  border-radius: 4px;
+  background: var(--signal);
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.racing {
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  border: 1px dashed var(--line);
+  border-radius: 4px;
+  color: var(--slate);
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.slot {
+  flex-basis: 100%;
+  min-height: 4.4rem;
+}

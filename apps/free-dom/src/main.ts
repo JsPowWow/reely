@@ -3,7 +3,7 @@ import { createAsyncRouter } from '@reely/dommy/router';
 import { scopedLogger } from '@reely/logger';
 import { isInstanceOf, isSomeFunction } from '@reely/utils';
 
-import { followPagerKey } from './pages/tutorial/pager.keys';
+import { followPagerKey } from './demo/pager.keys';
 import { navigateInPage } from './routing/page.navigation';
 import { createPageView } from './routing/page.view';
 import { routes } from './routing/routes';
@@ -30,7 +30,7 @@ const renderPage = async (pathname: string): Promise<boolean> => {
   } catch (error: unknown) {
     // every URL has a route, so this is a bug: say so instead of leaving a blank page
     scopedLogger('free-dom').error(error);
-    showPage(() => p(null, 'This page failed to load. ', a({ href: '/tutorial' }, 'Open the course from step 1'), '.'));
+    showPage(() => p(null, 'This page failed to load. ', a({ href: '/docs' }, 'Open the docs'), '.'));
   }
   return true;
 };
