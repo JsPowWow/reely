@@ -5,6 +5,7 @@ Nx monorepo (TypeScript, npm workspaces): publishable packages in `packages/`, d
 Talk to the user in Russian. Code, comments, commit messages — English.
 
 ## Layout
+
 - `packages/utils` — `@reely/utils`, private (`scope:shared`): type guards, fp (`pipe`, `flow`, `Either`, `Maybe`), nullable helpers, errors, shared types. **One function — one file** (`src/lib/<group>/<fnName>.ts`) with a spec next to it.
 - `packages/logger` — `@reely/logger` (`scope:shared`): `scopedLogger(scope)`, `logWith(level, prefix)` for `pipe`, `WithUseLogger<T>`.
 - `packages/dommy` — `@reely/dommy`: DOM element factories, JSX runtime, signals (`reelx`, port of artalar/act), async router. Current work: JsPowWow/reely#1 (dommy 0.1 for JsPowWow/ai-race).
@@ -12,9 +13,11 @@ Talk to the user in Russian. Code, comments, commit messages — English.
 - `apps/free-dom` — dommy playground; `apps/star-battle` — canvas game; `labs-ignore/` — experiments, not linted, not shipped.
 
 ## Commands
+
 Always through Nx (caching, `^build` deps): `npx nx test dommy`, `npx nx lint dommy`, `npx nx typecheck dommy`, `npx nx build dommy`; before a commit — `npx nx affected -t lint test typecheck build`. Node ≥ 22.12 (`.nvmrc`).
 
 ## Rules that must not break
+
 - **Reuse `@reely/utils` first.** Guards (`hasSome`, `isNil`, `isSomeFunction`, `isString`, `hasProperty`…), `pipe`/`flow`, `noop`/`identity`, `exhaustiveGuard`, `toErrorWithMessage`, shared types (`Nullable`, `PipeableFn`, `AnyFunction`…). No hand-written `typeof` checks or local copies. Missing a general helper → add it to utils (own file + spec + named export), then use it.
 - **No `as`** (ESLint `consistent-type-assertions: never`; allowed only in specs) — narrow with guards. No `any`, no `@ts-nocheck`/`@ts-ignore` in new code.
 - **Explicit return types**, `import type` for types, `import/order` groups (`@reely/**` after externals), no import cycles.
@@ -23,6 +26,7 @@ Always through Nx (caching, `^build` deps): `npx nx test dommy`, `npx nx lint do
 - Published packages must work for a consumer: `npm i @reely/<pkg>` + `tsc` in a clean project — no imports of unpublished `@reely/*` in the emitted `.d.ts`/JS.
 
 ## Git and release
+
 - Conventional Commits with the Nx project as scope, checked by commitlint + husky: `feat(dommy): add \`For\` with keyed reorder`, `fix(utils): …`, `chore(source): …`. Identifiers in backticks. Linear history on `main`, no merge commits.
 - Release — `nx release` (independent versions, tags `release/{projectName}/{version}`); publishing — manual workflow `.github/workflows/publish.yml`. Pre-releases of dommy: `0.1.0-next.N` with dist-tag `next`. The default npm registry on the author's machine is a corporate one — **publish only to `https://registry.npmjs.org`**, and never without the author.
 
@@ -50,13 +54,23 @@ Multi-context: `CONTEXT-MAP.md` → `packages/<pkg>/CONTEXT.md`; ADRs in `docs/a
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
 
-# General Guidelines for working with Nx
+## General Guidelines for working with Nx
 
+- For navigating/exploring the workspace, invoke the `nx-workspace` skill first - it has patterns for querying projects, targets, and dependencies
 - When running tasks (for example build, lint, test, e2e, etc.), always prefer running the task through `nx` (i.e. `nx run`, `nx run-many`, `nx affected`) instead of using the underlying tooling directly
+- Prefix nx commands with the workspace's package manager (e.g., `pnpm nx build`, `npm exec nx test`) - avoids using globally installed CLI
 - You have access to the Nx MCP server and its tools, use them to help the user
-- When answering questions about the repository, use the `nx_workspace` tool first to gain an understanding of the workspace architecture where applicable.
-- When working in individual projects, use the `nx_project_details` mcp tool to analyze and understand the specific project structure and dependencies
-- For questions around nx configuration, best practices or if you're unsure, use the `nx_docs` tool to get relevant, up-to-date docs. Always use this instead of assuming things about nx configuration
-- If the user needs help with an Nx configuration or project graph error, use the `nx_workspace` tool to get any errors
+- For Nx plugin best practices, check `node_modules/@nx/<plugin>/PLUGIN.md`. Not all plugins have this file - proceed without it if unavailable.
+- NEVER guess CLI flags - always check nx_docs or `--help` first when unsure
+
+## Scaffolding & Generators
+
+- For scaffolding tasks (creating apps, libs, project structure, setup), ALWAYS invoke the `nx-generate` skill FIRST before exploring or calling MCP tools
+
+## When to use nx_docs
+
+- USE for: advanced config options, unfamiliar flags, migration guides, plugin configuration, edge cases
+- DON'T USE for: basic generator syntax (`nx g @nx/react:app`), standard commands, things you already know
+- The `nx-generate` skill handles generator discovery internally - don't call nx_docs just to look up generator syntax
 
 <!-- nx configuration end-->
