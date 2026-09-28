@@ -57,12 +57,14 @@
     },
     "projectsRelationship": "independent",
     "projects": ["*", "!utils", "!@reely/source"],
-    "git": {
-      "commitMessage": "chore: updated version [no ci]"
-    },
     "version": {
       "preVersionCommand": "npx nx run-many -t build",
-      "conventionalCommits": true
+      "conventionalCommits": true,
+      "git": {
+        "commit": true,
+        "tag": true,
+        "commitMessage": "chore(source): release versions [no ci]"
+      }
     },
     "changelog": {
       "projectChangelogs": {
