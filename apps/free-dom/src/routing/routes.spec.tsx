@@ -17,6 +17,10 @@ const headingAt = async (pathname: string): Promise<string | null | undefined> =
   (await renderAt(pathname)).querySelector('h1')?.textContent;
 
 describe('routes', () => {
+  it('opens the landing page at the root', async () => {
+    expect(await headingAt('/')).toBe('Real DOM. One write per change.');
+  });
+
   it('opens the docs at their first topic and at a topic', async () => {
     expect(await headingAt('/docs')).toBe('Getting started');
     expect(await headingAt('/docs/signals')).toBe('Signals');

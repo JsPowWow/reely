@@ -56,4 +56,5 @@ vitest.config.*.timestamp*
 .claude/skills/impeccable/scripts/bin
 
 # impeccable critique archive and live-mode scratch, per machine
-.impeccable/
+/.impeccable/
+**/.impeccable/questions/

@@ -25,7 +25,7 @@ describe('navigateInPage', () => {
   };
 
   beforeEach(() => {
-    history.replaceState(null, '', '/tutorial/factories');
+    history.replaceState(null, '', '/evolution/factories');
     render.mockClear();
     stop = navigateInPage(render);
   });
@@ -33,28 +33,29 @@ describe('navigateInPage', () => {
   afterEach(() => stop());
 
   it('renders a same-site link in place and adds it to the history', () => {
-    const click = clickLink({ href: '/tutorial/jsx' });
+    const click = clickLink({ href: '/evolution/jsx' });
 
     expect(click.defaultPrevented).toBe(true);
-    expect(location.pathname).toBe('/tutorial/jsx');
-    expect(render).toHaveBeenCalledExactlyOnceWith('/tutorial/jsx');
+    expect(location.pathname).toBe('/evolution/jsx');
+    expect(render).toHaveBeenCalledExactlyOnceWith('/evolution/jsx');
   });
 
   it('renders the page of a history step, back or forward', () => {
-    clickLink({ href: '/tutorial/jsx' });
-    history.replaceState(null, '', '/tutorial/factories');
+    clickLink({ href: '/evolution/jsx' });
+    history.replaceState(null, '', '/evolution/factories');
 
     window.dispatchEvent(new PopStateEvent('popstate'));
 
-    expect(render).toHaveBeenLastCalledWith('/tutorial/factories');
+    expect(render).toHaveBeenLastCalledWith('/evolution/factories');
   });
 
   it.each<[string, Parameters<typeof a>[0], MouseEventInit]>([
     ['another site', { href: 'https://github.com/JsPowWow/reely' }, {}],
-    ['a new tab', { href: '/tutorial/jsx', target: '_blank' }, {}],
-    ['a download', { href: '/tutorial/jsx', download: '' }, {}],
-    ['a modified click', { href: '/tutorial/jsx' }, { metaKey: true }],
-    ['a middle click', { href: '/tutorial/jsx' }, { button: 1 }],
+    ['a new tab', { href: '/evolution/jsx', target: '_blank' }, {}],
+    ['a download', { href: '/evolution/jsx', download: '' }, {}],
+    ['a modified click', { href: '/evolution/jsx' }, { metaKey: true }],
+    ['a middle click', { href: '/evolution/jsx' }, { button: 1 }],
+    ['a place on the same page', { href: '#sector-2' }, {}],
   ])('leaves %s to the browser', (_name, props, init) => {
     const click = clickLink(props, init);
 
@@ -62,10 +63,18 @@ describe('navigateInPage', () => {
     expect(render).not.toHaveBeenCalled();
   });
 
+  it('keeps the page when the history moves between places on it', () => {
+    history.pushState(null, '', '/evolution/factories#sector-2');
+
+    window.dispatchEvent(new PopStateEvent('popstate'));
+
+    expect(render).not.toHaveBeenCalled();
+  });
+
   it('stops following links once stopped', () => {
     stop();
 
-    const click = clickLink({ href: '/tutorial/jsx' });
+    const click = clickLink({ href: '/evolution/jsx' });
 
     expect(click.defaultPrevented).toBe(false);
     expect(render).not.toHaveBeenCalled();

@@ -1,12 +1,12 @@
 import type { Routes } from '@reely/dommy/router';
 import { DocsPage } from '../pages/docs/docs.page';
 import { EvolutionPage } from '../pages/evolution/evolution.page';
+import { LandingPage } from '../pages/landing/landing.page';
 import { NotFoundPage } from '../site/not-found.page';
 
 // A route answers with how to render its page; `createPageView` renders it under an owner.
 export const routes = [
-  // TODO AR the landing page takes `/` once it is built
-  { path: '/', action: () => () => <DocsPage /> },
+  { path: '/', action: () => () => <LandingPage /> },
   {
     path: '/docs',
     children: [
