@@ -18,7 +18,7 @@ export default defineConfig(() => ({
   plugins: [
     nxViteTsPaths(),
     nxCopyAssetsPlugin(['*.md', 'netlify.toml', '*.svg']),
-    viteStaticCopy({ targets: [{ src: 'src/assets/*', dest: 'assets' }] }),
+    viteStaticCopy({ targets: [{ src: 'src/assets/*', dest: 'assets', rename: { stripBase: true } }] }),
   ],
   // Uncomment this if you are using workers.
   // worker: {

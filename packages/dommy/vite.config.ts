@@ -26,7 +26,7 @@ export default defineConfig(() => ({
     },
     minify: true,
     outDir: 'dist',
-    rollupOptions: {
+    rolldownOptions: {
       external: ['tslib'],
       output: {
         preserveModules: false,

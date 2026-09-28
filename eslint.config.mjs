@@ -128,7 +128,8 @@ export default [
     },
   },
   {
-    files: ['**/vitest.config.mts'],
+    // Vite 8 exposes its types only through `exports`, which the node import resolver can't read
+    files: ['**/{vite,vitest}.config.{ts,mts}'],
     rules: {
       'import/no-unresolved': 'off',
     },
