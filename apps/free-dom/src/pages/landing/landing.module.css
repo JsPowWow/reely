@@ -376,18 +376,20 @@
 
 }
 
-/* Phones: the bar keeps the four sector numbers; names come back as the width allows. */
+/* Phones: the bar keeps the sector numbers and their splits; the names stay for screen readers. */
 @media (max-width: 45em) {
   .segments {
     gap: 0 0.5rem;
   }
 
   .landing {
-    --bar: 4.5rem;
+    --bar: 5.25rem;
   }
 
+  /* five segments share a phone's width: the split posts under the number, not beside it */
   .segment {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.25rem;
     padding: 0.5rem 0 0.45rem;
   }
 
@@ -402,8 +404,9 @@
   }
 
   .segmentMark {
-    justify-self: end;
-    font-size: 0.9375rem;
+    justify-self: start;
+    padding: 0.05rem 0.25rem;
+    font-size: 0.8125rem;
   }
 
   .segmentNumber {

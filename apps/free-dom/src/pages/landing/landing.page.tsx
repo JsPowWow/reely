@@ -30,7 +30,7 @@ const Sector = ({ sector, number }: { sector: LapSector; number: number }): Node
 );
 
 /**
- * The landing page: one lap of reely. The start straight says what it is, three sectors prove it
+ * The landing page: one lap of reely. The start straight says what it is, four sectors prove it
  * live, and the finish gives the times and the way into the docs.
  */
 const finishId = 'finish';
@@ -38,7 +38,7 @@ const finishId = 'finish';
 /** The sector bar: every sector, then the finish, each with the split it posts once driven. */
 const segments = [
   ...lapSectors.map((sector, index) => ({ id: sector.id, number: `S${index + 1}`, name: sector.name, mark: sector.mark })),
-  { id: finishId, number: 'F', name: 'Finish', mark: '6.3 kB' },
+  { id: finishId, number: 'F', name: 'Finish', mark: '6.5 kB' },
 ];
 
 export const LandingPage = (): Node => {
@@ -115,7 +115,7 @@ export const LandingPage = (): Node => {
                 </tr>
                 <tr>
                   <th scope='row'>The whole package, gzipped</th>
-                  <td>6.3 kB</td>
+                  <td>6.5 kB</td>
                 </tr>
                 <tr>
                   <th scope='row'>A lap of a 500-row board, median in headless Chrome</th>

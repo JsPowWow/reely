@@ -17,6 +17,8 @@ import { Counter } from './demos/first.counter';
 import firstCounterSource from './demos/first.counter.tsx?highlight';
 import { LapClock } from './demos/lap.clock';
 import lapClockSource from './demos/lap.clock.tsx?highlight';
+import { PitWall } from './demos/pit.stop';
+import pitStopSource from './demos/pit.stop.tsx?highlight';
 import { RaceFinish } from './demos/race.finish';
 import raceFinishSource from './demos/race.finish.tsx?highlight';
 import listsSource from './snippets/lists.for.tsx?highlight';
@@ -298,6 +300,46 @@ export const docTopics: readonly DocTopic[] = [
     ),
   },
   {
+    slug: 'async',
+    group: 'Structure',
+    title: 'Async',
+    lead: 'Await shows the fallback while a promise is pending, then its result or its error. Give it a getter and it loads again when a signal it reads changes; only the latest promise ever renders.',
+    Demo: PitWall,
+    source: pitStopSource,
+    Details: () => (
+      <>
+        <h2>The props</h2>
+        <ul>
+          <li>
+            <code>promise</code>: a promise, or a signal or getter of one. A getter is tracked: here it reads the stop
+            number, so every call to the pits loads again. <code>promise={'{'}load{'}'}</code> starts the load when the
+            view renders.
+          </li>
+          <li>
+            <code>children</code>: a function of the value, built once the promise resolves.
+          </li>
+          <li>
+            <code>fallback</code>: shown while the promise is pending; nothing by default.
+          </li>
+          <li>
+            <code>catch</code>: a function of the reason, as an <code>Error</code>. Without it the slot is cleared and
+            the rejection stays unhandled, so the browser reports it.
+          </li>
+        </ul>
+        <h2>Only the latest promise</h2>
+        <p>
+          Press Box, box twice while the crew works: the first stop never posts, its answer is dropped. A promise that
+          settles after the view is taken down renders nothing either. The third stop fails; pressing again is the
+          retry, since the getter reads the stop number.
+        </p>
+        <p>
+          Every stop after the first costs the board 4 nodes: the result goes and the fallback comes, then the other
+          way round.
+        </p>
+      </>
+    ),
+  },
+  {
     slug: 'lifecycle',
     group: 'Structure',
     title: 'Mount and cleanup',
@@ -317,7 +359,8 @@ export const docTopics: readonly DocTopic[] = [
             <code>unmount()</code>, the function <code>mount</code> returned.
           </li>
           <li>
-            <code>For</code>, for a row whose key is gone; <code>Show</code>, for the branch it hides.
+            <code>For</code>, for a row whose key is gone; <code>Show</code> and <code>Await</code>, for the branch they
+            hide.
           </li>
           <li>An effect, before its next run and when it is stopped.</li>
         </ul>
@@ -355,7 +398,7 @@ export const docTopics: readonly DocTopic[] = [
             </tr>
             <tr>
               <th scope='row'>The whole package</th>
-              <td>6.3 kB</td>
+              <td>6.5 kB</td>
             </tr>
           </tbody>
         </table>

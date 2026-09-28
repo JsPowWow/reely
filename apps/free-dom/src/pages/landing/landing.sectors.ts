@@ -4,6 +4,8 @@ import { Grid } from './sectors/markup.grid';
 import gridSource from './sectors/markup.grid.tsx?highlight';
 import { Laps } from './sectors/signals.laps';
 import lapsSource from './sectors/signals.laps.tsx?highlight';
+import { PitWall } from '../docs/demos/pit.stop';
+import pitStopSource from '../docs/demos/pit.stop.tsx?highlight';
 
 import type { SourceLines } from '../../highlight/source.types';
 
@@ -55,5 +57,16 @@ export const lapSectors: readonly LapSector[] = [
     file: 'lists.race.tsx',
     Demo: Race,
     source: raceSource,
+  },
+  {
+    id: 'async',
+    name: 'Async',
+    claim:
+      'Await shows the fallback while a promise is pending, then its result or its error, and only the latest promise renders: box twice and the first stop never posts. Every stop after the first swaps one node for another, twice.',
+    split: '4 nodes a stop',
+    mark: '4 nodes',
+    file: 'pit.stop.tsx',
+    Demo: PitWall,
+    source: pitStopSource,
   },
 ];

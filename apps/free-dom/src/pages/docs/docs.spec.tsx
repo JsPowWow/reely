@@ -2,6 +2,7 @@ import { mount } from '@reely/dommy';
 
 import { clickButton } from '../../testing/dom.testing';
 import { LapClock } from './demos/lap.clock';
+import { PitWall, pitStopDelay } from './demos/pit.stop';
 import { RaceFinish } from './demos/race.finish';
 import { DocsPage } from './docs.page';
 import { docTopics } from './docs.topics';
@@ -81,6 +82,50 @@ describe('docs', () => {
 
       expect(finished).toBe('Winner: Car 3');
       expect(demo.querySelector('p')?.textContent).toBe('Racing, lap 1');
+    });
+  });
+
+  describe('demo "async"', () => {
+    const shown = (root: Element): string | null | undefined => root.querySelector('p')?.textContent;
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('shows the crew at work, then the stop time', async () => {
+      const host = document.createElement('div');
+      const dispose = mount(host, () => <PitWall />);
+      const onTrack = shown(host);
+
+      clickButton(host, 'Box, box');
+      const inThePits = shown(host);
+      await vi.advanceTimersByTimeAsync(pitStopDelay);
+
+      expect([onTrack, inThePits, shown(host)]).toEqual(['On track', 'In the pits…', 'Stop 1: 2.4 s']);
+      dispose();
+    });
+
+    it('drops the stop a newer call replaced, shows a failed stop, and posts the retry', async () => {
+      const host = document.createElement('div');
+      const dispose = mount(host, () => <PitWall />);
+
+      clickButton(host, 'Box, box');
+      await vi.advanceTimersByTimeAsync(pitStopDelay);
+      clickButton(host, 'Box, box');
+      clickButton(host, 'Box, box');
+      await vi.advanceTimersByTimeAsync(pitStopDelay);
+      const failed = shown(host);
+      clickButton(host, 'Box, box');
+      await vi.advanceTimersByTimeAsync(pitStopDelay);
+
+      expect(failed).toBe('Stop 3: a wheel nut stuck. Box again.');
+      expect(shown(host)).toBe('Stop 4: 2.8 s');
+      expect(host.querySelectorAll('p')).toHaveLength(1);
+      dispose();
     });
   });
 

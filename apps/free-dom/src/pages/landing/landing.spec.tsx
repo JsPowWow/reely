@@ -1,6 +1,7 @@
 import { mount } from '@reely/dommy';
 
 import { clickButton, flushMutations } from '../../testing/dom.testing';
+import { pitStopDelay } from '../docs/demos/pit.stop';
 import { LandingPage } from './landing.page';
 import { lapSectors } from './landing.sectors';
 
@@ -32,7 +33,7 @@ describe('LandingPage', () => {
     );
 
     expect(sectors.every((sector) => sector?.querySelector('figure') && sector.querySelector('pre'))).toBe(true);
-    expect(bar).toEqual(['#markup', '#signals', '#lists', '#finish']);
+    expect(bar).toEqual(['#markup', '#signals', '#lists', '#async', '#finish']);
     expect(host.querySelector('section#finish td')?.textContent).toBe('1.3 kB');
   });
 
@@ -71,4 +72,35 @@ describe('LandingPage', () => {
     expect([text, attributes, nodes]).toEqual(['10', '0', '4']);
     expect(lists.querySelector('header')?.textContent).toContain('2 rows moved');
   });
+
+  describe('the async sector', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('shows on the board the split it claims for a stop after the first', async () => {
+      const pits = host.querySelector('section#async');
+      if (!pits) {
+        throw new Error('No async sector');
+      }
+      const nodeWrites = (): number => Number(pits.querySelectorAll('figcaption dd')[3]?.firstChild?.textContent);
+      // the crew's timer and the mutation reports both run on the fake clock
+      const stop = async (): Promise<void> => {
+        clickButton(pits, 'Box, box');
+        await vi.advanceTimersByTimeAsync(pitStopDelay);
+      };
+
+      await stop();
+      const afterFirst = nodeWrites();
+      await stop();
+
+      expect(nodeWrites() - afterFirst).toBe(4);
+      expect(pits.querySelector('header')?.textContent).toContain('4 nodes a stop');
+    });
+  });
 });
+

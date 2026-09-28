@@ -27,7 +27,7 @@ No virtual DOM and no re-render: tag factories and JSX return real DOM nodes, a 
 
 ## Capabilities and Constraints
 
-- Documentation topics: getting started, elements and JSX, components, signals, bindings, `batch`, keyed lists (`For`), conditions (`Show`), mount and cleanup, performance.
+- Documentation topics: getting started, elements and JSX, components, signals, bindings, `batch`, keyed lists (`For`), conditions (`Show`), async (`Await`), mount and cleanup, performance.
 - reely evolution keeps the chain: markup (tag factories, the same markup in JSX, components from data), then interactivity (a counter by hand, signals, bindings, derived values, `batch`), then keyed lists and a five-hundred-row race board; each step marks the lines that are new since the previous step.
 - All copy is in English for now; code and comments are English too. English and Russian are planned, on reely's own signals.
 - The whole site uses only `@reely/*` packages at runtime: no other UI framework or runtime dependency.
@@ -43,7 +43,7 @@ No virtual DOM and no re-render: tag factories and JSX return real DOM nodes, a 
 
 ## Evidence on Hand
 
-- Sizes, gzip, measured on the packed tarball with esbuild: an app that uses only signals ships 1.3 kB of dommy; a typical JSX app with `For`, `Show` and `mount` 4.7 kB; the whole package 6.3 kB. No runtime dependencies.
+- Sizes, gzip, measured on the packed tarball with esbuild: an app that uses only signals ships 1.3 kB of dommy; a typical JSX app with `For`, `Show` and `mount` 4.7 kB; the whole package 6.5 kB. No runtime dependencies.
 - Speed: a 500-row keyed race board re-sorts in a median of 7.7 ms per lap (95th percentile 8.7 ms) in headless Chrome, measured from the write to the finished layout; the performance page times it live in the visitor's own browser.
 - The live demos and their DOM-write counts: `apps/free-dom/src/pages/`.
 - The library source and its tests: `packages/dommy`; first real consumer: JsPowWow/ai-race.

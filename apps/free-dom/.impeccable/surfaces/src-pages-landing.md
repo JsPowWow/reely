@@ -15,11 +15,11 @@ Memorable moment: the sector bar filling in signal yellow as you scroll the lap,
 
 ## Direction contract
 
-THESIS: Scrolling the page is driving one lap of reely: sector 1 markup, sector 2 signals, sector 3 lists, and the finish line is the docs. It refuses the category default of a centered hero, three feature cards, one code block and a closing CTA.
+THESIS: Scrolling the page is driving one lap of reely: sector 1 markup, sector 2 signals, sector 3 lists, sector 4 async (a pit stop), and the finish line is the docs. It refuses the category default of a centered hero, three feature cards, one code block and a closing CTA.
 
 OWN-WORLD: Asphalt #e9edf1 ground, graphite #1f2933 start straight and finish bands, signal yellow #f5c518 for the sector bar, split times and the primary action, flag red #d64545 only for node writes. Big Shoulders Display for headings, sector names and split times in tabular figures; Atkinson Hyperlegible for prose; JetBrains Mono only for code on graphite panes. White demo panels with the write-counter board under each demo.
 
-STORY: The visitor learns in one line what reely is (real DOM, one write per change), drives three sectors where each claim runs live beside its code with its writes counted, reads the size and speed as split times at the finish, learns the page itself is built with reely, and opens the docs.
+STORY: The visitor learns in one line what reely is (real DOM, one write per change), drives four sectors where each claim runs live beside its code with its writes counted, reads the size and speed as split times at the finish, learns the page itself is built with reely, and opens the docs.
 
 FIRST VIEWPORT: A graphite start straight under the site header. Left, at 5.5rem display: "Real DOM. One write per change." Under it one sentence on how, the signal-yellow "Open the docs" button beside the `npm i @reely/dommy@next` line, and "This site is built with reely". Right: the live first-counter demo with its write board, on a white panel. Along the bottom edge of the band, the sector bar S1 Markup, S2 Signals, S3 Lists, Finish, each with its split, linking to its sector.
 
