@@ -3,3 +3,8 @@ body {
   margin: 0;
   background: #e9edf1;
 }
+
+/* A heading focused after a move to another page is a reading position, not a control. */
+h1[tabindex='-1']:focus {
+  outline: none;
+}
