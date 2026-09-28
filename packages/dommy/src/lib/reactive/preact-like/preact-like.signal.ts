@@ -1,5 +1,6 @@
 import { noop, setPrototype } from '@reely/utils';
 
+import { onCleanup } from '../owner';
 import { reelx } from '../reelx/reelx.core';
 
 import type { Reelx, RlxState, RlxSubscribe } from '../reelx/reelx.types';
@@ -39,6 +40,7 @@ export function effect(fn: VoidFunction): VoidFunction {
   const s = computed<void>(() => reelx.batch(fn.bind(context)));
   const dispose = s.subscribe(noop);
   context.dispose = dispose;
+  onCleanup(dispose);
   return dispose;
 }
 

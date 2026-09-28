@@ -1,13 +1,14 @@
 import { isInstanceOf, isSomeFunction } from '@reely/utils';
 
 import { isFalsyElement } from './element.utils';
+import { onCleanup } from '../reactive/owner';
 import { computed } from '../reactive/preact-like/preact-like.signal';
 
 import type { ReactiveChildDOMElement, ReactiveValue, ValidChildDOMElement } from '../types/dommy.types';
 
 /**
  * Calls `write` with the current value of `read`, then again on every change of the
- * signals `read` depends on.
+ * signals `read` depends on, until the owner of the render is disposed.
  *
  * @template T - The value type.
  * @param {ReactiveValue<T>} read - A signal or a getter.
@@ -15,8 +16,7 @@ import type { ReactiveChildDOMElement, ReactiveValue, ValidChildDOMElement } fro
  * @returns {void}
  */
 export const bindValue = <T>(read: ReactiveValue<T>, write: (value: T) => void): void => {
-  // TODO AR register the subscription in the owner (JsPowWow/reely#1, step 2)
-  computed(read).subscribe(write);
+  onCleanup(computed(read).subscribe(write));
 };
 
 /**
