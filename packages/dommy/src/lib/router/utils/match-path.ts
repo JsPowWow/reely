@@ -1,4 +1,4 @@
-import { hasSome, isInstanceOf } from '@reely/utils';
+import { hasSome, isInstanceOf, isNil } from '@reely/utils';
 
 import type { MatchingRoute, RouteMatchingResult, RoutePath } from './types';
 
@@ -14,8 +14,10 @@ const toRegExp = (route: string): RegExp => {
       .replaceAll('?', String.raw`\?`)
       /** removes any trailing slashes (/) at the end of the route string */
       .replace(/\/+$/, '')
-      /** replace  * (wildcard) characters in the route to the regular expression .* */
-      .replaceAll(/\*+/g, '.*')
+      /** a bare wildcard `*` matches anything; a named one, `*rest`, also captures it as the `rest` param */
+      .replaceAll(/\*+([A-Za-z_]\w*)?/g, (_, parameterName?: string) =>
+        isNil(parameterName) ? '.*' : `(?<${makeRegexWithUniqueGroups(parameterName, usedNames)}>.*)`
+      )
       /** converts params from form of `:paramName` (e.g., :id) into regular expression named capturing groups. */
       .replaceAll(
         /:([^\d/^|]\w*(?=(?:\/|\\.)|$))/g,
@@ -88,7 +90,6 @@ export const toRouteMatchingResult = (matchedRoutes: MatchingRoute[], url: strin
     if (exact) {
       return { success: true, route: exact };
     }
-    // console.warn('matchedRoutes: ', matchedRoutes);
     return { success: false, error: new Error(`There was found more than one matching for url-request: "${url}"`) };
   }
 

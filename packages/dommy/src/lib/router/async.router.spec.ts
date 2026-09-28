@@ -668,7 +668,6 @@ describe('UniversalRouterSync', () => {
       action: (ctx): object => ctx.params,
     });
     const result = await router.resolve('/%2F/%3A/caf%C3%A9');
-    console.log('WWWWW', result);
     expect(result).toEqual({
       a: '/',
       b: ':',
@@ -685,6 +684,19 @@ describe('UniversalRouterSync', () => {
     expect(result).toStrictEqual({
       a: ['x/y', 'z', ' ', '%AF'],
     });
+  });
+
+  test('matches any remaining path with a named wildcard `/*name`', async () => {
+    const router = createAsyncRouter([
+      { path: '/', action: (): string => 'home' },
+      { path: '/*rest', action: (ctx): object => ({ page: 'not found', params: ctx.params }) },
+    ]);
+
+    await expect(router.resolve('/nope/deeper')).resolves.toEqual({
+      page: 'not found',
+      params: { rest: 'nope/deeper' },
+    });
+    await expect(router.resolve('/')).resolves.toBe('home');
   });
 
   test('matches 0 routes (1)', async () => {

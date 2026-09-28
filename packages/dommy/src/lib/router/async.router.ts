@@ -56,7 +56,6 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
     const routesConfig = parseConfig(this.root); // TODO AR in constructor ?
     const routePathList = Object.keys(routesConfig); // TODO AR in constructor ?
     const searchUrl = baseContext.pathname.substring(this.baseUrl.length);
-    console.log('routePathList', { pathnameOrContext, routePathList });
     const matchedRoutes = getMatchingRoutes(routePathList, searchUrl);
     if (!matchedRoutes.length) {
       throw new RouteNotFoundError();
@@ -71,13 +70,10 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
       //if (matchedRoute.success) {
       const matchedCfgRoute = routesConfig[matchedRoute.pathname];
       const resolver = this.options.resolveRoute ?? resolveRoute;
-      console.log('!!matchedRoutes!!', matchedRoutes);
-      //console.log('~~ CfgMatchedRoute', matchedCfgRoute);
       const gen = routeChainFromRoot(matchedCfgRoute);
       let result = gen.next();
 
       while (!result.done) {
-        console.log('RESULT-BEG', { result });
         const pp = result.value;
         if (visited.has(pp)) {
           result = gen.next();
@@ -89,7 +85,6 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
           Object.entries(matchedRoute.params).map(([key, value]) => [key, decode(value)])
         );
         const currParams = extractParamsFromPath(pp.path, params);
-        // console.log('AAA', { params, currParams, pp: pp.params });
         const currentContext = {
           ...baseContext,
           baseUrl: baseContext.baseUrl + (pp.parentRoute?.pathname ?? ''),
@@ -100,7 +95,6 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
           },
           next: async function (): Promise<unknown> {
             // const { value, done } = gen.next();
-            // console.log('CALL next', { value, done });
             // const res = await resolver(currentContext, currParams);
             // if (hasSome(res)) {
             //   return res;
@@ -112,39 +106,27 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
 
         const res = await resolver(currentContext, currParams);
 
-        console.log('CHAIN', {
-          path: pp.path,
-          result: res,
-          // pp,
-          // ppparams: pp.params,
-        });
         if (hasSome(res)) {
           return res;
         }
         visited.add(pp);
         result = gen.next();
 
-        console.log('RESULT-E', { result });
       }
       // throw new Error('Route not found'); //Error('No route resolved');
       // } else throw matchedRoute.error;
     }
     throw new Error('Route not found'); //Error('No route resolved');
     // for (const pp of routeChainFromRoot(matchedCfgRoute)) {
-    //   console.log('CHAIN', pp.path, pp.action());
     // }
 
     // const matchedRoute = findMatchingRoute(routePathList, context.pathname.substring(this.baseUrl.length));
-    // console.log('findMatchingRoute', matchedRoute);
 
     // if (matchedRoute.success) {
     //   const matchedCfgRoute = routesConfig[matchedRoute.route.pathname];
     //   const resolve = this.options.resolveRoute ?? resolveRoute;
     //
-    //   console.log('~~~matchedCfgRoute', matchedCfgRoute);
-    //   console.log('~~~matchedRoute', matchedRoute);
     //   for (const pp of routeChainFromRoot(matchedCfgRoute)) {
-    //     console.log('CHAIN', pp.path, pp.action());
     //   }
     //
     //   const currentContext = {
@@ -157,7 +139,6 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
     //       ),
     //     },
     //   };
-    //   console.log('ctx', currentContext);
     //   return Promise.resolve(resolve(currentContext, matchedRoute.route.params));
     //   // .then((result) => {
     //   // if (result !== null && result !== undefined) {
@@ -293,7 +274,7 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
 
 function resolveRoute<R = any, C extends RouterContext = object>(
   context: RouteContext<R, C>,
-  params: RouteParams
+  _params: RouteParams
 ): RouteResult<R> {
   if (isSomeFunction(context.route.action)) {
     const { route, router: _routerIgnored, ...rest } = context;
@@ -305,7 +286,6 @@ function resolveRoute<R = any, C extends RouterContext = object>(
       },
     };
 
-    console.log('🔥 exec ', { providedContext, params });
     return context.route.action(providedContext, providedContext.params);
   }
   return undefined;
@@ -378,16 +358,12 @@ function* routeChainFromRoot(route: ParsedRoute<RouteResolver>): Generator<Parse
 
 // v1
 // const matchedRoute = findMatchingRoute(routePathList, context.pathname.substring(this.baseUrl.length));
-// // console.log('findMatchingRoute', matchedRoute);
 //
 // if (matchedRoute.success) {
 //   const matchedCfgRoute = routesConfig[matchedRoute.route.pathname];
 //   const resolve = this.options.resolveRoute ?? resolveRoute;
 //
-//   console.log('~~~matchedCfgRoute', matchedCfgRoute);
-//   console.log('~~~matchedRoute', matchedRoute);
 //   for (const pp of routeChainFromRoot(matchedCfgRoute)) {
-//     console.log('CHAIN', pp.path, pp.action());
 //   }
 //
 //   const currentContext = {
@@ -398,7 +374,6 @@ function* routeChainFromRoot(route: ParsedRoute<RouteResolver>): Generator<Parse
 //       params: Object.fromEntries(Object.entries(matchedRoute.route.params).map(([key, value]) => [key, decode(value)])),
 //     },
 //   };
-//   console.log('ctx', currentContext);
 //   return Promise.resolve(resolve(currentContext, matchedRoute.route.params));
 //   // .then((result) => {
 //   // if (result !== null && result !== undefined) {
