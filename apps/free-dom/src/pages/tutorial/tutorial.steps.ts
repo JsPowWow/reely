@@ -1,3 +1,4 @@
+/* eslint-disable import/max-dependencies -- the step registry imports every step and its source */
 import type { JSX } from '@reely/dommy';
 
 import { ReelyLinks as FactoryLinks } from './steps/step1.factories';
@@ -8,6 +9,16 @@ import { ReelyLinks as ComponentLinks } from './steps/step3.components';
 import componentsSource from './steps/step3.components.tsx?raw';
 import { Counter as DomCounter } from './steps/step4.dom';
 import domSource from './steps/step4.dom.tsx?raw';
+import { Counter as SignalCounter } from './steps/step5.signal';
+import signalSource from './steps/step5.signal.ts?raw';
+import { Counter as BoundCounter } from './steps/step6.bind';
+import bindSource from './steps/step6.bind.ts?raw';
+import { Counter as DerivedCounter } from './steps/step7.derived';
+import derivedSource from './steps/step7.derived.ts?raw';
+import { Counter as TwoSignalCounter } from './steps/step8.two-signals';
+import twoSignalsSource from './steps/step8.two-signals.ts?raw';
+import { Counter as BatchCounter } from './steps/step9.batch';
+import batchSource from './steps/step9.batch.ts?raw';
 
 /**
  * One step of the lesson: the markup steps build the same card three ways, then every step
@@ -55,5 +66,45 @@ export const tutorialSteps: readonly TutorialStep[] = [
     lead: 'An element keeps its listeners, so a click can change the page. Here the counter keeps its number in a variable and redraws the output after every click. Watch the board under the demo: each click removes one text node and adds another.',
     Demo: DomCounter,
     source: domSource,
+  },
+  {
+    slug: 'signal',
+    track: 'counter',
+    title: 'State in a signal',
+    lead: 'A signal is a value that knows who reads it. The effect reads count.value, so it runs again after every change and redraws the output. The code says what the page shows, but the board still counts a removed and an added node on every click.',
+    Demo: SignalCounter,
+    source: signalSource,
+  },
+  {
+    slug: 'bind',
+    track: 'counter',
+    title: 'Bind the signal',
+    lead: 'Pass the signal itself as a child, and dommy binds it to one text node. A click now changes that node’s text and nothing else: one text edit, no nodes added or removed. This is the whole idea of reely.',
+    Demo: BoundCounter,
+    source: bindSource,
+  },
+  {
+    slug: 'derived',
+    track: 'counter',
+    title: 'Derived values',
+    lead: 'A computed value derives from signals, and a function in a prop is bound like a signal. The parity lands in a data attribute and −1 is disabled at zero: the board now counts attribute edits, and only when a value really changes.',
+    Demo: DerivedCounter,
+    source: derivedSource,
+  },
+  {
+    slug: 'two-signals',
+    track: 'counter',
+    title: 'Two signals, two writes',
+    lead: 'Each press changes two signals, and the summary reads both. Updates are synchronous, so the summary is written after the first change and again after the second: three text edits per click.',
+    Demo: TwoSignalCounter,
+    source: twoSignalsSource,
+  },
+  {
+    slug: 'batch',
+    track: 'counter',
+    title: 'Group writes with batch',
+    lead: 'batch applies both changes first and updates the page once when it returns. The summary is written once, so a click costs two text edits instead of three.',
+    Demo: BatchCounter,
+    source: batchSource,
   },
 ];

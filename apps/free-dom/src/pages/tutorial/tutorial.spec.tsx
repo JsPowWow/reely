@@ -52,6 +52,51 @@ describe('tutorial', () => {
     expect(components).toBe(factories);
   });
 
+  // Every counter step, after +1, +1, −1 clicked in turn: the first-render node count, then text
+  // edits, attribute edits and nodes added or removed, each with the last click's delta.
+  describe('counter steps', () => {
+    const clickInTurn = async (meter: Element, labels: readonly string[]): Promise<void> => {
+      for (const label of labels) {
+        clickButton(meter, label);
+        await flushMutations();
+      }
+    };
+
+    it.each([
+      ['signal', ['7', '0', '0', '6+2']],
+      ['bind', ['7', '3+1', '0', '0']],
+      ['derived', ['7', '3+1', '4+1', '0']],
+      ['two-signals', ['9', '9+3', '4+1', '0']],
+      ['batch', ['9', '6+2', '4+1', '0']],
+    ])('step "%s" makes the writes its lesson is about', async (slug, expected) => {
+      const meter = renderStep(slug);
+
+      await clickInTurn(meter, ['+1', '+1', '−1']);
+
+      expect(meter.querySelector('output')?.textContent).toBe('1');
+      expect(readWrites(meter)).toEqual(expected);
+    });
+
+    it('step "bind" updates the one text node it bound, never replacing it', async () => {
+      const meter = renderStep('bind');
+      const text = meter.querySelector('output')?.firstChild;
+
+      await clickInTurn(meter, ['+1', '+1']);
+
+      expect(meter.querySelector('output')?.firstChild).toBe(text);
+      expect(text?.textContent).toBe('2');
+    });
+
+    it('step "derived" disables −1 at zero', async () => {
+      const meter = renderStep('derived');
+      const minus = Array.from(meter.querySelectorAll('button')).find((item) => item.textContent === '−1');
+
+      expect(minus?.disabled).toBe(true);
+      await clickInTurn(meter, ['+1']);
+      expect(minus?.disabled).toBe(false);
+    });
+  });
+
   describe('step "dom"', () => {
     it('counts and replaces the output text node on every click', async () => {
       const meter = renderStep('dom');
