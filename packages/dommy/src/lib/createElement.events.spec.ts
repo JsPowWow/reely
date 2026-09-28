@@ -15,6 +15,26 @@ describe('createElement: events', () => {
     expect(onclick.mock.calls[0]?.[0]).toMatchObject({ type: 'click', currentTarget: button });
   });
 
+  it('types a handler parameter as the DOM event, with its element as `currentTarget`', () => {
+    const seen: string[] = [];
+    const button = createElement('button', {
+      onClick: (event) => {
+        expectTypeOf(event.clientX).toEqualTypeOf<number>();
+        expectTypeOf(event.currentTarget).toEqualTypeOf<HTMLButtonElement>();
+        seen.push(`${event.type} ${event.currentTarget.tagName}`);
+      },
+      onkeydown: addListener((event) => {
+        expectTypeOf(event.key).toEqualTypeOf<string>();
+        seen.push(event.key);
+      }),
+    });
+
+    button.click();
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(seen).toEqual(['click BUTTON', 'Enter']);
+  });
+
   it('accepts camelCase handler names', () => {
     const onClick = vi.fn();
     const onKeydown = vi.fn();
