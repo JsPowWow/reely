@@ -300,6 +300,7 @@
 
 .pager {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 1rem;
   padding-top: 1.25rem;
@@ -309,6 +310,7 @@
 /* The last step: where the course goes from here, instead of a next step. */
 .ending {
   display: grid;
+  flex: 1 1 22rem;
   gap: 0.5rem;
   max-width: 62ch;
   margin-left: auto;

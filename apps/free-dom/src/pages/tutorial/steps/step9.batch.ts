@@ -7,7 +7,7 @@ export const Counter = (): HTMLElement => {
   const count = signal(0);
   const presses = signal(0);
   const parity = computed(() => (count.value % 2 === 0 ? 'even' : 'odd'));
-  const summary = computed(() => `${presses.value} presses, net ${count.value}`);
+  const summary = computed(() => `Presses: ${presses.value}, net: ${count.value}`);
 
   const press = (step: number): void => {
     batch(() => {
