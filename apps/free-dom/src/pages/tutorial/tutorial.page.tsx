@@ -54,6 +54,7 @@ export const TutorialPage = ({ slug, missingPath }: TutorialPageProps): JSX.Elem
             </li>
           ))}
         </ol>
+        <p className={css.keys}>Use ← and → to move between steps.</p>
         <a className={css.back} href='https://github.com/JsPowWow/reely'>
           Source on GitHub
         </a>
@@ -94,14 +95,28 @@ export const TutorialPage = ({ slug, missingPath }: TutorialPageProps): JSX.Elem
             </section>,
             <footer className={css.pager}>
               {hasSome(previous) && (
-                <a className={css.previous} href={stepHref(previous)}>
+                <a
+                  className={css.previous}
+                  href={stepHref(previous)}
+                  rel='prev'
+                  aria={{ ariaKeyShortcuts: 'ArrowLeft' }}
+                >
                   Previous: {previous.title}
                 </a>
               )}
-              {hasSome(next) && (
-                <a className={css.next} href={stepHref(next)}>
+              {hasSome(next) ? (
+                <a className={css.next} href={stepHref(next)} rel='next' aria={{ ariaKeyShortcuts: 'ArrowRight' }}>
                   Next: {next.title}
                 </a>
+              ) : (
+                <section className={css.ending} aria={{ ariaLabelledby: 'ending-title' }}>
+                  <h2 id='ending-title'>What comes next</h2>
+                  <p>
+                    Keyed lists that keep their nodes when rows move, then the race scoreboard of ai-race. @reely/dommy
+                    0.1 is not on npm yet: the code in this course runs from the repo.
+                  </p>
+                  <a href='https://github.com/JsPowWow/reely'>Follow reely on GitHub</a>
+                </section>
               )}
             </footer>,
           ]

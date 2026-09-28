@@ -206,6 +206,14 @@ describe('tutorial', () => {
       expect(dom.querySelectorAll('pre ins')).toHaveLength(0);
     });
 
+    it('ends the course with what comes next instead of a next step', () => {
+      const last = renderPage(tutorialSteps.at(-1)?.slug);
+
+      expect(last.querySelector('a[rel="next"]')).toBeNull();
+      expect(last.querySelector('footer h2')?.textContent).toBe('What comes next');
+      expect(last.querySelector('footer a[href="https://github.com/JsPowWow/reely"]')).not.toBeNull();
+    });
+
     it('names the step in the document title', () => {
       renderPage('jsx');
 

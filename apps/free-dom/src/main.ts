@@ -2,12 +2,15 @@ import { a, createAsyncRouter, defineDommyConfig, p } from '@reely/dommy';
 import { scopedLogger } from '@reely/logger';
 import { isInstanceOf, toErrorWithMessage } from '@reely/utils';
 
+import { followPagerKey } from './pages/tutorial/pager.keys';
 import { routes } from './routing/routes';
 
 defineDommyConfig({
   debug: import.meta.env.DEV,
   logger: scopedLogger('dommy'),
 });
+
+document.addEventListener('keydown', followPagerKey);
 
 createAsyncRouter(routes)
   .resolve({ pathname: new URL(location.href).pathname })
