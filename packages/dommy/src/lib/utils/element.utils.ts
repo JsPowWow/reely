@@ -47,8 +47,8 @@ export const isValidRenderableChildDOMNode = (child: unknown): child is ValidChi
  * `null`/`undefined`/`false`, and reactive values. Children arrive untyped from JSX, so this
  * checks them at runtime.
  *
- * @param {readonly unknown[]} children - Children, possibly nested in arrays.
+ * @param {readonly unknown[]} maybeChildren - Children, possibly nested in arrays.
  * @returns {ValidChildDOMElement[]} A flat list of the children to render.
  */
-export const toValidChildDOMElement = (children: readonly unknown[]): ValidChildDOMElement[] =>
-  children.flat(Infinity).filter(isValidRenderableChildDOMNode);
+export const toValidChildDOMElement = (maybeChildren: readonly unknown[]): ValidChildDOMElement[] =>
+  maybeChildren.flat(Infinity).filter(isValidRenderableChildDOMNode);

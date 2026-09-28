@@ -30,8 +30,10 @@ export const appendChildren =
  */
 export const appendTo =
   <Element extends HTMLElement>(parent: Element): ((child: ChildDOMElement) => Element) =>
-  (child) =>
-    appendChildren<Element>(toValidChildDOMElement([child]))(parent);
+  (child) => {
+    parent.append(...toChildNodes([child]));
+    return parent;
+  };
 
 /**
  * Replaces all children of a parent element; accepts the same children as `appendTo`.
@@ -43,22 +45,32 @@ export const appendTo =
 export const replaceChildrenOf =
   <Element extends HTMLElement>(parent: Element): ((...children: ChildDOMElement[]) => Element) =>
   (...children) => {
-    parent.replaceChildren(...toValidChildDOMElement(children).map(toChildNode));
+    parent.replaceChildren(...toChildNodes(children));
     return parent;
   };
+
+/**
+ * Converts untyped children to nodes to insert: flattens arrays, drops `null`/`undefined`/`false`,
+ * binds reactive values to text nodes.
+ *
+ * @param {readonly unknown[]} maybeChildren - Children, possibly nested in arrays.
+ * @returns {(Node | string)[]} Nodes and texts for `append`/`replaceChildren`.
+ */
+export const toChildNodes = (maybeChildren: readonly unknown[]): (Node | string)[] =>
+  toValidChildDOMElement(maybeChildren).map(toChildNode);
 
 /**
  * Picks the children to render: the argument children when there are any, otherwise
  * `props.children`. Props arrive untyped from JSX, so they are checked at runtime.
  *
- * @param {unknown} props - The props object, if any.
- * @param {readonly unknown[]} children - The argument children.
+ * @param {unknown} maybeProps - The props object, if any.
+ * @param {readonly unknown[]} maybeChildren - The argument children.
  * @returns {ValidChildDOMElement[]} The children to render.
  */
-export const toElementChildren = (props: unknown, children: readonly unknown[]): ValidChildDOMElement[] => {
-  const elementChildren = toValidChildDOMElement(children);
-  if (isNonEmpty(elementChildren) || !hasProperty('children', props)) {
+export const toElementChildren = (maybeProps: unknown, maybeChildren: readonly unknown[]): ValidChildDOMElement[] => {
+  const elementChildren = toValidChildDOMElement(maybeChildren);
+  if (isNonEmpty(elementChildren) || !hasProperty('children', maybeProps)) {
     return elementChildren;
   }
-  return toValidChildDOMElement([props.children]);
+  return toValidChildDOMElement([maybeProps.children]);
 };

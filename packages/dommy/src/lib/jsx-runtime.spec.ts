@@ -1,4 +1,4 @@
-import { signal } from '../index';
+import { createElement, signal } from '../index';
 import { Fragment, jsx, jsxs } from './jsx-runtime';
 
 describe('jsx runtime (automatic)', () => {
@@ -36,12 +36,24 @@ describe('jsx runtime (automatic)', () => {
     expect(node instanceof Node && node.textContent).toBe('P:1');
   });
 
-  it('binds a signal child', () => {
+  it('binds a signal child, updating only its text node', () => {
     const place = signal(1);
     const cell = jsx('td', { children: place });
+    const text = cell instanceof Node ? cell.firstChild : null;
 
     place.value = 2;
 
     expect(cell instanceof Node && cell.textContent).toBe('2');
+    expect(cell instanceof Node && cell.firstChild).toBe(text);
+  });
+
+  it('supports `key` after a spread, which compiles to the root `createElement`', () => {
+    const Row = ({ name }: { name: string }): Node => document.createTextNode(name);
+
+    const row = createElement('li', { title: 't', key: 'racer-1' }, 'one');
+    const component = createElement(Row, { name: 'Bolt', key: 'racer-1' });
+
+    expect(row.outerHTML).toBe('<li title="t">one</li>');
+    expect(component instanceof Node && component.textContent).toBe('Bolt');
   });
 });

@@ -33,6 +33,8 @@ export default defineConfig(() => ({
       external: ['tslib'],
       output: {
         preserveModules: false,
+        // code shared by the entries
+        chunkFileNames: 'dommy-[hash].js',
       },
     },
     sourcemap: true,

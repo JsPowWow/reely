@@ -47,6 +47,8 @@ export type DOMElementFactoryProps<Tag extends HtmlElementTag> =
   | ReactiveChildDOMElement;
 
 export type DOMElementFactoryOptionsProps<Tag extends HtmlElementTag> = {
+  /** Identity of a list item; never rendered. */
+  key?: PropertyKey;
   children?: ChildDOMElement;
   eventsAbortSignal?: AbortSignal;
   elementRef?: Ref<DOMElement<Tag>>;

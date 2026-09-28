@@ -28,9 +28,9 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
 
   private readonly baseUrl: string;
 
-  private readonly options: RouterOptions;
+  private readonly options: RouterOptions<R, C>;
 
-  constructor(routes: RouteConfig<CallableFunction> | RouteConfig<CallableFunction>[], options?: RouterOptions) {
+  constructor(routes: RouteConfig<CallableFunction> | RouteConfig<CallableFunction>[], options?: RouterOptions<R, C>) {
     assertIsValidRoutes(routes);
     // console.log('routes!!!!!', routes);
     routes = Array.isArray(routes) ? routes : [routes];

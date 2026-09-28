@@ -10,6 +10,7 @@ import { assignProperty } from './element.property';
 import type { DOMElementFactoryOptionsProps, HtmlElementTag } from '../types/dommy.types';
 
 const elementFactoryOptionsProps = {
+  key: true,
   children: true,
   eventsAbortSignal: true,
   elementRef: true,
@@ -25,14 +26,14 @@ export const isElementFactoryOptionProp = (
  * Passes the element to `props.elementRef`: a callback ref or an object ref.
  *
  * @template Element - The type of the element.
- * @param {unknown} props - Props of the element; checked at runtime, since JSX passes them untyped.
+ * @param {unknown} maybeProps - Props of the element; checked at runtime, since JSX passes them untyped.
  * @returns {PipeableFn<Element>} A step that returns the same element.
  */
 export const assignElementRef =
-  <Element extends HTMLElement>(props: unknown): PipeableFn<Element> =>
+  <Element extends HTMLElement>(maybeProps: unknown): PipeableFn<Element> =>
   (element: Element) => {
-    if (hasProperty('elementRef', props)) {
-      const { elementRef } = props;
+    if (hasProperty('elementRef', maybeProps)) {
+      const { elementRef } = maybeProps;
       if (isSomeFunction(elementRef)) {
         elementRef(element);
       } else if (hasProperty('current', elementRef)) {
@@ -47,28 +48,27 @@ export const assignElementRef =
  * a signal or a getter keeps its prop updated.
  *
  * @template Element - The type of the element.
- * @param {unknown} props - Props of the element; checked at runtime, since JSX passes them untyped.
+ * @param {unknown} maybeProps - Props of the element; checked at runtime, since JSX passes them untyped.
  * @returns {PipeableFn<Element>} A step that returns the same element.
  */
 export const assignProperties =
-  <Element extends HTMLElement>(props: unknown): PipeableFn<Element> =>
+  <Element extends HTMLElement>(maybeProps: unknown): PipeableFn<Element> =>
   (element: Element) => {
-    if (!isPlainObject(props)) {
+    if (!isPlainObject(maybeProps)) {
       return element;
     }
 
-    if (hasStylesAttribute(props)) {
-      setStyleAttributes(element, props.styles);
+    if (hasStylesAttribute(maybeProps)) {
+      setStyleAttributes(element, maybeProps.styles);
     }
 
-    if (hasAriaAttribute(props)) {
-      setAriaAttributes(element, props.aria);
+    if (hasAriaAttribute(maybeProps)) {
+      setAriaAttributes(element, maybeProps.aria);
     }
 
-    const { styles: _ignoredStyles, aria: _ignoredAria, children: _ignoredChildren, ...restProps } = props;
-    const eventsAbortSignal = isInstanceOf(AbortSignal, restProps['eventsAbortSignal'])
-      ? restProps['eventsAbortSignal']
-      : undefined;
+    const { styles: _ignoredStyles, aria: _ignoredAria, children: _ignoredChildren, ...restProps } = maybeProps;
+    const { eventsAbortSignal: maybeSignal } = restProps;
+    const eventsAbortSignal = isInstanceOf(AbortSignal, maybeSignal) ? maybeSignal : undefined;
 
     for (const [property, value] of Object.entries(restProps)) {
       switch (true) {
