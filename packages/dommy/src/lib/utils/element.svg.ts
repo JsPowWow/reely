@@ -65,7 +65,8 @@ const svgTagTable = {
   view: true,
 } as const satisfies Record<SvgElementTag, true>;
 
-const svgTags: ReadonlySet<string> = new Set(Object.keys(svgTagTable));
+// pure, so a bundle that never creates an element drops the table
+const svgTags: ReadonlySet<string> = /* @__PURE__ */ new Set(/* @__PURE__ */ Object.keys(svgTagTable));
 
 /**
  * Checks whether a tag exists only in SVG, so it is created in the SVG namespace.

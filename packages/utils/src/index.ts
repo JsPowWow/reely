@@ -10,11 +10,9 @@ export { default as reThrow } from './lib/errors/reThrow';
 export { hasStringMessage } from './lib/errors/hasStringMessage';
 
 export { Either } from './lib/fp/either/Either';
-export { fromPromise, Right, Left, tryCatch } from './lib/fp/either/Either';
 export { default as maybeInstanceOf } from './lib/fp/maybe/maybeInstanceOf';
 export { default as maybePropertyRecordOf } from './lib/fp/maybe/maybePropertyRecordOf';
 export { Maybe } from './lib/fp/maybe/Maybe';
-export { from, some, none } from './lib/fp/maybe/Maybe';
 
 export { mapNullable } from './lib/nullable/mapNullable';
 export { withDefault } from './lib/nullable/withDefault';

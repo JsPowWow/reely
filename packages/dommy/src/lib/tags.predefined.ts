@@ -3,229 +3,229 @@ import { isValidChildDOMNode } from './utils/element.utils';
 
 import type { DOMElementFactoryFunction, HtmlElementTag } from './types/dommy.types';
 
-export const a = createElementFromTag('a');
+export const a = /* @__PURE__ */ createElementFromTag('a');
 
-export const abbr = createElementFromTag('abbr');
+export const abbr = /* @__PURE__ */ createElementFromTag('abbr');
 
-export const address = createElementFromTag('address');
+export const address = /* @__PURE__ */ createElementFromTag('address');
 
-export const area = createElementFromTag('area');
+export const area = /* @__PURE__ */ createElementFromTag('area');
 
-export const article = createElementFromTag('article');
+export const article = /* @__PURE__ */ createElementFromTag('article');
 
-export const aside = createElementFromTag('aside');
+export const aside = /* @__PURE__ */ createElementFromTag('aside');
 
-export const audio = createElementFromTag('audio');
+export const audio = /* @__PURE__ */ createElementFromTag('audio');
 
-export const b = createElementFromTag('b');
+export const b = /* @__PURE__ */ createElementFromTag('b');
 
-export const base = createElementFromTag('base');
+export const base = /* @__PURE__ */ createElementFromTag('base');
 
-export const bdi = createElementFromTag('bdi');
+export const bdi = /* @__PURE__ */ createElementFromTag('bdi');
 
-export const bdo = createElementFromTag('bdo');
+export const bdo = /* @__PURE__ */ createElementFromTag('bdo');
 
-export const blockquote = createElementFromTag('blockquote');
+export const blockquote = /* @__PURE__ */ createElementFromTag('blockquote');
 
-export const body = createElementFromTag('body');
+export const body = /* @__PURE__ */ createElementFromTag('body');
 
-export const br = createElementFromTag('br');
+export const br = /* @__PURE__ */ createElementFromTag('br');
 
-export const button = createElementFromTag('button');
+export const button = /* @__PURE__ */ createElementFromTag('button');
 
-export const canvas = createElementFromTag('canvas');
+export const canvas = /* @__PURE__ */ createElementFromTag('canvas');
 
-export const caption = createElementFromTag('caption');
+export const caption = /* @__PURE__ */ createElementFromTag('caption');
 
-export const cite = createElementFromTag('cite');
+export const cite = /* @__PURE__ */ createElementFromTag('cite');
 
-export const code = createElementFromTag('code');
+export const code = /* @__PURE__ */ createElementFromTag('code');
 
-export const col = createElementFromTag('col');
+export const col = /* @__PURE__ */ createElementFromTag('col');
 
-export const colgroup = createElementFromTag('colgroup');
+export const colgroup = /* @__PURE__ */ createElementFromTag('colgroup');
 
-export const data = createElementFromTag('data');
+export const data = /* @__PURE__ */ createElementFromTag('data');
 
-export const datalist = createElementFromTag('datalist');
+export const datalist = /* @__PURE__ */ createElementFromTag('datalist');
 
-export const dd = createElementFromTag('dd');
+export const dd = /* @__PURE__ */ createElementFromTag('dd');
 
-export const del = createElementFromTag('del');
+export const del = /* @__PURE__ */ createElementFromTag('del');
 
-export const details = createElementFromTag('details');
+export const details = /* @__PURE__ */ createElementFromTag('details');
 
-export const dfn = createElementFromTag('dfn');
+export const dfn = /* @__PURE__ */ createElementFromTag('dfn');
 
-export const dialog = createElementFromTag('dialog');
+export const dialog = /* @__PURE__ */ createElementFromTag('dialog');
 
-export const div = createElementFromTag('div');
+export const div = /* @__PURE__ */ createElementFromTag('div');
 
-export const dl = createElementFromTag('dl');
+export const dl = /* @__PURE__ */ createElementFromTag('dl');
 
-export const dt = createElementFromTag('dt');
+export const dt = /* @__PURE__ */ createElementFromTag('dt');
 
-export const em = createElementFromTag('em');
+export const em = /* @__PURE__ */ createElementFromTag('em');
 
-export const embed = createElementFromTag('embed');
+export const embed = /* @__PURE__ */ createElementFromTag('embed');
 
-export const fieldset = createElementFromTag('fieldset');
+export const fieldset = /* @__PURE__ */ createElementFromTag('fieldset');
 
-export const figcaption = createElementFromTag('figcaption');
+export const figcaption = /* @__PURE__ */ createElementFromTag('figcaption');
 
-export const figure = createElementFromTag('figure');
+export const figure = /* @__PURE__ */ createElementFromTag('figure');
 
-export const footer = createElementFromTag('footer');
+export const footer = /* @__PURE__ */ createElementFromTag('footer');
 
-export const form = createElementFromTag('form');
+export const form = /* @__PURE__ */ createElementFromTag('form');
 
-export const h1 = createElementFromTag('h1');
+export const h1 = /* @__PURE__ */ createElementFromTag('h1');
 
-export const h2 = createElementFromTag('h2');
+export const h2 = /* @__PURE__ */ createElementFromTag('h2');
 
-export const h3 = createElementFromTag('h3');
+export const h3 = /* @__PURE__ */ createElementFromTag('h3');
 
-export const h4 = createElementFromTag('h4');
+export const h4 = /* @__PURE__ */ createElementFromTag('h4');
 
-export const h5 = createElementFromTag('h5');
+export const h5 = /* @__PURE__ */ createElementFromTag('h5');
 
-export const h6 = createElementFromTag('h6');
+export const h6 = /* @__PURE__ */ createElementFromTag('h6');
 
-export const head = createElementFromTag('head');
+export const head = /* @__PURE__ */ createElementFromTag('head');
 
-export const header = createElementFromTag('header');
+export const header = /* @__PURE__ */ createElementFromTag('header');
 
-export const hgroup = createElementFromTag('hgroup');
+export const hgroup = /* @__PURE__ */ createElementFromTag('hgroup');
 
-export const hr = createElementFromTag('hr');
+export const hr = /* @__PURE__ */ createElementFromTag('hr');
 
-export const html = createElementFromTag('html');
+export const html = /* @__PURE__ */ createElementFromTag('html');
 
-export const i = createElementFromTag('i');
+export const i = /* @__PURE__ */ createElementFromTag('i');
 
-export const iframe = createElementFromTag('iframe');
+export const iframe = /* @__PURE__ */ createElementFromTag('iframe');
 
-export const img = createElementFromTag('img');
+export const img = /* @__PURE__ */ createElementFromTag('img');
 
-export const input = createElementFromTag('input');
+export const input = /* @__PURE__ */ createElementFromTag('input');
 
-export const ins = createElementFromTag('ins');
+export const ins = /* @__PURE__ */ createElementFromTag('ins');
 
-export const kbd = createElementFromTag('kbd');
+export const kbd = /* @__PURE__ */ createElementFromTag('kbd');
 
-export const label = createElementFromTag('label');
+export const label = /* @__PURE__ */ createElementFromTag('label');
 
-export const legend = createElementFromTag('legend');
+export const legend = /* @__PURE__ */ createElementFromTag('legend');
 
-export const li = createElementFromTag('li');
+export const li = /* @__PURE__ */ createElementFromTag('li');
 
-export const link = createElementFromTag('link');
+export const link = /* @__PURE__ */ createElementFromTag('link');
 
-export const main = createElementFromTag('main');
+export const main = /* @__PURE__ */ createElementFromTag('main');
 
-export const map = createElementFromTag('map');
+export const map = /* @__PURE__ */ createElementFromTag('map');
 
-export const mark = createElementFromTag('mark');
+export const mark = /* @__PURE__ */ createElementFromTag('mark');
 
-export const menu = createElementFromTag('menu');
+export const menu = /* @__PURE__ */ createElementFromTag('menu');
 
-export const meta = createElementFromTag('meta');
+export const meta = /* @__PURE__ */ createElementFromTag('meta');
 
-export const meter = createElementFromTag('meter');
+export const meter = /* @__PURE__ */ createElementFromTag('meter');
 
-export const nav = createElementFromTag('nav');
+export const nav = /* @__PURE__ */ createElementFromTag('nav');
 
-export const noscript = createElementFromTag('noscript');
+export const noscript = /* @__PURE__ */ createElementFromTag('noscript');
 
-export const object = createElementFromTag('object');
+export const object = /* @__PURE__ */ createElementFromTag('object');
 
-export const ol = createElementFromTag('ol');
+export const ol = /* @__PURE__ */ createElementFromTag('ol');
 
-export const optgroup = createElementFromTag('optgroup');
+export const optgroup = /* @__PURE__ */ createElementFromTag('optgroup');
 
-export const option = createElementFromTag('option');
+export const option = /* @__PURE__ */ createElementFromTag('option');
 
-export const output = createElementFromTag('output');
+export const output = /* @__PURE__ */ createElementFromTag('output');
 
-export const p = createElementFromTag('p');
+export const p = /* @__PURE__ */ createElementFromTag('p');
 
-export const picture = createElementFromTag('picture');
+export const picture = /* @__PURE__ */ createElementFromTag('picture');
 
-export const pre = createElementFromTag('pre');
+export const pre = /* @__PURE__ */ createElementFromTag('pre');
 
-export const progress = createElementFromTag('progress');
+export const progress = /* @__PURE__ */ createElementFromTag('progress');
 
-export const q = createElementFromTag('q');
+export const q = /* @__PURE__ */ createElementFromTag('q');
 
-export const rp = createElementFromTag('rp');
+export const rp = /* @__PURE__ */ createElementFromTag('rp');
 
-export const rt = createElementFromTag('rt');
+export const rt = /* @__PURE__ */ createElementFromTag('rt');
 
-export const ruby = createElementFromTag('ruby');
+export const ruby = /* @__PURE__ */ createElementFromTag('ruby');
 
-export const s = createElementFromTag('s');
+export const s = /* @__PURE__ */ createElementFromTag('s');
 
-export const samp = createElementFromTag('samp');
+export const samp = /* @__PURE__ */ createElementFromTag('samp');
 
-export const script = createElementFromTag('script');
+export const script = /* @__PURE__ */ createElementFromTag('script');
 
-export const search = createElementFromTag('search');
+export const search = /* @__PURE__ */ createElementFromTag('search');
 
-export const section = createElementFromTag('section');
+export const section = /* @__PURE__ */ createElementFromTag('section');
 
-export const select = createElementFromTag('select');
+export const select = /* @__PURE__ */ createElementFromTag('select');
 
-export const slot = createElementFromTag('slot');
+export const slot = /* @__PURE__ */ createElementFromTag('slot');
 
-export const small = createElementFromTag('small');
+export const small = /* @__PURE__ */ createElementFromTag('small');
 
-export const source = createElementFromTag('source');
+export const source = /* @__PURE__ */ createElementFromTag('source');
 
-export const span = createElementFromTag('span');
+export const span = /* @__PURE__ */ createElementFromTag('span');
 
-export const strong = createElementFromTag('strong');
+export const strong = /* @__PURE__ */ createElementFromTag('strong');
 
-export const style = createElementFromTag('style');
+export const style = /* @__PURE__ */ createElementFromTag('style');
 
-export const sub = createElementFromTag('sub');
+export const sub = /* @__PURE__ */ createElementFromTag('sub');
 
-export const summary = createElementFromTag('summary');
+export const summary = /* @__PURE__ */ createElementFromTag('summary');
 
-export const sup = createElementFromTag('sup');
+export const sup = /* @__PURE__ */ createElementFromTag('sup');
 
-export const table = createElementFromTag('table');
+export const table = /* @__PURE__ */ createElementFromTag('table');
 
-export const tbody = createElementFromTag('tbody');
+export const tbody = /* @__PURE__ */ createElementFromTag('tbody');
 
-export const td = createElementFromTag('td');
+export const td = /* @__PURE__ */ createElementFromTag('td');
 
-export const template = createElementFromTag('template');
+export const template = /* @__PURE__ */ createElementFromTag('template');
 
-export const textarea = createElementFromTag('textarea');
+export const textarea = /* @__PURE__ */ createElementFromTag('textarea');
 
-export const tfoot = createElementFromTag('tfoot');
+export const tfoot = /* @__PURE__ */ createElementFromTag('tfoot');
 
-export const th = createElementFromTag('th');
+export const th = /* @__PURE__ */ createElementFromTag('th');
 
-export const thead = createElementFromTag('thead');
+export const thead = /* @__PURE__ */ createElementFromTag('thead');
 
-export const time = createElementFromTag('time');
+export const time = /* @__PURE__ */ createElementFromTag('time');
 
-export const title = createElementFromTag('title');
+export const title = /* @__PURE__ */ createElementFromTag('title');
 
-export const tr = createElementFromTag('tr');
+export const tr = /* @__PURE__ */ createElementFromTag('tr');
 
-export const track = createElementFromTag('track');
+export const track = /* @__PURE__ */ createElementFromTag('track');
 
-export const u = createElementFromTag('u');
+export const u = /* @__PURE__ */ createElementFromTag('u');
 
-export const ul = createElementFromTag('ul');
+export const ul = /* @__PURE__ */ createElementFromTag('ul');
 
-export const var_ = createElementFromTag('var');
+export const var_ = /* @__PURE__ */ createElementFromTag('var');
 
-export const video = createElementFromTag('video');
+export const video = /* @__PURE__ */ createElementFromTag('video');
 
-export const wbr = createElementFromTag('wbr');
+export const wbr = /* @__PURE__ */ createElementFromTag('wbr');
 
 function createElementFromTag<Tag extends HtmlElementTag>(tag: Tag): DOMElementFactoryFunction<Tag> {
   return (props, ...children) => {

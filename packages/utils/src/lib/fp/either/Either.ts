@@ -19,50 +19,47 @@ export class Either<Left, Right> {
     this.wrapper = wrapper;
   }
 
-  public static from = <T>(value: T): Either<never, T> => {
+  // Static methods, not arrow fields: a class of methods only has no side effects when it loads,
+  // so a bundle that never uses it drops it.
+  public static from<T>(value: T): Either<never, T> {
     return Either.Right(value);
-  };
+  }
 
-  public static fromPromise = <L, R>(promise: Promise<R>): Promise<Either<L, R>> =>
-    promise.then(Either.Right).catch(Either.Left);
+  public static fromPromise<L, R>(promise: Promise<R>): Promise<Either<L, R>> {
+    return promise.then((value) => Either.Right<L, R>(value)).catch((error: L) => Either.Left<L, R>(error));
+  }
 
-  public static tryCatch = <Right>(f: () => Right): Either<Error, Right> => {
+  public static tryCatch<Right>(f: () => Right): Either<Error, Right> {
     try {
       return Either.Right(f());
     } catch (error) {
       return Either.Left(toErrorWithMessage(error));
     }
-  };
+  }
 
-  public static Right = <Left = never, Right = never>(value: Right): Either<Left, Right> => {
+  public static Right<Left = never, Right = never>(value: Right): Either<Left, Right> {
     return new Either<Left, Right>({ either: 'right', value });
-  };
+  }
 
-  public static Left = <Left = never, Right = never>(value: Left): Either<Left, Right> => {
+  public static Left<Left = never, Right = never>(value: Left): Either<Left, Right> {
     return new Either<Left, Right>({ either: 'left', value });
-  };
+  }
 
-  public static unwrapC =
-    <L, R>(left: (value: L) => L, right: (value: R) => R) =>
-    (either: Either<L, R>): L | R => {
-      return either.unwrap(left, right);
-    };
+  public static unwrapC<L, R>(left: (value: L) => L, right: (value: R) => R): (either: Either<L, R>) => L | R {
+    return (either) => either.unwrap(left, right);
+  }
 
-  public static getOrElseC =
-    <V>(value: V) =>
-    <L, R>(either: Either<L, R>): V | R => {
-      return either.getOrElse(value);
-    };
+  public static getOrElseC<V>(value: V): <L, R>(either: Either<L, R>) => V | R {
+    return (either) => either.getOrElse(value);
+  }
 
-  public static getOrDefaultC =
-    <R>(defaultValue: R) =>
-    <L>(either: Either<L, R>): R => {
-      return either.getOrDefault(defaultValue);
-    };
+  public static getOrDefaultC<R>(defaultValue: R): <L>(either: Either<L, R>) => R {
+    return (either) => either.getOrDefault(defaultValue);
+  }
 
-  public static getOrThrow = <L, R>(either: Either<L, R>): R => {
+  public static getOrThrow<L, R>(either: Either<L, R>): R {
     return either.getOrThrow();
-  };
+  }
 
   public isLeft(): this is Either<Left, never> {
     return this.wrapper.either === 'left';
@@ -116,5 +113,3 @@ export class Either<Left, Right> {
     return this.unwrap(reThrow, identity);
   };
 }
-
-export const { from, fromPromise, Left, Right, tryCatch } = Either;

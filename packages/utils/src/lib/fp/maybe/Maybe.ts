@@ -6,27 +6,24 @@ import type { Nullable } from '../../types/core.types';
 type MaybeWrapper<T> = { maybe: 'some'; value: NonNullable<T> } | { maybe: 'none' };
 
 export class Maybe<T> {
-  // private static nothing: Maybe<null>;
   private constructor(private value: Nullable<T>) {}
 
-  public static some = <T>(value: T): Maybe<NonNullable<T>> => {
+  // Static methods, not arrow fields: a class of methods only has no side effects when it loads,
+  // so a bundle that never uses it drops it.
+  public static some<T>(value: T): Maybe<NonNullable<T>> {
     if (!hasSome(value)) {
       throw new Error('The provide value must not be a nullable.');
     }
     return new Maybe(value);
-  };
+  }
 
-  public static none = <T>(): Maybe<T> => {
-    return new Maybe<T>(null); // TODO AR nothing constant
-    // if (!this.nothing) {
-    //   this.nothing = new Maybe(null);
-    // }
-    // return this.nothing;
-  };
+  public static none<T>(): Maybe<T> {
+    return new Maybe<T>(null);
+  }
 
-  public static from = <T>(value: Nullable<T>): Maybe<T> => {
+  public static from<T>(value: Nullable<T>): Maybe<T> {
     return hasSome(value) ? Maybe.some(value) : Maybe.none<T>();
-  };
+  }
 
   public tapNonNullable(f: (wrapped: NonNullable<T>) => void): Maybe<T> {
     if (hasSome(this.value)) {
@@ -82,5 +79,3 @@ export class Maybe<T> {
     return hasSome(this.value) ? this.value : defaultValue;
   }
 }
-
-export const { from, some, none } = Maybe;

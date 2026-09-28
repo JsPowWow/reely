@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { gzipSync } from 'node:zlib';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -67,6 +68,21 @@ try {
     dispose();
     assert.equal(document.body.innerHTML, '');
   }
+  // tree shaking: an app that uses only signals ships no element factories
+  writeFileSync(join(work, 'signals-only.ts'), "import { effect, signal } from '@reely/dommy';\neffect(() => signal(0).value);\n");
+  const { outputFiles } = await build({
+    absWorkingDir: work,
+    entryPoints: ['signals-only.ts'],
+    bundle: true,
+    format: 'esm',
+    minify: true,
+    write: false,
+    logLevel: 'error',
+  });
+  const signalsOnly = outputFiles[0].text;
+  assert.doesNotMatch(signalsOnly, /"abbr"|createElementNS/, 'a signals-only bundle keeps the element factories');
+  console.log(`signals-only bundle: ${gzipSync(signalsOnly).length} B gzip`);
+
   console.log(`@reely/dommy consumer check passed: ${tarball}`);
 } catch (error) {
   // tsc and npm report on stdout
