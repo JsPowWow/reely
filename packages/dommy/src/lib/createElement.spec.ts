@@ -72,6 +72,19 @@ describe('createElement', () => {
       expect(ref).toHaveBeenCalledExactlyOnceWith(element);
     });
 
+    it('types a function ref parameter as the element, never `null`', () => {
+      const tags: string[] = [];
+
+      createElement('output', {
+        elementRef: (element) => {
+          expectTypeOf(element).toEqualTypeOf<HTMLOutputElement>();
+          tags.push(element.tagName);
+        },
+      });
+
+      expect(tags).toEqual(['OUTPUT']);
+    });
+
     it('sets `current` of an object ref', () => {
       const ref = createObjectReference<HTMLDivElement>();
 

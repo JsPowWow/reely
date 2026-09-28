@@ -1,4 +1,4 @@
-import type { Nullable, PrimitiveValue, Ref } from '@reely/utils';
+import type { Nullable, ObjectReference, PrimitiveValue } from '@reely/utils';
 
 import type { DOMElementAttributes } from './attributes.types';
 import type { DOMElementEvents } from './event.types';
@@ -46,10 +46,16 @@ export type DOMElementFactoryProps<Tag extends HtmlElementTag> =
   | StaticChildDOMElement
   | ReactiveChildDOMElement;
 
+/**
+ * Receives the element once it is created: an object ref gets it in `current`, a function ref
+ * is called with it. dommy never calls a ref with `null`.
+ */
+export type ElementRef<Elt extends HTMLElement> = ObjectReference<Elt> | ((element: Elt) => void);
+
 export type DOMElementFactoryOptionsProps<Tag extends HtmlElementTag> = {
   /** Identity of a list item; never rendered. */
   key?: PropertyKey;
   children?: ChildDOMElement;
   eventsAbortSignal?: AbortSignal;
-  elementRef?: Ref<DOMElement<Tag>>;
+  elementRef?: ElementRef<DOMElement<Tag>>;
 };
