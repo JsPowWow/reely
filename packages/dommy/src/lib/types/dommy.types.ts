@@ -30,8 +30,19 @@ export type DOMElementFactoryFunction<Tag extends HtmlElementTag = HtmlElementTa
   ...children: ChildDOMElement[]
 ) => DOMElement<Tag>;
 
-export type DOMElementFactoryProps<Tag extends HtmlElementTag, Elt extends HTMLElement = DOMElement<Tag>> =
-  | (DOMElementAttributes<Elt> & DOMElementEvents<Elt> & DOMElementFactoryOptionsProps<Tag>)
+/**
+ * Props of an element: attributes, live properties, ARIA, styles, listeners and options.
+ */
+export type DOMElementProps<
+  Tag extends HtmlElementTag,
+  Elt extends HTMLElement = DOMElement<Tag>
+> = DOMElementAttributes<Elt> & DOMElementEvents<Elt> & DOMElementFactoryOptionsProps<Tag>;
+
+/**
+ * The first argument of a tag factory: props, or a child in place of props.
+ */
+export type DOMElementFactoryProps<Tag extends HtmlElementTag> =
+  | DOMElementProps<Tag>
   | StaticChildDOMElement
   | ReactiveChildDOMElement;
 

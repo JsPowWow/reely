@@ -1,80 +1,64 @@
-import type { Nullable, PipeableFn } from '@reely/utils';
-import { isNonEmpty } from '@reely/utils';
+import type { PipeableFn } from '@reely/utils';
+import { hasProperty, isNonEmpty } from '@reely/utils';
 
 import { toChildNode } from './element.bindings';
-import {
-  isFalsyElement,
-  isValidChildDOMNode,
-  isValidRenderableChildDOMNode,
-  toValidChildDOMElement,
-} from './element.utils';
+import { toValidChildDOMElement } from './element.utils';
 
-import type {
-  ChildDOMElement,
-  DOMElementFactoryProps,
-  HtmlElementTag,
-  ValidChildDOMElement,
-} from '../types/dommy.types';
+import type { ChildDOMElement, ValidChildDOMElement } from '../types/dommy.types';
 
 /**
- * Appends a list of DOM nodes to a given parent HTML element.
- *
- * The function takes an array of DOMNode elements and returns a pipeable
- * function that accepts an HTML element as its parent. It then appends
- * each child from the provided array to the parent element in order.
+ * Appends already validated children to a parent element.
  *
  * @template Element - The type of the parent HTML element.
- * @param {ValidChildDOMElement[]} children - An array of DOM nodes to be appended to the parent element.
- * @returns {PipeableFn<Element>} A function that takes a parent HTML element, appends
- * the provided children to it, and returns the parent element.
+ * @param {ValidChildDOMElement[]} children - Children to append, in order.
+ * @returns {PipeableFn<Element>} A step that appends the children and returns the parent.
  */
 export const appendChildren =
   <Element extends HTMLElement>(children: ValidChildDOMElement[]): PipeableFn<Element> =>
   (parent) => {
-    children.forEach(appendTo(parent));
+    parent.append(...children.map(toChildNode));
     return parent;
   };
 
 /**
- * A function that appends a DOM node or string representation to a given parent HTMLElement.
+ * Appends a child to a parent element: a node, a primitive, a reactive value, or nested arrays
+ * of them, as JSX produces; `null`, `undefined` and `false` render nothing.
  *
- * @template Element - The type of the HTMLElement to which the child will be appended.
- * @param {Element} parent - The parent HTMLElement to which the child node will be appended.
- * @returns {PipeableFn<ValidChildDOMElement>} A function that accepts a child node or string and appends it to the parent.
- * The child can either be a valid DOM Node or a string, which will be converted and appended accordingly.
+ * @template Element - The type of the parent HTML element.
+ * @param {Element} parent - The parent element.
+ * @returns {(child: ChildDOMElement) => Element} A function that appends a child and returns the parent.
  */
 export const appendTo =
-  <Element extends HTMLElement>(parent: Element): PipeableFn<ValidChildDOMElement> =>
-  (child) => {
-    if (!isFalsyElement(child)) {
-      parent.append(toChildNode(child));
-    }
+  <Element extends HTMLElement>(parent: Element): ((child: ChildDOMElement) => Element) =>
+  (child) =>
+    appendChildren<Element>(toValidChildDOMElement([child]))(parent);
 
-    return parent;
-  };
-
+/**
+ * Replaces all children of a parent element; accepts the same children as `appendTo`.
+ *
+ * @template Element - The type of the parent HTML element.
+ * @param {Element} parent - The parent element.
+ * @returns {(...children: ChildDOMElement[]) => Element} A function that replaces the children and returns the parent.
+ */
 export const replaceChildrenOf =
-  <Element extends HTMLElement>(parent: Element): PipeableFn<ValidChildDOMElement> =>
-  (...children: ValidChildDOMElement[]) => {
-    const newChildren = toValidChildDOMElement(children).filter(isValidRenderableChildDOMNode).map(toChildNode);
-    parent.replaceChildren(...newChildren);
+  <Element extends HTMLElement>(parent: Element): ((...children: ChildDOMElement[]) => Element) =>
+  (...children) => {
+    parent.replaceChildren(...toValidChildDOMElement(children).map(toChildNode));
     return parent;
   };
 
-export const normalizeChildrenProps = <Tag extends HtmlElementTag>(
-  props: Nullable<DOMElementFactoryProps<Tag>>,
-  children: ChildDOMElement[]
-): [props: Nullable<Omit<DOMElementFactoryProps<Tag>, 'children'>>, ValidChildDOMElement[]] => {
-  if (isValidChildDOMNode(props)) {
-    return [props, toValidChildDOMElement(children)];
-  }
-  const { children: propsChildren = [], ...restProps } = props ?? {};
+/**
+ * Picks the children to render: the argument children when there are any, otherwise
+ * `props.children`. Props arrive untyped from JSX, so they are checked at runtime.
+ *
+ * @param {unknown} props - The props object, if any.
+ * @param {readonly unknown[]} children - The argument children.
+ * @returns {ValidChildDOMElement[]} The children to render.
+ */
+export const toElementChildren = (props: unknown, children: readonly unknown[]): ValidChildDOMElement[] => {
   const elementChildren = toValidChildDOMElement(children);
-  if (isNonEmpty(elementChildren)) {
-    return [restProps, elementChildren];
+  if (isNonEmpty(elementChildren) || !hasProperty('children', props)) {
+    return elementChildren;
   }
-  if (Array.isArray(propsChildren)) {
-    return [restProps, toValidChildDOMElement(propsChildren)];
-  }
-  return [restProps, toValidChildDOMElement([propsChildren])];
+  return toValidChildDOMElement([props.children]);
 };

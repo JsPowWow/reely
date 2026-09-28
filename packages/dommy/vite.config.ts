@@ -20,8 +20,11 @@ export default defineConfig(() => ({
     //   fileName: 'index',
     // },
     lib: {
-      entry: resolve(import.meta.dirname, 'src/index.ts'),
-      fileName: 'index',
+      entry: {
+        index: resolve(import.meta.dirname, 'src/index.ts'),
+        'jsx-runtime': resolve(import.meta.dirname, 'src/lib/jsx-runtime.ts'),
+      },
+      fileName: (_format: string, entryName: string): string => `${entryName}.js`,
       formats: ['es' as const],
     },
     minify: true,

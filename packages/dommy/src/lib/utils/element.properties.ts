@@ -1,5 +1,5 @@
-import type { Nullable, PipeableFn } from '@reely/utils';
-import { hasProperty, isInstanceOf, isNil, isPrimitiveValue, isSomeFunction, isValidRecordKey } from '@reely/utils';
+import type { PipeableFn } from '@reely/utils';
+import { hasProperty, isInstanceOf, isPlainObject, isSomeFunction, isValidRecordKey } from '@reely/utils';
 
 import { hasAriaAttribute, setAriaAttributes } from './attributes/element.aria.attributes';
 import { hasStylesAttribute, setStyleAttributes } from './attributes/element.style.attributes';
@@ -7,12 +7,7 @@ import { addEventListenerHandler, isEventListenerHandler, toEventType } from './
 import { applyValue } from './element.bindings';
 import { assignProperty } from './element.property';
 
-import type {
-  DOMElement,
-  DOMElementFactoryOptionsProps,
-  DOMElementFactoryProps,
-  HtmlElementTag,
-} from '../types/dommy.types';
+import type { DOMElementFactoryOptionsProps, HtmlElementTag } from '../types/dommy.types';
 
 const elementFactoryOptionsProps = {
   children: true,
@@ -26,10 +21,15 @@ export const isElementFactoryOptionProp = (
   return isValidRecordKey(property) && hasProperty(property, elementFactoryOptionsProps);
 };
 
+/**
+ * Passes the element to `props.elementRef`: a callback ref or an object ref.
+ *
+ * @template Element - The type of the element.
+ * @param {unknown} props - Props of the element; checked at runtime, since JSX passes them untyped.
+ * @returns {PipeableFn<Element>} A step that returns the same element.
+ */
 export const assignElementRef =
-  <Tag extends HtmlElementTag, Element extends DOMElement<Tag> = DOMElement<Tag>>(
-    props: Nullable<DOMElementFactoryProps<Tag>>
-  ): PipeableFn<Element> =>
+  <Element extends HTMLElement>(props: unknown): PipeableFn<Element> =>
   (element: Element) => {
     if (hasProperty('elementRef', props)) {
       const { elementRef } = props;
@@ -42,12 +42,18 @@ export const assignElementRef =
     return element;
   };
 
+/**
+ * Applies props to the element: styles, ARIA, event listeners, attributes and live properties;
+ * a signal or a getter keeps its prop updated.
+ *
+ * @template Element - The type of the element.
+ * @param {unknown} props - Props of the element; checked at runtime, since JSX passes them untyped.
+ * @returns {PipeableFn<Element>} A step that returns the same element.
+ */
 export const assignProperties =
-  <Tag extends HtmlElementTag, Element extends DOMElement<Tag> = DOMElement<Tag>>(
-    props: Nullable<DOMElementFactoryProps<Tag>>
-  ): PipeableFn<Element> =>
+  <Element extends HTMLElement>(props: unknown): PipeableFn<Element> =>
   (element: Element) => {
-    if (isNil(props) || isPrimitiveValue(props) || isInstanceOf(Node, props) || isSomeFunction(props)) {
+    if (!isPlainObject(props)) {
       return element;
     }
 
@@ -60,6 +66,9 @@ export const assignProperties =
     }
 
     const { styles: _ignoredStyles, aria: _ignoredAria, children: _ignoredChildren, ...restProps } = props;
+    const eventsAbortSignal = isInstanceOf(AbortSignal, restProps['eventsAbortSignal'])
+      ? restProps['eventsAbortSignal']
+      : undefined;
 
     for (const [property, value] of Object.entries(restProps)) {
       switch (true) {
@@ -67,7 +76,7 @@ export const assignProperties =
           break;
         }
         case isEventListenerHandler(property, value): {
-          addEventListenerHandler(element, toEventType(property), value, restProps.eventsAbortSignal);
+          addEventListenerHandler(element, toEventType(property), value, eventsAbortSignal);
           break;
         }
         default: {

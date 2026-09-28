@@ -1,7 +1,7 @@
 import type { Nil } from '@reely/utils';
 import { isInstanceOf, isNil, isPrimitiveValue, isSomeFunction } from '@reely/utils';
 
-import type { ChildDOMElement, ValidChildDOMElement } from '../types/dommy.types';
+import type { ValidChildDOMElement } from '../types/dommy.types';
 
 /**
  * Checks whether the given element is a falsy value in a specific context.
@@ -43,20 +43,12 @@ export const isValidRenderableChildDOMNode = (child: unknown): child is ValidChi
   isValidChildDOMNode(child) && !isFalsyElement(child);
 
 /**
- * Flattens a deeply nested array of child DOM elements into a single-level array.
+ * Flattens nested children and keeps only the ones that render: nodes, primitives other than
+ * `null`/`undefined`/`false`, and reactive values. Children arrive untyped from JSX, so this
+ * checks them at runtime.
  *
- * @param {ChildDOMElement[]} children - An array of child DOM elements, which may contain nested arrays.
- * @returns {ChildDOMElement[]} A flattened array of child DOM elements without any nested structure.
+ * @param {readonly unknown[]} children - Children, possibly nested in arrays.
+ * @returns {ValidChildDOMElement[]} A flat list of the children to render.
  */
-// @ts-expect-error flat + Infinity/MAX_INT (anything ... > 20 ?) issue
-export const flatChildren = (children: ChildDOMElement[]): ChildDOMElement[] => children.flat(Infinity);
-
-/**
- * Transforms an array of potential child DOM elements into an array of valid renderable child DOM elements.
- * The function flattens the input array of child elements and filters out any elements that are not valid or renderable.
- *
- * @param {ChildDOMElement[]} children - An array of potential child DOM elements to be validated and processed.
- * @returns {ValidChildDOMElement[]} An array containing only the valid and renderable child DOM elements.
- */
-export const toValidChildDOMElement = (children: ChildDOMElement[]): ValidChildDOMElement[] =>
-  flatChildren(children).filter(isValidRenderableChildDOMNode);
+export const toValidChildDOMElement = (children: readonly unknown[]): ValidChildDOMElement[] =>
+  children.flat(Infinity).filter(isValidRenderableChildDOMNode);

@@ -6,7 +6,7 @@ export { appendTo, appendChildren, replaceChildrenOf } from './lib/utils/element
 
 export * from './lib/types/dommy.types';
 export * from './lib/types/event.types';
-export { jsx } from './lib/jsx-runtime';
+export { Fragment, type JSX } from './lib/jsx-runtime';
 export * from './lib/tags.predefined';
 export { setAttribute, removeAttribute, isSafeAttributeEntry } from './lib/utils/attributes/element.attributes';
 export { setStyleAttributes, hasStylesAttribute } from './lib/utils/attributes/element.style.attributes';
