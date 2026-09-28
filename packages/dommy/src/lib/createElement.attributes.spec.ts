@@ -63,6 +63,16 @@ describe('createElement: properties and attributes', () => {
     expect(element.hasAttribute('aria')).toBe(false);
   });
 
+  it('names multi-word `aria` attributes the ARIA way, in one lowercase word', () => {
+    const link = createElement('a', {
+      aria: { ariaKeyShortcuts: 'ArrowRight', ariaValueNow: '3', ariaRoleDescription: 'lap' },
+    });
+
+    expect(link.getAttribute('aria-keyshortcuts')).toBe('ArrowRight');
+    expect(link.getAttribute('aria-valuenow')).toBe('3');
+    expect(link.getAttribute('aria-roledescription')).toBe('lap');
+  });
+
   it('renders ID-reference `aria` props, which `ARIAMixin` has only as element arrays', () => {
     const listing = createElement('pre', { aria: { ariaLabelledby: 'title caption', ariaDescribedby: 'hint' } });
 

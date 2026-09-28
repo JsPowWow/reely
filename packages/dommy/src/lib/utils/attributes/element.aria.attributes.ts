@@ -17,13 +17,14 @@ export const hasAriaAttribute = <T>(props: T): props is T & { aria: DOMElementAr
 };
 
 /**
- * Converts an `ARIAMixin` property name to its attribute: `ariaCurrent` → `aria-current`, `role` stays.
+ * Converts an `ARIAMixin` property name to its attribute; ARIA names are one lowercase word after
+ * `aria-`: `ariaCurrent` → `aria-current`, `ariaKeyShortcuts` → `aria-keyshortcuts`; `role` stays.
  *
  * @param {string} property - The `ARIAMixin` property name.
  * @returns {string} The attribute name.
  */
 const toAriaAttributeName = (property: string): string =>
-  property.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+  property.startsWith('aria') ? `aria-${property.slice('aria'.length).toLowerCase()}` : property;
 
 /**
  * Renders ARIA props as `role` and `aria-*` attributes; a signal or a getter keeps an attribute
