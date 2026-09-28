@@ -43,22 +43,25 @@ let BATCH_DEPTH = 0;
 /** true while `flushSync` runs subscribers; writes made meanwhile join the same flush */
 let FLUSHING = false;
 
-export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) => boolean) => {
+/** What a reelx is made from: a computation, or the initial value of a state, a function included. */
+type ReelxSource<T> = { readonly kind: 'computed'; readonly compute: () => T } | { readonly kind: 'state'; readonly initial: T };
+
+const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => boolean): RlxSelfInstance<T> => {
   let queueVersion = -1;
   let subscriberVersion = -1;
   let state: T;
   let rlxSelf: RlxSelfInstance<T>;
 
-  if (isSomeFunction(init)) {
+  if (source.kind === 'computed') {
+    const init = source.compute;
     const deps: Dependencies<T> = [];
-    // a computation that tracked nothing is a constant once computed
-    let computed = false;
+    // a computation that tracked nothing is a constant once it has run
+    let hasRun = false;
     // @ts-expect-error expected properties assigned below
     rlxSelf = (): T => {
       if (subscriberVersion !== SUBSCRIBER_VERSION) {
         if (queueVersion === QUEUE_VERSION && SUBSCRIBER !== null && rlxSelf._subscribers.size !== 0) {
           const [firstS] = rlxSelf._subscribers ?? [];
-          // console.log(new Set([1, 2, 3]).values().next().value);
           if (firstS) {
             for (const { _subscribers } of firstS._values) {
               if (_subscribers.size !== _subscribers.add(SUBSCRIBER).size) {
@@ -71,7 +74,7 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
           DEPS = null;
 
           try {
-            let isActual = computed;
+            let isActual = hasRun;
             for (let i = 0; isActual && i < deps.length; i++) {
               isActual = Object.is(deps[i]?.value, deps[i]?.computation());
             }
@@ -79,7 +82,7 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
               (DEPS = deps).length = 0;
 
               const newState = init();
-              computed = true;
+              hasRun = true;
 
               if (
                 equal === undefined ||
@@ -103,7 +106,7 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
       return state;
     };
   } else {
-    state = init;
+    state = source.initial;
     // @ts-expect-error expected properties assigned below
     rlxSelf = (...args: [] | [newState: T]): T => {
       // a call with an argument writes, even `undefined`; a call without one reads
@@ -169,7 +172,13 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
     };
     subscriber._values = [];
 
-    subscriber();
+    try {
+      subscriber();
+    } catch (error) {
+      // a first run that throws leaves no subscription behind
+      for (const { _subscribers } of subscriber._values) _subscribers.delete(subscriber);
+      throw error;
+    }
     rlxSelf._subscribers.add(subscriber);
 
     return (): void => {
@@ -186,12 +195,14 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
   // @ts-expect-error state as object
   rlxSelf.valueOf = (): object => state;
   rlxSelf.toJSON = (): T => state;
-  // rlxSelf.peek = (): T => {
-  //   throw new Error('Mot implemented');
-  // };
 
   return rlxSelf;
 };
+
+export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) => boolean) =>
+  createReelx<T>(isSomeFunction(init) ? { kind: 'computed', compute: init } : { kind: 'state', initial: init }, equal);
+
+reelx.state = <T>(initial: T): RlxState<T> => createReelx({ kind: 'state', initial });
 
 export function reelxDebug<S>(rlx: RlxState<S> | RlxDerivedState<S>): {
   subs: () => Nullable<Set<Subscriber>>;

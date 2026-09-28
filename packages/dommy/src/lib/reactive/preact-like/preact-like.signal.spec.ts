@@ -1,4 +1,5 @@
 import { batch, computed, effect, signal, type Signal, untracked } from './preact-like.signal';
+import { onCleanup } from '../owner';
 
 describe('signal', () => {
   it('should return value', () => {
@@ -57,6 +58,18 @@ describe('signal', () => {
     expect(spy1).toHaveBeenCalledTimes(2);
     expect(spy2).toHaveBeenCalledOnce();
     expect(spy3).toHaveBeenCalledTimes(2);
+  });
+
+  it('should hold a function as a value, never calling it', () => {
+    const first = vi.fn();
+    const second = vi.fn();
+    const handler = signal(first);
+
+    handler.value = second;
+
+    expect(handler.value).toBe(second);
+    expect(first).not.toHaveBeenCalled();
+    expect(second).not.toHaveBeenCalled();
   });
 
   describe('.peek()', () => {
@@ -429,56 +442,85 @@ describe('effect()', () => {
     expect(spy).toHaveBeenCalledOnce();
   });
 
-  // it('should call the cleanup callback before the next run', () => {
-  //   const a = signal(0);
-  //   const spy = vi.fn();
-  //
-  //   effect(() => {
-  //     a.value;
-  //     return spy;
-  //   });
-  //   expect(spy).not.toHaveBeenCalled();
-  //   a.value = 1;
-  //   expect(spy).toHaveBeenCalledOnce(); // TODO WOW cleanup callback
-  //   a.value = 2;
-  //   expect(spy).toHaveBeenCalledTimes(2);
-  // });
+  it('should run the cleanup registered with onCleanup before the next run', () => {
+    const a = signal(0);
+    const spy = vi.fn();
 
-  // it('should call only the callback from the previous run', () => {
-  //   const spy1 = vi.fn();
-  //   const spy2 = vi.fn();
-  //   const spy3 = vi.fn();
-  //   const a = signal(spy1);
-  //
-  //   effect(() => {
-  //     return a.value;
-  //   });
-  //
-  //   expect(spy1).not.toHaveBeenCalled(); // TODO WOW cleanup callback
-  //   expect(spy2).not.toHaveBeenCalled();
-  //   expect(spy3).not.toHaveBeenCalled();
-  //
-  //   a.value = spy2;
-  //   expect(spy1).toHaveBeenCalledOnce();
-  //   expect(spy2).not.toHaveBeenCalled();
-  //   expect(spy3).not.toHaveBeenCalled();
-  //
-  //   a.value = spy3;
-  //   expect(spy1).toHaveBeenCalledOnce();
-  //   expect(spy2).toHaveBeenCalledOnce();
-  //   expect(spy3).not.toHaveBeenCalled();
-  // });
+    effect(() => {
+      a.value;
+      onCleanup(spy);
+    });
+    expect(spy).not.toHaveBeenCalled();
+    a.value = 1;
+    expect(spy).toHaveBeenCalledOnce();
+    a.value = 2;
+    expect(spy).toHaveBeenCalledTimes(2);
+  });
 
-  // it('should call the cleanup callback function when disposed', () => {
-  //   const spy = vi.fn();
-  //
-  //   const dispose = effect(() => {
-  //     return spy;
-  //   });
-  //   expect(spy).not.toHaveBeenCalled();
-  //   dispose();
-  //   expect(spy).toHaveBeenCalledOnce(); // TODO WOW cleanup callback
-  // });
+  it('should run only the cleanup from the previous run', () => {
+    const spy1 = vi.fn();
+    const spy2 = vi.fn();
+    const spy3 = vi.fn();
+    const a = signal(spy1);
+
+    effect(() => {
+      onCleanup(a.value);
+    });
+
+    expect(spy1).not.toHaveBeenCalled();
+    a.value = spy2;
+    expect(spy1).toHaveBeenCalledOnce();
+    expect(spy2).not.toHaveBeenCalled();
+    a.value = spy3;
+    expect(spy1).toHaveBeenCalledOnce();
+    expect(spy2).toHaveBeenCalledOnce();
+    expect(spy3).not.toHaveBeenCalled();
+  });
+
+  it('should run the cleanup when disposed', () => {
+    const spy = vi.fn();
+
+    const dispose = effect(() => {
+      onCleanup(spy);
+    });
+    expect(spy).not.toHaveBeenCalled();
+    dispose();
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
+  it('should dispose an effect created in the previous run', () => {
+    const outer = signal(0);
+    const inner = signal(0);
+    const spy = vi.fn();
+
+    effect(() => {
+      outer.value;
+      effect(() => spy(inner.value));
+    });
+    outer.value = 1;
+    outer.value = 2;
+    spy.mockClear();
+    inner.value = 1;
+
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
+  it('should dispose the effects created in its runs when disposed', () => {
+    const outer = signal(0);
+    const inner = signal(0);
+    const spy = vi.fn();
+
+    const dispose = effect(() => {
+      outer.value;
+      effect(() => spy(inner.value));
+    });
+    outer.value = 1;
+    dispose();
+    spy.mockClear();
+    inner.value = 1;
+
+    expect(spy).not.toHaveBeenCalled();
+  });
 
   it('should not recompute if the effect has been notified about changes, but no direct dependency has actually changed', () => {
     const s = signal(0);
@@ -554,148 +596,126 @@ describe('effect()', () => {
     spy.mockClear();
   });
 
-  // it('should recompute if a dependency changes during computation after becoming a dependency', () => {
-  //   const a = signal(0);
-  //   const spy = vi.fn(() => {
-  //     if (a.value === 0) {
-  //       a.value++;
-  //     }
-  //   });
-  //   effect(spy);
-  //   expect(spy).toHaveBeenCalledTimes(2);
-  // });
+  it('should recompute if a dependency changes during computation after becoming a dependency', () => {
+    const a = signal(0);
+    const spy = vi.fn(() => {
+      if (a.value === 0) {
+        a.value++;
+      }
+    });
+    effect(spy);
+    expect(spy).toHaveBeenCalledTimes(2);
+  });
 
-  // it('should run the cleanup in an implicit batch', () => {
-  //   const a = signal(0);
-  //   const b = signal('a');
-  //   const c = signal('b');
-  //   const spy = vi.fn();
-  //
-  //   effect(() => {
-  //     b.value;
-  //     c.value;
-  //     spy(b.value + c.value);
-  //   });
-  //
-  //   effect(() => {
-  //     a.value;
-  //     return () => {
-  //       b.value = 'x';
-  //       c.value = 'y';
-  //     };
-  //   });
-  //
-  //   expect(spy).toHaveBeenCalledOnce();
-  //   spy.mockClear();
-  //
-  //   a.value = 1;
-  //   expect(spy).toHaveBeenCalledOnce();
-  //   expect(spy).toHaveBeenCalledWith('xy');
-  // });
+  it('should run the cleanup in an implicit batch', () => {
+    const a = signal(0);
+    const b = signal('a');
+    const c = signal('b');
+    const spy = vi.fn();
 
-  // it('should not retrigger the effect if the cleanup modifies one of the dependencies', () => {
-  //   const a = signal(0);
-  //   const spy = vi.fn();
-  //
-  //   effect(() => {
-  //     spy(a.value);
-  //     return () => {
-  //       a.value = 2;
-  //     };
-  //   });
-  //   expect(spy).toHaveBeenCalledOnce();
-  //   spy.mockClear();
-  //
-  //   a.value = 1;
-  //   expect(spy).toHaveBeenCalledOnce();
-  //   expect(spy).toHaveBeenCalledWith(2);
-  // });
+    effect(() => {
+      spy(b.value + c.value);
+    });
 
-  // it('should run the cleanup if the effect disposes itself', () => {
-  //   const a = signal(0);
-  //   const spy = vi.fn();
-  //
-  //   const dispose = effect(() => {
-  //     if (a.value > 0) {
-  //       dispose();
-  //       return spy;
-  //     }
-  //   });
-  //   expect(spy).not.toHaveBeenCalled();
-  //   a.value = 1;
-  //
-  //   expect(spy).toHaveBeenCalledOnce();
-  //   a.value = 2;
-  //   expect(spy).toHaveBeenCalledOnce();
-  // });
-  //
-  // it('should not run the effect if the cleanup function disposes it', () => {
-  //   const a = signal(0);
-  //   const spy = vi.fn();
-  //
-  //   const dispose = effect(() => {
-  //     a.value;
-  //     spy();
-  //     return () => {
-  //       dispose();
-  //     };
-  //   });
-  //   expect(spy).toHaveBeenCalledOnce();
-  //   a.value = 1;
-  //   expect(spy).toHaveBeenCalledOnce();
-  // });
-  //
-  // it('should not subscribe to anything if first run throws', () => {
-  //   const s = signal(0);
-  //   const spy = vi.fn(() => {
-  //     s.value;
-  //     throw new Error('test');
-  //   });
-  //   expect(() => effect(spy)).to.throw('test');
-  //   expect(spy).toHaveBeenCalledOnce();
-  //
-  //   s.value++;
-  //   expect(spy).toHaveBeenCalledOnce();
-  // });
-  //
-  // it('should reset the cleanup if the effect throws', () => {
-  //   const a = signal(0);
-  //   const spy = vi.fn();
-  //
-  //   effect(() => {
-  //     if (a.value === 0) {
-  //       return spy;
-  //     } else {
-  //       throw new Error('hello');
-  //     }
-  //   });
-  //   expect(spy).not.toHaveBeenCalled();
-  //   expect(() => (a.value = 1)).to.throw('hello');
-  //   expect(spy).toHaveBeenCalledOnce();
-  //   a.value = 0;
-  //   expect(spy).toHaveBeenCalledOnce();
-  // });
-  //
-  // it('should dispose the effect if the cleanup callback throws', () => {
-  //   const a = signal(0);
-  //   const spy = vi.fn();
-  //
-  //   effect(() => {
-  //     if (a.value === 0) {
-  //       return () => {
-  //         throw new Error('hello');
-  //       };
-  //     } else {
-  //       spy();
-  //     }
-  //   });
-  //   expect(spy).not.toHaveBeenCalled();
-  //   expect(() => a.value++).to.throw('hello');
-  //   expect(spy).not.toHaveBeenCalled();
-  //   a.value++;
-  //   expect(spy).not.toHaveBeenCalled();
-  // });
-  //
+    effect(() => {
+      a.value;
+      onCleanup(() => {
+        b.value = 'x';
+        c.value = 'y';
+      });
+    });
+
+    expect(spy).toHaveBeenCalledOnce();
+    spy.mockClear();
+
+    a.value = 1;
+    expect(spy).toHaveBeenCalledOnce();
+    expect(spy).toHaveBeenCalledWith('xy');
+  });
+
+  it('should not retrigger the effect if the cleanup modifies one of the dependencies', () => {
+    const a = signal(0);
+    const spy = vi.fn();
+
+    effect(() => {
+      spy(a.value);
+      onCleanup(() => {
+        a.value = 2;
+      });
+    });
+    expect(spy).toHaveBeenCalledOnce();
+    spy.mockClear();
+
+    a.value = 1;
+    expect(spy).toHaveBeenCalledOnce();
+    expect(spy).toHaveBeenCalledWith(2);
+  });
+
+  it('should run the cleanup if the effect disposes itself', () => {
+    const a = signal(0);
+    const spy = vi.fn();
+
+    const dispose = effect(() => {
+      if (a.value > 0) {
+        dispose();
+        onCleanup(spy);
+      }
+    });
+    expect(spy).not.toHaveBeenCalled();
+    a.value = 1;
+
+    expect(spy).toHaveBeenCalledOnce();
+    a.value = 2;
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
+  it('should not run the effect if the cleanup disposes it', () => {
+    const a = signal(0);
+    const spy = vi.fn();
+
+    const dispose = effect(() => {
+      a.value;
+      spy();
+      onCleanup(() => {
+        dispose();
+      });
+    });
+    expect(spy).toHaveBeenCalledOnce();
+    a.value = 1;
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
+  it('should not subscribe to anything if first run throws', () => {
+    const s = signal(0);
+    const spy = vi.fn(() => {
+      s.value;
+      throw new Error('test');
+    });
+    expect(() => effect(spy)).toThrow('test');
+    expect(spy).toHaveBeenCalledOnce();
+
+    s.value++;
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
+  it('should run the cleanup registered before the effect threw', () => {
+    const a = signal(0);
+    const spy = vi.fn();
+
+    effect(() => {
+      if (a.value === 0) {
+        onCleanup(spy);
+      } else {
+        throw new Error('hello');
+      }
+    });
+    expect(spy).not.toHaveBeenCalled();
+    expect(() => (a.value = 1)).toThrow('hello');
+    expect(spy).toHaveBeenCalledOnce();
+    a.value = 0;
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
   it('should run cleanups outside any evaluation context', () => {
     const spy = vi.fn();
     const a = signal(0);
@@ -703,9 +723,9 @@ describe('effect()', () => {
     const c = computed(() => {
       if (a.value === 0) {
         effect(() => {
-          return () => {
+          onCleanup(() => {
             b.value;
-          };
+          });
         });
       }
       return a.value;
