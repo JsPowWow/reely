@@ -1,4 +1,5 @@
 import type { ChildDOMElement, DOMElementProps, HtmlElementTag } from './dommy.types';
+import type { SvgElementProps, SvgElementTag } from './svg.types';
 
 /**
  * A function component: takes its props, `children` included, and returns anything renderable.
@@ -14,8 +15,10 @@ export type Component = {
  */
 export declare namespace JSX {
   type Element = ChildDOMElement;
-  type ElementType = HtmlElementTag | ((props: never) => ChildDOMElement);
-  type IntrinsicElements = { [Tag in HtmlElementTag]: DOMElementProps<Tag> };
+  type ElementType = HtmlElementTag | SvgElementTag | ((props: never) => ChildDOMElement);
+  type IntrinsicElements = { [Tag in HtmlElementTag]: DOMElementProps<Tag> } & {
+    [Tag in SvgElementTag]: SvgElementProps<Tag>;
+  };
   interface IntrinsicAttributes {
     key?: PropertyKey;
   }

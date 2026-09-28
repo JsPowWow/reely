@@ -2,6 +2,8 @@ import { hasSome, isBoolean, isNil, isNumber, isString } from '@reely/utils';
 
 import { isEventHandlerName } from '../element.addListeners';
 
+import type { DommyElement } from '../../types/dommy.types';
+
 /**
  * Checks whether a prop can be rendered as an attribute: a primitive value under a name
  * that is not an `on*` handler slot, so a string never becomes an inline handler.
@@ -18,7 +20,7 @@ export const isSafeAttributeEntry = (attributeName: string, value: unknown): val
   );
 };
 
-export const setAttribute = <Element extends HTMLElement>(
+export const setAttribute = <Element extends DommyElement>(
   element: Element,
   attributeName: string,
   value: string
@@ -35,7 +37,7 @@ export const setAttribute = <Element extends HTMLElement>(
   return element;
 };
 
-export const removeAttribute = <Element extends HTMLElement>(element: Element, attributeName: string): Element => {
+export const removeAttribute = <Element extends DommyElement>(element: Element, attributeName: string): Element => {
   if (isNil(element) || !attributeName) {
     return element;
   }

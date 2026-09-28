@@ -3,6 +3,7 @@ import { hasProperty, hasSome, isNil } from '@reely/utils';
 import { applyValue } from '../element.bindings';
 
 import type { DOMElementStyles } from '../../types/attributes.types';
+import type { DommyElement } from '../../types/dommy.types';
 
 /**
  * Determines whether the given object has a `styles` attribute.
@@ -41,7 +42,7 @@ const setStyle = (style: CSSStyleDeclaration, name: string, value: unknown): voi
  * @param {DOMElementStyles} styles Styles by camelCase property or `--custom` property name.
  * @returns {HTMLElement} The updated HTML element with the specified styles applied.
  */
-export const setStyleAttributes = <Element extends HTMLElement>(
+export const setStyleAttributes = <Element extends DommyElement>(
   element: Element,
   styles: DOMElementStyles
 ): Element => {

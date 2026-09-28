@@ -4,7 +4,7 @@ import { hasProperty, isInstanceOf, isNonEmpty, isString } from '@reely/utils';
 import { toChildNode } from './element.bindings';
 import { toValidChildDOMElement } from './element.utils';
 
-import type { ChildDOMElement, ValidChildDOMElement } from '../types/dommy.types';
+import type { ChildDOMElement, ValidChildDOMElement, DommyElement } from '../types/dommy.types';
 
 /**
  * Appends already validated children to a parent element.
@@ -14,7 +14,7 @@ import type { ChildDOMElement, ValidChildDOMElement } from '../types/dommy.types
  * @returns {PipeableFn<Element>} A step that appends the children and returns the parent.
  */
 export const appendChildren =
-  <Element extends HTMLElement>(children: ValidChildDOMElement[]): PipeableFn<Element> =>
+  <Element extends DommyElement>(children: ValidChildDOMElement[]): PipeableFn<Element> =>
   (parent) => {
     parent.append(...children.map(toChildNode));
     return parent;
@@ -29,7 +29,7 @@ export const appendChildren =
  * @returns {(child: ChildDOMElement) => Element} A function that appends a child and returns the parent.
  */
 export const appendTo =
-  <Element extends HTMLElement>(parent: Element): ((child: ChildDOMElement) => Element) =>
+  <Element extends DommyElement>(parent: Element): ((child: ChildDOMElement) => Element) =>
   (child) =>
     appendChildren<Element>(toValidChildDOMElement([child]))(parent);
 
@@ -41,7 +41,7 @@ export const appendTo =
  * @returns {(...children: ChildDOMElement[]) => Element} A function that replaces the children and returns the parent.
  */
 export const replaceChildrenOf =
-  <Element extends HTMLElement>(parent: Element): ((...children: ChildDOMElement[]) => Element) =>
+  <Element extends DommyElement>(parent: Element): ((...children: ChildDOMElement[]) => Element) =>
   (...children) => {
     parent.replaceChildren(...toChildNodes(children));
     return parent;

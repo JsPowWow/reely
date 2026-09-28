@@ -7,7 +7,7 @@ import { addEventListenerHandler, isEventListenerHandler, toEventType } from './
 import { applyValue } from './element.bindings';
 import { assignProperty } from './element.property';
 
-import type { DOMElementFactoryOptionsProps, HtmlElementTag } from '../types/dommy.types';
+import type { DOMElementFactoryOptionsProps, HtmlElementTag, DommyElement } from '../types/dommy.types';
 
 const elementFactoryOptionsProps = {
   key: true,
@@ -30,7 +30,7 @@ export const isElementFactoryOptionProp = (
  * @returns {PipeableFn<Element>} A step that returns the same element.
  */
 export const assignElementRef =
-  <Element extends HTMLElement>(maybeProps: unknown): PipeableFn<Element> =>
+  <Element extends DommyElement>(maybeProps: unknown): PipeableFn<Element> =>
   (element: Element) => {
     if (hasProperty('elementRef', maybeProps)) {
       const { elementRef } = maybeProps;
@@ -52,7 +52,7 @@ export const assignElementRef =
  * @returns {PipeableFn<Element>} A step that returns the same element.
  */
 export const assignProperties =
-  <Element extends HTMLElement>(maybeProps: unknown): PipeableFn<Element> =>
+  <Element extends DommyElement>(maybeProps: unknown): PipeableFn<Element> =>
   (element: Element) => {
     if (!isPlainObject(maybeProps)) {
       return element;

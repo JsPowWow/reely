@@ -1,6 +1,7 @@
 import type { WithRequiredNonNullable } from '@reely/utils';
 import { hasProperty, hasSome, isNonEmpty, isSomeFunction, toNonNullableItems } from '@reely/utils';
 
+import type { DommyElement } from '../types/dommy.types';
 import type {
   DOMElementEventHandler,
   DOMElementEventHandlerDescriptor,
@@ -8,14 +9,14 @@ import type {
   DOMElementEventType,
 } from '../types/event.types';
 
-type ValidEventListenerDescriptor<Evt extends DOMElementEventType, Elt extends HTMLElement> = Omit<
+type ValidEventListenerDescriptor<Evt extends DOMElementEventType, Elt extends DommyElement> = Omit<
   WithRequiredNonNullable<DOMElementEventHandlerDescriptor<Evt, Elt>, 'handleEvent'>,
   'handleEvent'
 > & {
   handleEvent: EventListener;
 };
 
-export function isEventListenerHandler<Evt extends DOMElementEventType, Elt extends HTMLElement>(
+export function isEventListenerHandler<Evt extends DOMElementEventType, Elt extends DommyElement>(
   maybeEventType: string,
   maybeListener: unknown
 ): maybeListener is DOMElementEventHandlerProp<Evt, Elt> {
@@ -43,14 +44,14 @@ export const isEventHandlerName = (property: string): property is `on${string}` 
  */
 export const toEventType = (handlerProperty: string): string => handlerProperty.slice(2).toLowerCase();
 
-export function addListener<Evt extends DOMElementEventType, Elt extends HTMLElement>(
+export function addListener<Evt extends DOMElementEventType, Elt extends DommyElement>(
   handleEvent: DOMElementEventHandler<Evt, Elt>,
   options?: AddEventListenerOptions
 ): DOMElementEventHandlerDescriptor<Evt, Elt>[] {
   return [{ handleEvent, ...options }];
 }
 
-export function addListeners<Evt extends DOMElementEventType, Elt extends HTMLElement>(
+export function addListeners<Evt extends DOMElementEventType, Elt extends DommyElement>(
   ...args: (
     | [DOMElementEventHandler<Evt, Elt>, AddEventListenerOptions]
     | [DOMElementEventHandler<Evt, Elt>]
@@ -71,7 +72,7 @@ export function addListeners<Evt extends DOMElementEventType, Elt extends HTMLEl
   );
 }
 
-export function addEventListenerHandler<Evt extends DOMElementEventType, Elt extends HTMLElement>(
+export function addEventListenerHandler<Evt extends DOMElementEventType, Elt extends DommyElement>(
   element: Elt,
   eventType: string,
   eventHandler: DOMElementEventHandlerProp<Evt, Elt>,
@@ -105,7 +106,7 @@ export function addEventListenerHandler<Evt extends DOMElementEventType, Elt ext
   return false;
 }
 
-function isEventListenerDescriptor<Evt extends DOMElementEventType, Elt extends HTMLElement>(
+function isEventListenerDescriptor<Evt extends DOMElementEventType, Elt extends DommyElement>(
   maybeDescriptor: unknown
 ): maybeDescriptor is ValidEventListenerDescriptor<Evt, Elt> {
   return (

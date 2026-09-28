@@ -4,6 +4,7 @@ import { applyValue } from '../element.bindings';
 import { removeAttribute, setAttribute } from './element.attributes';
 
 import type { DOMElementAria } from '../../types/attributes.types';
+import type { DommyElement } from '../../types/dommy.types';
 
 /**
  * Determines if the given props object contains an `aria` object with at least one entry.
@@ -35,7 +36,7 @@ const toAriaAttributeName = (property: string): string =>
  * @param {DOMElementAria} aria - ARIA values by `ARIAMixin` property name.
  * @returns {Element} The same element.
  */
-export const setAriaAttributes = <Element extends HTMLElement>(element: Element, aria: DOMElementAria): Element => {
+export const setAriaAttributes = <Element extends DommyElement>(element: Element, aria: DOMElementAria): Element => {
   for (const [property, value] of Object.entries(aria)) {
     const attributeName = toAriaAttributeName(property);
     applyValue(value, (current) =>

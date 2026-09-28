@@ -1,4 +1,4 @@
-import { isNil } from '@reely/utils';
+import { isInstanceOf, isNil } from '@reely/utils';
 
 import { getDommyLogger } from '../config';
 import { isSafeAttributeEntry, removeAttribute, setAttribute } from './attributes/element.attributes';
@@ -6,6 +6,9 @@ import { isBooleanAttribute, setBoolAttribute } from './attributes/element.bool.
 import { isDataAttribute } from './attributes/element.data.attributes';
 import { isLiveProperty, setLiveProperty } from './attributes/element.live.properties';
 import { toAttributeName } from './attributes/element.mapped.attributes';
+import { assignSvgAttribute } from './attributes/element.svg.attributes';
+
+import type { DommyElement } from '../types/dommy.types';
 
 /**
  * Applies one static prop value: live state as a property, a boolean attribute,
@@ -18,11 +21,14 @@ import { toAttributeName } from './attributes/element.mapped.attributes';
  * @param {unknown} value - The prop value.
  * @returns {Element} The same element.
  */
-export const assignProperty = <Element extends HTMLElement>(
+export const assignProperty = <Element extends DommyElement>(
   element: Element,
   property: string,
   value: unknown
 ): Element => {
+  if (isInstanceOf(SVGElement, element)) {
+    return assignSvgAttribute(element, property, value);
+  }
   const attributeName = toAttributeName(property);
   switch (true) {
     case isLiveProperty(property): {

@@ -3,9 +3,11 @@ import { isPlainObject, isSomeFunction, pipe } from '@reely/utils';
 
 import { appendChildren, toElementChildren } from './utils/element.children';
 import { assignElementRef, assignProperties } from './utils/element.properties';
+import { isSvgTag, SVG_NAMESPACE } from './utils/element.svg';
 
 import type { ChildDOMElement, DOMElement, DOMElementFactoryProps, HtmlElementTag } from './types/dommy.types';
 import type { Component } from './types/jsx.types';
+import type { SvgElement, SvgElementProps, SvgElementTag } from './types/svg.types';
 
 /** Builds an element from untyped props and children, checking them at runtime. */
 const buildElement = <Tag extends HtmlElementTag>(
@@ -18,6 +20,19 @@ const buildElement = <Tag extends HtmlElementTag>(
     assignElementRef<DOMElement<Tag>>(maybeProps),
     assignProperties<DOMElement<Tag>>(maybeProps),
     appendChildren<DOMElement<Tag>>(toElementChildren(maybeProps, maybeChildren))
+  );
+
+/** Builds an SVG element: the same steps in the SVG namespace. */
+const buildSvgElement = <Tag extends SvgElementTag>(
+  tag: Tag,
+  maybeProps: unknown,
+  maybeChildren: readonly unknown[]
+): SvgElement<Tag> =>
+  pipe(
+    document.createElementNS(SVG_NAMESPACE, tag),
+    assignElementRef<SvgElement<Tag>>(maybeProps),
+    assignProperties<SvgElement<Tag>>(maybeProps),
+    appendChildren<SvgElement<Tag>>(toElementChildren(maybeProps, maybeChildren))
   );
 
 /**
@@ -35,22 +50,24 @@ const toComponentProps = (maybeProps: unknown, maybeChildren: readonly unknown[]
 /**
  * Renders a tag or calls a component; what JSX compiles to, whichever runtime entry it uses.
  *
- * @param {HtmlElementTag | Component} type - A tag name or a component.
+ * @param {HtmlElementTag | SvgElementTag | Component} type - A tag name or a component.
  * @param {unknown} maybeProps - Props, `key` and `children` possibly included.
  * @param {readonly unknown[]} maybeChildren - Argument children, if any.
  * @returns {ChildDOMElement} The element, or what the component returned.
  */
 export const renderElement = (
-  type: HtmlElementTag | Component,
+  type: HtmlElementTag | SvgElementTag | Component,
   maybeProps: unknown,
   maybeChildren: readonly unknown[]
-): ChildDOMElement =>
-  isSomeFunction(type)
-    ? type(toComponentProps(maybeProps, maybeChildren))
-    : buildElement(type, maybeProps, maybeChildren);
+): ChildDOMElement => {
+  if (isSomeFunction(type)) {
+    return type(toComponentProps(maybeProps, maybeChildren));
+  }
+  return isSvgTag(type) ? buildSvgElement(type, maybeProps, maybeChildren) : buildElement(type, maybeProps, maybeChildren);
+};
 
 /**
- * Creates an HTML element with props and children; signals and getters in props and children
+ * Creates an HTML element, or an SVG element for an SVG-only tag, with props and children; signals and getters in props and children
  * stay bound to the element. Also calls a component: JSX compiles `<Row {...props} key={id} />`
  * to this function.
  *
@@ -66,13 +83,18 @@ export function createElement<Tag extends HtmlElementTag>(
   props?: Nullable<DOMElementFactoryProps<Tag>>,
   ...children: ChildDOMElement[]
 ): DOMElement<Tag>;
+export function createElement<Tag extends SvgElementTag>(
+  tag: Tag,
+  props?: Nullable<SvgElementProps<Tag>>,
+  ...children: ChildDOMElement[]
+): SvgElement<Tag>;
 export function createElement<Props extends object>(
   component: (props: Props) => ChildDOMElement,
   props: Props & { key?: PropertyKey },
   ...children: ChildDOMElement[]
 ): ChildDOMElement;
 export function createElement(
-  type: HtmlElementTag | Component,
+  type: HtmlElementTag | SvgElementTag | Component,
   props?: unknown,
   ...children: ChildDOMElement[]
 ): ChildDOMElement {

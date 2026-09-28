@@ -1,3 +1,4 @@
+import type { DommyElement } from '../../types/dommy.types';
 /**
  * Props that hold live element state: the user changes them, so they are set as properties.
  * Their attributes only hold the initial (default) state, and `indeterminate` has none.
@@ -18,7 +19,7 @@ export const isLiveProperty = (property: string): property is (typeof liveProper
  * @param {unknown} value - The new value.
  * @returns {Element} The same element.
  */
-export const setLiveProperty = <Element extends HTMLElement>(
+export const setLiveProperty = <Element extends DommyElement>(
   element: Element,
   property: (typeof liveProperties)[number],
   value: unknown

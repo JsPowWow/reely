@@ -1,5 +1,7 @@
 import { removeAttribute, setAttribute } from './element.attributes';
 
+import type { DommyElement } from '../../types/dommy.types';
+
 const booleanAttributes = [
   'disabled',
   'readonly',
@@ -18,7 +20,7 @@ export const booleanAttributesSet: Set<string> = new Set(booleanAttributes);
 export const isBooleanAttribute = (attributeName: string): attributeName is (typeof booleanAttributes)[number] =>
   booleanAttributesSet.has(attributeName);
 
-export const setBoolAttribute = <Element extends HTMLElement>(
+export const setBoolAttribute = <Element extends DommyElement>(
   element: Element,
   attributeName: string,
   value: boolean

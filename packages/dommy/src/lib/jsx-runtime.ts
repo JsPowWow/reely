@@ -3,6 +3,7 @@ import { toChildNodes } from './utils/element.children';
 
 import type { ChildDOMElement, HtmlElementTag } from './types/dommy.types';
 import type { Component, JSX } from './types/jsx.types';
+import type { SvgElementTag } from './types/svg.types';
 
 export type { JSX } from './types/jsx.types';
 
@@ -22,13 +23,13 @@ export const Fragment = ({ children }: { children?: ChildDOMElement }): Document
  * The automatic JSX runtime: builds an element for a tag, or calls a component with its props.
  * `children` come inside props; the `key` is not rendered.
  *
- * @param {HtmlElementTag | Component} type - A tag name or a component.
+ * @param {HtmlElementTag | SvgElementTag | Component} type - A tag name or a component.
  * @param {Record<string, unknown>} props - Props, `children` included.
  * @param {PropertyKey} [_key] - The key of a list item; unused until keyed lists.
  * @returns {JSX.Element} The rendered node, or what the component returned.
  */
 export const jsx = (
-  type: HtmlElementTag | Component,
+  type: HtmlElementTag | SvgElementTag | Component,
   props: Record<string, unknown>,
   _key?: PropertyKey
 ): JSX.Element => renderElement(type, props, []);
