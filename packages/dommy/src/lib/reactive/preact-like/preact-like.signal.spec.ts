@@ -1,5 +1,4 @@
-import { computed, effect, signal, type Signal } from './preact-like.signal';
-import { reelx } from '../reelx/reelx.core';
+import { batch, computed, effect, signal, type Signal } from './preact-like.signal';
 
 describe('signal', () => {
   it('should return value', () => {
@@ -33,7 +32,6 @@ describe('signal', () => {
   });
 
   it('should notify other listeners of changes after one listener is disposed', () => {
-    const effect = signal;
     const s = signal(0);
     const spy1 = vi.fn(() => {
       s.value;
@@ -49,16 +47,16 @@ describe('signal', () => {
     const dispose = effect(spy2);
     effect(spy3);
 
-    expect(spy1).not.toHaveBeenCalledOnce(); // TODO AR, originally called
-    expect(spy2).not.toHaveBeenCalledOnce(); // TODO AR, originally called
-    expect(spy3).not.toHaveBeenCalledOnce(); // TODO AR, originally called
+    expect(spy1).toHaveBeenCalledOnce();
+    expect(spy2).toHaveBeenCalledOnce();
+    expect(spy3).toHaveBeenCalledOnce();
 
     dispose();
 
     s.value = 1;
-    expect(spy1).not.toHaveBeenCalledTimes(2); // TODO AR, originally called
+    expect(spy1).toHaveBeenCalledTimes(2);
     expect(spy2).toHaveBeenCalledOnce();
-    expect(spy3).not.toHaveBeenCalledTimes(2); // TODO AR, originally called
+    expect(spy3).toHaveBeenCalledTimes(2);
   });
 
   describe.skip('.peek()', () => {
@@ -117,7 +115,6 @@ describe('signal', () => {
       a.subscribe(spy);
       expect(spy).toHaveBeenNthCalledWith(1, 1, undefined);
       a.value = 2;
-      reelx.flushSync(); // // TODO different behavior, need .flushSync();
       expect(spy).toHaveBeenNthCalledWith(2, 2, 1);
     });
 
@@ -237,7 +234,6 @@ describe('effect()', () => {
     spy.mockClear();
 
     s.value = 42;
-    reelx.flushSync(); // TODO AR, need flush
     expect(spy).toHaveBeenCalled();
   });
   //
@@ -253,9 +249,7 @@ describe('effect()', () => {
 
     a.value = 'aa';
     b.value = 'bb';
-    reelx.flushSync(); // TODO AR, need flush
-    // expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveBeenCalledTimes(1); // TODO AR different behaviour, but cool
+    expect(spy).toHaveBeenCalledTimes(2);
   });
 
   it('should dispose of subscriptions', () => {
@@ -291,11 +285,9 @@ describe('effect()', () => {
     expect(spy).toHaveBeenCalled();
 
     a.value = 'aa';
-    reelx.flushSync();
     expect(spy).toHaveBeenCalledTimes(2);
 
     a.value = 'aaa';
-    reelx.flushSync();
     expect(spy).toHaveBeenCalledTimes(2);
   });
 
@@ -335,7 +327,6 @@ describe('effect()', () => {
 
     expect(spy).toHaveBeenCalled();
     a.value = 'aa';
-    reelx.flushSync();
     console.log('aa');
     expect(spy).toHaveBeenCalledTimes(2);
     dispose();
@@ -415,7 +406,6 @@ describe('effect()', () => {
     expect(spy).toHaveBeenCalledOnce();
 
     cond.value = false;
-    reelx.flushSync();
     expect(spy).toHaveBeenCalledTimes(2);
 
     spy.mockClear();
@@ -436,7 +426,6 @@ describe('effect()', () => {
       a.value = 'aa';
       a.value = 'aaa';
     });
-    reelx.flushSync();
     expect(spy).toHaveBeenCalledOnce();
   });
 
@@ -523,10 +512,10 @@ describe('effect()', () => {
     });
     expect(spy).toHaveBeenCalledOnce();
 
-    //batch(() => {
-    b.value = 1;
-    a.value = 1;
-    //});
+    batch(() => {
+      b.value = 1;
+      a.value = 1;
+    });
     expect(spy).toHaveBeenCalledOnce();
   });
 
@@ -548,21 +537,19 @@ describe('effect()', () => {
     });
     spy.mockClear();
 
-    //batch(() => {
-    a.value = 2;
-    b.value = 2;
-    c.value = 2;
-    //});
-    reelx.flushSync();
+    batch(() => {
+      a.value = 2;
+      b.value = 2;
+      c.value = 2;
+    });
     expect(spy).toHaveBeenCalledOnce();
     spy.mockClear();
 
-    //batch(() => {
-    a.value = -1;
-    b.value = -1;
-    c.value = -1;
-    //});
-    reelx.flushSync();
+    batch(() => {
+      a.value = -1;
+      b.value = -1;
+      c.value = -1;
+    });
     expect(spy).not.toHaveBeenCalled();
     spy.mockClear();
   });
@@ -732,12 +719,10 @@ describe('effect()', () => {
     spy.mockClear();
 
     a.value = 1;
-    reelx.flushSync();
     expect(spy).toHaveBeenCalledOnce();
     spy.mockClear();
 
     b.value = 1;
-    reelx.flushSync();
     expect(spy).not.toHaveBeenCalled();
   });
 
@@ -810,10 +795,8 @@ describe('effect()', () => {
     });
     expect(spy).not.toHaveBeenCalled();
     a.value = 1;
-    reelx.flushSync();
     expect(spy).toHaveBeenCalledOnce();
     a.value = 2;
-    reelx.flushSync();
     expect(spy).toHaveBeenCalledOnce();
   });
   //
@@ -825,10 +808,10 @@ describe('effect()', () => {
     const dispose = effect(spy);
     spy.mockClear();
 
-    //batch(() => {
-    a.value = 1;
-    dispose();
-    //});
+    batch(() => {
+      a.value = 1;
+      dispose();
+    });
 
     expect(spy).not.toHaveBeenCalled();
   });
@@ -841,11 +824,11 @@ describe('effect()', () => {
     const dispose = effect(spy);
     spy.mockClear();
 
-    //batch(() => {
-    a.value = 1;
-    dispose();
-    a.value = 2;
-    //});
+    batch(() => {
+      a.value = 1;
+      dispose();
+      a.value = 2;
+    });
 
     expect(spy).not.toHaveBeenCalled();
   });
@@ -870,12 +853,10 @@ describe('effect()', () => {
     expect(childEffect).toHaveBeenCalledOnce();
 
     childSignal.value = 1;
-    reelx.flushSync();
     expect(parentEffect).toHaveBeenCalledOnce();
     expect(childEffect).toHaveBeenCalledTimes(2);
 
     parentSignal.value = 1;
-    reelx.flushSync();
     expect(parentEffect).toHaveBeenCalledTimes(2);
     expect(childEffect).toHaveBeenCalledTimes(3);
   });
@@ -1114,7 +1095,6 @@ describe('computed', () => {
     c.value;
     expect(spy).toHaveBeenCalledOnce();
     c.value;
-    reelx.flushSync();
     expect(spy).toHaveBeenCalledTimes(1); // TODO AR difference, 2 vs 1 but Ok ?
   });
 
@@ -1298,7 +1278,6 @@ describe('computed', () => {
     spy.mockClear();
 
     a.value = 1;
-    reelx.flushSync();
     expect(spy).toHaveBeenCalledOnce();
   });
 
@@ -1339,7 +1318,6 @@ describe('computed', () => {
     dispose();
 
     s.value = 1;
-    reelx.flushSync();
     expect(spy1).toHaveBeenCalledTimes(2);
     expect(spy2).toHaveBeenCalledOnce();
     expect(spy3).toHaveBeenCalledTimes(2);
@@ -1396,12 +1374,10 @@ describe('computed', () => {
     d.value;
     expect(spy).toHaveBeenCalledOnce();
 
-    // batch(() => {
-    //   b.value = 1;
-    //   a.value = 1;
-    // });
-    b.value = 1;
-    a.value = 1;
+    batch(() => {
+      b.value = 1;
+      a.value = 1;
+    });
 
     d.value;
     expect(spy).toHaveBeenCalledOnce();
@@ -1924,29 +1900,29 @@ describe('computed', () => {
 });
 
 describe('batch/transaction', () => {
-  //   it("should return the value from the callback", () => {
-  //     expect(batch(() => 1)).to.equal(1);
-  //   });
-  //
-  //   it("should throw errors thrown from the callback", () => {
-  //     expect(() =>
-  //       batch(() => {
-  //         throw Error("hello");
-  //       })
-  //     ).to.throw("hello");
-  //   });
-  //
-  //   it("should throw non-errors thrown from the callback", () => {
-  //     try {
-  //       batch(() => {
-  //         throw undefined;
-  //       });
-  //       expect.fail();
-  //     } catch (err) {
-  //       expect(err).to.be.undefined;
-  //     }
-  //   });
-  //
+  it('should return the value from the callback', () => {
+    expect(batch(() => 1)).to.equal(1);
+  });
+
+  it('should throw errors thrown from the callback', () => {
+    expect(() =>
+      batch(() => {
+        throw Error('hello');
+      })
+    ).to.throw('hello');
+  });
+
+  it('should throw non-errors thrown from the callback', () => {
+    try {
+      batch(() => {
+        throw undefined;
+      });
+      expect.fail();
+    } catch (err) {
+      expect(err).to.be.undefined;
+    }
+  });
+
   it('should delay writes', () => {
     const a = signal('a');
     const b = signal('b');
@@ -1956,49 +1932,48 @@ describe('batch/transaction', () => {
     effect(spy);
     spy.mockClear();
 
-    //batch(() => {
-    a.value = 'aa';
-    b.value = 'bb';
-    //});
-    reelx.flushSync();
+    batch(() => {
+      a.value = 'aa';
+      b.value = 'bb';
+    });
     expect(spy).toHaveBeenCalledOnce();
   });
-  //
-  //   it("should delay writes until outermost batch is complete", () => {
-  //     const a = signal("a");
-  //     const b = signal("b");
-  //     const spy = vi.fn(() => {
-  //       a.value + ", " + b.value;
-  //     });
-  //     effect(spy);
-  //     spy.mockClear();
-  //
-  //     batch(() => {
-  //       batch(() => {
-  //         a.value += " inner";
-  //         b.value += " inner";
-  //       });
-  //       a.value += " outer";
-  //       b.value += " outer";
-  //     });
-  //
-  //     // If the inner batch() would have flushed the update
-  //     // this spy would've been called twice.
-  //     expect(spy).toHaveBeenCalledOnce();
-  //   });
-  //
-  //   it("should read signals written to", () => {
-  //     const a = signal("a");
-  //
-  //     let result = "";
-  //     batch(() => {
-  //       a.value = "aa";
-  //       result = a.value;
-  //     });
-  //
-  //     expect(result).to.equal("aa");
-  //   });
-  //
+
+  it('should delay writes until outermost batch is complete', () => {
+    const a = signal('a');
+    const b = signal('b');
+    const spy = vi.fn(() => {
+      a.value + ', ' + b.value;
+    });
+    effect(spy);
+    spy.mockClear();
+
+    batch(() => {
+      batch(() => {
+        a.value += ' inner';
+        b.value += ' inner';
+      });
+      a.value += ' outer';
+      b.value += ' outer';
+    });
+
+    // If the inner batch() would have flushed the update
+    // this spy would've been called twice.
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
+  it('should read signals written to', () => {
+    const a = signal('a');
+
+    let result = '';
+    batch(() => {
+      a.value = 'aa';
+      result = a.value;
+    });
+
+    expect(result).to.equal('aa');
+  });
+
   it('should read computed signals with updated source signals', () => {
     // A->B->C->D->E
     const a = signal('a');
@@ -2018,14 +1993,14 @@ describe('batch/transaction', () => {
     spyE.mockClear();
 
     let result = '';
-    //batch(() => {
-    a.value = 'aa';
-    result = c.value;
+    batch(() => {
+      a.value = 'aa';
+      result = c.value;
 
-    // Since "D" isn't accessed during batching, we should not
-    // update it, only after batching has completed
-    expect(spyD).not.toHaveBeenCalled();
-    //});
+      // Since "D" isn't accessed during batching, we should not
+      // update it, only after batching has completed
+      expect(spyD).not.toHaveBeenCalled();
+    });
 
     expect(result).to.equal('aa');
     expect(d.value).to.equal('aa');
@@ -2049,12 +2024,11 @@ describe('batch/transaction', () => {
       result = d.value;
     });
 
-    //batch(() => {
-    a.value = 'aa';
-    b.value = 'bb';
-    //});
+    batch(() => {
+      a.value = 'aa';
+      b.value = 'bb';
+    });
     c.value = 'cc';
-    reelx.flushSync();
     expect(result).to.equal('aa bb cc');
   });
 
@@ -2070,11 +2044,10 @@ describe('batch/transaction', () => {
 
     expect(invokes).to.deep.equal([[0, 0]]);
 
-    //batch(() => {
-    counter.value = 1;
-    expect(double.value).to.equal(2);
-    //});
-    reelx.flushSync();
+    batch(() => {
+      counter.value = 1;
+      expect(double.value).to.equal(2);
+    });
     expect(invokes[1]).to.deep.equal([2, 3]);
   });
   //
@@ -2165,10 +2138,10 @@ describe('batch/transaction', () => {
   it("should run effect's first run immediately even inside a batch", () => {
     let callCount = 0;
     const spy = vi.fn();
-    //batch(() => {
-    effect(spy);
-    callCount = spy.mock.calls.length;
-    //});
+    batch(() => {
+      effect(spy);
+      callCount = spy.mock.calls.length;
+    });
     expect(callCount).to.equal(1);
   });
 });

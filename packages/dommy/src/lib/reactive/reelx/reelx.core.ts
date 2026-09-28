@@ -37,6 +37,12 @@ let SUBSCRIBER_VERSION = 0;
 /** stack-based parent ref to silently link nodes */
 let DEPS: null | Dependencies<unknown> = null;
 
+/** nesting depth of `batch` calls; subscribers run when the outermost one ends */
+let BATCH_DEPTH = 0;
+
+/** true while `flushSync` runs subscribers; writes made meanwhile join the same flush */
+let FLUSHING = false;
+
 export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) => boolean) => {
   let queueVersion = -1;
   let subscriberVersion = -1;
@@ -103,12 +109,14 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
 
         state = newState;
 
-        if (QUEUE.push(rlxSelf._subscribers) === 1) {
+        const subscribers = rlxSelf._subscribers;
+        // replace before scheduling: a synchronous flush re-subscribes to the new set
+        rlxSelf._subscribers = new Set();
+
+        if (QUEUE.push(subscribers) === 1) {
           QUEUE_VERSION++;
           reelx.schedule?.();
         }
-
-        rlxSelf._subscribers = new Set();
       }
 
       if (SUBSCRIBER !== null && rlxSelf._subscribers.size !== rlxSelf._subscribers.add(SUBSCRIBER).size) {
@@ -125,9 +133,11 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
     let queueVersion = -1;
     let lastState: unknown;
     let prevState: T | undefined;
+    let isDisposed = false;
 
     const subscriber: Subscriber = () => {
-      if (queueVersion !== QUEUE_VERSION) {
+      // a subscriber disposed inside `batch` may still be queued
+      if (!isDisposed && queueVersion !== QUEUE_VERSION) {
         try {
           queueVersion = QUEUE_VERSION;
 
@@ -152,6 +162,7 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
     rlxSelf._subscribers.add(subscriber);
 
     return (): void => {
+      isDisposed = true;
       rlxSelf._subscribers.delete(subscriber);
       if (rlxSelf._subscribers.size === 0) {
         for (const { _subscribers } of subscriber._values) _subscribers.delete(subscriber);
@@ -183,14 +194,37 @@ export function reelxDebug<S>(rlx: RlxState<S> | RlxDerivedState<S>): {
 }
 
 reelx.flushSync = (): void => {
-  const iterator = QUEUE;
-
-  QUEUE = [];
-
-  for (const subscribers of iterator) {
-    for (const subscriber of subscribers) subscriber();
+  if (FLUSHING) {
+    return;
+  }
+  FLUSHING = true;
+  try {
+    while (QUEUE.length > 0) {
+      const iterator = QUEUE;
+      QUEUE = [];
+      for (const subscribers of iterator) {
+        for (const subscriber of subscribers) subscriber();
+      }
+    }
+  } finally {
+    FLUSHING = false;
   }
 };
 
-reelx.schedule = (): Promise<void> => Promise.resolve().then(reelx.flushSync);
-// schedule = () => requestAnimationFrame(reelx.flushSync)
+reelx.batch = <T>(fn: () => T): T => {
+  BATCH_DEPTH++;
+  try {
+    return fn();
+  } finally {
+    if (--BATCH_DEPTH === 0) {
+      reelx.flushSync();
+    }
+  }
+};
+
+/** Runs subscribers synchronously after a write, or at the end of the outermost `batch`. */
+reelx.schedule = (): void => {
+  if (BATCH_DEPTH === 0) {
+    reelx.flushSync();
+  }
+};

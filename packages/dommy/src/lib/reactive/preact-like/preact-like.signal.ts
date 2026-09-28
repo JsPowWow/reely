@@ -26,11 +26,23 @@ export function computed<T>(fn: () => T): Computed<T> {
   return setPrototype<Computed<T>>(computedProto, reelx(fn));
 }
 
+/**
+ * Groups writes: effects and bindings run once, when the outermost `batch` ends.
+ *
+ * @template T - The callback result type.
+ * @param {() => T} fn - The callback that writes signals.
+ * @returns {T} The callback result.
+ */
+export function batch<T>(fn: () => T): T {
+  return reelx.batch(fn);
+}
+
 export function effect(fn: VoidFunction): VoidFunction {
   const context: { dispose?: VoidFunction } = {};
   // let cleanup: VoidFunction | undefined;
 
-  const effectFn = fn.bind(context);
+  // writes inside the effect are grouped, so its dependants run once
+  const effectFn = (): void => reelx.batch(fn.bind(context));
   // let effectFn = function (): ReturnType<typeof fn> {
   //   if (isSomeFunction(cleanup)) {
   //     cleanup();

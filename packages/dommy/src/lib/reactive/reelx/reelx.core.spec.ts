@@ -52,13 +52,15 @@ describe('reelx tests', () => {
     let i = 2;
     while (--i) {
       res.length = 0;
-      B(1);
-      A(1 + i * 2);
-      reelx.flushSync();
+      reelx.batch(() => {
+        B(1);
+        A(1 + i * 2);
+      });
 
-      A(2 + i * 2);
-      B(2);
-      reelx.flushSync();
+      reelx.batch(() => {
+        A(2 + i * 2);
+        B(2);
+      });
 
       expect(res.length).toBe(4);
       expect(res).toEqual([3198, 1601, 3195, 1598]);

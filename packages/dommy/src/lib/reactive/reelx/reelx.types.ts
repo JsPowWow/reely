@@ -3,6 +3,7 @@ export interface Reelx {
   <S>(initial: S): RlxState<S>;
   <S>(initial?: S): RlxState<S>;
   flushSync: VoidFunction;
+  batch: <T>(fn: () => T) => T;
   schedule?: null | VoidFunction;
 }
 
