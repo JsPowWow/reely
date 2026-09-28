@@ -122,7 +122,13 @@
   padding: 1.25rem 0;
   overflow-x: auto;
   border-radius: 6px;
-  background: var(--graphite);
+  /* scroll shadows: a light edge shows where a long line runs on, and goes once it is scrolled to */
+  background:
+    linear-gradient(to right, var(--graphite) 30%, transparent) left / 2.5rem 100% no-repeat local,
+    linear-gradient(to left, var(--graphite) 30%, transparent) right / 2.5rem 100% no-repeat local,
+    linear-gradient(to right, rgb(228 231 235 / 0.28), transparent) left / 1rem 100% no-repeat scroll,
+    linear-gradient(to left, rgb(228 231 235 / 0.28), transparent) right / 1rem 100% no-repeat scroll,
+    var(--graphite);
   color: var(--code-text);
   font-family: var(--mono);
   font-size: 0.8125rem;

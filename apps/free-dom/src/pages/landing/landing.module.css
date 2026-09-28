@@ -169,7 +169,7 @@
   white-space: nowrap;
 }
 
-/* The split posts when its sector is driven: dim until then, then signal ink on its plate. */
+/* The split posts when its sector is driven: slate until then, then signal ink on its plate. */
 .segmentMark {
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
@@ -180,13 +180,11 @@
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
   white-space: nowrap;
-  opacity: 0.45;
 }
 
 .segment[data-driven='true'] .segmentMark {
   background: var(--graphite);
   color: var(--signal);
-  opacity: 1;
 }
 
 .track {
