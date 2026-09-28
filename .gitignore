@@ -54,3 +54,6 @@ vitest.config.*.timestamp*
 .claude/settings.local.json
 # impeccable engine binary, downloaded per machine by `impeccable install`
 .claude/skills/impeccable/scripts/bin
+
+# impeccable critique archive and live-mode scratch, per machine
+/.impeccable/
