@@ -44,8 +44,8 @@ export const TutorialPage = ({ slug }: TutorialPageProps): JSX.Element => {
             </li>
           ))}
         </ol>
-        <a className={css.back} href='/'>
-          Back to free-dom
+        <a className={css.back} href='https://github.com/JsPowWow/reely'>
+          Source on GitHub
         </a>
       </nav>
       <main className={css.main}>

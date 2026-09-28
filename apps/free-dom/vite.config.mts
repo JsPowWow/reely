@@ -14,7 +14,7 @@ export default defineConfig(() => ({
     port: 4300,
     host: 'localhost',
   },
-  plugins: [nxViteTsPaths(), nxCopyAssetsPlugin(['*.md', 'netlify.toml', '*.svg'])],
+  plugins: [nxViteTsPaths(), nxCopyAssetsPlugin(['netlify.toml'])],
   build: {
     outDir: './dist',
     emptyOutDir: true,

@@ -1,17 +1,9 @@
 import type { JSX, Routes } from '@reely/dommy';
-import { MainPage } from '../pages/mainPage';
-import { Layout } from './Layout';
 import { TutorialPage } from '../pages/tutorial/tutorial.page';
 
 export const routes = [
-  {
-    path: '/',
-    action: () => (
-      <Layout>
-        <MainPage />
-      </Layout>
-    ),
-  },
+  // The course is the home page until the reely landing page exists.
+  { path: '/', action: () => <TutorialPage /> },
   {
     path: '/tutorial',
     children: [
