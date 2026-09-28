@@ -75,6 +75,9 @@
     "test": {
       "dependsOn": ["^build"]
     },
+    "typecheck": {
+      "dependsOn": ["^typecheck", "^build"]
+    },
     "nx-release-publish": {
       "dependsOn": ["build"],
       "executor": "@nx/js:release-publish",
