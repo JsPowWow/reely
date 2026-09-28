@@ -2,7 +2,9 @@ export const MainPage = () => [
   <div className='header'>
     <h1>free-dom</h1>
     <p>Lightweight and fast JavaScript framework</p>
-    <button className='start-btn'>Get Started</button>
+    <a className='start-btn' href='/tutorial'>
+      Start the course
+    </a>
   </div>,
   <div className='features'>
     <div className='feature'>

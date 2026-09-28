@@ -247,6 +247,7 @@
   }
 }
 
+/* Phones: the rail becomes a grid of numbered chips; the heading shows the step title. */
 @media (max-width: 720px) {
   .tutorial {
     grid-template-columns: minmax(0, 1fr);
@@ -263,17 +264,72 @@
   }
 
   .steps {
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
-    overflow-x: auto;
+    grid-template-columns: repeat(auto-fill, minmax(2.75rem, 1fr));
+    gap: 0.5rem;
   }
 
   .stepLink {
-    border-left: none;
-    border-bottom: 4px solid transparent;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    min-height: 2.75rem;
+    padding: 0.35rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--panel);
   }
 
   .stepLink[aria-current='step'] {
-    border-bottom-color: var(--signal);
+    border-color: var(--signal);
+    background: var(--signal);
+  }
+
+  .stepTitle {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .back {
+    margin-top: 1rem;
+  }
+
+  /* Room for the Netlify badge, which floats over the bottom of the page. */
+  .main {
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+    padding-bottom: 5rem;
+  }
+
+  .heading {
+    align-items: center;
+  }
+
+  .bigNumber {
+    grid-row: auto;
+    font-size: 3.5rem;
+  }
+
+  .lead {
+    grid-column: 1 / -1;
+  }
+
+  .stage {
+    padding: 1.25rem 1rem;
+  }
+
+  .writes {
+    padding: 0.75rem 1rem;
+  }
+
+  .source {
+    font-size: 0.75rem;
+  }
+
+  .line,
+  .added {
+    padding: 0 0.75rem;
   }
 }

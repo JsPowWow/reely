@@ -39,7 +39,7 @@ export const TutorialPage = ({ slug }: TutorialPageProps): JSX.Element => {
                 aria={itemIndex === index ? { ariaCurrent: 'step' } : {}}
               >
                 <span className={css.stepNumber}>{itemIndex + 1}</span>
-                <span>{item.title}</span>
+                <span className={css.stepTitle}>{item.title}</span>
               </a>
             </li>
           ))}
