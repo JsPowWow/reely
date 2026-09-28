@@ -1,5 +1,8 @@
+import { hasSome } from '@reely/utils';
+
 import { withOwner } from './reactive/owner';
 import { toNodes } from './utils/element.children';
+import { rangeOf, removeNodes } from './utils/element.range';
 
 import type { ChildDOMElement } from './types/dommy.types';
 
@@ -15,10 +18,13 @@ export const mount = (parent: ParentNode, render: () => ChildDOMElement): VoidFu
   withOwner((dispose) => {
     const nodes = toNodes(render());
     parent.append(...nodes);
+    const [first] = nodes;
+    const last = nodes.at(-1);
     return (): void => {
       dispose();
-      for (const node of nodes) {
-        node.parentNode?.removeChild(node);
+      // the view is the range from its first node to its last, with what its flows show now
+      if (hasSome(first) && hasSome(last)) {
+        removeNodes(rangeOf(first, last));
       }
     };
   });

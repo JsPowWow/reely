@@ -1,10 +1,11 @@
-import { isInstanceOf } from '@reely/utils';
+import { isInstanceOf, isNil } from '@reely/utils';
 
 import { getDommyLogger } from './config';
 import { getOwner, withOwner } from './reactive/owner';
 import { signal } from './reactive/preact-like/preact-like.signal';
 import { bindValue } from './utils/element.bindings';
 import { toNodes } from './utils/element.children';
+import { createAnchors, insertBefore, rangeOf, removeNodes } from './utils/element.range';
 
 import type { Signal } from './reactive/preact-like/preact-like.signal';
 import type { ChildDOMElement, ReactiveValue } from './types/dommy.types';
@@ -22,18 +23,21 @@ export interface ForProps<T> {
 }
 
 interface Row<T> {
-  /** The nodes of the row, moved and removed together. */
-  readonly nodes: readonly Node[];
+  /** The first and the last node of the row: it is moved and removed as the range between them. */
+  readonly first: Node;
+  readonly last: Node;
   readonly item: Signal<T>;
   readonly index: Signal<number>;
   readonly dispose: VoidFunction;
 }
 
 /**
- * Marks the positions that stay in place: the longest increasing run of old positions.
+ * Finds the rows that stay in place: the longest increasing run of old positions.
  * Rows outside it are the fewest that must move to reach the new order.
+ *
+ * @returns {Set<number>} The indices, in `oldPositions`, of the rows that stay.
  */
-const markStaying = (oldPositions: readonly number[]): boolean[] => {
+const findStaying = (oldPositions: readonly number[]): Set<number> => {
   // tails[k]: index in oldPositions of the smallest tail of an increasing run of length k + 1
   const tails: number[] = [];
   const previous: number[] = oldPositions.map(() => -1);
@@ -54,9 +58,9 @@ const markStaying = (oldPositions: readonly number[]): boolean[] => {
     previous[i] = low > 0 ? (tails[low - 1] ?? -1) : -1;
     tails[low] = i;
   });
-  const staying = oldPositions.map(() => false);
+  const staying = new Set<number>();
   for (let i = tails.at(-1) ?? -1; i >= 0; i = previous[i] ?? -1) {
-    staying[i] = true;
+    staying.add(i);
   }
   return staying;
 };
@@ -78,27 +82,25 @@ const keepFocus = (move: VoidFunction): void => {
  *
  * @template T - The item type.
  * @param {ForProps<T>} props - The items, their key (`by`) and the row renderer.
- * @returns {DocumentFragment} The rows followed by the anchor the list keeps its place by.
+ * @returns {DocumentFragment} The rows between the two anchors the list keeps its place by.
  */
 export const For = <T,>({ each, by, children }: ForProps<T>): DocumentFragment => {
   const owner = getOwner();
-  const end = document.createComment('For');
-  const fragment = document.createDocumentFragment();
-  fragment.append(end);
+  const { fragment, end } = createAnchors('For');
   let rows = new Map<PropertyKey, Row<T>>();
 
   const createRow = (value: T, position: number): Row<T> =>
     withOwner((dispose) => {
       const item = signal(value);
       const index = signal(position);
-      return { nodes: toNodes(children(item, index)), item, index, dispose };
+      // an empty row still needs a node to keep its place by
+      const [first = document.createTextNode(''), ...rest] = toNodes(children(item, index));
+      // the nodes become siblings, so the row is a range from its first node on
+      document.createDocumentFragment().append(first, ...rest);
+      return { first, last: rest.at(-1) ?? first, item, index, dispose };
     }, owner);
 
   const update = (items: readonly T[]): void => {
-    const parent = end.parentNode;
-    if (parent === null) {
-      return;
-    }
     const oldPositions = new Map(Array.from(rows.keys(), (itemKey, position) => [itemKey, position]));
     const next = new Map<PropertyKey, Row<T>>();
     for (const value of items) {
@@ -108,7 +110,7 @@ export const For = <T,>({ each, by, children }: ForProps<T>): DocumentFragment =
         continue;
       }
       const row = rows.get(itemKey);
-      if (row === undefined) {
+      if (isNil(row)) {
         next.set(itemKey, createRow(value, next.size));
       } else {
         row.item.value = value;
@@ -120,28 +122,20 @@ export const For = <T,>({ each, by, children }: ForProps<T>): DocumentFragment =
     for (const [itemKey, row] of rows) {
       if (!next.has(itemKey)) {
         row.dispose();
-        for (const node of row.nodes) {
-          parent.removeChild(node);
-        }
+        removeNodes(rangeOf(row.first, row.last));
       }
     }
 
-    const ordered = Array.from(next);
-    const staying = markStaying(ordered.map(([itemKey]) => oldPositions.get(itemKey) ?? -1));
+    const ordered = Array.from(next.keys());
+    const staying = findStaying(ordered.map((itemKey) => oldPositions.get(itemKey) ?? -1));
+    const fromLast = Array.from(next.values(), (row, i) => ({ row, stays: staying.has(i) })).reverse();
     keepFocus(() => {
       let anchor: Node = end;
-      for (let i = ordered.length - 1; i >= 0; i--) {
-        const nodes = ordered[i]?.[1].nodes ?? [];
-        for (let n = nodes.length - 1; n >= 0; n--) {
-          const node = nodes[n];
-          if (node === undefined) {
-            continue;
-          }
-          if (staying[i] !== true || node.parentNode !== parent) {
-            parent.insertBefore(node, anchor);
-          }
-          anchor = node;
+      for (const { row, stays } of fromLast) {
+        if (!stays) {
+          insertBefore(anchor, rangeOf(row.first, row.last));
         }
+        anchor = row.first;
       }
     });
     rows = next;

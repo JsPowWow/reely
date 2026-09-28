@@ -1,8 +1,9 @@
-import { noop } from '@reely/utils';
+import { hasSome, noop } from '@reely/utils';
 
 import { getOwner, withOwner } from './reactive/owner';
 import { bindValue } from './utils/element.bindings';
 import { toNodes } from './utils/element.children';
+import { createAnchors, insertBefore, rangeOf, removeNodes } from './utils/element.range';
 
 import type { ChildDOMElement, ReactiveValue } from './types/dommy.types';
 
@@ -21,30 +22,23 @@ export interface ShowProps {
  * branch stays as it is and updates through its own bindings.
  *
  * @param {ShowProps} props - The condition and the two branches.
- * @returns {DocumentFragment} The shown branch followed by the anchor it keeps its place by.
+ * @returns {DocumentFragment} The shown branch between the two anchors it keeps its place by.
  */
 export const Show = ({ when, children, fallback }: ShowProps): DocumentFragment => {
   const owner = getOwner();
-  const end = document.createComment('Show');
-  const fragment = document.createDocumentFragment();
-  fragment.append(end);
-  let nodes: readonly Node[] = [];
+  const { fragment, start, end } = createAnchors('Show');
   let disposeBranch: VoidFunction = noop;
 
   const showBranch = (shown: boolean): void => {
-    const parent = end.parentNode;
-    if (parent === null) {
-      return;
-    }
     disposeBranch();
-    for (const node of nodes) {
-      parent.removeChild(node);
-    }
+    removeNodes(rangeOf(start, end).slice(1, -1));
     const render = shown ? children : fallback;
-    [nodes, disposeBranch] = withOwner((dispose) => [render === undefined ? [] : toNodes(render()), dispose], owner);
-    for (const node of nodes) {
-      parent.insertBefore(node, end);
-    }
+    disposeBranch = withOwner((dispose) => {
+      if (hasSome(render)) {
+        insertBefore(end, toNodes(render()));
+      }
+      return dispose;
+    }, owner);
   };
 
   bindValue(() => Boolean(when()), showBranch);

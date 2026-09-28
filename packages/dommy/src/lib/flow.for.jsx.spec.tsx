@@ -20,6 +20,6 @@ describe('For in JSX', () => {
     ));
     racers.value = [...racers.value].reverse();
 
-    expect(board.innerHTML).toBe('<li class="p1">Flash</li><li class="p2">Bolt</li><!--For-->');
+    expect(board.innerHTML).toBe('<!--For--><li class="p1">Flash</li><li class="p2">Bolt</li><!--/For-->');
   });
 });
