@@ -6,7 +6,9 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "ignoreDeprecations": "6.0",
-    "rootDir": "."
+    "rootDir": ".",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@reely/dommy"
   },
   "include": [
     "vite.config.ts",

@@ -49,11 +49,7 @@ export default defineConfig(() => ({
       provider: 'v8' as const,
     },
   },
-  esbuild: {
-    jsx: 'transform' as const,
-    jsxDev: false,
-    jsxImportSource: '@reely/dommy',
-    jsxInject: `import { jsx } from '@reely/dommy'`,
-    jsxFactory: 'jsx',
+  oxc: {
+    jsx: { runtime: 'automatic' as const, importSource: '@reely/dommy' },
   },
 }));

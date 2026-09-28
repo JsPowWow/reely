@@ -1,3 +1,5 @@
+import type { JSX } from '@reely/dommy';
+
 interface NxPageProps {
   children?: JSX.Element;
 }
@@ -5,7 +7,7 @@ export const NxPage = ({ children }: NxPageProps) => {
   return (
     <div id='nx-page'>
       <nav>
-        <a class='Icon' href='/nx'>
+        <a className='Icon' href='/nx'>
           Nx
         </a>
         <a href='/nx/naive'>VanJS style</a>

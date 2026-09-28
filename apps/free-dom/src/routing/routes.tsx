@@ -1,10 +1,10 @@
-import { createAsyncRouter, Routes } from '@reely/dommy';
+import type { JSX, Routes } from '@reely/dommy';
 import { MainPage } from '../pages/mainPage';
 import { NxPage } from '../pages/nx/nxPage';
 import { Layout } from './Layout';
 import { TutorialPage } from '../pages/tutorial/tutorial.page';
 
-const routes = [
+export const routes = [
   {
     path: '/',
     action: () => (
@@ -63,5 +63,3 @@ const routes = [
   },
   { path: '/*all', action: () => <h1>Not Found</h1> },
 ] as const satisfies Routes<JSX.Element>;
-
-export const router = createAsyncRouter(routes);

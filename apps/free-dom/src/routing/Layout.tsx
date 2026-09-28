@@ -1,3 +1,5 @@
+import type { JSX } from '@reely/dommy';
+
 interface LayoutProps {
   children: JSX.Element;
 }
@@ -6,7 +8,7 @@ export const Layout = ({ children }: LayoutProps) => {
   return (
     <div className='container'>
       <nav>
-        <a href='#' class='Icon'>
+        <a href='#' className='Icon'>
           FreeDom
         </a>
         <a href='#'>Home</a>
@@ -17,7 +19,7 @@ export const Layout = ({ children }: LayoutProps) => {
       </nav>
       {children}
       <nav>
-        <a href='#' class='Icon'>
+        <a href='#' className='Icon'>
           FreeDom
         </a>
         <a href='#'>Home</a>

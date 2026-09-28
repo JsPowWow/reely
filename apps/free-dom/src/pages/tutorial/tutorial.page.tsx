@@ -1,3 +1,4 @@
+import type { JSX } from '@reely/dommy';
 import { hasSome, isNil } from '@reely/utils';
 
 import { MutationMeter } from './mutation.meter';
