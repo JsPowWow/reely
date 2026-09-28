@@ -45,17 +45,19 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # `nx release publish` does not run the build: without this step the tarball has no `dist`
+      # the tarball ships `dist`, built here
       - name: Build packages
         run: npx nx run-many -t build --projects "$PROJECTS"
         env:
           PROJECTS: ${{ inputs.projects }}
 
+      # `npm publish` itself, not `nx release publish`: npm's own output (OIDC included) stays visible
       - name: Publish packages
         run: |
-          git config --global user.email "js.developer.powwow@gmail.com"
-          git config --global user.name "JsPowWow"
-          npx nx release publish --projects "$PROJECTS" --tag "$DIST_TAG" ${{ inputs.dry-run == true && '--dry-run --verbose' || '--verbose' }}
+          for project in ${PROJECTS//,/ }; do
+            root=$(npx nx show project "$project" --json | node -e "process.stdout.write(JSON.parse(require('fs').readFileSync(0, 'utf8')).root)")
+            npm publish "./$root" --tag "$DIST_TAG" --access public ${{ inputs.dry-run == true && '--dry-run' || '' }}
+          done
         env:
           PROJECTS: ${{ inputs.projects }}
           DIST_TAG: ${{ inputs.dist-tag }}
