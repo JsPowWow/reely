@@ -1,0 +1,41 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": [
+      "vitest/globals",
+      "node"
+    ],
+    "moduleResolution": "bundler",
+    "module": "esnext",
+    "target": "esnext",
+    "lib": [
+      "esnext",
+      "esnext.disposable",
+      "dom"
+    ],
+    "jsx": "react-jsx",
+    "jsxImportSource": "@reely/dommy",
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@reely/dommy": [
+        "../../packages/dommy/src/index.ts"
+      ],
+      "@reely/dommy/jsx-runtime": [
+        "../../packages/dommy/src/lib/jsx-runtime.ts"
+      ],
+      "@reely/dommy/jsx-dev-runtime": [
+        "../../packages/dommy/src/lib/jsx-runtime.ts"
+      ]
+    },
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "incremental": false,
+    "emitDeclarationOnly": false
+  },
+  "include": [
+    "*.ts",
+    "*.tsx"
+  ]
+}
