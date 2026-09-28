@@ -1,5 +1,7 @@
 import { addListener, addListeners, createElement } from '../index';
 
+import type { DOMElementFactoryProps } from '../index';
+
 describe('createElement: events', () => {
   it('calls an `onclick` handler with the event of its element', () => {
     const onclick = vi.fn();
@@ -21,6 +23,14 @@ describe('createElement: events', () => {
 
     expect(onClick).toHaveBeenCalledOnce();
     expect(onKeydown).toHaveBeenCalledOnce();
+  });
+
+  it.each(['onclick', 'onClick'])('never renders a string `%s` as an inline handler', (property) => {
+    const props = { [property]: 'alert(1)' } as Record<string, unknown> as DOMElementFactoryProps<'button'>;
+
+    const button = createElement('button', props);
+
+    expect(button.attributes).toHaveLength(0);
   });
 
   it('calls every handler of an array', () => {
