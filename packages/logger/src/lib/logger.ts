@@ -82,7 +82,7 @@ class ConsoleScopedLogger<S extends string> implements ScopedLogger<S> {
 
   public error: ScopedLogger<S>['error'] = (message, ...optionalParams): void => {
     if (isLoggerEnabled(this)) {
-      console.warn(`[[${this.loggerScope}]]\t`, message, ...optionalParams);
+      console.error(`[[${this.loggerScope}]]\t`, message, ...optionalParams);
     }
   };
 
@@ -114,7 +114,7 @@ class ConsoleScopedLogger<S extends string> implements ScopedLogger<S> {
 
 export const scopedLogger = (scope = DEFAULT_LOGGER): ScopedLogger => {
   const thisScope = scope || DEFAULT_LOGGER;
-  let logger = logInstances.get(scope);
+  let logger = logInstances.get(thisScope);
   if (!logger) {
     logger = Object.freeze(new ConsoleScopedLogger(thisScope));
     logInstances.set(thisScope, logger);
