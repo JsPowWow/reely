@@ -4,6 +4,12 @@
     "outDir": "./out-tsc/vitest",
     "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "vitest"],
     "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@reely/dommy",
+    "paths": {
+      "@reely/dommy/jsx-runtime": ["./src/lib/jsx-runtime.ts"],
+      "@reely/dommy/jsx-dev-runtime": ["./src/lib/jsx-runtime.ts"]
+    },
     "module": "esnext",
     "lib": ["es2021", "dom"],
     "forceConsistentCasingInFileNames": true,

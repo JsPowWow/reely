@@ -1,6 +1,7 @@
 export { defineDommyConfig } from './lib/config';
 export { createElement } from './lib/createElement';
 export { mount } from './lib/mount';
+export { For, type ForProps } from './lib/flow.for';
 export { createObjectReference } from '@reely/utils';
 export { addListener, addListeners } from './lib/utils/element.addListeners';
 export { appendTo, appendChildren, replaceChildrenOf } from './lib/utils/element.children';

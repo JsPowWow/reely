@@ -1,17 +1,7 @@
-import { isInstanceOf, isString } from '@reely/utils';
-
 import { withOwner } from './reactive/owner';
-import { toChildNodes } from './utils/element.children';
+import { toNodes } from './utils/element.children';
 
 import type { ChildDOMElement } from './types/dommy.types';
-
-/** The nodes a view puts into its parent: a fragment gives its children, a string a text node. */
-const toViewNodes = (child: Node | string): Node[] => {
-  if (isString(child)) {
-    return [document.createTextNode(child)];
-  }
-  return isInstanceOf(DocumentFragment, child) ? Array.from(child.childNodes) : [child];
-};
 
 /**
  * Renders a view into a parent and returns the function that takes it down: it removes the
@@ -23,7 +13,7 @@ const toViewNodes = (child: Node | string): Node[] => {
  */
 export const mount = (parent: ParentNode, render: () => ChildDOMElement): VoidFunction =>
   withOwner((dispose) => {
-    const nodes = toChildNodes([render()]).flatMap(toViewNodes);
+    const nodes = toNodes(render());
     parent.append(...nodes);
     return (): void => {
       dispose();

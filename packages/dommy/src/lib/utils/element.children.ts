@@ -1,5 +1,5 @@
 import type { PipeableFn } from '@reely/utils';
-import { hasProperty, isNonEmpty } from '@reely/utils';
+import { hasProperty, isInstanceOf, isNonEmpty, isString } from '@reely/utils';
 
 import { toChildNode } from './element.bindings';
 import { toValidChildDOMElement } from './element.utils';
@@ -56,6 +56,21 @@ export const replaceChildrenOf =
  */
 export const toChildNodes = (maybeChildren: readonly unknown[]): (Node | string)[] =>
   toValidChildDOMElement(maybeChildren).map(toChildNode);
+
+/**
+ * Converts anything renderable to the nodes it puts into a parent: a fragment gives its
+ * children and a string a text node, so each node can later be moved or removed on its own.
+ *
+ * @param {unknown} maybeChild - A child, possibly an array of children.
+ * @returns {Node[]} The nodes, in order.
+ */
+export const toNodes = (maybeChild: unknown): Node[] =>
+  toChildNodes([maybeChild]).flatMap((child) => {
+    if (isString(child)) {
+      return [document.createTextNode(child)];
+    }
+    return isInstanceOf(DocumentFragment, child) ? Array.from(child.childNodes) : [child];
+  });
 
 /**
  * Picks the children to render: the argument children when there are any, otherwise
