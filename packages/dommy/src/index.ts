@@ -28,5 +28,3 @@ export {
   untracked,
 } from './lib/reactive/preact-like/preact-like.signal';
 
-export * from './lib/router/router.types';
-export { createAsyncRouter } from './lib/router/async.router';

@@ -1,4 +1,5 @@
-import { a, createAsyncRouter, defineDommyConfig, p } from '@reely/dommy';
+import { a, defineDommyConfig, p } from '@reely/dommy';
+import { createAsyncRouter } from '@reely/dommy/router';
 import { scopedLogger } from '@reely/logger';
 import { isInstanceOf } from '@reely/utils';
 

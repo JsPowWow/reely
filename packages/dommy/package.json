@@ -1,6 +1,8 @@
 {
   "name": "@reely/dommy",
   "version": "0.0.5",
+  "description": "DOM elements from tag factories and JSX, bound to signals: no virtual DOM, one DOM node updated per change.",
+  "license": "MIT",
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.js",
@@ -20,14 +22,19 @@
       "default": "./dist/index.js"
     },
     "./jsx-runtime": {
-      "types": "./dist/lib/jsx-runtime.d.ts",
+      "types": "./dist/jsx-runtime.d.ts",
       "import": "./dist/jsx-runtime.js",
       "default": "./dist/jsx-runtime.js"
     },
     "./jsx-dev-runtime": {
-      "types": "./dist/lib/jsx-runtime.d.ts",
+      "types": "./dist/jsx-runtime.d.ts",
       "import": "./dist/jsx-runtime.js",
       "default": "./dist/jsx-runtime.js"
+    },
+    "./router": {
+      "types": "./dist/router.d.ts",
+      "import": "./dist/router.js",
+      "default": "./dist/router.js"
     }
   },
   "files": [
@@ -56,9 +63,8 @@
       }
     }
   },
-  "dependencies": {
+  "devDependencies": {
     "@reely/logger": "*",
     "@reely/utils": "*"
-  },
-  "devDependencies": {}
+  }
 }

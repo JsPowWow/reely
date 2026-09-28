@@ -1,4 +1,5 @@
-import type { JSX, Routes } from '@reely/dommy';
+import type { JSX } from '@reely/dommy';
+import type { Routes } from '@reely/dommy/router';
 import { TutorialPage } from '../pages/tutorial/tutorial.page';
 
 export const routes = [

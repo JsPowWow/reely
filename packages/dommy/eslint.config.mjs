@@ -13,6 +13,8 @@ export default [
             '{projectRoot}/vite.config.{js,ts,mjs,mts}',
             '{projectRoot}/vitest.config.{js,ts,mjs,mts}',
           ],
+          // bundled into dist with their types, so a consumer installs nothing but dommy
+          ignoredDependencies: ['@reely/utils', '@reely/logger'],
         },
       ],
     },

@@ -11,18 +11,18 @@ export default defineConfig(() => ({
     dts({
       entryRoot: 'src',
       tsconfigPath: './tsconfig.lib.json',
+      // one declaration file per entry, with the private @reely helpers inlined, so the
+      // published types import nothing a consumer cannot install
+      rollupTypes: true,
+      bundledPackages: ['@reely/utils', '@reely/logger'],
     }),
   ],
   build: {
-    // lib: {
-    //   entry: resolve(import.meta.dirname, 'src/index.ts'),
-    //   formats: ['es'],
-    //   fileName: 'index',
-    // },
     lib: {
       entry: {
         index: resolve(import.meta.dirname, 'src/index.ts'),
         'jsx-runtime': resolve(import.meta.dirname, 'src/lib/jsx-runtime.ts'),
+        router: resolve(import.meta.dirname, 'src/router.ts'),
       },
       fileName: (_format: string, entryName: string): string => `${entryName}.js`,
       formats: ['es' as const],
@@ -39,20 +39,4 @@ export default defineConfig(() => ({
     },
     sourcemap: true,
   },
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [],
-  // },
-  // test: {
-  //   name: '@reely/dommy',
-  //   watch: false,
-  //   globals: true,
-  //   environment: 'node',
-  //   include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-  //   reporters: ['default'],
-  //   coverage: {
-  //     reportsDirectory: './test-output/vitest/coverage',
-  //     provider: 'v8' as const,
-  //   },
-  // },
 }));

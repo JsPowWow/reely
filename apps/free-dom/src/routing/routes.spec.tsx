@@ -1,4 +1,4 @@
-import { createAsyncRouter } from '@reely/dommy';
+import { createAsyncRouter } from '@reely/dommy/router';
 import { isInstanceOf } from '@reely/utils';
 
 import { routes } from './routes';
