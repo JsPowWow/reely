@@ -8,7 +8,7 @@ import { isBooleanAttribute, setBoolAttribute } from './attributes/element.bool.
 import { isDataAttribute, setDataAttribute } from './attributes/element.data.attributes';
 import { isMappedAttribute, setMappedAttribute } from './attributes/element.mapped.attributes';
 import { hasStylesAttribute, setStyleAttributes } from './attributes/element.style.attributes';
-import { addEventListenerHandler, isEventListenerHandler } from './element.addListeners';
+import { addEventListenerHandler, isEventListenerHandler, toEventType } from './element.addListeners';
 
 import type {
   DOMElement,
@@ -72,7 +72,7 @@ export const assignProperties =
           break;
         }
         case isEventListenerHandler(property, value): {
-          addEventListenerHandler(element, property.slice(2), value, restProps.eventsAbortSignal);
+          addEventListenerHandler(element, toEventType(property), value, restProps.eventsAbortSignal);
           break;
         }
         case isBooleanAttribute(property): {

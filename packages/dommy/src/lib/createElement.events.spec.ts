@@ -11,6 +11,18 @@ describe('createElement: events', () => {
     expect(onclick.mock.calls[0]?.[0]).toMatchObject({ type: 'click', currentTarget: button });
   });
 
+  it('accepts camelCase handler names', () => {
+    const onClick = vi.fn();
+    const onKeydown = vi.fn();
+    const input = createElement('input', { onClick, onKeydown });
+
+    input.click();
+    input.dispatchEvent(new KeyboardEvent('keydown'));
+
+    expect(onClick).toHaveBeenCalledOnce();
+    expect(onKeydown).toHaveBeenCalledOnce();
+  });
+
   it('calls every handler of an array', () => {
     const first = vi.fn();
     const second = vi.fn();

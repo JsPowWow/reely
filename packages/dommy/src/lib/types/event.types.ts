@@ -5,9 +5,17 @@ export type DOMElementEventType = ValueOf<GlobalEventHandlers>;
 export type DOMElementEvent<Evt extends DOMElementEventType, Elt extends HTMLElement> = Omit<Evt, 'currentTarget'> &
   Readonly<{ currentTarget: Elt }>;
 
+/**
+ * Handler props of an element: `onclick` and its camelCase form `onClick`.
+ */
 export type DOMElementEvents<T extends HTMLElement> = {
-  [K in keyof GlobalEventHandlers]?: DOMElementEventHandlerProp<GlobalEventHandlers[K], T>;
+  [K in keyof GlobalEventHandlers as K | CamelCaseHandlerName<K>]?: DOMElementEventHandlerProp<
+    GlobalEventHandlers[K],
+    T
+  >;
 };
+
+type CamelCaseHandlerName<K> = K extends `on${infer EventType}` ? `on${Capitalize<EventType>}` : never;
 
 export type DOMElementEventHandler<Evt extends DOMElementEventType, Elt extends HTMLElement> = (
   event: DOMElementEvent<Evt, Elt>

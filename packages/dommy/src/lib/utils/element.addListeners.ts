@@ -25,6 +25,14 @@ export function isEventListenerHandler<Evt extends DOMElementEventType, Elt exte
   return maybeEventType.startsWith('on') && (isSomeFunction(maybeListener) || isEventListenerDescriptor(maybeListener));
 }
 
+/**
+ * Converts a handler property name to its DOM event type: `onclick` and `onClick` → `click`.
+ *
+ * @param {string} handlerProperty - The `on*` property name.
+ * @returns {string} The event type to listen to.
+ */
+export const toEventType = (handlerProperty: string): string => handlerProperty.slice(2).toLowerCase();
+
 export function addListener<Evt extends DOMElementEventType, Elt extends HTMLElement>(
   handleEvent: DOMElementEventHandler<Evt, Elt>,
   options?: AddEventListenerOptions
