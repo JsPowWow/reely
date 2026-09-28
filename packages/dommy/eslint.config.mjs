@@ -29,6 +29,7 @@ export default [
     },
   },
   {
-    ignores: ['**/out-tsc'],
+    // a consumer's code, checked by `consumer/check.mjs` with a consumer's tsconfig
+    ignores: ['**/out-tsc', 'consumer/src'],
   },
 ];
