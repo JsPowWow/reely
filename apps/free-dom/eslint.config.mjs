@@ -12,4 +12,11 @@ export default [
       'import/no-unresolved': ['error', { ignore: ['\\?raw$'] }],
     },
   },
+  {
+    // The step registry imports every step and its source, two modules per step.
+    files: ['src/pages/tutorial/tutorial.steps.ts'],
+    rules: {
+      'import/max-dependencies': 'off',
+    },
+  },
 ];

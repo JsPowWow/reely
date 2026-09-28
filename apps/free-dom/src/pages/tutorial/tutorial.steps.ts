@@ -1,8 +1,9 @@
-/* eslint-disable import/max-dependencies -- the step registry imports every step and its source */
 import type { JSX } from '@reely/dommy';
 
 import { ReelyLinks as FactoryLinks } from './steps/step1.factories';
 import factoriesSource from './steps/step1.factories.ts?raw';
+import { Counter as BatchCounter } from './steps/step10.batch';
+import batchSource from './steps/step10.batch.ts?raw';
 import { ReelyLinks as JsxLinks } from './steps/step2.jsx';
 import jsxSource from './steps/step2.jsx.tsx?raw';
 import { ReelyLinks as ComponentLinks } from './steps/step3.components';
@@ -15,10 +16,10 @@ import { Counter as BoundCounter } from './steps/step6.bind';
 import bindSource from './steps/step6.bind.ts?raw';
 import { Counter as DerivedCounter } from './steps/step7.derived';
 import derivedSource from './steps/step7.derived.ts?raw';
-import { Counter as TwoSignalCounter } from './steps/step8.two-signals';
-import twoSignalsSource from './steps/step8.two-signals.ts?raw';
-import { Counter as BatchCounter } from './steps/step9.batch';
-import batchSource from './steps/step9.batch.ts?raw';
+import { Counter as GetterCounter } from './steps/step8.getter';
+import getterSource from './steps/step8.getter.ts?raw';
+import { Counter as TwoSignalCounter } from './steps/step9.two-signals';
+import twoSignalsSource from './steps/step9.two-signals.ts?raw';
 
 /**
  * One step of the lesson: the markup steps build the same card three ways, then every step
@@ -79,7 +80,7 @@ export const tutorialSteps: readonly TutorialStep[] = [
     slug: 'bind',
     track: 'counter',
     title: 'Bind the signal',
-    lead: 'Pass the signal itself as a child, and dommy binds it to one text node. A click now changes that node’s text and nothing else: one text edit, no nodes added or removed. This is the whole idea of reely.',
+    lead: 'Pass the signal itself as a child, and dommy binds it to one text node. A click now changes that node’s text and nothing else: one text edit, no nodes added or removed. This is the whole idea of dommy.',
     Demo: BoundCounter,
     source: bindSource,
   },
@@ -87,14 +88,22 @@ export const tutorialSteps: readonly TutorialStep[] = [
     slug: 'derived',
     track: 'counter',
     title: 'Derived values',
-    lead: 'A computed value derives from signals, and a function in a prop is bound like a signal. The parity lands in a data attribute and −1 is disabled at zero: the board now counts attribute edits, and only when a value really changes.',
+    lead: 'A computed value derives from signals and is bound like one. The parity lands in a data attribute, so the board now counts attribute edits: one per click, because the parity changes on every click.',
     Demo: DerivedCounter,
     source: derivedSource,
   },
   {
+    slug: 'getter',
+    track: 'counter',
+    title: 'A getter in a prop',
+    lead: 'Any function in a prop is bound like a signal, so disabled follows the count without a computed. It is written only when its value really changes: once when the count leaves zero, and again when it comes back.',
+    Demo: GetterCounter,
+    source: getterSource,
+  },
+  {
     slug: 'two-signals',
     track: 'counter',
-    title: 'Two signals, two writes',
+    title: 'Two signals, the summary written twice',
     lead: 'Each press changes two signals, and the summary reads both. Updates are synchronous, so the summary is written after the first change and again after the second: three text edits per click.',
     Demo: TwoSignalCounter,
     source: twoSignalsSource,
@@ -103,7 +112,7 @@ export const tutorialSteps: readonly TutorialStep[] = [
     slug: 'batch',
     track: 'counter',
     title: 'Group writes with batch',
-    lead: 'batch applies both changes first and updates the page once when it returns. The summary is written once, so a click costs two text edits instead of three.',
+    lead: 'batch applies both changes first and runs each binding once when it returns. The summary is written once, so a click costs two text edits instead of three.',
     Demo: BatchCounter,
     source: batchSource,
   },

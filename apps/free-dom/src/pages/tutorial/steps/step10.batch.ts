@@ -2,7 +2,7 @@ import { batch, button, computed, div, output, p, signal } from '@reely/dommy';
 
 import css from './counter.module.css';
 
-// `batch` applies both writes first and updates the page once: the summary is written once.
+// `batch` applies both writes first, then runs each binding once: the summary is written once.
 export const Counter = (): HTMLElement => {
   const count = signal(0);
   const presses = signal(0);

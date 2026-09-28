@@ -335,6 +335,13 @@
   font-size: 0.875rem;
 }
 
+.keys kbd {
+  padding: 0 0.3em;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font: inherit;
+}
+
 /* Arrow keys are for presenting from a keyboard; touch screens do not need the hint. */
 @media (pointer: coarse) {
   .keys {

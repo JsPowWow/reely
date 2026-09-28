@@ -2,9 +2,11 @@ import { hasProperty, isInstanceOf } from '@reely/utils';
 
 const pagerRels = { ArrowLeft: 'prev', ArrowRight: 'next' } as const;
 
+const typingTags = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
+
 const isTypingTarget = (target: EventTarget | null): boolean =>
   isInstanceOf(HTMLElement, target) &&
-  (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
+  (target.isContentEditable || typingTags.has(target.tagName));
 
 /**
  * Follows the pager's `rel="prev"` or `rel="next"` link on ← or →, so a presenter can move

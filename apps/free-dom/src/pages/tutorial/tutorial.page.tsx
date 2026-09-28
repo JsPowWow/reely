@@ -54,7 +54,9 @@ export const TutorialPage = ({ slug, missingPath }: TutorialPageProps): JSX.Elem
             </li>
           ))}
         </ol>
-        <p className={css.keys}>Use ← and → to move between steps.</p>
+        <p className={css.keys}>
+          Use <kbd>←</kbd> and <kbd>→</kbd> to move between steps.
+        </p>
         <a className={css.back} href='https://github.com/JsPowWow/reely'>
           Source on GitHub
         </a>

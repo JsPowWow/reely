@@ -14,7 +14,7 @@ export type DOMElementAttributes<T extends HTMLElement> = Exclude<Partial<SafeAt
 
 /**
  * ID-reference ARIA attributes: `ARIAMixin` has them only as element arrays (`ariaLabelledByElements`),
- * so here they take space-separated ids, named so that they map to `aria-labelledby` and the like.
+ * so here they take space-separated ids; `ariaLabelledby` renders as `aria-labelledby`.
  */
 type AriaIdReference =
   | 'ariaActivedescendant'

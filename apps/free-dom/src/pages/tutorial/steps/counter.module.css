@@ -30,7 +30,7 @@
   cursor: pointer;
 }
 
-.counter button:hover {
+.counter button:not(:disabled):hover {
   background: var(--graphite);
   color: var(--asphalt);
 }
@@ -46,15 +46,9 @@
   cursor: not-allowed;
 }
 
-.counter button:disabled:hover {
-  background: transparent;
-  color: var(--slate);
-}
-
 /* An odd count gets the signal mark, so the bound attribute is visible too. */
 .value[data-parity='odd'] {
-  border-color: var(--signal-ink);
-  box-shadow: inset 0 -4px 0 var(--signal-ink);
+  border-bottom: 4px solid var(--signal-ink);
 }
 
 .summary {

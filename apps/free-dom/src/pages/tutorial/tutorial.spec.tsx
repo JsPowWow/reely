@@ -65,7 +65,8 @@ describe('tutorial', () => {
     it.each([
       ['signal', ['7', '0', '0', '6+2']],
       ['bind', ['7', '3+1', '0', '0']],
-      ['derived', ['7', '3+1', '4+1', '0']],
+      ['derived', ['7', '3+1', '3+1', '0']],
+      ['getter', ['7', '3+1', '4+1', '0']],
       ['two-signals', ['9', '9+3', '4+1', '0']],
       ['batch', ['9', '6+2', '4+1', '0']],
     ])('step "%s" makes the writes its lesson is about', async (slug, expected) => {
@@ -87,8 +88,8 @@ describe('tutorial', () => {
       expect(text?.textContent).toBe('2');
     });
 
-    it('step "derived" disables −1 at zero', async () => {
-      const meter = renderStep('derived');
+    it('step "getter" disables −1 at zero', async () => {
+      const meter = renderStep('getter');
       const minus = Array.from(meter.querySelectorAll('button')).find((item) => item.textContent === '−1');
 
       expect(minus?.disabled).toBe(true);
