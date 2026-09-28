@@ -1,29 +1,56 @@
-import { hasProperty, hasSome } from '@reely/utils';
+import { hasProperty, hasSome, isNil, isSomeFunction } from '@reely/utils';
+
+import { bindValue } from '../element.bindings';
+
+import type { DOMElementStyles } from '../../types/attributes.types';
 
 /**
- * Determines whether the given object has a `styles` attribute that is a partial implementation of `CSSStyleDeclaration`.
+ * Determines whether the given object has a `styles` attribute.
  *
  * @template T - The type of the props object to be checked.
  * @param {T} props - The object to be inspected for the presence of a `styles` property.
- * @returns {props is T & { styles: Partial<CSSStyleDeclaration> }} - A type guard indicating whether the `styles` property
- * exists and satisfies the condition of being a partial `CSSStyleDeclaration`.
+ * @returns {props is T & { styles: DOMElementStyles }} - A type guard indicating whether the `styles` property exists.
  */
-export const hasStylesAttribute = <T>(props: T): props is T & { styles: Partial<CSSStyleDeclaration> } => {
+export const hasStylesAttribute = <T>(props: T): props is T & { styles: DOMElementStyles } => {
   return hasProperty('styles', props) && hasSome(props.styles);
 };
 
 /**
- * Applies a set of CSS styles to a given HTML element.
+ * Sets one inline style: a camelCase property (`marginTop`) or a custom property (`--flip`);
+ * `null`/`undefined` removes it.
+ *
+ * @param {CSSStyleDeclaration} style - The inline style of an element.
+ * @param {string} name - The style name.
+ * @param {unknown} value - The style value.
+ * @returns {void}
+ */
+const setStyle = (style: CSSStyleDeclaration, name: string, value: unknown): void => {
+  const cssValue = isNil(value) ? '' : String(value);
+  if (name.startsWith('--')) {
+    style.setProperty(name, cssValue);
+  } else {
+    Reflect.set(style, name, cssValue);
+  }
+};
+
+/**
+ * Applies a set of CSS styles to a given HTML element; a signal or a getter keeps its style updated.
  *
  * @template Element Extends the HTMLElement type to ensure type safety for the provided element.
  * @param {Element} element The HTML element to which the styles will be applied.
- * @param {Partial<CSSStyleDeclaration>} styles An object representing the CSS styles to apply. Each key corresponds to a valid CSS property name (camelCase format), and the value specifies the style for that property.
+ * @param {DOMElementStyles} styles Styles by camelCase property or `--custom` property name.
  * @returns {HTMLElement} The updated HTML element with the specified styles applied.
  */
 export const setStyleAttributes = <Element extends HTMLElement>(
   element: Element,
-  styles: Partial<CSSStyleDeclaration>
+  styles: DOMElementStyles
 ): Element => {
-  Object.assign(element.style, { ...styles });
+  for (const [name, value] of Object.entries(styles)) {
+    if (isSomeFunction(value)) {
+      bindValue(value, (current) => setStyle(element.style, name, current));
+    } else {
+      setStyle(element.style, name, value);
+    }
+  }
   return element;
 };

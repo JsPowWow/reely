@@ -68,5 +68,24 @@ describe('createElement: reactive bindings', () => {
 
       expect(input.value).toBe('Flash');
     });
+
+    it('updates a bound style key, leaving the others', () => {
+      const color = signal('gold');
+      const cell = createElement('td', { styles: { color, fontWeight: 'bold' } });
+
+      color.value = 'silver';
+
+      expect(cell.style.color).toBe('silver');
+      expect(cell.style.fontWeight).toBe('bold');
+    });
+
+    it('updates a bound custom property', () => {
+      const flip = signal('0deg');
+      const cell = createElement('td', { styles: { '--flip': flip } });
+
+      flip.value = '90deg';
+
+      expect(cell.style.getPropertyValue('--flip')).toBe('90deg');
+    });
   });
 });

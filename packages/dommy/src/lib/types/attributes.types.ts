@@ -8,8 +8,18 @@ import type { HtmlElementEvent, ReactiveValue } from './dommy.types';
 export type MaybeReactive<T> = T | ReactiveValue<Nullable<T>>;
 
 export type DOMElementAttributes<T extends HTMLElement> = Exclude<Partial<SafeAttributes<T>>, HtmlElementEvent> & {
-  styles?: Partial<CSSStyleDeclaration>;
+  styles?: DOMElementStyles;
   aria?: Partial<ARIAMixin>;
+};
+
+/**
+ * Inline styles by camelCase property name (`marginTop`) or custom property name (`--flip`),
+ * each static or reactive.
+ */
+export type DOMElementStyles = {
+  [K in keyof CSSStyleDeclaration as CSSStyleDeclaration[K] extends string ? K : never]?: MaybeReactive<string>;
+} & {
+  [K in `--${string}`]?: MaybeReactive<string>;
 };
 
 type ExcludedDOMProps =
