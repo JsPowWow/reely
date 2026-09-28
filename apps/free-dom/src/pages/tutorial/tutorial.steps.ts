@@ -9,7 +9,7 @@ import jsxSource from './steps/step2.jsx.tsx?raw';
 import { ReelyLinks as ComponentLinks } from './steps/step3.components';
 import componentsSource from './steps/step3.components.tsx?raw';
 import { Counter as DomCounter } from './steps/step4.dom';
-import domSource from './steps/step4.dom.tsx?raw';
+import domSource from './steps/step4.dom.ts?raw';
 import { Counter as SignalCounter } from './steps/step5.signal';
 import signalSource from './steps/step5.signal.ts?raw';
 import { Counter as BoundCounter } from './steps/step6.bind';
@@ -64,7 +64,7 @@ export const tutorialSteps: readonly TutorialStep[] = [
     slug: 'dom',
     track: 'counter',
     title: 'Interactivity by hand',
-    lead: 'An element keeps its listeners, so a click can change the page. Here the counter keeps its number in a variable and redraws the output after every click. Watch the board under the demo: each click removes one text node and adds another.',
+    lead: 'An element keeps its listeners, so a click can change the page. The number sits in an output, the HTML element for a result; elementRef hands that element over, and the click handler redraws it by hand. Watch the board under the demo: each click removes one text node and adds another.',
     Demo: DomCounter,
     source: domSource,
   },
@@ -72,7 +72,7 @@ export const tutorialSteps: readonly TutorialStep[] = [
     slug: 'signal',
     track: 'counter',
     title: 'State in a signal',
-    lead: 'A signal is a value that knows who reads it. The effect reads count.value, so it runs again after every change and redraws the output. The code says what the page shows, but the board still counts a removed and an added node on every click.',
+    lead: 'A signal is a value that knows who reads it. A callback ref gets the output as soon as it exists and subscribes it with an effect: the effect reads count.value, so it runs again after every change and redraws the output. The code no longer redraws by hand, but the board still counts a removed and an added node on every click.',
     Demo: SignalCounter,
     source: signalSource,
   },
