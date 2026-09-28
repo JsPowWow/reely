@@ -2,7 +2,6 @@
 import { defineConfig } from 'vite';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
@@ -15,15 +14,7 @@ export default defineConfig(() => ({
     port: 4300,
     host: 'localhost',
   },
-  plugins: [
-    nxViteTsPaths(),
-    nxCopyAssetsPlugin(['*.md', 'netlify.toml', '*.svg']),
-    viteStaticCopy({ targets: [{ src: 'src/assets/*', dest: 'assets', rename: { stripBase: true } }] }),
-  ],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [],
-  // },
+  plugins: [nxViteTsPaths(), nxCopyAssetsPlugin(['*.md', 'netlify.toml', '*.svg'])],
   build: {
     outDir: './dist',
     emptyOutDir: true,
