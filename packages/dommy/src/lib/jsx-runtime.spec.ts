@@ -56,4 +56,14 @@ describe('jsx runtime (automatic)', () => {
     expect(row.outerHTML).toBe('<li title="t">one</li>');
     expect(component instanceof Node && component.textContent).toBe('Bolt');
   });
+
+  it('passes a component its props without `key`, and argument children as `children`', () => {
+    const Probe = (props: Record<string, unknown>): Node => document.createTextNode(JSON.stringify(props));
+    const read = (node: unknown): unknown => (node instanceof Node ? JSON.parse(node.textContent ?? '') : null);
+
+    expect(read(createElement(Probe, { name: 'Bolt', key: 'racer-1' }))).toEqual({ name: 'Bolt' });
+    expect(read(createElement(Probe, { children: 'kept' }))).toEqual({ children: 'kept' });
+    expect(read(createElement(Probe, {}, 'one'))).toEqual({ children: 'one' });
+    expect(read(createElement(Probe, {}, 'one', 'two'))).toEqual({ children: ['one', 'two'] });
+  });
 });

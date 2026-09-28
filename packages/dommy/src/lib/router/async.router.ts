@@ -32,14 +32,10 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
 
   constructor(routes: RouteConfig<CallableFunction> | RouteConfig<CallableFunction>[], options?: RouterOptions<R, C>) {
     assertIsValidRoutes(routes);
-    // console.log('routes!!!!!', routes);
     routes = Array.isArray(routes) ? routes : [routes];
-    // ^?
-    // this.options = { decode, ...options };
     this.options = { ...options };
     this.baseUrl = this.options.baseUrl || '';
-    this.root = routes; // { path: '', children: routes, parent: null };
-    //this.root.parent = null;
+    this.root = routes;
   }
 
   /**

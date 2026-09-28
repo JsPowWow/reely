@@ -7,17 +7,8 @@ import { assignElementRef, assignProperties } from './utils/element.properties';
 import type { ChildDOMElement, DOMElement, DOMElementFactoryProps, HtmlElementTag } from './types/dommy.types';
 import type { Component } from './types/jsx.types';
 
-/**
- * Builds an element from untyped props and children, checking them at runtime; the shared core
- * of `createElement` and the JSX runtime.
- *
- * @template Tag - The HTML tag name.
- * @param {Tag} tag - The tag to create.
- * @param {unknown} maybeProps - The props object, a child in place of props, or nothing.
- * @param {readonly unknown[]} maybeChildren - The argument children; `props.children` is used when empty.
- * @returns {DOMElement<Tag>} The new element.
- */
-export const buildElement = <Tag extends HtmlElementTag>(
+/** Builds an element from untyped props and children, checking them at runtime. */
+const buildElement = <Tag extends HtmlElementTag>(
   tag: Tag,
   maybeProps: unknown,
   maybeChildren: readonly unknown[]
@@ -63,6 +54,8 @@ export const renderElement = (
  * stay bound to the element. Also calls a component: JSX compiles `<Row {...props} key={id} />`
  * to this function.
  *
+ * @template Tag - The HTML tag name, when `type` is a tag.
+ * @template Props - The component props, when `type` is a component.
  * @param {HtmlElementTag | Component} type - The tag to create, or a component.
  * @param {unknown} props - Attributes, properties, listeners and options, or component props.
  * @param {ChildDOMElement[]} children - Children; `props.children` is used when there are none.
