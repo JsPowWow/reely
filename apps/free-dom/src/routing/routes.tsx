@@ -3,7 +3,6 @@ import { MainPage } from '../pages/mainPage';
 import { NxPage } from '../pages/nx/nxPage';
 import { Layout } from './Layout';
 import { TutorialPage } from '../pages/tutorial/tutorial.page';
-import { findTutorialStep } from '../pages/tutorial/tutorial.steps';
 
 const routes = [
   {
@@ -58,14 +57,8 @@ const routes = [
   {
     path: '/tutorial',
     children: [
-      { path: '', action: () => <TutorialPage index={0} /> },
-      {
-        path: '/:step',
-        action: (_ctx, { step }) => {
-          const index = findTutorialStep(String(step));
-          return index < 0 ? <h1>Not Found</h1> : <TutorialPage index={index} />;
-        },
-      },
+      { path: '', action: () => <TutorialPage /> },
+      { path: '/:step', action: (_ctx, { step }) => <TutorialPage slug={String(step)} /> },
     ],
   },
   { path: '/*all', action: () => <h1>Not Found</h1> },

@@ -36,6 +36,6 @@
 }
 
 .counter button:focus-visible {
-  outline: 3px solid var(--signal);
+  outline: 3px solid var(--graphite);
   outline-offset: 2px;
 }

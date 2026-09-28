@@ -67,12 +67,34 @@
   font-weight: 700;
 }
 
+/* Focus is graphite on light surfaces and signal yellow on the dark source panel. */
 .stepLink:focus-visible,
 .pager a:focus-visible,
 .home:focus-visible,
+.back:focus-visible {
+  outline: 3px solid var(--graphite);
+  outline-offset: 2px;
+}
+
 .source:focus-visible {
   outline: 3px solid var(--signal);
   outline-offset: 2px;
+}
+
+.back {
+  display: inline-block;
+  margin-top: 2rem;
+  color: var(--slate);
+  text-decoration: underline;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .stepNumber {
@@ -92,6 +114,7 @@
 }
 
 .heading {
+  position: relative;
   display: grid;
   grid-template-columns: auto 1fr;
   column-gap: 1.25rem;
@@ -210,9 +233,10 @@
 .pager a {
   color: var(--graphite);
   font-weight: 700;
+  text-decoration: underline;
 }
 
-.pager a:last-child {
+.next {
   margin-left: auto;
   text-align: right;
 }

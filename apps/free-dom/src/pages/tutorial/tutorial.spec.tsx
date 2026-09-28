@@ -1,5 +1,6 @@
 import { MutationMeter } from './mutation.meter';
 import { SourceView } from './source.view';
+import { TutorialPage } from './tutorial.page';
 import { tutorialSteps } from './tutorial.steps';
 
 const flushMutations = (): Promise<void> => new Promise((resolve) => setTimeout(resolve));
@@ -52,10 +53,47 @@ describe('tutorial', () => {
       expect(Array.from(view.querySelectorAll('ins')).map((line) => line.textContent)).toEqual(['const b = 2;\n']);
     });
 
+    it('marks structural lines too, by a line diff rather than a lookup', () => {
+      const view = SourceView({
+        source: 'run(() => {\n  one();\n});\nrun(() => {\n  two();\n});',
+        previous: 'run(() => {\n  one();\n});',
+      });
+
+      expect(Array.from(view.querySelectorAll('ins')).map((line) => line.textContent)).toEqual([
+        'run(() => {\n',
+        '  two();\n',
+        '});\n',
+      ]);
+    });
+
     it('marks nothing for the first step', () => {
       const view = SourceView({ source: 'const a = 1;' });
 
       expect(view.querySelectorAll('ins')).toHaveLength(0);
+    });
+  });
+
+  describe('TutorialPage', () => {
+    const renderPage = (slug?: string): Element => {
+      const page = TutorialPage({ slug });
+      if (!(page instanceof Element)) {
+        throw new Error('The page is not an element');
+      }
+      return page;
+    };
+
+    it('shows the first step by default and marks it as current', () => {
+      const page = renderPage();
+
+      expect(page.querySelector('h1')?.textContent).toBe(`Step 1. ${tutorialSteps[0]?.title}`);
+      expect(page.querySelector('nav a[href="/tutorial/dom"]')?.getAttribute('aria-current')).toBe('step');
+    });
+
+    it('explains an unknown step instead of rendering a demo', () => {
+      const page = renderPage('nope');
+
+      expect(page.querySelector('h1')?.textContent).toBe('There is no step “nope”');
+      expect(page.querySelector('figure')).toBeNull();
     });
   });
 });

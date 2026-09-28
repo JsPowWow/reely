@@ -1,5 +1,3 @@
-import type { Nullable } from '@reely/utils';
-
 import { Counter as DomCounter } from './steps/step1.dom';
 import domSource from './steps/step1.dom.tsx?raw';
 
@@ -23,6 +21,3 @@ export const tutorialSteps: readonly TutorialStep[] = [
     source: domSource,
   },
 ];
-
-export const findTutorialStep = (slug: Nullable<string>): number =>
-  tutorialSteps.findIndex((step) => step.slug === slug);

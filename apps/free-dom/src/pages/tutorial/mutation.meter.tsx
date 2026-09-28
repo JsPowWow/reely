@@ -4,46 +4,45 @@ import { exhaustiveGuard, isInstanceOf, isNil, isSomeFunction } from '@reely/uti
 
 import css from './tutorial.module.css';
 
-type MutationKind = 'text' | 'attribute' | 'node';
+type WriteKind = 'text' | 'attribute' | 'node';
 
-const flashColors = {
-  text: '#f5c518',
-  attribute: '#f5c518',
-  node: '#d64545',
-} as const satisfies Record<MutationKind, string>;
+interface DomWrite {
+  kind: WriteKind;
+  count: number;
+}
 
-const toMutationKind = (record: MutationRecord): MutationKind => {
+const toDomWrite = (record: MutationRecord): DomWrite => {
   switch (record.type) {
     case 'characterData':
-      return 'text';
+      return { kind: 'text', count: 1 };
     case 'attributes':
-      return 'attribute';
+      return { kind: 'attribute', count: 1 };
     case 'childList':
-      return 'node';
+      return { kind: 'node', count: record.addedNodes.length + record.removedNodes.length };
     default:
       return exhaustiveGuard(record.type);
   }
 };
 
-const toWriteCount = (record: MutationRecord): number =>
-  record.type === 'childList' ? record.addedNodes.length + record.removedNodes.length : 1;
-
 const prefersReducedMotion = (): boolean =>
   isSomeFunction(window.matchMedia) && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
- * Outlines the element a mutation touched, so the reader sees which DOM nodes a click rewrote.
+ * Outlines the element a mutation touched, in the page's `--signal` or `--flag` color;
+ * with reduced motion the outline shows and hides without fading.
  */
 const flash = (record: MutationRecord): void => {
   const element = isInstanceOf(Element, record.target) ? record.target : record.target.parentElement;
-  if (isNil(element) || prefersReducedMotion() || !isSomeFunction(element.animate)) {
+  if (isNil(element) || !isSomeFunction(element.animate)) {
     return;
   }
-  const color = flashColors[toMutationKind(record)];
+  const token = toDomWrite(record).kind === 'node' ? '--flag' : '--signal';
+  const outline = `3px solid ${getComputedStyle(element).getPropertyValue(token)}`;
+  const fadeOut = prefersReducedMotion() ? outline : '3px solid transparent';
   element.animate(
     [
-      { outline: `3px solid ${color}`, outlineOffset: '2px' },
-      { outline: '3px solid transparent', outlineOffset: '2px' },
+      { outline, outlineOffset: '2px' },
+      { outline: fadeOut, outlineOffset: '2px' },
     ],
     { duration: 700, easing: 'ease-out' }
   );
@@ -55,20 +54,21 @@ interface MutationMeterProps {
 
 /**
  * Wraps a demo: counts the DOM writes it makes by kind and flashes every node it touches.
+ * The observer lives as long as the page: tutorial links navigate with a full reload.
  */
 export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => {
   const writes = {
     text: signal(0),
     attribute: signal(0),
     node: signal(0),
-  } satisfies Record<MutationKind, Signal<number>>;
+  } satisfies Record<WriteKind, Signal<number>>;
 
   const stage = div({ className: css.stage }, children);
 
   new MutationObserver((records) => {
     batch(() => {
-      for (const record of records) {
-        writes[toMutationKind(record)].value += toWriteCount(record);
+      for (const { kind, count } of records.map(toDomWrite)) {
+        writes[kind].value += count;
       }
     });
     records.forEach(flash);

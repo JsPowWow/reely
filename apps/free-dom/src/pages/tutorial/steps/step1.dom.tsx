@@ -7,14 +7,15 @@ export const Counter = (): HTMLElement => {
   let count = 0;
   const value = output({ className: css.value }, count);
 
-  const show = (): void => {
+  const add = (step: number): void => {
+    count += step;
     replaceChildrenOf(value)(count);
   };
 
   return div(
     { className: css.counter },
     value,
-    button({ onClick: () => (count++, show()) }, '+1'),
-    button({ onClick: () => (count--, show()) }, '−1')
+    button({ onClick: () => add(1) }, '+1'),
+    button({ onClick: () => add(-1) }, '−1')
   );
 };

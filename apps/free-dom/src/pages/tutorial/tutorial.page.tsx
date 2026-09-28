@@ -1,3 +1,5 @@
+import { hasSome, isNil } from '@reely/utils';
+
 import { MutationMeter } from './mutation.meter';
 import { SourceView } from './source.view';
 import css from './tutorial.module.css';
@@ -6,7 +8,8 @@ import { tutorialSteps } from './tutorial.steps';
 import type { TutorialStep } from './tutorial.steps';
 
 interface TutorialPageProps {
-  index: number;
+  /** The step to show; the first step when omitted. */
+  slug?: string;
 }
 
 const stepHref = (step: TutorialStep): string => `/tutorial/${step.slug}`;
@@ -14,14 +17,11 @@ const stepHref = (step: TutorialStep): string => `/tutorial/${step.slug}`;
 /**
  * The lesson page: step rail, the live demo with its DOM write counter, and the step source.
  */
-export const TutorialPage = ({ index }: TutorialPageProps): JSX.Element => {
+export const TutorialPage = ({ slug }: TutorialPageProps): JSX.Element => {
+  const index = isNil(slug) ? 0 : tutorialSteps.findIndex((item) => item.slug === slug);
   const step = tutorialSteps[index];
-  if (!step) {
-    return <h1>Step not found</h1>;
-  }
   const previous = tutorialSteps[index - 1];
   const next = tutorialSteps[index + 1];
-  const { Demo } = step;
 
   return (
     <div className={css.tutorial}>
@@ -43,25 +43,48 @@ export const TutorialPage = ({ index }: TutorialPageProps): JSX.Element => {
             </li>
           ))}
         </ol>
+        <a className={css.back} href='/'>
+          Back to free-dom
+        </a>
       </nav>
       <main className={css.main}>
-        <header className={css.heading}>
-          <span className={css.bigNumber} aria={{ ariaHidden: 'true' }}>
-            {index + 1}
-          </span>
-          <h1 className={css.title}>{step.title}</h1>
-          <p className={css.lead}>{step.lead}</p>
-        </header>
-        <section className={css.panels} aria={{ ariaLabel: 'Demo and source' }}>
-          <MutationMeter>
-            <Demo />
-          </MutationMeter>
-          <SourceView source={step.source} previous={previous?.source} />
-        </section>
-        <footer className={css.pager}>
-          {previous && <a href={stepHref(previous)}>Previous: {previous.title}</a>}
-          {next && <a href={stepHref(next)}>Next: {next.title}</a>}
-        </footer>
+        {isNil(step) ? (
+          <header className={css.heading}>
+            <h1 className={css.title}>There is no step “{slug}”</h1>
+            <p className={css.lead}>Pick a step from the list, or start from the first one.</p>
+          </header>
+        ) : (
+          [
+            <header className={css.heading}>
+              <span className={css.bigNumber} aria={{ ariaHidden: 'true' }}>
+                {index + 1}
+              </span>
+              <h1 className={css.title}>
+                <span className={css.visuallyHidden}>Step {index + 1}. </span>
+                {step.title}
+              </h1>
+              <p className={css.lead}>{step.lead}</p>
+            </header>,
+            <section className={css.panels} aria={{ ariaLabel: 'Demo and source' }}>
+              <MutationMeter>
+                <step.Demo />
+              </MutationMeter>
+              <SourceView source={step.source} previous={previous?.source} />
+            </section>,
+            <footer className={css.pager}>
+              {hasSome(previous) && (
+                <a className={css.previous} href={stepHref(previous)}>
+                  Previous: {previous.title}
+                </a>
+              )}
+              {hasSome(next) && (
+                <a className={css.next} href={stepHref(next)}>
+                  Next: {next.title}
+                </a>
+              )}
+            </footer>,
+          ]
+        )}
       </main>
     </div>
   );
