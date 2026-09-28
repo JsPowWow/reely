@@ -13,6 +13,6 @@ createAsyncRouter(routes)
   });
 
 defineDommyConfig({
-  debug: true,
+  debug: import.meta.env.DEV,
   logger: scopedLogger('dommy'),
 });

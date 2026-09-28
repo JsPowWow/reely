@@ -11,6 +11,8 @@ import type { TutorialStep } from './tutorial.steps';
 interface TutorialPageProps {
   /** The step to show; the first step when omitted. */
   slug?: string;
+  /** A URL that has no page: the course explains it instead of showing a step. */
+  missingPath?: string;
 }
 
 const stepHref = (step: TutorialStep): string => `/tutorial/${step.slug}`;
@@ -18,8 +20,8 @@ const stepHref = (step: TutorialStep): string => `/tutorial/${step.slug}`;
 /**
  * The lesson page: step rail, the live demo with its DOM write counter, and the step source.
  */
-export const TutorialPage = ({ slug }: TutorialPageProps): JSX.Element => {
-  const index = isNil(slug) ? 0 : tutorialSteps.findIndex((item) => item.slug === slug);
+export const TutorialPage = ({ slug, missingPath }: TutorialPageProps): JSX.Element => {
+  const index = hasSome(missingPath) ? -1 : isNil(slug) ? 0 : tutorialSteps.findIndex((item) => item.slug === slug);
   const step = tutorialSteps[index];
   const previous = tutorialSteps[index - 1];
   const next = tutorialSteps[index + 1];
@@ -28,6 +30,9 @@ export const TutorialPage = ({ slug }: TutorialPageProps): JSX.Element => {
     -1
   );
   const trackPrevious = tutorialSteps[trackIndex];
+  const first = tutorialSteps[0];
+
+  document.title = isNil(step) ? 'Not found | reely' : `Step ${index + 1}. ${step.title} | reely`;
 
   return (
     <div className={css.tutorial}>
@@ -55,9 +60,16 @@ export const TutorialPage = ({ slug }: TutorialPageProps): JSX.Element => {
       </nav>
       <main className={css.main}>
         {isNil(step) ? (
-          <header className={css.heading}>
-            <h1 className={css.title}>There is no step “{slug}”</h1>
-            <p className={css.lead}>Pick a step from the list, or start from the first one.</p>
+          <header className={css.missing}>
+            <h1 className={css.title}>
+              {hasSome(missingPath) ? `There is no page at ${missingPath}` : `There is no step “${slug}”`}
+            </h1>
+            <p className={css.lead}>Pick a step from the list, or start from the beginning.</p>
+            {hasSome(first) && (
+              <a className={css.start} href={stepHref(first)}>
+                Start with step 1
+              </a>
+            )}
           </header>
         ) : (
           [

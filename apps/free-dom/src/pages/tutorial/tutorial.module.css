@@ -118,6 +118,32 @@
   align-items: end;
 }
 
+/* A URL or step that does not exist: title, what to do, and the way back to step 1. */
+.missing {
+  display: grid;
+  justify-items: start;
+  gap: 1rem;
+}
+
+.start {
+  display: inline-block;
+  padding: 0.6rem 1rem;
+  border-radius: 4px;
+  background: var(--graphite);
+  color: var(--asphalt);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.start:hover {
+  background: var(--slate);
+}
+
+.start:focus-visible {
+  outline: 3px solid var(--graphite);
+  outline-offset: 2px;
+}
+
 .bigNumber {
   grid-row: span 2;
   font-family: var(--display);

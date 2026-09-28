@@ -11,5 +11,5 @@ export const routes = [
       { path: '/:step', action: (_ctx, { step }) => <TutorialPage slug={String(step)} /> },
     ],
   },
-  { path: '/*all', action: () => <h1>Not Found</h1> },
+  { path: '/*rest', action: (ctx) => <TutorialPage missingPath={ctx.pathname} /> },
 ] as const satisfies Routes<JSX.Element>;

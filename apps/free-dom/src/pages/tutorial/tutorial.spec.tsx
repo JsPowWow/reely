@@ -150,11 +150,19 @@ describe('tutorial', () => {
       expect(dom.querySelectorAll('pre ins')).toHaveLength(0);
     });
 
-    it('explains an unknown step instead of rendering a demo', () => {
+    it('names the step in the document title', () => {
+      renderPage('jsx');
+
+      expect(document.title).toBe('Step 2. The same markup in JSX | reely');
+    });
+
+    it('explains an unknown step and links to the first one instead of rendering a demo', () => {
       const page = renderPage('nope');
 
       expect(page.querySelector('h1')?.textContent).toBe('There is no step “nope”');
+      expect(page.querySelector('main a[href="/tutorial/factories"]')?.textContent).toBe('Start with step 1');
       expect(page.querySelector('figure')).toBeNull();
+      expect(document.title).toBe('Not found | reely');
     });
   });
 });
