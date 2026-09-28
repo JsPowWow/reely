@@ -99,6 +99,16 @@ describe('createElement: reactive bindings', () => {
       expect(cell.style.fontWeight).toBe('bold');
     });
 
+    it('updates a bound `aria` attribute and removes it on null', () => {
+      const current = signal<string | null>('step');
+      const link = createElement('a', { aria: { ariaCurrent: current } });
+      expect(link.getAttribute('aria-current')).toBe('step');
+
+      current.value = null;
+
+      expect(link.hasAttribute('aria-current')).toBe(false);
+    });
+
     it('updates a bound custom property', () => {
       const flip = signal('0deg');
       const cell = createElement('td', { styles: { '--flip': flip } });

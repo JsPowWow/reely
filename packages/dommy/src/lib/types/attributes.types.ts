@@ -9,7 +9,14 @@ export type MaybeReactive<T> = T | ReactiveValue<Nullable<T>>;
 
 export type DOMElementAttributes<T extends HTMLElement> = Exclude<Partial<SafeAttributes<T>>, HtmlElementEvent> & {
   styles?: DOMElementStyles;
-  aria?: Partial<ARIAMixin>;
+  aria?: DOMElementAria;
+};
+
+/**
+ * ARIA values by `ARIAMixin` property name (`role`, `ariaLabel`, `ariaCurrent`…), each static or reactive.
+ */
+export type DOMElementAria = {
+  [K in keyof ARIAMixin as ARIAMixin[K] extends Nullable<string> ? K : never]?: MaybeReactive<string>;
 };
 
 /**

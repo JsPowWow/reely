@@ -54,10 +54,12 @@ describe('createElement: properties and attributes', () => {
     expect(element.hasAttribute('styles')).toBe(false);
   });
 
-  it('assigns `aria` properties to the element', () => {
-    const element = createElement('div', { aria: { role: 'status' } });
+  it('renders `aria` props as `role` and `aria-*` attributes', () => {
+    const element = createElement('a', { aria: { role: 'status', ariaCurrent: 'step', ariaLabel: 'Step 1' } });
 
-    expect(element.role).toBe('status');
+    expect(element.getAttribute('role')).toBe('status');
+    expect(element.getAttribute('aria-current')).toBe('step');
+    expect(element.getAttribute('aria-label')).toBe('Step 1');
     expect(element.hasAttribute('aria')).toBe(false);
   });
 
