@@ -25,6 +25,21 @@ describe('createElement: properties and attributes', () => {
     expect(disabled.disabled).toBe(true);
   });
 
+  describe('live state', () => {
+    it('sets `value` as a property', () => {
+      const textarea = createElement('textarea', { value: 'draft' });
+
+      expect(textarea.value).toBe('draft');
+    });
+
+    it('sets `indeterminate`, which has no attribute', () => {
+      const input = createElement('input', { type: 'checkbox', indeterminate: true });
+
+      expect(input.indeterminate).toBe(true);
+      expect(input.hasAttribute('indeterminate')).toBe(false);
+    });
+  });
+
   it('sets `data-*` attributes', () => {
     const element = createElement('li', { 'data-racer': 'bolt' });
 

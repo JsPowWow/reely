@@ -1,17 +1,14 @@
 import { removeAttribute, setAttribute } from './element.attributes';
 
 const booleanAttributes = [
-  'checked',
   'disabled',
   'readonly',
   'required',
   'hidden',
   'multiple',
   'autofocus',
-  'selected',
   'controls',
   'loop',
-  'muted',
   'playsinline',
   'open',
 ] as const;
