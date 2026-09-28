@@ -19,6 +19,19 @@ const writeLabels = {
   node: 'Nodes added or removed',
 } as const satisfies Record<WriteKind, string>;
 
+/** How the announcement names one write of a kind, and several. */
+const writeNouns = {
+  text: ['text edit', 'text edits'],
+  attribute: ['attribute edit', 'attribute edits'],
+  node: ['node added or removed', 'nodes added or removed'],
+} as const satisfies Record<WriteKind, readonly [string, string]>;
+
+const countSignals = (): Record<WriteKind, Signal<number>> => ({
+  text: signal(0),
+  attribute: signal(0),
+  node: signal(0),
+});
+
 const toDomWrite = (record: MutationRecord): DomWrite => {
   switch (record.type) {
     case 'characterData':
@@ -50,10 +63,7 @@ const countNodes = (root: Node): number => {
 const describeChange = (delta: Readonly<Record<WriteKind, number>>): string => {
   const parts = writeKinds
     .filter((kind) => delta[kind] > 0)
-    .map((kind) => {
-      const label = writeLabels[kind].toLowerCase();
-      return `${delta[kind]} ${delta[kind] === 1 ? label.replace('edits', 'edit') : label}`;
-    });
+    .map((kind) => `${delta[kind]} ${writeNouns[kind][delta[kind] === 1 ? 0 : 1]}`);
   return parts.length === 0 ? '' : `Last change: ${parts.join(', ')}.`;
 };
 
@@ -91,8 +101,8 @@ interface MutationMeterProps {
  * The observer lives as long as the page: tutorial links navigate with a full reload.
  */
 export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => {
-  const totals = { text: signal(0), attribute: signal(0), node: signal(0) } satisfies Record<WriteKind, Signal<number>>;
-  const deltas = { text: signal(0), attribute: signal(0), node: signal(0) } satisfies Record<WriteKind, Signal<number>>;
+  const totals = countSignals();
+  const deltas = countSignals();
   const announcement = signal('');
 
   const stage = div({ className: css.stage }, children);

@@ -62,11 +62,16 @@ interface SourceViewProps {
   previous?: Nullable<{ source: string; number: number }>;
 }
 
+let sourceViews = 0;
+
 /**
  * Shows the source of a step under a caption that says what is marked: the lines added since
  * the previous step of the same demo.
  */
 export const SourceView = ({ source, previous }: SourceViewProps): HTMLElement => {
+  // ids unique per view, for the listing's accessible name
+  const titleId = `source-title-${++sourceViews}`;
+  const captionId = `source-caption-${sourceViews}`;
   const lines = source.trimEnd().split('\n');
   const inserted = isNil(previous)
     ? lines.map(() => false)
@@ -75,14 +80,14 @@ export const SourceView = ({ source, previous }: SourceViewProps): HTMLElement =
     { className: css.sourcePanel },
     p(
       { className: css.sourceCaption },
-      span({ id: 'source-title', className: css.visuallyHidden }, 'Source'),
+      span({ id: titleId, className: css.visuallyHidden }, 'Source'),
       span(
-        { id: 'source-caption' },
+        { id: captionId },
         isNil(previous) ? 'A new demo starts here' : `Highlighted: new since step ${previous.number}`
       )
     ),
     pre(
-      { className: css.source, aria: { ariaLabelledby: 'source-title source-caption' } },
+      { className: css.source, aria: { ariaLabelledby: `${titleId} ${captionId}` } },
       code(
         null,
         lines.map((line, index) =>
