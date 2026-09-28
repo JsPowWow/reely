@@ -8,6 +8,16 @@ on:
         required: false
         default: false
         type: boolean
+      projects:
+        description: 'Projects to publish, comma separated'
+        required: true
+        default: '@reely/dommy'
+        type: string
+      dist-tag:
+        description: 'npm dist-tag: next for a pre-release, latest for a release'
+        required: true
+        default: 'next'
+        type: string
 
 jobs:
   publish:
@@ -35,7 +45,9 @@ jobs:
         run: |
           git config --global user.email "js.developer.powwow@gmail.com"
           git config --global user.name "JsPowWow"
-          npx nx release publish ${{ inputs.dry-run == true && '--dry-run --verbose' || '--verbose' }}
+          npx nx release publish --projects "$PROJECTS" --tag "$DIST_TAG" ${{ inputs.dry-run == true && '--dry-run --verbose' || '--verbose' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+          PROJECTS: ${{ inputs.projects }}
+          DIST_TAG: ${{ inputs.dist-tag }}
           NPM_CONFIG_PROVENANCE: true
