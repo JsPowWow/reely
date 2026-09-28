@@ -51,7 +51,7 @@ export const assignProperties =
     props: Nullable<DOMElementFactoryProps<Tag>>
   ): PipeableFn<Element> =>
   (element: Element) => {
-    if (isNil(props) || isPrimitiveValue(props) || isInstanceOf(Node, props)) {
+    if (isNil(props) || isPrimitiveValue(props) || isInstanceOf(Node, props) || isSomeFunction(props)) {
       return element;
     }
 

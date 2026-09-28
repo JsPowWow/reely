@@ -1,5 +1,5 @@
 import type { Nil } from '@reely/utils';
-import { isInstanceOf, isNil, isPrimitiveValue } from '@reely/utils';
+import { isInstanceOf, isNil, isPrimitiveValue, isSomeFunction } from '@reely/utils';
 
 import type { ChildDOMElement, ValidChildDOMElement } from '../types/dommy.types';
 
@@ -18,15 +18,15 @@ export const isFalsyElement = (element: unknown): element is Nil | false => isNi
  * Determines whether the given value is a valid child DOM node.
  *
  * A valid child DOM node can either be an instance of a `Node`
- * (e.g., HTMLElement, Text, Comment, etc.) or a primitive value
+ * (e.g., HTMLElement, Text, Comment, etc.), a primitive value
  * (e.g., string, number, boolean, or null/undefined) that can
- * be used as content in a DOM structure.
+ * be used as content in a DOM structure, or a reactive value (a signal or a getter).
  *
  * @param {unknown} child - The value to be checked for validity as a child DOM node.
  * @returns {child is ValidChildDOMElement} True if the value is a valid child DOM node; otherwise, false.
  */
 export const isValidChildDOMNode = (child: unknown): child is ValidChildDOMElement =>
-  isInstanceOf(Node, child) || isPrimitiveValue(child);
+  isInstanceOf(Node, child) || isPrimitiveValue(child) || isSomeFunction(child);
 
 /**
  * Determines whether a given child node is a valid, renderable DOM element.

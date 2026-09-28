@@ -2,18 +2,17 @@ import { setPrototype } from '@reely/utils';
 
 import { reelx } from '../reelx/reelx.core';
 
-import type { Reelx, RlxDerivedState, RlxState, RlxSubscribe } from '../reelx/reelx.types';
+import type { Reelx, RlxState, RlxSubscribe } from '../reelx/reelx.types';
 
 export interface Signal<T> extends RlxSubscribe<T> {
-  (initial: T): RlxState<T>;
-  (initial?: T): RlxState<T>;
+  (): T;
   get value(): T;
   set value(value: T);
   // peek(): T;
 }
 
 export interface Computed<T> extends RlxSubscribe<T> {
-  (fn: () => T, equal?: (prev: T, next: T) => boolean): RlxDerivedState<T>;
+  (): T;
   get value(): T;
   // peek(): T;
 }

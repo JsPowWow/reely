@@ -1,6 +1,7 @@
 import type { Nullable, PipeableFn } from '@reely/utils';
-import { isInstanceOf, isNonEmpty } from '@reely/utils';
+import { isNonEmpty } from '@reely/utils';
 
+import { toChildNode } from './element.bindings';
 import {
   isFalsyElement,
   isValidChildDOMNode,
@@ -46,7 +47,7 @@ export const appendTo =
   <Element extends HTMLElement>(parent: Element): PipeableFn<ValidChildDOMElement> =>
   (child) => {
     if (!isFalsyElement(child)) {
-      parent.append(isInstanceOf(Node, child) ? child : String(child));
+      parent.append(toChildNode(child));
     }
 
     return parent;
@@ -55,9 +56,7 @@ export const appendTo =
 export const replaceChildrenOf =
   <Element extends HTMLElement>(parent: Element): PipeableFn<ValidChildDOMElement> =>
   (...children: ValidChildDOMElement[]) => {
-    const newChildren = toValidChildDOMElement(children)
-      .filter(isValidRenderableChildDOMNode)
-      .map((c) => (isInstanceOf(Node, c) ? c : String(c)));
+    const newChildren = toValidChildDOMElement(children).filter(isValidRenderableChildDOMNode).map(toChildNode);
     parent.replaceChildren(...newChildren);
     return parent;
   };
