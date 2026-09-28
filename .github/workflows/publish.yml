@@ -41,6 +41,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # `nx release publish` does not run the build: without this step the tarball has no `dist`
+      - name: Build packages
+        run: npx nx run-many -t build --projects "$PROJECTS"
+        env:
+          PROJECTS: ${{ inputs.projects }}
+
       - name: Publish packages
         run: |
           git config --global user.email "js.developer.powwow@gmail.com"
