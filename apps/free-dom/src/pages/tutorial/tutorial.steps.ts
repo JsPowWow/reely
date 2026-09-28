@@ -1,5 +1,3 @@
-import type { JSX } from '@reely/dommy';
-
 import { ReelyLinks as FactoryLinks } from './steps/step1.factories';
 import factoriesSource from './steps/step1.factories.ts?highlight';
 import { Counter as TwoSignalCounter } from './steps/step10.two-signals';
@@ -39,7 +37,7 @@ export interface TutorialStep {
   track: 'links' | 'counter' | 'board';
   title: string;
   lead: string;
-  Demo: () => JSX.Element;
+  Demo: () => Node;
   /** The module that renders the demo, highlighted at build time. */
   source: SourceLines;
 }

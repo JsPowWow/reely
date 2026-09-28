@@ -1,5 +1,3 @@
-import type { JSX } from '@reely/dommy';
-
 import arrowIcon from '../../../assets/arrow.svg';
 import codeIcon from '../../../assets/code.svg';
 import docIcon from '../../../assets/doc.svg';
@@ -7,7 +5,7 @@ import flagIcon from '../../../assets/flag.svg';
 import css from './links.module.css';
 
 // JSX compiles to the same calls: `<a href='…'>` becomes `jsx('a', { href: '…', children })`.
-export const ReelyLinks = (): JSX.Element => (
+export const ReelyLinks = (): Node => (
   <section className={css.card}>
     <h2>Where reely lives</h2>
     <a className={css.link} href='https://github.com/JsPowWow/reely'>

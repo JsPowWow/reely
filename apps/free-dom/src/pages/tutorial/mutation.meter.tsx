@@ -1,4 +1,4 @@
-import type { ChildDOMElement, Signal } from '@reely/dommy';
+import type { ReelyNode, Signal } from '@reely/dommy';
 import { batch, dd, div, dl, dt, figcaption, figure, onCleanup, p, signal, span } from '@reely/dommy';
 import { exhaustiveGuard, isInstanceOf, isNil, isSomeFunction } from '@reely/utils';
 
@@ -110,7 +110,7 @@ const flash = (record: MutationRecord): void => {
 };
 
 interface MutationMeterProps {
-  children?: ChildDOMElement;
+  children?: ReelyNode;
 }
 
 /**

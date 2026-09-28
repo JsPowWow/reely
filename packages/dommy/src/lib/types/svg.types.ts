@@ -1,7 +1,7 @@
 import type { Nullable } from '@reely/utils';
 
 import type { DOMElementAria, DOMElementStyles, MaybeReactive } from './attributes.types';
-import type { ChildDOMElement, ElementRef, ReactiveChildDOMElement, StaticChildDOMElement } from './dommy.types';
+import type { ElementRef, ReactiveReelyNode, ReelyNode, StaticReelyNode } from './dommy.types';
 import type { DOMElementEvents } from './event.types';
 
 /**
@@ -125,7 +125,7 @@ export type SvgElementProps<Tag extends SvgElementTag, Elt extends SVGElement = 
     aria?: DOMElementAria;
     /** Identity of a list item; never rendered. */
     key?: PropertyKey;
-    children?: ChildDOMElement;
+    children?: ReelyNode;
     eventsAbortSignal?: AbortSignal;
     elementRef?: ElementRef<Elt>;
   };
@@ -133,10 +133,10 @@ export type SvgElementProps<Tag extends SvgElementTag, Elt extends SVGElement = 
 /** The first argument of an SVG tag factory: props, or a child in place of props. */
 export type SvgElementFactoryProps<Tag extends SvgElementTag> =
   | SvgElementProps<Tag>
-  | StaticChildDOMElement
-  | ReactiveChildDOMElement;
+  | StaticReelyNode
+  | ReactiveReelyNode;
 
 export type SvgElementFactoryFunction<Tag extends SvgElementTag> = (
   props?: Nullable<SvgElementFactoryProps<Tag>>,
-  ...children: ChildDOMElement[]
+  ...children: ReelyNode[]
 ) => SvgElement<Tag>;

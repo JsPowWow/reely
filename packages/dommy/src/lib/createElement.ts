@@ -1,11 +1,11 @@
 import type { Nullable } from '@reely/utils';
 import { isPlainObject, isSomeFunction, pipe } from '@reely/utils';
 
-import { appendChildren, toElementChildren } from './utils/element.children';
+import { appendChildren, toElementChildren, toNode } from './utils/element.children';
 import { assignElementRef, assignProperties } from './utils/element.properties';
 import { isSvgTag, SVG_NAMESPACE } from './utils/element.svg';
 
-import type { ChildDOMElement, DOMElement, DOMElementFactoryProps, HtmlElementTag } from './types/dommy.types';
+import type { DOMElement, DOMElementFactoryProps, HtmlElementTag, ReelyNode } from './types/dommy.types';
 import type { Component } from './types/jsx.types';
 import type { SvgElement, SvgElementProps, SvgElementTag } from './types/svg.types';
 
@@ -53,15 +53,15 @@ const toComponentProps = (maybeProps: unknown, maybeChildren: readonly unknown[]
  * @param {HtmlElementTag | SvgElementTag | Component} type - A tag name or a component.
  * @param {unknown} maybeProps - Props, `key` and `children` possibly included.
  * @param {readonly unknown[]} maybeChildren - Argument children, if any.
- * @returns {ChildDOMElement} The element, or what the component returned.
+ * @returns {Node} The element, or what the component returned as one node.
  */
 export const renderElement = (
   type: HtmlElementTag | SvgElementTag | Component,
   maybeProps: unknown,
   maybeChildren: readonly unknown[]
-): ChildDOMElement => {
+): Node => {
   if (isSomeFunction(type)) {
-    return type(toComponentProps(maybeProps, maybeChildren));
+    return toNode(type(toComponentProps(maybeProps, maybeChildren)));
   }
   return isSvgTag(type) ? buildSvgElement(type, maybeProps, maybeChildren) : buildElement(type, maybeProps, maybeChildren);
 };
@@ -75,28 +75,28 @@ export const renderElement = (
  * @template Props - The component props, when `type` is a component.
  * @param {HtmlElementTag | Component} type - The tag to create, or a component.
  * @param {unknown} props - Attributes, properties, listeners and options, or component props.
- * @param {ChildDOMElement[]} children - Children; `props.children` is used when there are none.
- * @returns {ChildDOMElement} The new element, or what the component returned.
+ * @param {ReelyNode[]} children - Children; `props.children` is used when there are none.
+ * @returns {Node} The new element, or what the component returned as one node.
  */
 export function createElement<Tag extends HtmlElementTag>(
   tag: Tag,
   props?: Nullable<DOMElementFactoryProps<Tag>>,
-  ...children: ChildDOMElement[]
+  ...children: ReelyNode[]
 ): DOMElement<Tag>;
 export function createElement<Tag extends SvgElementTag>(
   tag: Tag,
   props?: Nullable<SvgElementProps<Tag>>,
-  ...children: ChildDOMElement[]
+  ...children: ReelyNode[]
 ): SvgElement<Tag>;
 export function createElement<Props extends object>(
-  component: (props: Props) => ChildDOMElement,
+  component: (props: Props) => ReelyNode,
   props: Props & { key?: PropertyKey },
-  ...children: ChildDOMElement[]
-): ChildDOMElement;
+  ...children: ReelyNode[]
+): Node;
 export function createElement(
   type: HtmlElementTag | SvgElementTag | Component,
   props?: unknown,
-  ...children: ChildDOMElement[]
-): ChildDOMElement {
+  ...children: ReelyNode[]
+): Node {
   return renderElement(type, props, children);
 }

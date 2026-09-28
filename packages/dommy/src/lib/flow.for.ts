@@ -8,7 +8,7 @@ import { toNodes } from './utils/element.children';
 import { createAnchors, insertBefore, rangeOf, removeNodes } from './utils/element.range';
 
 import type { Signal } from './reactive/preact-like/preact-like.signal';
-import type { ChildDOMElement, ReactiveValue } from './types/dommy.types';
+import type { ReactiveValue, ReelyNode } from './types/dommy.types';
 
 export interface ForProps<T> {
   /** The items: a signal or a getter of an array. */
@@ -19,7 +19,7 @@ export interface ForProps<T> {
    */
   by: (item: T) => PropertyKey;
   /** Renders one row, once per key; `item` and `index` follow later updates of that key. */
-  children: (item: ReactiveValue<T>, index: ReactiveValue<number>) => ChildDOMElement;
+  children: (item: ReactiveValue<T>, index: ReactiveValue<number>) => ReelyNode;
 }
 
 interface Row<T> {

@@ -64,15 +64,24 @@ const same = (
 - `elementRef` gets the element: an object from `createObjectReference()` or a function `(element) => void`.
 - Text is always inserted as text, so user input cannot become markup.
 
-A component is a function of props that returns nodes. It runs once.
+## Components
+
+A component is a function of props that runs once. It returns a `ReelyNode`, the counterpart of React's `ReactNode`: a node, text, a number, a getter, nothing (`null`, `undefined`, a boolean) or a list of these. `children` are a `ReelyNode` too.
+
+A JSX expression is always a `Node`, ready for `append`. A tag gives its element; a component that returns anything else gives a `DocumentFragment` holding it.
 
 ```tsx
-import type { ChildDOMElement } from '@reely/dommy';
+import { signal } from '@reely/dommy';
+import type { ReelyNode } from '@reely/dommy';
 
-const Link = ({ href, children }: { href: string; children?: ChildDOMElement }): ChildDOMElement => (
-  <a href={href}>{children}</a>
-);
+const laps = signal(0);
+const Link = ({ href, children }: { href: string; children?: ReelyNode }): Node => <a href={href}>{children}</a>;
+const Laps = (): ReelyNode => () => `${laps.value} laps`;
+
+document.body.append(<Link href="/race"><Laps /></Link>);
 ```
+
+A fragment, whether from such a component, `<>…</>`, `Show` or `For`, empties into its parent on `append`, so place it once. To move or remove it later, keep it inside an element, or render it with `mount`.
 
 ## Signals
 

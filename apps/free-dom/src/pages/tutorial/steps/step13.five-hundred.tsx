@@ -1,4 +1,3 @@
-import type { JSX } from '@reely/dommy';
 import { batch, computed, For, onCleanup, signal } from '@reely/dommy';
 
 import css from './board.module.css';
@@ -39,7 +38,7 @@ const percentile = (timings: readonly number[], share: number): number | undefin
 // `For` renders a row once per `by` key. A new order moves the rows that changed places, and each
 // row's bindings rewrite only the texts that changed. A lap is timed from the write to the finished
 // layout, in this browser; a key that changes every lap makes `For` build every row again.
-export const Board = (): JSX.Element => {
+export const Board = (): Node => {
   const size = signal<number>(500);
   const field = signal<readonly Racer[]>(startingGrid(size.value));
   const lap = signal(0);

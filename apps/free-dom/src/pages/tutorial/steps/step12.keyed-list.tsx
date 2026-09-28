@@ -1,4 +1,3 @@
-import type { JSX } from '@reely/dommy';
 import { batch, For, signal } from '@reely/dommy';
 
 import css from './board.module.css';
@@ -23,7 +22,7 @@ const raceLap = (field: readonly Racer[], lap: number): Racer[] =>
 
 // `For` renders a row once per `by` key. A new order moves the rows that changed places, and each
 // row's bindings rewrite only the texts that changed.
-export const Board = (): JSX.Element => {
+export const Board = (): Node => {
   const field = signal<readonly Racer[]>(startingGrid(8));
   const lap = signal(0);
 

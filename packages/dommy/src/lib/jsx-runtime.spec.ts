@@ -22,7 +22,7 @@ describe('jsx runtime (automatic)', () => {
     const fragment = jsx(Fragment, { children: ['a', jsx('b', { children: 'b' })] });
     const parent = document.createElement('p');
 
-    parent.append(fragment instanceof Node ? fragment : '');
+    parent.append(fragment);
 
     expect(parent.innerHTML).toBe('a<b>b</b>');
   });
@@ -33,18 +33,18 @@ describe('jsx runtime (automatic)', () => {
 
     const node = jsx(Badge, { label: 'P', children: 1 });
 
-    expect(node instanceof Node && node.textContent).toBe('P:1');
+    expect(node.textContent).toBe('P:1');
   });
 
   it('binds a signal child, updating only its text node', () => {
     const place = signal(1);
     const cell = jsx('td', { children: place });
-    const text = cell instanceof Node ? cell.firstChild : null;
+    const text = cell.firstChild;
 
     place.value = 2;
 
-    expect(cell instanceof Node && cell.textContent).toBe('2');
-    expect(cell instanceof Node && cell.firstChild).toBe(text);
+    expect(cell.textContent).toBe('2');
+    expect(cell.firstChild).toBe(text);
   });
 
   it('supports `key` after a spread, which compiles to the root `createElement`', () => {
@@ -54,12 +54,12 @@ describe('jsx runtime (automatic)', () => {
     const component = createElement(Row, { name: 'Bolt', key: 'racer-1' });
 
     expect(row.outerHTML).toBe('<li title="t">one</li>');
-    expect(component instanceof Node && component.textContent).toBe('Bolt');
+    expect(component.textContent).toBe('Bolt');
   });
 
   it('passes a component its props without `key`, and argument children as `children`', () => {
     const Probe = (props: Record<string, unknown>): Node => document.createTextNode(JSON.stringify(props));
-    const read = (node: unknown): unknown => (node instanceof Node ? JSON.parse(node.textContent ?? '') : null);
+    const read = (node: Node): unknown => JSON.parse(node.textContent ?? '');
 
     expect(read(createElement(Probe, { name: 'Bolt', key: 'racer-1' }))).toEqual({ name: 'Bolt' });
     expect(read(createElement(Probe, { children: 'kept' }))).toEqual({ children: 'kept' });

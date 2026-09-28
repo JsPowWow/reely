@@ -1,7 +1,7 @@
 import type { Nil } from '@reely/utils';
 import { isInstanceOf, isNil, isPrimitiveValue, isSomeFunction } from '@reely/utils';
 
-import type { ValidChildDOMElement } from '../types/dommy.types';
+import type { SingleReelyNode } from '../types/dommy.types';
 
 /**
  * Checks whether the given element is a falsy value in a specific context.
@@ -23,9 +23,9 @@ export const isFalsyElement = (element: unknown): element is Nil | false => isNi
  * be used as content in a DOM structure, or a reactive value (a signal or a getter).
  *
  * @param {unknown} child - The value to be checked for validity as a child DOM node.
- * @returns {child is ValidChildDOMElement} True if the value is a valid child DOM node; otherwise, false.
+ * @returns {child is SingleReelyNode} True if the value is a valid child DOM node; otherwise, false.
  */
-export const isValidChildDOMNode = (child: unknown): child is ValidChildDOMElement =>
+export const isValidChildDOMNode = (child: unknown): child is SingleReelyNode =>
   isInstanceOf(Node, child) || isPrimitiveValue(child) || isSomeFunction(child);
 
 /**
@@ -36,10 +36,10 @@ export const isValidChildDOMNode = (child: unknown): child is ValidChildDOMEleme
  * not be rendered).
  *
  * @param {unknown} child - The child node to evaluate.
- * @returns {child is ValidChildDOMElement} - True if the child is a valid
+ * @returns {child is SingleReelyNode} - True if the child is a valid
  * renderable DOM element; otherwise, false.
  */
-export const isValidRenderableChildDOMNode = (child: unknown): child is ValidChildDOMElement =>
+export const isValidRenderableChildDOMNode = (child: unknown): child is SingleReelyNode =>
   isValidChildDOMNode(child) && !isFalsyElement(child);
 
 /**
@@ -48,7 +48,7 @@ export const isValidRenderableChildDOMNode = (child: unknown): child is ValidChi
  * checks them at runtime.
  *
  * @param {readonly unknown[]} maybeChildren - Children, possibly nested in arrays.
- * @returns {ValidChildDOMElement[]} A flat list of the children to render.
+ * @returns {SingleReelyNode[]} A flat list of the children to render.
  */
-export const toValidChildDOMElement = (maybeChildren: readonly unknown[]): ValidChildDOMElement[] =>
+export const toValidChildDOMElement = (maybeChildren: readonly unknown[]): SingleReelyNode[] =>
   maybeChildren.flat(Infinity).filter(isValidRenderableChildDOMNode);

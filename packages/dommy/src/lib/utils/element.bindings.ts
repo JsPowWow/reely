@@ -4,7 +4,7 @@ import { isFalsyElement } from './element.utils';
 import { onCleanup } from '../reactive/owner';
 import { computed } from '../reactive/preact-like/preact-like.signal';
 
-import type { ReactiveChildDOMElement, ReactiveValue, ValidChildDOMElement } from '../types/dommy.types';
+import type { ReactiveReelyNode, ReactiveValue, SingleReelyNode } from '../types/dommy.types';
 
 /**
  * Calls `write` with the current value of `read`, then again on every change of the
@@ -47,10 +47,10 @@ const toTextData = (value: unknown): string => (isFalsyElement(value) ? '' : Str
  * Creates a text node bound to a reactive value: a change updates `text.data` in place,
  * the node itself is never replaced.
  *
- * @param {ReactiveChildDOMElement} read - A signal or a getter.
+ * @param {ReactiveReelyNode} read - A signal or a getter.
  * @returns {Text} The bound text node.
  */
-export const toBoundTextNode = (read: ReactiveChildDOMElement): Text => {
+export const toBoundTextNode = (read: ReactiveReelyNode): Text => {
   const text = document.createTextNode('');
   bindValue(read, (value) => {
     text.data = toTextData(value);
@@ -61,10 +61,10 @@ export const toBoundTextNode = (read: ReactiveChildDOMElement): Text => {
 /**
  * Converts a valid child to a node or a string for `append`/`replaceChildren`.
  *
- * @param {ValidChildDOMElement} child - A node, a primitive or a reactive value.
+ * @param {SingleReelyNode} child - A node, a primitive or a reactive value.
  * @returns {Node | string} The node to insert, or the text of a static child.
  */
-export const toChildNode = (child: ValidChildDOMElement): Node | string => {
+export const toChildNode = (child: SingleReelyNode): Node | string => {
   if (isSomeFunction(child)) {
     return toBoundTextNode(child);
   }

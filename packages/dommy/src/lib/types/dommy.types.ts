@@ -17,20 +17,27 @@ export type DommyElement = HTMLElement | SVGElement;
  */
 export type ReactiveValue<T> = () => T;
 
-export type StaticChildDOMElement = Nullable<Node | PrimitiveValue>;
+/** A child rendered once: a node, text, a number, or nothing. */
+export type StaticReelyNode = Nullable<Node | PrimitiveValue>;
 
 /**
  * A reactive child renders as a text node whose data follows the getter.
  */
-export type ReactiveChildDOMElement = ReactiveValue<Nullable<PrimitiveValue>>;
+export type ReactiveReelyNode = ReactiveValue<Nullable<PrimitiveValue>>;
 
-export type ValidChildDOMElement = StaticChildDOMElement | ReactiveChildDOMElement;
+/** One renderable child, static or reactive; `ReelyNode` adds lists of them. */
+export type SingleReelyNode = StaticReelyNode | ReactiveReelyNode;
 
-export type ChildDOMElement = ValidChildDOMElement | readonly ChildDOMElement[];
+/**
+ * Anything renderable, like React's `ReactNode`: a node, text, a number, a getter or signal (a
+ * text node that follows it), nothing (`null`, `undefined`, a boolean) or a list of these.
+ * Children and components take and return it; a JSX expression itself is always a `Node`.
+ */
+export type ReelyNode = SingleReelyNode | readonly ReelyNode[];
 
 export type DOMElementFactoryFunction<Tag extends HtmlElementTag = HtmlElementTag> = (
   props?: Nullable<DOMElementFactoryProps<Tag>>,
-  ...children: ChildDOMElement[]
+  ...children: ReelyNode[]
 ) => DOMElement<Tag>;
 
 /**
@@ -46,8 +53,8 @@ export type DOMElementProps<
  */
 export type DOMElementFactoryProps<Tag extends HtmlElementTag> =
   | DOMElementProps<Tag>
-  | StaticChildDOMElement
-  | ReactiveChildDOMElement;
+  | StaticReelyNode
+  | ReactiveReelyNode;
 
 /**
  * Receives the element once it is created: an object ref gets it in `current`, a function ref
@@ -58,7 +65,7 @@ export type ElementRef<Elt extends DommyElement> = ObjectReference<Elt> | ((elem
 export type DOMElementFactoryOptionsProps<Tag extends HtmlElementTag> = {
   /** Identity of a list item; never rendered. */
   key?: PropertyKey;
-  children?: ChildDOMElement;
+  children?: ReelyNode;
   eventsAbortSignal?: AbortSignal;
   elementRef?: ElementRef<DOMElement<Tag>>;
 };

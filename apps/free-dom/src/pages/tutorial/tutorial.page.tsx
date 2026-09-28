@@ -1,4 +1,3 @@
-import type { JSX } from '@reely/dommy';
 import { hasSome, isNil } from '@reely/utils';
 
 import { MutationMeter } from './mutation.meter';
@@ -20,7 +19,7 @@ const stepHref = (step: TutorialStep): string => `/tutorial/${step.slug}`;
 /**
  * The lesson page: step rail, the live demo with its DOM write counter, and the step source.
  */
-export const TutorialPage = ({ slug, missingPath }: TutorialPageProps): JSX.Element => {
+export const TutorialPage = ({ slug, missingPath }: TutorialPageProps): Node => {
   const index = hasSome(missingPath) ? -1 : isNil(slug) ? 0 : tutorialSteps.findIndex((item) => item.slug === slug);
   const step = tutorialSteps[index];
   const previous = tutorialSteps[index - 1];

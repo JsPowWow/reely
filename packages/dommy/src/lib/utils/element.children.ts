@@ -4,17 +4,17 @@ import { hasProperty, isInstanceOf, isNonEmpty, isString } from '@reely/utils';
 import { toChildNode } from './element.bindings';
 import { toValidChildDOMElement } from './element.utils';
 
-import type { ChildDOMElement, ValidChildDOMElement, DommyElement } from '../types/dommy.types';
+import type { DommyElement, ReelyNode, SingleReelyNode } from '../types/dommy.types';
 
 /**
  * Appends already validated children to a parent element.
  *
  * @template Element - The type of the parent HTML element.
- * @param {ValidChildDOMElement[]} children - Children to append, in order.
+ * @param {SingleReelyNode[]} children - Children to append, in order.
  * @returns {PipeableFn<Element>} A step that appends the children and returns the parent.
  */
 export const appendChildren =
-  <Element extends DommyElement>(children: ValidChildDOMElement[]): PipeableFn<Element> =>
+  <Element extends DommyElement>(children: SingleReelyNode[]): PipeableFn<Element> =>
   (parent) => {
     parent.append(...children.map(toChildNode));
     return parent;
@@ -26,10 +26,10 @@ export const appendChildren =
  *
  * @template Element - The type of the parent HTML element.
  * @param {Element} parent - The parent element.
- * @returns {(child: ChildDOMElement) => Element} A function that appends a child and returns the parent.
+ * @returns {(child: ReelyNode) => Element} A function that appends a child and returns the parent.
  */
 export const appendTo =
-  <Element extends DommyElement>(parent: Element): ((child: ChildDOMElement) => Element) =>
+  <Element extends DommyElement>(parent: Element): ((child: ReelyNode) => Element) =>
   (child) => {
     parent.append(...toChildNodes([child]));
     return parent;
@@ -40,10 +40,10 @@ export const appendTo =
  *
  * @template Element - The type of the parent HTML element.
  * @param {Element} parent - The parent element.
- * @returns {(...children: ChildDOMElement[]) => Element} A function that replaces the children and returns the parent.
+ * @returns {(...children: ReelyNode[]) => Element} A function that replaces the children and returns the parent.
  */
 export const replaceChildrenOf =
-  <Element extends DommyElement>(parent: Element): ((...children: ChildDOMElement[]) => Element) =>
+  <Element extends DommyElement>(parent: Element): ((...children: ReelyNode[]) => Element) =>
   (...children) => {
     parent.replaceChildren(...toChildNodes(children));
     return parent;
@@ -58,6 +58,22 @@ export const replaceChildrenOf =
  */
 export const toChildNodes = (maybeChildren: readonly unknown[]): (Node | string)[] =>
   toValidChildDOMElement(maybeChildren).map(toChildNode);
+
+/**
+ * Puts anything renderable into one node: a node stays as it is, anything else goes into a
+ * fragment of its nodes, so a component may return text, a getter, a list or nothing.
+ *
+ * @param {ReelyNode} child - What to render.
+ * @returns {Node} The node itself, or a fragment holding what `child` renders to.
+ */
+export const toNode = (child: ReelyNode): Node => {
+  if (isInstanceOf(Node, child)) {
+    return child;
+  }
+  const fragment = document.createDocumentFragment();
+  fragment.append(...toChildNodes([child]));
+  return fragment;
+};
 
 /**
  * Converts anything renderable to the nodes it puts into a parent: a fragment gives its
@@ -80,9 +96,9 @@ export const toNodes = (maybeChild: unknown): Node[] =>
  *
  * @param {unknown} maybeProps - The props object, if any.
  * @param {readonly unknown[]} maybeChildren - The argument children.
- * @returns {ValidChildDOMElement[]} The children to render.
+ * @returns {SingleReelyNode[]} The children to render.
  */
-export const toElementChildren = (maybeProps: unknown, maybeChildren: readonly unknown[]): ValidChildDOMElement[] => {
+export const toElementChildren = (maybeProps: unknown, maybeChildren: readonly unknown[]): SingleReelyNode[] => {
   const elementChildren = toValidChildDOMElement(maybeChildren);
   if (isNonEmpty(elementChildren) || !hasProperty('children', maybeProps)) {
     return elementChildren;

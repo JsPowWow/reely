@@ -1,5 +1,3 @@
-import type { JSX } from '@reely/dommy';
-
 import arrowIcon from '../../../assets/arrow.svg';
 import codeIcon from '../../../assets/code.svg';
 import docIcon from '../../../assets/doc.svg';
@@ -35,7 +33,7 @@ const links: readonly ReelyLink[] = [
 ];
 
 // A component is a plain function of its props: it runs once and returns DOM nodes.
-const LinkItem = ({ title, hint, href, icon }: ReelyLink): JSX.Element => (
+const LinkItem = ({ title, hint, href, icon }: ReelyLink): Node => (
   <a className={css.link} href={href}>
     <img src={icon} alt='' />
     <span className={css.text}>
@@ -46,7 +44,7 @@ const LinkItem = ({ title, hint, href, icon }: ReelyLink): JSX.Element => (
   </a>
 );
 
-export const ReelyLinks = (): JSX.Element => (
+export const ReelyLinks = (): Node => (
   <section className={css.card}>
     <h2>Where reely lives</h2>
     {links.map((link) => (

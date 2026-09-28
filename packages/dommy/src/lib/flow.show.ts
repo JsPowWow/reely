@@ -5,15 +5,15 @@ import { bindValue } from './utils/element.bindings';
 import { toNodes } from './utils/element.children';
 import { createAnchors, insertBefore, rangeOf, removeNodes } from './utils/element.range';
 
-import type { ChildDOMElement, ReactiveValue } from './types/dommy.types';
+import type { ReactiveValue, ReelyNode } from './types/dommy.types';
 
 export interface ShowProps {
   /** The condition: a signal or a getter; only a change of its truthiness switches the branch. */
   when: ReactiveValue<unknown>;
   /** Renders the branch shown while `when` is truthy. */
-  children: () => ChildDOMElement;
+  children: () => ReelyNode;
   /** Renders the branch shown while `when` is falsy; nothing by default. */
-  fallback?: () => ChildDOMElement;
+  fallback?: () => ReelyNode;
 }
 
 /**

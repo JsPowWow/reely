@@ -1,4 +1,3 @@
-import type { JSX } from '@reely/dommy';
 import type { Routes } from '@reely/dommy/router';
 import { TutorialPage } from '../pages/tutorial/tutorial.page';
 
@@ -14,4 +13,4 @@ export const routes = [
     ],
   },
   { path: '/*rest', action: (ctx) => () => <TutorialPage missingPath={ctx.pathname} /> },
-] as const satisfies Routes<() => JSX.Element>;
+] as const satisfies Routes<() => Node>;

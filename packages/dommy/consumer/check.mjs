@@ -49,17 +49,16 @@ try {
 
   for (const jsxDev of [false, true]) {
     const outfile = join(work, `out/board-${jsxDev ? 'dev' : 'prod'}.js`);
-    await build({
+    const options = {
       absWorkingDir: work,
-      entryPoints: ['src/board.tsx'],
       bundle: true,
       format: 'esm',
       jsx: 'automatic',
       jsxDev,
       jsxImportSource: '@reely/dommy',
-      outfile,
       logLevel: 'error',
-    });
+    };
+    await build({ ...options, entryPoints: ['src/board.tsx'], outfile });
     const { start } = await import(pathToFileURL(outfile).href);
     const dispose = start(document.body);
     assert.match(document.body.innerHTML, /Leader: Bolt/);
@@ -67,6 +66,15 @@ try {
     assert.match(document.body.innerHTML, /--car-color: red/);
     dispose();
     assert.equal(document.body.innerHTML, '');
+
+    // what a component returns that is not a node still renders, and stays bound
+    const counterFile = join(work, `out/counter-${jsxDev ? 'dev' : 'prod'}.js`);
+    await build({ ...options, entryPoints: ['src/counter.tsx'], outfile: counterFile });
+    const { labelled } = await import(pathToFileURL(counterFile).href);
+    const parent = document.createElement('div');
+    labelled(parent);
+    parent.querySelector('button').click();
+    assert.equal(parent.innerHTML, '1<button>1</button>');
   }
   // tree shaking: an app that uses only signals ships no element factories
   writeFileSync(join(work, 'signals-only.ts'), "import { effect, signal } from '@reely/dommy';\neffect(() => signal(0).value);\n");

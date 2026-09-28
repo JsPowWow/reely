@@ -1,5 +1,5 @@
 import { mount } from '@reely/dommy';
-import type { ChildDOMElement } from '@reely/dommy';
+import type { ReelyNode } from '@reely/dommy';
 import { noop } from '@reely/utils';
 
 /**
@@ -7,9 +7,9 @@ import { noop } from '@reely/utils';
  * page takes the current one down with everything it holds: bindings, effects, timers.
  *
  * @param {ParentNode} parent - Where the pages are shown, usually `document.body`.
- * @returns {(render: () => ChildDOMElement) => void} Shows the page `render` builds.
+ * @returns {(render: () => ReelyNode) => void} Shows the page `render` builds.
  */
-export const createPageView = (parent: ParentNode): ((render: () => ChildDOMElement) => void) => {
+export const createPageView = (parent: ParentNode): ((render: () => ReelyNode) => void) => {
   let disposePage: VoidFunction = noop;
   return (render) => {
     disposePage();
