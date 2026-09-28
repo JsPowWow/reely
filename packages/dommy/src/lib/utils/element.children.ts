@@ -30,8 +30,10 @@ export const appendChildren =
  */
 export const appendTo =
   <Element extends DommyElement>(parent: Element): ((child: ChildDOMElement) => Element) =>
-  (child) =>
-    appendChildren<Element>(toValidChildDOMElement([child]))(parent);
+  (child) => {
+    parent.append(...toChildNodes([child]));
+    return parent;
+  };
 
 /**
  * Replaces all children of a parent element; accepts the same children as `appendTo`.

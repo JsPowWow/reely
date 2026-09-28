@@ -1,4 +1,4 @@
-import { button, createObjectReference, div, effect, output, replaceChildrenOf, signal } from '@reely/dommy';
+import { button, createObjectReference, div, effect, output, signal } from '@reely/dommy';
 
 import css from './counter.module.css';
 
@@ -16,7 +16,7 @@ export const Counter = (): HTMLElement => {
 
   effect(() => {
     if (result.current) {
-      replaceChildrenOf(result.current)(count.value);
+      result.current.replaceChildren(String(count.value));
     }
   });
 
