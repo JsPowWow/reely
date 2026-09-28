@@ -25,6 +25,7 @@ export {
   computed,
   effect,
   batch,
+  untracked,
 } from './lib/reactive/preact-like/preact-like.signal';
 
 export * from './lib/router/router.types';

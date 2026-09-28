@@ -3,17 +3,21 @@ import { noop, setPrototype } from '@reely/utils';
 import { onCleanup } from '../owner';
 import { reelx } from '../reelx/reelx.core';
 
-import type { Reelx, RlxState, RlxSubscribe } from '../reelx/reelx.types';
+import type { RlxDerivedState, RlxState, RlxSubscribe } from '../reelx/reelx.types';
 
 export interface Signal<T> extends RlxSubscribe<T> {
   (): T;
   get value(): T;
   set value(value: T);
+  /** Reads the value without subscribing the running effect or computed to it. */
+  peek(): T;
 }
 
 export interface Computed<T> extends RlxSubscribe<T> {
   (): T;
   get value(): T;
+  /** Reads the value without subscribing the running effect or computed to it. */
+  peek(): T;
 }
 
 export function signal<T>(init: T): Signal<T> {
@@ -33,6 +37,15 @@ export function computed<T>(fn: () => T): Computed<T> {
  */
 export const batch = <T>(fn: () => T): T => reelx.batch(fn);
 
+/**
+ * Runs `fn` without subscribing the running effect or computed to the signals it reads.
+ *
+ * @template T - The callback result type.
+ * @param {() => T} fn - Reads signals.
+ * @returns {T} The callback result.
+ */
+export const untracked = <T>(fn: () => T): T => reelx.untracked(fn);
+
 export function effect(fn: VoidFunction): VoidFunction {
   const context: { dispose?: VoidFunction } = {};
 
@@ -48,13 +61,19 @@ const signalProto: ThisType<RlxState<unknown>> = {
   get value() {
     return this();
   },
+  peek() {
+    return reelx.untracked(this);
+  },
   set value(v) {
     this(v);
   },
 };
 
-const computedProto: ThisType<Reelx> = {
+const computedProto: ThisType<RlxDerivedState<unknown>> = {
   get value() {
     return this();
+  },
+  peek() {
+    return reelx.untracked(this);
   },
 };

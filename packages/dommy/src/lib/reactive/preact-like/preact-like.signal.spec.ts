@@ -1,34 +1,34 @@
-import { batch, computed, effect, signal, type Signal } from './preact-like.signal';
+import { batch, computed, effect, signal, type Signal, untracked } from './preact-like.signal';
 
 describe('signal', () => {
   it('should return value', () => {
     const v = [1, 2];
     const s = signal(v);
 
-    expect(s.value).to.equal(v);
+    expect(s.value).toBe(v);
   });
 
   it('should support .toString()', () => {
     const s = signal(123);
-    expect(s.toString()).equal('123');
+    expect(s.toString()).toBe('123');
   });
 
   it('should support JSON.Stringify()', () => {
     const s = signal(123);
-    expect(JSON.stringify({ s })).equal(JSON.stringify({ s: 123 }));
+    expect(JSON.stringify({ s })).toBe(JSON.stringify({ s: 123 }));
   });
 
   it('should support .valueOf()', () => {
     const s = signal(123);
     expect(s).to.have.property('valueOf');
     expect(s.valueOf).to.be.a('function');
-    expect(s.valueOf()).equal(123);
-    expect(+s).equal(123);
+    expect(s.valueOf()).toBe(123);
+    expect(+s).toBe(123);
 
     const a = signal(1);
     const b = signal(2);
     // @ts-expect-error-next-line
-    expect(a + b).to.equal(3);
+    expect(a + b).toBe(3);
   });
 
   it('should notify other listeners of changes after one listener is disposed', () => {
@@ -59,44 +59,44 @@ describe('signal', () => {
     expect(spy3).toHaveBeenCalledTimes(2);
   });
 
-  describe.skip('.peek()', () => {
-    // it('should get value', () => {
-    //   const s = signal(1);
-    //   expect(s.peek()).equal(1);
-    // });
-    //
-    // it('should get the updated value after a value change', () => {
-    //   const s = signal(1);
-    //   s.value = 2;
-    //   expect(s.peek()).equal(2);
-    // });
-    // it('should not make surrounding effect depend on the signal', () => {
-    //   const s = signal(1);
-    //   const spy = vi.fn(() => {
-    //     s.peek();
-    //   });
-    //
-    //   effect(spy);
-    //   expect(spy).toHaveBeenCalledOnce();
-    //
-    //   s.value = 2;
-    //   expect(spy).toHaveBeenCalledOnce();
-    // });
-    //
-    //   it("should not make surrounding computed depend on the signal", () => {
-    //     const s = signal(1);
-    //     const spy = vi.fn(() => {
-    //       s.peek();
-    //     });
-    //     const d = computed(spy);
-    //
-    //     d.value;
-    //     expect(spy).toHaveBeenCalledOnce();
-    //
-    //     s.value = 2;
-    //     d.value;
-    //     expect(spy).toHaveBeenCalledOnce();
-    //   });
+  describe('.peek()', () => {
+    it('should get value', () => {
+      const s = signal(1);
+      expect(s.peek()).toBe(1);
+    });
+    
+    it('should get the updated value after a value change', () => {
+      const s = signal(1);
+      s.value = 2;
+      expect(s.peek()).toBe(2);
+    });
+    it('should not make surrounding effect depend on the signal', () => {
+      const s = signal(1);
+      const spy = vi.fn(() => {
+        s.peek();
+      });
+    
+      effect(spy);
+      expect(spy).toHaveBeenCalledOnce();
+    
+      s.value = 2;
+      expect(spy).toHaveBeenCalledOnce();
+    });
+    
+      it("should not make surrounding computed depend on the signal", () => {
+        const s = signal(1);
+        const spy = vi.fn(() => {
+          s.peek();
+        });
+        const d = computed(spy);
+    
+        d.value;
+        expect(spy).toHaveBeenCalledOnce();
+    
+        s.value = 2;
+        d.value;
+        expect(spy).toHaveBeenCalledOnce();
+      });
   });
   //
   describe('.subscribe()', () => {
@@ -207,12 +207,12 @@ describe.skip('.(un)watched()', () => {
 //
 // it("signals should be identified with a symbol", () => {
 //   const a = signal(0);
-//   expect(a.brand).to.equal(Symbol.for("preact-signals"));
+//   expect(a.brand).toBe(Symbol.for("preact-signals"));
 // });
 //
 // it("should be identified with a symbol", () => {
 //   const a = computed(() => {});
-//   expect(a.brand).to.equal(Symbol.for("preact-signals"));
+//   expect(a.brand).toBe(Symbol.for("preact-signals"));
 // });
 
 describe('effect()', () => {
@@ -768,7 +768,7 @@ describe('effect()', () => {
   it('should allow disposing the effect multiple times', () => {
     const dispose = effect(() => undefined);
     dispose();
-    expect(() => dispose()).not.to.throw();
+    expect(() => dispose()).not.toThrow();
   });
 
   // it("should support resource management disposal", () => {
@@ -868,8 +868,8 @@ describe('effect()', () => {
   //       effect(function (this: any) {
   //         e = this;
   //       });
-  //       expect(typeof e._start).to.equal("function");
-  //       expect(typeof e._dispose).to.equal("function");
+  //       expect(typeof e._start).toBe("function");
+  //       expect(typeof e._dispose).toBe("function");
   //     });
   //
   //     it("should allow setting _callback that replaces the default functionality", () => {
@@ -1044,7 +1044,7 @@ describe('computed', () => {
     const a = signal('a');
     const b = signal('b');
     const c = computed(() => a.value + b.value);
-    expect(c.value).to.equal('ab');
+    expect(c.value).toBe('ab');
   });
 
   it('should return updated value', () => {
@@ -1052,10 +1052,10 @@ describe('computed', () => {
     const b = signal('b');
 
     const c = computed(() => a.value + b.value);
-    expect(c.value).to.equal('ab');
+    expect(c.value).toBe('ab');
 
     a.value = 'aa';
-    expect(c.value).to.equal('aab');
+    expect(c.value).toBe('aab');
   });
 
   it('should be lazily computed on demand', () => {
@@ -1183,21 +1183,21 @@ describe('computed', () => {
     });
 
     const c = computed(spy);
-    expect(c.value).to.equal('a');
+    expect(c.value).toBe('a');
     expect(spy).toHaveBeenCalledOnce();
 
     b.value = 'bb';
-    expect(c.value).to.equal('a');
+    expect(c.value).toBe('a');
     expect(spy).toHaveBeenCalledOnce();
 
     cond.value = false;
-    expect(c.value).to.equal('bb');
+    expect(c.value).toBe('bb');
     expect(spy).toHaveBeenCalledTimes(2);
 
     spy.mockClear();
 
     a.value = 'aaa';
-    expect(c.value).to.equal('bb');
+    expect(c.value).toBe('bb');
     expect(spy).not.toHaveBeenCalled();
   });
 
@@ -1240,8 +1240,7 @@ describe('computed', () => {
     expect(c.value).to.be.undefined;
     a.value = 1;
     expect(c.value).to.be.undefined;
-    // expect(spy).toHaveBeenCalledOnce();
-    expect(spy).toHaveBeenCalledTimes(2); // TODO different behavior, 2 vs 1
+    expect(spy).toHaveBeenCalledOnce();
   });
   //
   it('should not leak errors raised by dependencies', () => {
@@ -1258,9 +1257,9 @@ describe('computed', () => {
       }
       return expect.fail();
     });
-    expect(c.value).to.equal('ok');
+    expect(c.value).toBe('ok');
     a.value = 1;
-    expect(c.value).to.equal('ok');
+    expect(c.value).toBe('ok');
   });
 
   it('should propagate notifications even right after first subscription', () => {
@@ -1290,7 +1289,7 @@ describe('computed', () => {
     effect(() => {
       c.value;
     });
-    expect(c.value).to.equal(1);
+    expect(c.value).toBe(1);
   });
 
   it('should propagate notification to other listeners after one listener is disposed', () => {
@@ -1389,7 +1388,7 @@ describe('computed', () => {
     //
     //   const c = computed(() => s.value);
     //
-    //   expect(c.peek()).equal(1);
+    //   expect(c.peek()).toBe(1);
     // });
     //     it("should throw when evaluation throws", () => {
     //       const c = computed(() => {
@@ -1409,10 +1408,10 @@ describe('computed', () => {
     //     it("should refresh value if stale", () => {
     //       const a = signal(1);
     //       const b = computed(() => a.value);
-    //       expect(b.peek()).to.equal(1);
+    //       expect(b.peek()).toBe(1);
     //
     //       a.value = 2;
-    //       expect(b.peek()).to.equal(2);
+    //       expect(b.peek()).toBe(2);
     //     });
     //
     //     it("should detect simple dependency cycles", () => {
@@ -1538,7 +1537,7 @@ describe('computed', () => {
       });
       const c = computed(compute);
 
-      expect(c.value).to.equal('ab');
+      expect(c.value).toBe('ab');
       expect(compute).toHaveBeenCalledOnce();
       compute.mockClear();
 
@@ -1565,7 +1564,7 @@ describe('computed', () => {
       const d = computed(compute);
 
       // Trigger read
-      expect(d.value).to.equal('d: 3');
+      expect(d.value).toBe('d: 3');
       expect(compute).toHaveBeenCalledOnce();
       compute.mockClear();
 
@@ -1589,11 +1588,11 @@ describe('computed', () => {
       const spy = vi.fn(() => b.value + ' ' + c.value);
       const d = computed(spy);
 
-      expect(d.value).to.equal('a a');
+      expect(d.value).toBe('a a');
       expect(spy).toHaveBeenCalledOnce();
 
       a.value = 'aa';
-      expect(d.value).to.equal('aa aa');
+      expect(d.value).toBe('aa aa');
       expect(spy).toHaveBeenCalledTimes(2);
     });
 
@@ -1615,11 +1614,11 @@ describe('computed', () => {
       const spy = vi.fn(() => d.value);
       const e = computed(spy);
 
-      expect(e.value).to.equal('a a');
+      expect(e.value).toBe('a a');
       expect(spy).toHaveBeenCalledOnce();
 
       a.value = 'aa';
-      expect(e.value).to.equal('aa aa');
+      expect(e.value).toBe('aa aa');
       expect(spy).toHaveBeenCalledTimes(2);
     });
 
@@ -1635,11 +1634,11 @@ describe('computed', () => {
       const spy = vi.fn(() => b.value);
       const c = computed(spy);
 
-      expect(c.value).to.equal('foo');
+      expect(c.value).toBe('foo');
       expect(spy).toHaveBeenCalledOnce();
 
       a.value = 'aa';
-      expect(c.value).to.equal('foo');
+      expect(c.value).toBe('foo');
       expect(spy).toHaveBeenCalledOnce();
     });
 
@@ -1669,10 +1668,10 @@ describe('computed', () => {
       const gSpy = vi.fn(() => e.value);
       const g = computed(gSpy);
 
-      expect(f.value).to.equal('a a');
+      expect(f.value).toBe('a a');
       expect(fSpy).toHaveBeenCalledOnce();
 
-      expect(g.value).to.equal('a a');
+      expect(g.value).toBe('a a');
       expect(gSpy).toHaveBeenCalledOnce();
 
       eSpy.mockClear();
@@ -1681,13 +1680,13 @@ describe('computed', () => {
 
       a.value = 'b';
 
-      expect(e.value).to.equal('b b');
+      expect(e.value).toBe('b b');
       expect(eSpy).toHaveBeenCalledOnce();
 
-      expect(f.value).to.equal('b b');
+      expect(f.value).toBe('b b');
       expect(fSpy).toHaveBeenCalledOnce();
 
-      expect(g.value).to.equal('b b');
+      expect(g.value).toBe('b b');
       expect(gSpy).toHaveBeenCalledOnce();
 
       eSpy.mockClear();
@@ -1696,13 +1695,13 @@ describe('computed', () => {
 
       a.value = 'c';
 
-      expect(e.value).to.equal('c c');
+      expect(e.value).toBe('c c');
       expect(eSpy).toHaveBeenCalledOnce();
 
-      expect(f.value).to.equal('c c');
+      expect(f.value).toBe('c c');
       expect(fSpy).toHaveBeenCalledOnce();
 
-      expect(g.value).to.equal('c c');
+      expect(g.value).toBe('c c');
       expect(gSpy).toHaveBeenCalledOnce();
 
       // top to bottom
@@ -1721,11 +1720,11 @@ describe('computed', () => {
       const spy = vi.fn(() => a.value);
       computed(spy);
 
-      expect(b.value).to.equal('a');
+      expect(b.value).toBe('a');
       expect(spy).not.toHaveBeenCalled();
 
       a.value = 'aa';
-      expect(b.value).to.equal('aa');
+      expect(b.value).toBe('aa');
       expect(spy).not.toHaveBeenCalled();
     });
 
@@ -1752,8 +1751,8 @@ describe('computed', () => {
         result = c.value;
       });
 
-      expect(result).to.equal('a');
-      expect(d.value).to.equal('a');
+      expect(result).toBe('a');
+      expect(d.value).toBe('a');
 
       spyB.mockClear();
       spyC.mockClear();
@@ -1763,7 +1762,7 @@ describe('computed', () => {
 
       expect(spyB).not.toHaveBeenCalled();
       expect(spyC).not.toHaveBeenCalled();
-      expect(d.value).to.equal('aa');
+      expect(d.value).toBe('aa');
     });
 
     it('should ensure subs update even if one dep unmarks it', () => {
@@ -1784,7 +1783,7 @@ describe('computed', () => {
       });
       const spy = vi.fn(() => b.value + ' ' + c.value);
       const d = computed(spy);
-      expect(d.value).to.equal('a c');
+      expect(d.value).toBe('a c');
       spy.mockClear();
 
       a.value = 'aa';
@@ -1813,7 +1812,7 @@ describe('computed', () => {
       });
       const spy = vi.fn(() => b.value + ' ' + c.value + ' ' + d.value);
       const e = computed(spy);
-      expect(e.value).to.equal('a c d');
+      expect(e.value).toBe('a c d');
       spy.mockClear();
 
       a.value = 'aa';
@@ -1839,7 +1838,7 @@ describe('computed', () => {
       expect(() => b.value).to.throw('fail');
 
       a.value = 1;
-      expect(c.value).to.equal(1);
+      expect(c.value).toBe(1);
     });
 
     it('should keep graph consistent on errors in computeds', () => {
@@ -1849,13 +1848,13 @@ describe('computed', () => {
         return a.value;
       });
       const c = computed(() => b.value);
-      expect(c.value).to.equal(0);
+      expect(c.value).toBe(0);
 
       a.value = 1;
       expect(() => b.value).to.throw('fail');
 
       a.value = 2;
-      expect(c.value).to.equal(2);
+      expect(c.value).toBe(2);
     });
 
     it('should support lazy branches', () => {
@@ -1863,12 +1862,12 @@ describe('computed', () => {
       const b = computed(() => a.value);
       const c = computed(() => (a.value > 0 ? a.value : b.value));
 
-      expect(c.value).to.equal(0);
+      expect(c.value).toBe(0);
       a.value = 1;
-      expect(c.value).to.equal(1);
+      expect(c.value).toBe(1);
 
       a.value = 0;
-      expect(c.value).to.equal(0);
+      expect(c.value).toBe(0);
     });
 
     it('should not update a sub if all deps unmark it', () => {
@@ -1890,7 +1889,7 @@ describe('computed', () => {
       });
       const spy = vi.fn(() => b.value + ' ' + c.value);
       const d = computed(spy);
-      expect(d.value).to.equal('b c');
+      expect(d.value).toBe('b c');
       spy.mockClear();
 
       a.value = 'aa';
@@ -1901,7 +1900,7 @@ describe('computed', () => {
 
 describe('batch/transaction', () => {
   it('should return the value from the callback', () => {
-    expect(batch(() => 1)).to.equal(1);
+    expect(batch(() => 1)).toBe(1);
   });
 
   it('should throw errors thrown from the callback', () => {
@@ -1971,7 +1970,7 @@ describe('batch/transaction', () => {
       result = a.value;
     });
 
-    expect(result).to.equal('aa');
+    expect(result).toBe('aa');
   });
 
   it('should read computed signals with updated source signals', () => {
@@ -2002,9 +2001,9 @@ describe('batch/transaction', () => {
       expect(spyD).not.toHaveBeenCalled();
     });
 
-    expect(result).to.equal('aa');
-    expect(d.value).to.equal('aa');
-    expect(e.value).to.equal('aa');
+    expect(result).toBe('aa');
+    expect(d.value).toBe('aa');
+    expect(e.value).toBe('aa');
     expect(spyC).toHaveBeenCalledOnce();
     expect(spyD).toHaveBeenCalledOnce();
     expect(spyE).toHaveBeenCalledOnce();
@@ -2029,7 +2028,7 @@ describe('batch/transaction', () => {
       b.value = 'bb';
     });
     c.value = 'cc';
-    expect(result).to.equal('aa bb cc');
+    expect(result).toBe('aa bb cc');
   });
 
   it('should not lead to stale signals with .value in batch', () => {
@@ -2046,7 +2045,7 @@ describe('batch/transaction', () => {
 
     batch(() => {
       counter.value = 1;
-      expect(double.value).to.equal(2);
+      expect(double.value).toBe(2);
     });
     expect(invokes[1]).to.deep.equal([2, 3]);
   });
@@ -2065,7 +2064,7 @@ describe('batch/transaction', () => {
   //
   //     batch(() => {
   //       counter.value = 1;
-  //       expect(double.peek()).to.equal(2);
+  //       expect(double.peek()).toBe(2);
   //     });
   //
   //     expect(invokes[1]).to.deep.equal([2, 3]);
@@ -2142,74 +2141,74 @@ describe('batch/transaction', () => {
       effect(spy);
       callCount = spy.mock.calls.length;
     });
-    expect(callCount).to.equal(1);
+    expect(callCount).toBe(1);
   });
 });
 //
-describe.skip('untracked', () => {
-  //   it("should block tracking inside effects", () => {
-  //     const a = signal(1);
-  //     const b = signal(2);
-  //     const spy = vi.fn(() => {
-  //       a.value + b.value;
-  //     });
-  //     effect(() => untracked(spy));
-  //     expect(spy).toHaveBeenCalledOnce();
-  //
-  //     a.value = 10;
-  //     b.value = 20;
-  //     expect(spy).toHaveBeenCalledOnce();
-  //   });
-  //
-  //   it("should block tracking even when run inside effect run inside untracked", () => {
-  //     const s = signal(1);
-  //     const spy = vi.fn(() => s.value);
-  //
-  //     untracked(() =>
-  //       effect(() => {
-  //         untracked(spy);
-  //       })
-  //     );
-  //     expect(spy).toHaveBeenCalledOnce();
-  //
-  //     s.value = 2;
-  //     expect(spy).toHaveBeenCalledOnce();
-  //   });
-  //
-  //   it("should not cause signal assignments throw", () => {
-  //     const a = signal(1);
-  //     const aChangedTime = signal(0);
-  //
-  //     const dispose = effect(() => {
-  //       a.value;
-  //       untracked(() => {
-  //         aChangedTime.value = aChangedTime.value + 1;
-  //       });
-  //     });
-  //
-  //     expect(() => (a.value = 2)).not.to.throw();
-  //     expect(aChangedTime.value).to.equal(2);
-  //     a.value = 3;
-  //     expect(aChangedTime.value).to.equal(3);
-  //
-  //     dispose();
-  //   });
-  //
-  //   it("should block tracking inside computed signals", () => {
-  //     const a = signal(1);
-  //     const b = signal(2);
-  //     const spy = vi.fn(() => a.value + b.value);
-  //     const c = computed(() => untracked(spy));
-  //
-  //     expect(spy).not.toHaveBeenCalled();
-  //     expect(c.value).to.equal(3);
-  //     a.value = 10;
-  //     c.value;
-  //     b.value = 20;
-  //     c.value;
-  //     expect(spy).toHaveBeenCalledOnce();
-  //     expect(c.value).to.equal(3);
-  //   });
+describe('untracked', () => {
+    it("should block tracking inside effects", () => {
+      const a = signal(1);
+      const b = signal(2);
+      const spy = vi.fn(() => {
+        a.value + b.value;
+      });
+      effect(() => untracked(spy));
+      expect(spy).toHaveBeenCalledOnce();
+  
+      a.value = 10;
+      b.value = 20;
+      expect(spy).toHaveBeenCalledOnce();
+    });
+  
+    it("should block tracking even when run inside effect run inside untracked", () => {
+      const s = signal(1);
+      const spy = vi.fn(() => s.value);
+  
+      untracked(() =>
+        effect(() => {
+          untracked(spy);
+        })
+      );
+      expect(spy).toHaveBeenCalledOnce();
+  
+      s.value = 2;
+      expect(spy).toHaveBeenCalledOnce();
+    });
+  
+    it("should not cause signal assignments throw", () => {
+      const a = signal(1);
+      const aChangedTime = signal(0);
+  
+      const dispose = effect(() => {
+        a.value;
+        untracked(() => {
+          aChangedTime.value = aChangedTime.value + 1;
+        });
+      });
+  
+      expect(() => (a.value = 2)).not.toThrow();
+      expect(aChangedTime.value).toBe(2);
+      a.value = 3;
+      expect(aChangedTime.value).toBe(3);
+  
+      dispose();
+    });
+  
+    it("should block tracking inside computed signals", () => {
+      const a = signal(1);
+      const b = signal(2);
+      const spy = vi.fn(() => a.value + b.value);
+      const c = computed(() => untracked(spy));
+  
+      expect(spy).not.toHaveBeenCalled();
+      expect(c.value).toBe(3);
+      a.value = 10;
+      c.value;
+      b.value = 20;
+      c.value;
+      expect(spy).toHaveBeenCalledOnce();
+      expect(c.value).toBe(3);
+    });
 });
 
 describe('reentrancy and errors', () => {

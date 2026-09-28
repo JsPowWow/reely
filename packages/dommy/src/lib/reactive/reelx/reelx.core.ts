@@ -51,6 +51,8 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
 
   if (isSomeFunction(init)) {
     const deps: Dependencies<T> = [];
+    // a computation that tracked nothing is a constant once computed
+    let computed = false;
     // @ts-expect-error expected properties assigned below
     rlxSelf = (): T => {
       if (subscriberVersion !== SUBSCRIBER_VERSION) {
@@ -69,7 +71,7 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
           DEPS = null;
 
           try {
-            let isActual = deps.length > 0;
+            let isActual = computed;
             for (let i = 0; isActual && i < deps.length; i++) {
               isActual = Object.is(deps[i]?.value, deps[i]?.computation());
             }
@@ -77,6 +79,7 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
               (DEPS = deps).length = 0;
 
               const newState = init();
+              computed = true;
 
               if (
                 equal === undefined ||
@@ -227,6 +230,20 @@ reelx.flushSync = (): void => {
   }
   if (errors.length > 0) {
     throw errors[0];
+  }
+};
+
+/** Runs `fn` without subscribing the running computation or effect to what `fn` reads. */
+reelx.untracked = <T>(fn: () => T): T => {
+  const prevSubscriber = SUBSCRIBER;
+  const prevDeps = DEPS;
+  SUBSCRIBER = null;
+  DEPS = null;
+  try {
+    return fn();
+  } finally {
+    SUBSCRIBER = prevSubscriber;
+    DEPS = prevDeps;
   }
 };
 
