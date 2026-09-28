@@ -15,6 +15,8 @@ import domSource from './steps/step4.dom.tsx?raw';
  */
 export interface TutorialStep {
   slug: string;
+  /** Steps that build the same demo share a track; a step's source is diffed against the previous step on its track. */
+  track: 'links' | 'counter';
   title: string;
   lead: string;
   Demo: () => JSX.Element;
@@ -24,6 +26,7 @@ export interface TutorialStep {
 export const tutorialSteps: readonly TutorialStep[] = [
   {
     slug: 'factories',
+    track: 'links',
     title: 'Markup with tag factories',
     lead: 'Every HTML tag is a function that returns a real DOM element: props first, children after. No template language and no virtual DOM, so what you build is what the browser shows. Nothing changes after the first render, so the counters below the demo stay at zero.',
     Demo: FactoryLinks,
@@ -31,6 +34,7 @@ export const tutorialSteps: readonly TutorialStep[] = [
   },
   {
     slug: 'jsx',
+    track: 'links',
     title: 'The same markup in JSX',
     lead: 'JSX reads like HTML and compiles to the same function calls, so the card renders exactly the same nodes. Props are DOM properties, so the class goes in className.',
     Demo: JsxLinks,
@@ -38,6 +42,7 @@ export const tutorialSteps: readonly TutorialStep[] = [
   },
   {
     slug: 'components',
+    track: 'links',
     title: 'Components from data',
     lead: 'The three links differ only in their data. A component is a plain function of props, and map turns the data into elements. It runs once: there is no re-render to schedule.',
     Demo: ComponentLinks,
@@ -45,6 +50,7 @@ export const tutorialSteps: readonly TutorialStep[] = [
   },
   {
     slug: 'dom',
+    track: 'counter',
     title: 'Interactivity by hand',
     lead: 'An element keeps its listeners, so a click can change the page. Here the counter keeps its number in a variable and redraws the output after every click. Watch the counters below the demo: each click removes one text node and adds another.',
     Demo: DomCounter,

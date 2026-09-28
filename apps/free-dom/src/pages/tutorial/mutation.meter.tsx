@@ -1,5 +1,5 @@
 import type { ChildDOMElement, Signal } from '@reely/dommy';
-import { b, batch, div, figcaption, figure, signal, span } from '@reely/dommy';
+import { batch, dd, div, dl, dt, figcaption, figure, p, signal, span } from '@reely/dommy';
 import { exhaustiveGuard, isInstanceOf, isNil, isSomeFunction } from '@reely/utils';
 
 import css from './tutorial.module.css';
@@ -10,6 +10,14 @@ interface DomWrite {
   kind: WriteKind;
   count: number;
 }
+
+const writeKinds: readonly WriteKind[] = ['text', 'attribute', 'node'];
+
+const writeLabels = {
+  text: 'Text edits',
+  attribute: 'Attribute edits',
+  node: 'Nodes added or removed',
+} as const satisfies Record<WriteKind, string>;
 
 const toDomWrite = (record: MutationRecord): DomWrite => {
   switch (record.type) {
@@ -24,11 +32,36 @@ const toDomWrite = (record: MutationRecord): DomWrite => {
   }
 };
 
+/** Counts the elements and non-blank text nodes inside `root`, without `root` itself. */
+const countNodes = (root: Node): number => {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, (node) =>
+    node.nodeType === Node.TEXT_NODE && node.textContent?.trim() === ''
+      ? NodeFilter.FILTER_SKIP
+      : NodeFilter.FILTER_ACCEPT
+  );
+  let count = 0;
+  while (walker.nextNode()) {
+    count++;
+  }
+  return count;
+};
+
+/** "Last change: 1 text edit, 2 nodes added or removed." — empty when nothing changed yet. */
+const describeChange = (delta: Readonly<Record<WriteKind, number>>): string => {
+  const parts = writeKinds
+    .filter((kind) => delta[kind] > 0)
+    .map((kind) => {
+      const label = writeLabels[kind].toLowerCase();
+      return `${delta[kind]} ${delta[kind] === 1 ? label.replace('edits', 'edit') : label}`;
+    });
+  return parts.length === 0 ? '' : `Last change: ${parts.join(', ')}.`;
+};
+
 const prefersReducedMotion = (): boolean =>
   isSomeFunction(window.matchMedia) && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
- * Outlines the element a mutation touched, in the page's `--signal` or `--flag` color;
+ * Outlines the element a mutation touched, in the page's `--signal-ink` or `--flag` color;
  * with reduced motion the outline shows and hides without fading.
  */
 const flash = (record: MutationRecord): void => {
@@ -36,7 +69,7 @@ const flash = (record: MutationRecord): void => {
   if (isNil(element) || !isSomeFunction(element.animate)) {
     return;
   }
-  const token = toDomWrite(record).kind === 'node' ? '--flag' : '--signal';
+  const token = toDomWrite(record).kind === 'node' ? '--flag' : '--signal-ink';
   const outline = `3px solid ${getComputedStyle(element).getPropertyValue(token)}`;
   const fadeOut = prefersReducedMotion() ? outline : '3px solid transparent';
   element.animate(
@@ -53,35 +86,54 @@ interface MutationMeterProps {
 }
 
 /**
- * Wraps a demo: counts the DOM writes it makes by kind and flashes every node it touches.
+ * Wraps a demo: counts the nodes it builds on the first render, then the DOM writes it makes
+ * by kind, flashes every node it touches, and announces what the last change did.
  * The observer lives as long as the page: tutorial links navigate with a full reload.
  */
 export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => {
-  const writes = {
-    text: signal(0),
-    attribute: signal(0),
-    node: signal(0),
-  } satisfies Record<WriteKind, Signal<number>>;
+  const totals = { text: signal(0), attribute: signal(0), node: signal(0) } satisfies Record<WriteKind, Signal<number>>;
+  const deltas = { text: signal(0), attribute: signal(0), node: signal(0) } satisfies Record<WriteKind, Signal<number>>;
+  const announcement = signal('');
 
   const stage = div({ className: css.stage }, children);
 
   new MutationObserver((records) => {
+    const delta = { text: 0, attribute: 0, node: 0 } satisfies Record<WriteKind, number>;
+    for (const { kind, count } of records.map(toDomWrite)) {
+      delta[kind] += count;
+    }
     batch(() => {
-      for (const { kind, count } of records.map(toDomWrite)) {
-        writes[kind].value += count;
+      for (const kind of writeKinds) {
+        totals[kind].value += delta[kind];
+        deltas[kind].value = delta[kind];
       }
+      announcement.value = describeChange(delta);
     });
     records.forEach(flash);
   }).observe(stage, { subtree: true, childList: true, attributes: true, characterData: true });
+
+  const readout = (kind: WriteKind): HTMLElement =>
+    div(
+      { className: kind === 'node' ? css.readoutNode : css.readoutEdit },
+      dt(null, writeLabels[kind]),
+      dd(
+        null,
+        totals[kind],
+        span({ className: css.delta }, () => (deltas[kind].value > 0 ? `+${deltas[kind].value}` : ''))
+      )
+    );
 
   return figure(
     { className: css.meter },
     stage,
     figcaption(
-      { className: css.writes },
-      span({ className: css.write }, 'Text edits ', b(null, writes.text)),
-      span({ className: css.write }, 'Attribute edits ', b(null, writes.attribute)),
-      span({ className: css.writeNode }, 'Nodes added or removed ', b(null, writes.node))
+      { className: css.readouts },
+      dl(
+        { className: css.board },
+        div({ className: css.readoutBuilt }, dt(null, 'Built at first render'), dd(null, countNodes(stage))),
+        writeKinds.map(readout)
+      ),
+      p({ className: css.visuallyHidden, aria: { ariaLive: 'polite' } }, announcement)
     )
   );
 };

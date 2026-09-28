@@ -1,5 +1,5 @@
 import type { Nullable } from '@reely/utils';
-import { code, ins, pre, span } from '@reely/dommy';
+import { code, div, ins, p, pre, span } from '@reely/dommy';
 import { isNil } from '@reely/utils';
 
 import css from './tutorial.module.css';
@@ -34,23 +34,60 @@ const markInsertedLines = (previous: readonly string[], current: readonly string
   return inserted;
 };
 
+const isBlank = (line: string): boolean => line.trim() === '';
+
+/**
+ * A blank line belongs to an inserted block only when the code on both sides of it was
+ * inserted; otherwise it separates the block from unchanged code and stays unmarked.
+ */
+const markBlankLines = (lines: readonly string[], inserted: readonly boolean[]): boolean[] => {
+  const isInsertedCode = (index: number): boolean => !isBlank(lines[index] ?? '') && inserted[index] === true;
+  const nearestCode = (from: number, step: 1 | -1): number => {
+    let index = from;
+    while (index >= 0 && index < lines.length && isBlank(lines[index] ?? '')) {
+      index += step;
+    }
+    return index;
+  };
+  return lines.map((line, index) =>
+    isBlank(line)
+      ? isInsertedCode(nearestCode(index, -1)) && isInsertedCode(nearestCode(index, 1))
+      : inserted[index] === true
+  );
+};
+
 interface SourceViewProps {
   source: string;
-  previous?: Nullable<string>;
+  /** The source of the step this one grows from, with its number; nothing is marked without it. */
+  previous?: Nullable<{ source: string; number: number }>;
 }
 
 /**
- * Shows the source of a step; lines added since the previous step are marked as inserted.
+ * Shows the source of a step under a caption that says what is marked: the lines added since
+ * the previous step of the same demo.
  */
 export const SourceView = ({ source, previous }: SourceViewProps): HTMLElement => {
   const lines = source.trimEnd().split('\n');
-  const inserted = isNil(previous) ? lines.map(() => false) : markInsertedLines(previous.trimEnd().split('\n'), lines);
-  return pre(
-    { className: css.source, tabIndex: 0 },
-    code(
-      null,
-      lines.map((line, index) =>
-        inserted[index] ? ins({ className: css.added }, line, '\n') : span({ className: css.line }, line, '\n')
+  const inserted = isNil(previous)
+    ? lines.map(() => false)
+    : markBlankLines(lines, markInsertedLines(previous.source.trimEnd().split('\n'), lines));
+  return div(
+    { className: css.sourcePanel },
+    p(
+      { className: css.sourceCaption },
+      span({ id: 'source-title', className: css.visuallyHidden }, 'Source'),
+      span(
+        { id: 'source-caption' },
+        isNil(previous) ? 'A new demo starts here' : `Highlighted: new since step ${previous.number}`
+      )
+    ),
+    pre(
+      { className: css.source, aria: { ariaLabelledby: 'source-title source-caption' } },
+      code(
+        null,
+        lines.map((line, index) =>
+          inserted[index] ? ins({ className: css.added }, line, '\n') : span({ className: css.line }, line, '\n')
+        )
       )
     )
   );

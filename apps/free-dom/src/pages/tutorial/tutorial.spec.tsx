@@ -13,8 +13,11 @@ const clickButton = (root: Element, label: string): void => {
   button.click();
 };
 
+// the first-render node count, then text edits, attribute edits, nodes added or removed
 const readWrites = (meter: Element): string[] =>
-  Array.from(meter.querySelectorAll('figcaption b')).map((count) => count.textContent ?? '');
+  Array.from(meter.querySelectorAll('figcaption dd')).map((count) => count.textContent ?? '');
+
+const readAnnouncement = (meter: Element): string => meter.querySelector('[aria-live]')?.textContent ?? '';
 
 const renderStep = (slug: string): HTMLElement => {
   const step = tutorialSteps.find((item) => item.slug === slug);
@@ -31,6 +34,14 @@ describe('tutorial', () => {
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
+  it('counts the nodes a static step builds once, and no writes after that', async () => {
+    const meter = renderStep('factories');
+    await flushMutations();
+
+    expect(readWrites(meter)).toEqual(['24', '0', '0', '0']);
+    expect(readAnnouncement(meter)).toBe('');
+  });
+
   it('renders the same card from factories, JSX and components', () => {
     const [factories, jsx, components] = ['factories', 'jsx', 'components'].map(
       (slug) => renderStep(slug).querySelector('section')?.outerHTML
@@ -45,20 +56,31 @@ describe('tutorial', () => {
     it('counts and replaces the output text node on every click', async () => {
       const meter = renderStep('dom');
 
-      clickButton(meter, '+1');
-      clickButton(meter, '+1');
-      clickButton(meter, '−1');
-      await flushMutations();
+      for (const label of ['+1', '+1', '−1']) {
+        clickButton(meter, label);
+        await flushMutations();
+      }
 
       expect(meter.querySelector('output')?.textContent).toBe('1');
-      // text edits, attribute edits, nodes added or removed
-      expect(readWrites(meter)).toEqual(['0', '0', '6']);
+      expect(readWrites(meter)).toEqual(['7', '0', '0', '6+2']);
+    });
+
+    it('announces what the last click changed', async () => {
+      const meter = renderStep('dom');
+
+      clickButton(meter, '+1');
+      await flushMutations();
+
+      expect(readAnnouncement(meter)).toBe('Last change: 2 nodes added or removed.');
     });
   });
 
   describe('SourceView', () => {
     it('marks lines that the previous step did not have', () => {
-      const view = SourceView({ source: 'const a = 1;\nconst b = 2;', previous: 'const a = 1;' });
+      const view = SourceView({
+        source: 'const a = 1;\nconst b = 2;',
+        previous: { source: 'const a = 1;', number: 1 },
+      });
 
       expect(Array.from(view.querySelectorAll('ins')).map((line) => line.textContent)).toEqual(['const b = 2;\n']);
     });
@@ -66,13 +88,26 @@ describe('tutorial', () => {
     it('marks structural lines too, by a line diff rather than a lookup', () => {
       const view = SourceView({
         source: 'run(() => {\n  one();\n});\nrun(() => {\n  two();\n});',
-        previous: 'run(() => {\n  one();\n});',
+        previous: { source: 'run(() => {\n  one();\n});', number: 1 },
       });
 
       expect(Array.from(view.querySelectorAll('ins')).map((line) => line.textContent)).toEqual([
         'run(() => {\n',
         '  two();\n',
         '});\n',
+      ]);
+    });
+
+    it('marks blank lines inside an inserted block, but not around it', () => {
+      const view = SourceView({
+        source: 'const a = 1;\n\nconst b = 2;\n\nconst c = 3;',
+        previous: { source: 'const a = 1;\n', number: 1 },
+      });
+
+      expect(Array.from(view.querySelectorAll('ins')).map((line) => line.textContent)).toEqual([
+        'const b = 2;\n',
+        '\n',
+        'const c = 3;\n',
       ]);
     });
 
@@ -84,6 +119,12 @@ describe('tutorial', () => {
   });
 
   describe('TutorialPage', () => {
+    // the accessible name of the source listing, from the caption it is labelled by
+    const sourceName = (page: Element): string => {
+      const ids = page.querySelector('pre')?.getAttribute('aria-labelledby')?.split(' ') ?? [];
+      return ids.map((id) => page.querySelector(`#${id}`)?.textContent).join('. ');
+    };
+
     const renderPage = (slug?: string): Element => {
       const page = TutorialPage({ slug });
       if (!(page instanceof Element)) {
@@ -97,6 +138,16 @@ describe('tutorial', () => {
 
       expect(page.querySelector('h1')?.textContent).toBe(`Step 1. ${tutorialSteps[0]?.title}`);
       expect(page.querySelector('nav a[href="/tutorial/factories"]')?.getAttribute('aria-current')).toBe('step');
+    });
+
+    it('diffs a step against the previous step of the same demo and says so', () => {
+      const jsx = renderPage('jsx');
+      const dom = renderPage('dom');
+
+      expect(sourceName(jsx)).toBe('Source. Highlighted: new since step 1');
+      expect(jsx.querySelectorAll('pre ins').length).toBeGreaterThan(0);
+      expect(sourceName(dom)).toBe('Source. A new demo starts here');
+      expect(dom.querySelectorAll('pre ins')).toHaveLength(0);
     });
 
     it('explains an unknown step instead of rendering a demo', () => {

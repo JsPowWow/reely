@@ -23,6 +23,11 @@ export const TutorialPage = ({ slug }: TutorialPageProps): JSX.Element => {
   const step = tutorialSteps[index];
   const previous = tutorialSteps[index - 1];
   const next = tutorialSteps[index + 1];
+  const trackIndex = tutorialSteps.reduce(
+    (found, item, itemIndex) => (itemIndex < index && item.track === step?.track ? itemIndex : found),
+    -1
+  );
+  const trackPrevious = tutorialSteps[trackIndex];
 
   return (
     <div className={css.tutorial}>
@@ -70,7 +75,10 @@ export const TutorialPage = ({ slug }: TutorialPageProps): JSX.Element => {
               <MutationMeter>
                 <step.Demo />
               </MutationMeter>
-              <SourceView source={step.source} previous={previous?.source} />
+              <SourceView
+                source={step.source}
+                previous={hasSome(trackPrevious) ? { source: trackPrevious.source, number: trackIndex + 1 } : null}
+              />
             </section>,
             <footer className={css.pager}>
               {hasSome(previous) && (

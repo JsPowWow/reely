@@ -5,6 +5,8 @@
   --slate: #5b6b7a;
   --line: #cbd2d9;
   --signal: #f5c518;
+  /* signal yellow for marks on light surfaces: 4.6:1 on the panel */
+  --signal-ink: #9c6d00;
   --flag: #d64545;
   --code-text: #e4e7eb;
   --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
@@ -67,17 +69,12 @@
   font-weight: 700;
 }
 
-/* Focus is graphite on light surfaces and signal yellow on the dark source panel. */
+/* Focus is graphite: every focusable element sits on a light surface. */
 .stepLink:focus-visible,
 .pager a:focus-visible,
 .home:focus-visible,
 .back:focus-visible {
   outline: 3px solid var(--graphite);
-  outline-offset: 2px;
-}
-
-.source:focus-visible {
-  outline: 3px solid var(--signal);
   outline-offset: 2px;
 }
 
@@ -163,37 +160,88 @@
   padding: 2rem 1.5rem;
 }
 
-.writes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.25rem;
-  padding: 0.75rem 1.5rem;
+.readouts {
+  padding: 1rem 1.5rem 1.25rem;
   border-top: 1px solid var(--line);
+}
+
+/* The timing board: what the first render built, then every write since. */
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: 1rem 1.5rem;
+  margin: 0;
+}
+
+.board dt {
+  order: 1;
   color: var(--slate);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
+  line-height: 1.3;
 }
 
-.writes b {
-  color: var(--graphite);
+.board dd {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 2.75rem;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
-.write::before,
-.writeNode::before {
+.readoutBuilt,
+.readoutEdit,
+.readoutNode {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.readoutBuilt dd {
+  color: var(--slate);
+}
+
+.readoutEdit dt::before,
+.readoutNode dt::before {
   content: '';
   display: inline-block;
-  width: 0.7em;
-  height: 0.7em;
+  width: 0.65em;
+  height: 0.65em;
   margin-right: 0.4em;
   border-radius: 50%;
-  background: var(--signal);
+  background: var(--signal-ink);
 }
 
-.writeNode::before {
+.readoutNode dt::before {
   background: var(--flag);
 }
 
-/* Source of the step; lines new since the previous step are marked */
+.delta {
+  margin-left: 0.3em;
+  font-size: 0.5em;
+  vertical-align: 0.6em;
+}
+
+.readoutEdit .delta {
+  color: var(--signal-ink);
+}
+
+.readoutNode .delta {
+  color: var(--flag);
+}
+
+/* Source of the step; lines new since the previous step of the same demo are marked */
+
+.sourcePanel {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.sourceCaption {
+  margin: 0;
+  color: var(--slate);
+  font-size: 0.875rem;
+}
 
 .source {
   margin: 0;
@@ -279,7 +327,7 @@
   }
 
   .stepLink[aria-current='step'] {
-    border-color: var(--signal);
+    border: 2px solid var(--graphite);
     background: var(--signal);
   }
 
@@ -320,8 +368,12 @@
     padding: 1.25rem 1rem;
   }
 
-  .writes {
-    padding: 0.75rem 1rem;
+  .readouts {
+    padding: 0.75rem 1rem 1rem;
+  }
+
+  .board dd {
+    font-size: 2.25rem;
   }
 
   .source {
