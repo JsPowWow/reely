@@ -5,6 +5,7 @@ paths:
 ---
 # @reely/utils and @reely/logger (`scope:shared`)
 
+- **Minimal, yet mature** (the repo principle in `CLAUDE.md`): a helper is tiny and total — correct for every input, including `null`/`undefined`, wrappers and edge cases — and lands here only when dommy or a sibling package needs it.
 - **One function — one file:** `src/lib/<group>/<fnName>.ts` (groups: `objects`, `fp`, `nullable`, `errors`, `types`), spec next to it, **named export** re-exported from `src/index.ts` (default exports are being phased out — don't add new ones).
 - Guards return `x is T`; dual-mode helpers (`mapNullable(f)` vs `mapNullable(f, v)`) use overloads — follow the existing pattern.
 - Specs: `test.each` tables covering primitives, wrappers, `null`/`undefined`, edge cases (see `hasSome.spec.ts`).

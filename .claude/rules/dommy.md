@@ -7,6 +7,12 @@ paths:
 
 Goal of the current work — JsPowWow/reely#1: signals bound to the DOM (point updates, no virtual DOM), owner/`dispose`, keyed `For` and `Show`, automatic JSX runtime, working npm package. First real consumer — JsPowWow/ai-race (a race scoreboard with split-flap letters: frequent point updates, row reordering).
 
+## Minimal, yet mature (the repo principle in `CLAUDE.md`, applied to dommy)
+- The public surface stays small: tag factories, `createElement`, JSX runtime, signals (`signal`/`computed`/`effect`/`batch`), `For`/`Show`, owner/`dispose`. A new export earns its place by serving ai-race; otherwise it composes from these.
+- One reactive model: any function in a prop (other than `on*`) or a child is a reactive value, bound as a new pipe step. No second mechanism beside it.
+- The main entry ships only finished code; experiments (the router until it is cleaned up) move to a separate entry or out.
+- Mature means: a bound value updates exactly one DOM node, every subscription is released by `dispose`, effects run synchronously (`batch` groups writes), types work in a consumer's `tsc`.
+
 ## Style (keep it — it is the author's)
 - **Element transforms are curried `PipeableFn` steps** composed with `pipe` from `@reely/utils`: `appendTo(parent)(child)`, `assignProperties(props)(el)`, `replaceChildrenOf(el)(...children)`; `createElement` is `pipe(newElement, assignElementRef(p), assignProperties(p), appendChildren(c))`. New behaviour (signal binding, owner registration) — new steps in this chain, not a rewrite.
 - Setters return the element, so they chain.

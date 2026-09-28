@@ -4,6 +4,14 @@ Nx monorepo (TypeScript, npm workspaces): publishable packages in `packages/`, d
 
 Talk to the user in Russian. Code, comments, commit messages — English.
 
+## Principle: minimal, yet mature
+
+The repo exists for `@reely/dommy` and the small `@reely/*` helpers it stands on. Every change — feature, fix, refactor — keeps both halves:
+
+- **Minimal:** the smallest API that covers the real use case, one way to do a thing, few concepts, small files, no third-party runtime dependencies. A primitive that composes beats an option or a flag. Stubs, dead code and commented-out variants get deleted.
+- **Mature:** what exists is production-grade — types that work for a consumer, behaviour covered by tests, no leaks, predictable timing, correct and safe DOM, documented public API, tree-shakeable.
+- A capability the real consumer (JsPowWow/ai-race) needs is built fully or not at all. Touching code leaves it smaller and sturdier: improve it along the way, test real behaviour and bugs rather than trivia.
+
 ## Layout
 
 - `packages/utils` — `@reely/utils`, private (`scope:shared`): type guards, fp (`pipe`, `flow`, `Either`, `Maybe`), nullable helpers, errors, shared types. **One function — one file** (`src/lib/<group>/<fnName>.ts`) with a spec next to it.
