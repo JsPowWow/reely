@@ -151,10 +151,23 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
         // replace before scheduling: a synchronous flush re-subscribes to the new set
         rlxSelf._subscribers = new Set();
 
+        // a run does not depend on what it writes, even after reading it: its own write
+        // neither runs it again nor unlinks it from the rest of what it read
+        if (SUBSCRIBER !== null) {
+          subscribers.delete(SUBSCRIBER);
+          const values = SUBSCRIBER._values;
+          SUBSCRIBER._values = values.filter((value) => value !== rlxSelf);
+        }
+        if (DEPS !== null) {
+          const deps = DEPS;
+          DEPS.splice(0, deps.length, ...deps.filter(({ computation }) => computation !== rlxSelf));
+        }
+
         if (QUEUE.push(subscribers) === 1) {
           QUEUE_VERSION++;
           reelx.schedule?.();
         }
+        return state;
       }
 
       if (SUBSCRIBER !== null && rlxSelf._subscribers.size !== rlxSelf._subscribers.add(SUBSCRIBER).size) {

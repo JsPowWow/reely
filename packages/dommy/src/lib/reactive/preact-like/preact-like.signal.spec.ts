@@ -576,7 +576,7 @@ describe('effect()', () => {
     spy.mockClear();
   });
 
-  it('should recompute if a dependency changes during computation after becoming a dependency', () => {
+  it('does not recompute for a dependency it changes itself (preact runs it twice; reely follows VanJS 1.3)', () => {
     const a = signal(0);
     const spy = vi.fn(() => {
       if (a.value === 0) {
@@ -584,7 +584,7 @@ describe('effect()', () => {
       }
     });
     effect(spy);
-    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 
   it('should run the cleanup in an implicit batch', () => {

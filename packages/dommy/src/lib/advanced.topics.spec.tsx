@@ -131,6 +131,53 @@ describe('Self-referencing in effects', () => {
     expect(runs).toHaveBeenCalledTimes(2);
   });
 
+  it('keeps the effect that writes a signal it read running for the signals it only reads', () => {
+    const checked = signal(false);
+    const timesChecked = signal(0);
+    effect(() => {
+      if (checked.value) {
+        timesChecked.value += 1;
+      }
+    });
+
+    checked.value = true;
+    checked.value = false;
+    checked.value = true;
+    timesChecked.value = 10;
+
+    expect(timesChecked.value).toBe(10);
+    checked.value = false;
+    checked.value = true;
+    expect(timesChecked.value).toBe(11);
+  });
+
+  it('does not see later writes of a signal it wrote, so a clamp belongs in a computed', () => {
+    const laps = signal(12);
+    effect(() => {
+      if (laps.value > 10) {
+        laps.value = 10;
+      }
+    });
+    const clamped = computed(() => Math.min(laps.value, 10));
+
+    laps.value = 20;
+
+    expect(laps.value).toBe(20);
+    expect(clamped.value).toBe(10);
+  });
+
+  it('keeps a binding that writes a signal it read bound to the rest', () => {
+    const lap = signal(1);
+    const reads = signal(0);
+    const host = render(() => <p>{() => ((reads.value += 1), `lap ${lap.value}`)}</p>);
+
+    lap.value = 2;
+    lap.value = 3;
+
+    expect(host.textContent).toBe('lap 3');
+    expect(reads.value).toBe(3);
+  });
+
   it('throws instead of hanging when two effects write what the other reads', () => {
     const a = signal(0);
     const b = signal(0);
