@@ -4,6 +4,6 @@
  */
 export const measured = {
   signalsOnly: '1.5 kB',
-  jsxApp: '4.6 kB',
-  wholePackage: '6.7 kB',
+  jsxApp: '4.7 kB',
+  wholePackage: '6.8 kB',
 } as const;
