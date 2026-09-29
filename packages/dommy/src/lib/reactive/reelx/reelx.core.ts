@@ -214,7 +214,7 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
 
           SUBSCRIBER_VERSION++;
 
-          if (rlxSelf() !== lastState) {
+          if (!Object.is(rlxSelf(), lastState)) {
             cb((lastState = state), prevState);
             prevState = state;
           }

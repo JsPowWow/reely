@@ -107,6 +107,17 @@ describe('the signal contract', () => {
     ]);
   });
 
+  it('tells a subscriber of a computed nothing when the new value is the same by `Object.is`, `NaN` included', () => {
+    const lap = signal(1);
+    const ratio = computed(() => (lap.value > 0 ? Number.NaN : 0));
+    const heard = vi.fn();
+    ratio.subscribe(heard);
+
+    lap.value = 2;
+
+    expect(heard).toHaveBeenCalledOnce();
+  });
+
   it('releases every source of a computed chain when its last effect is disposed', () => {
     const lap = signal(1);
     const double = computed(() => lap.value * 2);
