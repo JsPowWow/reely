@@ -100,9 +100,17 @@ batch(() => {
   laps.value += 1;
 });
 untracked(() => laps.value); // reads without subscribing; same as `laps.peek()`
+
+// the style of Angular works as well: a signal and a computed are functions
+laps(); // reads, as `laps.value` does
+laps.set(3); // writes, as `laps.value = 3` does
+laps.update((n) => n + 1); // writes from the value, read without subscribing
+done(); // a computed reads the same way
 ```
 
-Effects run synchronously. A write of an equal value (`Object.is`) changes nothing. A signal holds any value, a function included.
+Pick the style you like; the two mix freely.
+
+Effects run synchronously. A write of an equal value (`Object.is`) changes nothing. A signal holds any value, a function included: `set` and `.value =` store it; `update` calls only the function you pass it.
 
 Each run of an effect has its own owner: `onCleanup` inside it runs before the next run and when the effect is disposed, and the effects it created go with it.
 
@@ -328,23 +336,27 @@ A machine of [`@reely/state-machine`](../state-machine/README.md) has no signals
 ```tsx
 import { Keyed, onCleanup, signal } from '@reely/dommy';
 import type { Signal } from '@reely/dommy';
-import type { IStateMachine, StateMachineMode, StateMachineTypes } from '@reely/state-machine';
 
-const stateOf = <M extends StateMachineTypes, Mode extends StateMachineMode>(
-  machine: IStateMachine<M, Mode>
-): Signal<M['state']> => {
+/** What `stateOf` needs of a machine; every machine of `@reely/state-machine` has it. */
+interface Followed<State> {
+  readonly state: State;
+  on(event: 'stateChanged', listener: (change: { readonly to: State }) => void): () => void;
+}
+
+const stateOf = <State,>(machine: Followed<State>): Signal<State> => {
   const state = signal(machine.state);
-  onCleanup(machine.on('stateChanged', ({ to }) => (state.value = to)));
+  onCleanup(machine.on('stateChanged', ({ to }) => state.set(to)));
   return state;
 };
 
-// `final` is the machine from the README of @reely/state-machine
-const Race = (): Node => {
+type Phase = 'ready' | 'running' | 'paused';
+
+const Race = ({ final }: { final: Followed<Phase> & { send(type: 'play'): unknown } }): Node => {
   const phase = stateOf(final);
   return (
     <section>
-      <button onClick={() => final.send('play')}>{() => (phase.value === 'running' ? 'Pause' : 'Play')}</button>
-      <Keyed value={phase}>{(now) => <PhaseView name={now} />}</Keyed>
+      <button onClick={() => final.send('play')}>{() => (phase() === 'running' ? 'Pause' : 'Play')}</button>
+      <Keyed value={phase}>{(now) => <p className={now}>{now}</p>}</Keyed>
     </section>
   );
 };

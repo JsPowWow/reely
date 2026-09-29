@@ -9,6 +9,10 @@ export interface Signal<T> extends RlxSubscribe<T> {
   (): T;
   get value(): T;
   set value(value: T);
+  /** Writes `value`, as `.value =` does. */
+  set(value: T): void;
+  /** Writes what `fn` makes of the value, read without subscribing the running effect or computed to it. */
+  update(fn: (value: T) => T): void;
   /** Reads the value without subscribing the running effect or computed to it. */
   peek(): T;
 }
@@ -122,6 +126,12 @@ const signalProto: ThisType<RlxState<unknown>> = {
   },
   set value(v) {
     this(v);
+  },
+  set(value: unknown) {
+    this(value);
+  },
+  update(fn: (value: unknown) => unknown) {
+    this(fn(reelx.untracked(this)));
   },
 };
 

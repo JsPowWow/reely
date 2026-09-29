@@ -87,6 +87,52 @@ describe('signal', () => {
     expect(spy).toHaveBeenCalledOnce();
   });
 
+  describe('.set() and .update(), as in Angular', () => {
+    it('should write as `.value =` does, an equal value changing nothing', () => {
+      const laps = signal(0);
+      const double = computed(() => laps() * 2);
+      const seen: number[] = [];
+      effect(() => void seen.push(double()));
+
+      laps.set(1);
+      laps.set(1);
+      laps.update((n) => n + 1);
+
+      expect(seen).toStrictEqual([0, 2, 4]);
+    });
+
+    it('should hold a function given to `set` as a value, never calling it', () => {
+      const first = vi.fn();
+      const second = vi.fn();
+      const handler = signal(first);
+
+      handler.set(second);
+
+      expect(handler()).toBe(second);
+      expect(second).not.toHaveBeenCalled();
+    });
+
+    it('should not make the effect that updates a signal depend on it, even when nothing changes', () => {
+      const laps = signal(0);
+      const spy = vi.fn(() => laps.update((n) => n));
+      effect(spy);
+
+      laps.set(10);
+
+      expect(spy).toHaveBeenCalledOnce();
+    });
+
+    it('should hand `update` a held function as the value, never calling it', () => {
+      const first = vi.fn();
+      const handler = signal(first);
+
+      handler.update((held) => (held === first ? vi.fn() : held));
+
+      expect(handler()).not.toBe(first);
+      expect(first).not.toHaveBeenCalled();
+    });
+  });
+
   describe('.peek()', () => {
     it('should get value', () => {
       const s = signal(1);
