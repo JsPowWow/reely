@@ -1,77 +1,18 @@
 # @reely/strings
 
-String manipulation utilities for TypeScript applications.
+Capitalize words and make URL slugs.
 
-## 📦 Package Information
+```sh
+npm i @reely/strings
+```
 
-- **Version**: 0.0.1
-- **Publishable**: ✅ Yes
-- **Tag**: `scope:strings`
-- **Module Boundaries**: Can only import from `scope:shared` packages
-
-## 🚀 Features
-
-This package provides essential string manipulation utilities:
-
-- **capitalize** - Capitalizes the first letter of a string
-- **slugify** - Converts strings to URL-friendly slugs
-
-## 📝 Usage Examples
-
-```typescript
+```ts
 import { capitalize, slugify } from '@reely/strings';
 
-// Capitalize strings
-capitalize('hello world');  // 'Hello world'
-capitalize('typescript');   // 'Typescript'
+capitalize('ada lovelace'); // 'Ada Lovelace': every word by default
+capitalize('LONDON', false); // 'London': the first letter, the rest lowercased
 
-// Create URL-friendly slugs
-slugify('Hello World!');           // 'hello-world'
-slugify('TypeScript & JavaScript'); // 'typescript-javascript'
+const url = `/blog/${slugify('10 Tips for Remote Work in 2026!')}`; // '/blog/10-tips-for-remote-work-in-2026'
 ```
 
-## 🛠️ Custom Commands
-
-This package includes a custom build command to demonstrate Nx's flexibility:
-
-```bash
-# Run the custom build-base command
-nx run strings:build-base
-
-# This will output: "Running build-base for strings. This can be replaced with arbitrary commands."
-```
-
-## 🧪 Testing
-
-```bash
-# Run tests for this package
-nx test strings
-
-# Run tests in watch mode
-nx test strings --watch
-```
-
-## 🏗️ Building
-
-```bash
-# Build the package
-nx build strings
-
-# The build output will be in dist/packages/strings
-```
-
-## 📋 Available Commands
-
-```bash
-nx build strings       # Build the package
-nx test strings        # Run tests
-nx lint strings        # Lint the package
-nx run strings:build-base  # Run custom build command
-```
-
-## 🔒 Module Boundaries
-
-This package has the tag `scope:strings` and can only import from:
-- `@reely/utils` (tagged with `scope:shared`)
-
-Attempting to import from `@reely/colors` or `@reely/async` will result in a linting error due to module boundary constraints.
+`slugify` keeps ASCII letters, digits and hyphens: other characters, accented letters included, are dropped, not transliterated. Both throw a `TypeError` for anything but a string.
