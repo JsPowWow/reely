@@ -1,3 +1,3 @@
-export * from './lib/objectStore';
-export { default as withSelector } from './lib/withSelector';
-export * from './lib/primitiveStore';
+export { ObjectStore } from './lib/objectStore';
+export { PrimitiveStore } from './lib/primitiveStore';
+export type { StoreEvents } from './lib/store.types';

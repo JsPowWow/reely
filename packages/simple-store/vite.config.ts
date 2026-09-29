@@ -1,14 +1,36 @@
 /// <reference types='vitest' />
+import { resolve } from 'path';
+
 import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
+
+// the published packages this one imports: they stay imports, so an app that uses several
+// @reely packages ships each once; the private @reely/utils is bundled into the JS and the types
+const external: string[] = ['@reely/emitter'];
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/packages/simple-store',
-  plugins: [],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [],
-  // },
+  plugins: [
+    dts({
+      entryRoot: 'src',
+      tsconfigPath: './tsconfig.lib.json',
+      rollupTypes: true,
+      bundledPackages: ['@reely/utils'],
+    }),
+  ],
+  build: {
+    lib: {
+      entry: resolve(import.meta.dirname, 'src/index.ts'),
+      fileName: (): string => 'index.js',
+      formats: ['es' as const],
+    },
+    // the app's bundler minifies; unminified, a consumer's stack traces keep the real names
+    minify: false,
+    outDir: 'dist',
+    sourcemap: true,
+    rolldownOptions: { external },
+  },
   test: {
     name: '@reely/simple-store',
     watch: false,

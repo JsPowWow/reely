@@ -1,42 +1,42 @@
-import type { IEventEmitter } from '@reely/emitter';
-import { EventEmitter } from '@reely/emitter';
-import type { KeyValueObject } from '@reely/utils';
+import { isPlainObject, isSomeFunction } from '@reely/utils';
 
-import withSelector from './withSelector';
+import { Store } from './store';
 
-export class ObjectStore<T extends KeyValueObject> implements Pick<IEventEmitter<{ changed: T }>, 'on' | 'off'> {
-  private storeValue;
-  private emitter = new EventEmitter<{ changed: T }>();
-
-  constructor(initialValue: T) {
-    this.storeValue = initialValue;
+/**
+ * An object that changes a few fields at a time and says so. Each `set` makes a new object, so a
+ * value read earlier stays as it was, and notifies the `changed` listeners with it; a `set` made
+ * by a listener reaches the listeners once they all have the current object.
+ *
+ * @template T - A plain object (`{ … }`): `set` copies its own fields into a new one, so a class
+ *   instance would lose its methods.
+ */
+export class ObjectStore<T extends object> extends Store<T> {
+  /**
+   * @param initialValue - The object held until the first `set`.
+   * @throws {TypeError} When `initialValue` is not a plain object (an array, a `Map`, `null`…).
+   */
+  public constructor(initialValue: T) {
+    if (!isPlainObject(initialValue)) {
+      throw new TypeError(`An ObjectStore holds a plain object, not ${String(initialValue)}`);
+    }
+    super(initialValue);
   }
 
-  public set<K extends keyof T>(updater: Pick<T, K> | ((store: T) => Pick<T, K>)): typeof this {
-    if (typeof updater === 'function') {
-      this.storeValue = { ...this.storeValue, ...updater(this.storeValue) };
-      this.emitter.emit('changed', this.storeValue);
-    }
-    if (updater && typeof updater === 'object') {
-      this.storeValue = { ...this.storeValue, ...updater };
-      this.emitter.emit('changed', this.storeValue);
-    }
-    return this;
-  }
-
+  /** The object held now. */
   public get(): T {
-    return this.storeValue;
+    return this.current;
   }
 
-  public select<R>(selector: (s: T) => R): R {
-    return withSelector(this.storeValue, selector);
-  }
-
-  public on<P extends Parameters<typeof this.emitter.on>>(...parameters: P): void {
-    return this.emitter.on.apply(this, parameters);
-  }
-
-  public off<P extends Parameters<typeof this.emitter.off>>(...parameters: P): void {
-    return this.emitter.off.apply(this, parameters);
+  /**
+   * Replaces the object with a copy that has the given fields, then notifies the listeners. A
+   * listener that throws does not stop the others; its error is thrown after them, or an
+   * `AggregateError` when several threw.
+   *
+   * @param part - The fields to change, or a function of the current object that returns them.
+   * @returns The store, to chain another `set`.
+   */
+  public set<K extends keyof T>(part: Pick<T, K> | ((current: T) => Pick<T, K>)): this {
+    this.hold({ ...this.current, ...(isSomeFunction(part) ? part(this.current) : part) });
+    return this;
   }
 }
