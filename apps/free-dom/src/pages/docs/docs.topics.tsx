@@ -1,3 +1,4 @@
+import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
 import { measured } from '../../site/measurements';
 import { Board as KeyedBoard } from '../evolution/steps/step12.keyed-list';
@@ -14,6 +15,20 @@ import { Counter as GetterCounter } from '../evolution/steps/step9.getter';
 import getterSource from '../evolution/steps/step9.getter.ts?highlight';
 import { Counter as BatchCounter } from '../evolution/steps/step11.batch';
 import batchSource from '../evolution/steps/step11.batch.ts?highlight';
+import { CheckboxCounter } from './demos/advanced/checkbox.counter';
+import checkboxCounterSource from './demos/advanced/checkbox.counter.tsx?highlight';
+import { ConditionalBinding } from './demos/advanced/conditional.binding';
+import conditionalBindingSource from './demos/advanced/conditional.binding.tsx?highlight';
+import { Flavours } from './demos/advanced/flavours';
+import flavoursSource from './demos/advanced/flavours.tsx?highlight';
+import { Greeting } from './demos/advanced/greeting';
+import greetingSource from './demos/advanced/greeting.tsx?highlight';
+import { LabelAfterMount } from './demos/advanced/label.after.mount';
+import labelAfterMountSource from './demos/advanced/label.after.mount.tsx?highlight';
+import { PreOrSpan } from './demos/advanced/pre.or.span';
+import preOrSpanSource from './demos/advanced/pre.or.span.tsx?highlight';
+import { TurnBold } from './demos/advanced/turn.bold';
+import turnBoldSource from './demos/advanced/turn.bold.tsx?highlight';
 import { Counter } from './demos/first.counter';
 import firstCounterSource from './demos/first.counter.tsx?highlight';
 import { LapClock } from './demos/lap.clock';
@@ -22,15 +37,19 @@ import { PitWall } from './demos/pit.stop';
 import pitStopSource from './demos/pit.stop.tsx?highlight';
 import { RaceFinish } from './demos/race.finish';
 import raceFinishSource from './demos/race.finish.tsx?highlight';
+import granularitySource from './snippets/advanced.granularity.ts?highlight';
 import resourceSource from './snippets/async.resource.tsx?highlight';
 import listsSource from './snippets/lists.for.tsx?highlight';
 import signalsSource from './snippets/signals.api.ts?highlight';
 import mountSource from './snippets/start.mount.tsx?highlight';
 
+import guide from '../../site/guide.module.css';
+import css from './docs.module.css';
+
 import type { SourceLines } from '../../highlight/source.types';
 
 /** The groups of the docs rail, in the order the library is layered. */
-export const docGroups = ['Start', 'Markup', 'Reactivity', 'Structure', 'Measure'] as const;
+export const docGroups = ['Start', 'Markup', 'Reactivity', 'Structure', 'Deeper', 'Measure'] as const;
 
 export type DocGroup = (typeof docGroups)[number];
 
@@ -55,6 +74,16 @@ const plain = (text: string): SourceLines => text.split('\n').map((line) => [{ c
 
 const Code = ({ caption, source }: { caption: string; source: SourceLines }): Node => (
   <SourceView caption={caption} source={source} />
+);
+
+/** A second live demo inside the details, with its DOM writes counted beside its source. */
+const Live = ({ Demo, caption, source }: { Demo: () => Node; caption: string; source: SourceLines }): Node => (
+  <div className={`${guide.panels} ${css.live}`}>
+    <MutationMeter>
+      <Demo />
+    </MutationMeter>
+    <SourceView source={source} caption={caption} />
+  </div>
 );
 
 export const docTopics: readonly DocTopic[] = [
@@ -381,6 +410,81 @@ export const docTopics: readonly DocTopic[] = [
           </li>
           <li>An effect, before its next run and when it is stopped.</li>
         </ul>
+      </>
+    ),
+  },
+  {
+    slug: 'advanced',
+    group: 'Deeper',
+    title: 'Advanced topics',
+    lead: 'The pitfalls VanJS lists in its own advanced topics, each answered in reely with a live demo. First, conditional bindings: a binding depends on what its last run read, so the sum below runs for a and b, or for c and d, never for all four.',
+    Demo: ConditionalBinding,
+    source: conditionalBindingSource,
+    Details: () => (
+      <>
+        <p>
+          Change c while the formula is a + b: the run count stays. Switch the formula, and a and b stop counting
+          instead. The same holds for a <code>computed</code> and an <code>effect</code>. Every answer on this page is also
+          checked by the specs of @reely/dommy (<code>advanced.topics.spec.tsx</code>), and the headings follow{' '}
+          <a href='https://vanjs.org/advanced'>vanjs.org/advanced</a>.
+        </p>
+        <h2>DOM attributes vs. properties</h2>
+        <p>
+          Live state (<code>value</code>, <code>checked</code>, <code>selected</code>, <code>indeterminate</code>,{' '}
+          <code>muted</code>) is set as a property, so the form shows it. Everything else is an attribute, a read-only{' '}
+          <code>list</code> included. A property that takes an object, such as <code>srcObject</code>, goes through{' '}
+          <code>elementRef</code>.
+        </p>
+        <Live Demo={Flavours} caption='flavours.tsx' source={flavoursSource} />
+        <h2>Why can’t a signal hold a DOM node?</h2>
+        <p>
+          A bound child is text. In VanJS a state holding one node, bound in two places, can be in one place only, so
+          the first name disappears. In reely a signal of nodes does not type-check as a child, and from JavaScript it
+          renders as text and the dommy logger reports it. To switch nodes, use <code>Show</code> or{' '}
+          <code>Keyed</code>: each place builds its own node.
+        </p>
+        <Live Demo={TurnBold} caption='turn.bold.tsx' source={turnBoldSource} />
+        <h2>Signal granularity</h2>
+        <p>
+          A binding runs again when any signal it read changes. Prefer a signal per field that changes on its own; when
+          the object stays one signal, read a field through a <code>computed</code>, which passes a change on only when
+          its result differs.
+        </p>
+        <Code caption='granularity.ts' source={granularitySource} />
+        <h2>The scope of DOM updates</h2>
+        <p>
+          VanJS advises a derived state so that typing does not rebuild the whole paragraph. Here there is nothing to
+          remember: a function child renders text, and <code>Show</code> keeps its branch while the truthiness of{' '}
+          <code>when</code> stays. Type a name and count one text edit per key; clear it and count the nodes.
+        </p>
+        <Live Demo={Greeting} caption='greeting.tsx' source={greetingSource} />
+        <h2>Self-referencing in effects</h2>
+        <p>
+          The effect below reads <code>timesChecked</code> and writes it. As in VanJS 1.3, a signal an effect writes is
+          not its dependency, so its own write does not run it again and Reset sets the count to 0 for good. It still
+          runs for <code>checked</code>, which it only reads. Two effects that write what the other reads would run
+          forever; after 100 waves of writes the flush throws a cycle error instead.
+        </p>
+        <Live Demo={CheckboxCounter} caption='checkbox.counter.tsx' source={checkboxCounterSource} />
+        <h2>Releasing bindings</h2>
+        <p>
+          VanJS collects the bindings of disconnected nodes as garbage, so a view built across an <code>await</code> can
+          lose them. reely has no such collection: bindings are released by their owner. A branch that goes releases the
+          signal, the computed and the subscriptions made in it. Switch as often as you like; one branch stays alive.
+        </p>
+        <Live Demo={PreOrSpan} caption='pre.or.span.tsx' source={preOrSpanSource} />
+        <p>
+          The other side: a node built outside any owner, at module level or in an event handler and appended by hand,
+          keeps its bindings as long as their signals live. Build views inside <code>mount</code> and switch nodes with
+          the flow components.
+        </p>
+        <h2>Lifecycle hooks</h2>
+        <p>
+          A component runs before its nodes are in the document. What must run once they are, such as focusing a field
+          or reading the rendered text, goes in <code>later(0, fn)</code> from <code>@reely/dommy/kit</code>; it is
+          cancelled if the view goes first. Increment rebuilds the label, and the message reads it from the document.
+        </p>
+        <Live Demo={LabelAfterMount} caption='label.after.mount.tsx' source={labelAfterMountSource} />
       </>
     ),
   },

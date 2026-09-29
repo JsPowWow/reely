@@ -66,3 +66,41 @@
   flex-basis: 100%;
   min-height: 4.4rem;
 }
+
+/* A labelled field: the label above in bold slate, the control in panel white (DESIGN.md, Inputs). */
+.field {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--slate);
+  font-weight: 700;
+}
+
+.field input,
+.field select {
+  min-width: 0;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--slate);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--graphite);
+  font: inherit;
+  font-weight: 400;
+}
+
+.field input[type='number'] {
+  width: 4.5rem;
+}
+
+/* A checkbox with its label beside it. */
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+
+.check input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--graphite);
+}

@@ -37,6 +37,22 @@ describe('docs', () => {
       expect(page.querySelector('article h2')?.textContent).toBe('The props');
     });
 
+    it('answers the advanced topics with a live demo each, under the headings of VanJS', () => {
+      const page = renderPage('advanced');
+      const headings = Array.from(page.querySelectorAll('article h2'), (heading) => heading.textContent);
+
+      expect(page.querySelectorAll('figure')).toHaveLength(7);
+      expect(headings).toEqual([
+        'DOM attributes vs. properties',
+        'Why can’t a signal hold a DOM node?',
+        'Signal granularity',
+        'The scope of DOM updates',
+        'Self-referencing in effects',
+        'Releasing bindings',
+        'Lifecycle hooks',
+      ]);
+    });
+
     it('links the neighbouring topics, and ends with reely evolution', () => {
       const signals = renderPage('signals');
       const last = renderPage(docTopics.at(-1)?.slug);

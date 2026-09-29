@@ -47,7 +47,16 @@
 .details {
   display: grid;
   gap: 1rem;
+}
+
+.details > * {
   max-width: 68ch;
+}
+
+/* A live demo inside the details takes the width of the demo panels above. */
+.details > .live {
+  max-width: none;
+  margin: 0.5rem 0 1rem;
 }
 
 .details h2 {
