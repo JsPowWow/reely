@@ -1,7 +1,16 @@
 import type { Head, Last } from './utility.types';
 
+/** Any function, whatever it takes and returns. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...parameters: any) => any;
+
+/**
+ * `F` with its parameters compared both ways, as a method's are, so a function taking a narrower argument fits.
+ * Unchecked: whoever calls it vouches for the argument, as the DOM does for a listener of an event type.
+ */
+export type Bivariant<F extends AnyFunction> = {
+  vouched(...parameters: Parameters<F>): ReturnType<F>;
+}['vouched'];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyAsyncFunction = (...parameters: any[]) => Promise<any>;
