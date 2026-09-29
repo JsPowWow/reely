@@ -288,6 +288,46 @@ const icon = (
 
 `a`, `title`, `script` and `style` are HTML tags too, so they are always created as HTML elements.
 
+## Kit
+
+Small helpers over signals and the owner live in their own entry, `@reely/dommy/kit`; an app that does not import it does not ship it. Each one that listens or times stops with the render that created it.
+
+```tsx
+import { effect, onCleanup } from '@reely/dommy';
+import { flip, listen, machine, media, persisted, size, throttled } from '@reely/dommy/kit';
+
+// a state machine: the state moves only along its transitions; states and events are typed from the config
+const race = machine({
+  initial: 'idle',
+  states: { idle: { start: 'countdown' }, countdown: { go: 'running', cancel: 'idle' }, running: { finish: 'idle' } },
+});
+race.send('start'); // true: idle → countdown
+race.can('finish'); // false, and reactive like any read of `race.state`
+effect(() => {
+  if (race.state.value === 'countdown') {
+    const timer = setTimeout(() => race.send('go'), 3000); // entering the state
+    onCleanup(() => clearTimeout(timer)); // leaving it
+  }
+});
+
+const phone = media('(max-width: 700px)'); // follows the media query
+const theme = persisted('theme', 'light'); // kept in localStorage, synced across tabs
+listen(window, 'keydown', (event) => event.key === 'Escape' && race.send('cancel')); // removed with the view
+
+const board = document.createElement('ol');
+const box = size(board); // { width, height } through a ResizeObserver
+const width = throttled(() => box.value.width, 500); // at most one change per 500 ms, the latest last
+flip(board, () => board.append(...Array.from(board.children).reverse())); // rows glide to their new places
+
+effect(() => console.log(phone.value, theme.value, width.value));
+```
+
+- `machine({ initial, states })` gives `state` (a computed), `send(event)` and `can(event)`; enter and leave a state with an effect and `onCleanup`.
+- `media(query)`, `size(element)` and `throttled(source, ms)` give computeds.
+- `persisted(key, initial, { storage, is })` gives a signal; what is read back must be of the kind of `initial`, or pass `is` to check it; a storage that throws leaves it working in memory.
+- `listen(target, type, handler, options)` types the event by target and returns the function that removes it.
+- `flip(container, change)` animates the children `change` moved, not those it added; nothing moves under reduced motion.
+
 ## Router
 
 `@reely/dommy/router` holds an experimental async router (`createAsyncRouter`). Its API will change; it is not part of the stable surface.

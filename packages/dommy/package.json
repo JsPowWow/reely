@@ -35,6 +35,11 @@
       "types": "./dist/router.d.ts",
       "import": "./dist/router.js",
       "default": "./dist/router.js"
+    },
+    "./kit": {
+      "types": "./dist/kit.d.ts",
+      "import": "./dist/kit.js",
+      "default": "./dist/kit.js"
     }
   },
   "files": [
