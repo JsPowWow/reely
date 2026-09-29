@@ -131,6 +131,29 @@ describe('Self-referencing in effects', () => {
     expect(runs).toHaveBeenCalledTimes(2);
   });
 
+  it('throws instead of hanging when two effects write what the other reads', () => {
+    const a = signal(0);
+    const b = signal(0);
+    const runs = vi.fn();
+    effect(() => {
+      runs();
+      b.value = a.value + 1;
+    });
+
+    const start = (): void => {
+      effect(() => {
+        runs();
+        if (runs.mock.calls.length > 10_000) {
+          throw new Error('the spec stopped the loop');
+        }
+        a.value = b.value + 1;
+      });
+    };
+
+    expect(start).toThrow(/cycle/);
+    expect(runs.mock.calls.length).toBeLessThan(1_000);
+  });
+
   it('still re-runs an effect for a signal it only reads', () => {
     const laps = signal(1);
     const seen: number[] = [];

@@ -65,6 +65,9 @@ let BATCH_DEPTH = 0;
 /** true while `flushSync` runs subscribers; writes made meanwhile join the same flush */
 let FLUSHING = false;
 
+/** How many waves of writes one flush runs before it takes them for a cycle of effects. */
+const MAX_FLUSH_WAVES = 100;
+
 /** What a reelx is made from: a computation, or the initial value of a state, a function included. */
 type ReelxSource<T> = { readonly kind: 'computed'; readonly compute: () => T } | { readonly kind: 'state'; readonly initial: T };
 
@@ -250,8 +253,13 @@ reelx.flushSync = (): void => {
   FLUSHING = true;
   // every subscriber runs even if one throws; the first error is rethrown at the end
   const errors: unknown[] = [];
+  let waves = 0;
   try {
     while (QUEUE.length > 0) {
+      if (++waves > MAX_FLUSH_WAVES) {
+        QUEUE = [];
+        throw new Error(`reelx: a cycle of effects, each writes a signal another one reads (${MAX_FLUSH_WAVES} waves)`);
+      }
       const iterator = QUEUE;
       QUEUE = [];
       for (const subscribers of iterator) {

@@ -411,7 +411,7 @@ effect(() => {
 });
 ```
 
-It still runs for the signals it only reads. To read a signal without depending on it, use `untracked` or `.peek()`.
+It still runs for the signals it only reads. To read a signal without depending on it, use `untracked` or `.peek()`. Two effects that each write what the other reads would run forever; after 100 waves of writes the flush stops and throws a cycle error instead of hanging the page.
 
 ### Releasing bindings
 
