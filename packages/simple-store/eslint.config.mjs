@@ -12,7 +12,7 @@ export default [
             '{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}',
             '{projectRoot}/vite.config.{js,ts,mjs,mts}',
           ],
-          // bundled into dist with its types, so a consumer installs only published packages
+          // bundled into dist
           ignoredDependencies: ['@reely/utils'],
         },
       ],
@@ -22,7 +22,7 @@ export default [
     },
   },
   {
-    // a consumer's code, checked by `scripts/consumer-check.mjs` with a consumer's tsconfig
+    // checked by scripts/consumer-check.mjs
     ignores: ['**/out-tsc', 'consumer'],
   },
 ];

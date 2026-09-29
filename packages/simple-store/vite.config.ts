@@ -4,8 +4,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
-// the published packages this one imports: they stay imports, so an app that uses several
-// @reely packages ships each once; the private @reely/utils is bundled into the JS and the types
+// published @reely packages stay imports, so an app ships each once; @reely/utils is bundled
 const external: string[] = ['@reely/emitter'];
 
 export default defineConfig(() => ({
@@ -25,7 +24,7 @@ export default defineConfig(() => ({
       fileName: (): string => 'index.js',
       formats: ['es' as const],
     },
-    // the app's bundler minifies; unminified, a consumer's stack traces keep the real names
+    // the app minifies; unminified, stack traces keep names
     minify: false,
     outDir: 'dist',
     sourcemap: true,

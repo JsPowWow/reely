@@ -11,7 +11,6 @@ export default defineConfig(() => ({
     dts({
       entryRoot: 'src',
       tsconfigPath: './tsconfig.lib.json',
-      // one declaration file with the private @reely/utils inlined, as in the JS
       rollupTypes: true,
       bundledPackages: ['@reely/utils'],
     }),
@@ -22,7 +21,7 @@ export default defineConfig(() => ({
       fileName: (): string => 'index.js',
       formats: ['es' as const],
     },
-    // the app's bundler minifies; unminified, a consumer's stack traces keep the real names
+    // the app minifies; unminified, stack traces keep names
     minify: false,
     outDir: 'dist',
     sourcemap: true,

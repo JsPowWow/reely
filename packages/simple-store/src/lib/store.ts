@@ -5,42 +5,24 @@ import type { Nullable } from '@reely/utils';
 
 import type { StoreEvents } from './store.types';
 
-/** How many notifications one change may cause before the store takes its listeners for a loop. */
 const maxNotifications = 100;
 
-/** Whether two selected values are the same, so the listeners of a selection need no notice. */
 export type Equality<R> = (previous: R, next: R) => boolean;
 
-/**
- * A read-only store of a part of another store's value, made by `select`. It notifies its
- * `changed` listeners only when the part changes, and follows the other store only while it has
- * listeners; without them it holds no subscription and `value` picks the part afresh.
- *
- * @template R - The part selected.
- */
+/** A read-only store of a part of another store's value, made by `select`. */
 export interface StoreSelection<R> {
-  /** The part of the other store's value held now. */
   readonly value: R;
-  /** Adds a listener of `changed` and returns the function that removes this subscription. */
   readonly on: IEventEmitter<StoreEvents<R>>['on'];
-  /** Removes a listener of `changed`. */
   readonly off: IEventEmitter<StoreEvents<R>>['off'];
-  /** Selects a part of this part: see `select` of a store. */
   select<Q>(selector: (value: R) => Q, equals?: Equality<Q>): StoreSelection<Q>;
 }
 
 /**
- * What every store shares: the `changed` listeners, notified one change at a time. A change made
- * while the listeners are being notified waits until every listener has the current value;
- * several such changes reach them once, as the latest. So each listener gets the values in the
- * order they were held and last gets the value held now.
- *
- * @template T - The value held.
+ * The `changed` listeners of a store, notified one change at a time: a change made during a
+ * notification waits for it to finish, and several such changes arrive once, as the latest.
  */
 export abstract class Store<T> {
-  /** Adds a listener of `changed` and returns the function that removes this subscription. */
   public readonly on: IEventEmitter<StoreEvents<T>>['on'];
-  /** Removes a listener of `changed`. */
   public readonly off: IEventEmitter<StoreEvents<T>>['off'];
 
   private readonly emitter = new EventEmitter<StoreEvents<T>>();
@@ -71,32 +53,24 @@ export abstract class Store<T> {
   }
 
   /**
-   * A read-only store of a part of this one's value: it notifies its listeners only when that part
-   * changes, and follows this store only while it has listeners. To read a part once, call the
-   * selector on the value instead.
-   *
-   * @param selector - Picks the part; called while the selection is read or listened to.
-   * @param equals - Whether two parts are the same; `Object.is` by default.
+   * A read-only store of a part of the value: it notifies only when the part changes (by `equals`)
+   * and follows this store only while it has listeners.
    */
   public select<R>(selector: (value: T) => R, equals: Equality<R> = Object.is): StoreSelection<R> {
     return new SelectedStore(this.on, () => selector(this.read()), equals);
   }
 
-  /** Called when the store gets its first listener; a throw takes that listener back. */
+  /** Called on the first listener; a throw takes that listener back. */
   protected watch(): void {
-    // a store that holds its own value has nothing to follow
+    // only a selection follows another store
   }
 
-  /** Called when the store loses its last listener. */
+  /** Called when the last listener leaves. */
   protected unwatch(): void {
-    // a store that holds its own value has nothing to follow
+    // only a selection follows another store
   }
 
-  /**
-   * Notifies the listeners of the value held now. A listener that throws does not stop the others
-   * or the notifications still due; its error is thrown after them, or an `AggregateError` when
-   * several threw.
-   */
+  /** Errors of listeners are thrown after all have run: one as is, several as `AggregateError`. */
   protected notify(): void {
     if (this.notifying) {
       this.changedMeanwhile = true;
@@ -136,17 +110,14 @@ export abstract class Store<T> {
     }
   }
 
-  /** The value held now. */
   protected abstract read(): T;
 }
 
-/** A selection while it follows its store: the part its listeners have, and how to stop. */
 interface Followed<R> {
   value: R;
   readonly stop: Unsubscribe;
 }
 
-/** The store `select` makes. */
 class SelectedStore<R> extends Store<R> implements StoreSelection<R> {
   private followed: Nullable<Followed<R>> = null;
 
@@ -167,7 +138,7 @@ class SelectedStore<R> extends Store<R> implements StoreSelection<R> {
   }
 
   protected override watch(): void {
-    // follow first, so a selection this one picks from is followed, and fresh, too
+    // follow before picking, so a selection this one picks from is fresh
     const stop = this.follow('changed', () => {
       const next = this.pick();
       if (hasSome(this.followed) && !this.equals(this.followed.value, next)) {

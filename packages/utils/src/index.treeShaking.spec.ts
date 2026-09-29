@@ -4,7 +4,6 @@ import { build } from 'esbuild';
 
 const index = resolve(import.meta.dirname, 'index.ts');
 
-/** Bundles `code` as an app would, with pure annotations ignored, so only really unused code goes. */
 const bundle = async (code: string): Promise<string> => {
   const { outputFiles } = await build({
     stdin: { contents: code, resolveDir: import.meta.dirname, loader: 'ts' },

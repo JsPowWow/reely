@@ -1,11 +1,6 @@
-// Checks a package the way a consumer gets it: `npm pack` of it and of the `@reely/*` packages it
-// depends on, `npm i` of the tarballs in a clean project, strict `tsc` without the DOM library on
-// the package's `consumer/*.ts`, then each compiled file run in Node (it throws when a check fails).
-// Last, tree shaking: an app that imports the package and uses nothing ships nothing, and each
-// case of `consumer/shake.json` bundles its code with esbuild, as an app would, and counts the
-// declarations of each name, including the copies esbuild renames (`EventEmitter2`): `absent`
-// names must have none, `once` names exactly one.
-// Run from the package directory: `node ../../scripts/consumer-check.mjs`.
+// A package as a consumer gets it: packed with its @reely dependencies, installed in a clean
+// project, `consumer/*.ts` compiled (strict, no DOM lib) and run, then tree shaking checked:
+// a bare import ships nothing, and `consumer/shake.json` names are declared `once` or are `absent`.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -23,7 +18,6 @@ const work = mkdtempSync(join(tmpdir(), 'reely-consumer-'));
 
 const run = (command, args, cwd = work) => execFileSync(command, args, { cwd, encoding: 'utf8', stdio: 'pipe' });
 
-/** The directories of the package and of every `@reely/*` package it needs at run time. */
 const withLocalDependencies = (dir, seen = new Set()) => {
   if (seen.has(dir)) {
     return seen;
@@ -57,14 +51,12 @@ try {
       include: ['src'],
     })
   );
-  // the packed @reely packages bundle their private helpers, so the install needs nothing else
   run('npm', ['install', '--no-audit', '--no-fund', '--registry', 'https://registry.npmjs.org', ...tarballs]);
   run(process.execPath, [tsc, '-p', work]);
   for (const file of readdirSync(join(work, 'out')).filter((name) => name.endsWith('.js'))) {
     run(process.execPath, [join(work, 'out', file)]);
   }
 
-  /** Bundles `code` the way an app does, unminified so names stay searchable, and minified to size it. */
   const bundle = async (code, minify) => {
     const { outputFiles } = await build({
       stdin: { contents: code, resolveDir: work, loader: 'ts' },
@@ -77,7 +69,7 @@ try {
     });
     return outputFiles[0].text;
   };
-  // pure without the help of `"sideEffects": false`: no top-level code runs, so nothing is kept
+  // ignoreAnnotations: pure code, not just `sideEffects: false`
   for (const ignoreAnnotations of [false, true]) {
     const { outputFiles } = await build({
       stdin: { contents: `import '${manifest.name}';`, resolveDir: work },
