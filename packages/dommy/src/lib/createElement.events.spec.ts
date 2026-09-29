@@ -35,16 +35,22 @@ describe('createElement: events', () => {
     expect(seen).toEqual(['click BUTTON', 'Enter']);
   });
 
-  it('accepts camelCase handler names', () => {
+  it('accepts camelCase handler names, a capital letter for every word as in React', () => {
     const onClick = vi.fn();
-    const onKeydown = vi.fn();
-    const input = createElement('input', { onClick, onKeydown });
+    const onKeyDown = vi.fn();
+    const onPointerMove = vi.fn();
+    const input = createElement('input', { onClick, onKeyDown, onPointerMove });
 
     input.click();
     input.dispatchEvent(new KeyboardEvent('keydown'));
+    input.dispatchEvent(new Event('pointermove'));
 
     expect(onClick).toHaveBeenCalledOnce();
-    expect(onKeydown).toHaveBeenCalledOnce();
+    expect(onKeyDown).toHaveBeenCalledOnce();
+    expect(onPointerMove).toHaveBeenCalledOnce();
+    expect(createElement('div', { onDblClick: () => undefined, onTransitionEnd: () => undefined })).toBeInstanceOf(HTMLDivElement);
+    // @ts-expect-error only the first word capitalised is neither the DOM name nor the camelCase one
+    expect(createElement('input', { onKeydown: () => undefined })).toBeInstanceOf(HTMLInputElement);
   });
 
   it.each(['onclick', 'onClick'])('never renders a string `%s` as an inline handler', (property) => {
