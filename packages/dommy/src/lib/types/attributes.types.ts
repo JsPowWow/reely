@@ -59,6 +59,12 @@ type ExcludedDOMProps =
   | 'ownerDocument'
   | 'childNodes';
 
+/**
+ * Props the DOM types as the element they point at (`input.list`, `button.form`), while the
+ * attribute takes that element's id, as the ID-reference `aria` props do.
+ */
+type ElementIdReference = 'list' | 'form';
+
 type SafeAttributes<T> = {
   [K in keyof T as K extends ExcludedDOMProps
     ? never
@@ -66,7 +72,7 @@ type SafeAttributes<T> = {
     ? never
     : Extract<T[K], AnyFunction> extends never
     ? K
-    : never]: MaybeReactive<T[K]>;
+    : never]: K extends ElementIdReference ? MaybeReactive<string> : MaybeReactive<T[K]>;
 } & DataAttributes;
 
 type DataAttributes = {

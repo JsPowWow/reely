@@ -16,6 +16,22 @@ describe('createElement: properties and attributes', () => {
     expect(input.getAttribute('tabindex')).toBe('2');
   });
 
+  it('takes DOM property names, lowercase where the DOM has them so', () => {
+    const input = createElement('input', { autocomplete: 'username', autofocus: true });
+
+    expect(input.getAttribute('autocomplete')).toBe('username');
+    expect(input.hasAttribute('autofocus')).toBe(true);
+  });
+
+  it('sets `list` and `form`, element references in the DOM, as the id attributes they are', () => {
+    const input = createElement('input', { list: 'cars', form: 'entry' });
+    const button = createElement('button', { form: 'entry' });
+
+    expect(input.getAttribute('list')).toBe('cars');
+    expect(input.getAttribute('form')).toBe('entry');
+    expect(button.getAttribute('form')).toBe('entry');
+  });
+
   it('sets a boolean attribute when true and omits it when false', () => {
     const enabled = createElement('button', { disabled: false });
     const disabled = createElement('button', { disabled: true });
@@ -23,6 +39,17 @@ describe('createElement: properties and attributes', () => {
     expect(enabled.hasAttribute('disabled')).toBe(false);
     expect(disabled.getAttribute('disabled')).toBe('');
     expect(disabled.disabled).toBe(true);
+  });
+
+  it('selects the option a `select` value names, set once its options are in place', () => {
+    const select = createElement(
+      'select',
+      { value: 'b' },
+      createElement('option', { value: 'a' }, 'A'),
+      createElement('option', { value: 'b' }, 'B')
+    );
+
+    expect(select.value).toBe('b');
   });
 
   describe('live state', () => {

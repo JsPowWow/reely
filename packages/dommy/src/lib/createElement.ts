@@ -9,7 +9,10 @@ import type { DOMElement, DOMElementFactoryProps, HtmlElementTag, ReelyNode } fr
 import type { Component } from './types/jsx.types';
 import type { SvgElement, SvgElementProps, SvgElementTag } from './types/svg.types';
 
-/** Builds an element from untyped props and children, checking them at runtime. */
+/**
+ * Builds an element from untyped props and children, checking them at runtime. Children go in
+ * before props, so a `select` value finds the option it names.
+ */
 const buildElement = <Tag extends HtmlElementTag>(
   tag: Tag,
   maybeProps: unknown,
@@ -18,8 +21,8 @@ const buildElement = <Tag extends HtmlElementTag>(
   pipe(
     document.createElement(tag),
     assignElementRef<DOMElement<Tag>>(maybeProps),
-    assignProperties<DOMElement<Tag>>(maybeProps),
-    appendChildren<DOMElement<Tag>>(toElementChildren(maybeProps, maybeChildren))
+    appendChildren<DOMElement<Tag>>(toElementChildren(maybeProps, maybeChildren)),
+    assignProperties<DOMElement<Tag>>(maybeProps)
   );
 
 /** Builds an SVG element: the same steps in the SVG namespace. */
@@ -31,8 +34,8 @@ const buildSvgElement = <Tag extends SvgElementTag>(
   pipe(
     document.createElementNS(SVG_NAMESPACE, tag),
     assignElementRef<SvgElement<Tag>>(maybeProps),
-    assignProperties<SvgElement<Tag>>(maybeProps),
-    appendChildren<SvgElement<Tag>>(toElementChildren(maybeProps, maybeChildren))
+    appendChildren<SvgElement<Tag>>(toElementChildren(maybeProps, maybeChildren)),
+    assignProperties<SvgElement<Tag>>(maybeProps)
   );
 
 /**

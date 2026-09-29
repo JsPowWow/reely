@@ -5,13 +5,11 @@ const mappedAttributes = [
   ['maxLength', 'maxlength'],
   ['minLength', 'minlength'],
   ['tabIndex', 'tabindex'],
-  ['autoComplete', 'autocomplete'],
   ['colSpan', 'colspan'],
   ['rowSpan', 'rowspan'],
   ['formNoValidate', 'formnovalidate'],
 
   ['formAction', 'formaction'],
-  ['formEncType', 'formenctype'],
   ['formMethod', 'formmethod'],
   ['formTarget', 'formtarget'],
   ['acceptCharset', 'accept-charset'],
@@ -25,8 +23,6 @@ const mappedAttributes = [
   ['bgColor', 'bgcolor'],
 
   ['httpEquiv', 'http-equiv'],
-
-  ['autoFocus', 'autofocus'],
 
   ['viewBox', 'viewBox'],
   ['preserveAspectRatio', 'preserveAspectRatio'],
