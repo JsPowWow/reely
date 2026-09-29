@@ -12,6 +12,8 @@ export default [
             '{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}',
             '{projectRoot}/vite.config.{js,ts,mjs,mts}',
           ],
+          // bundled into dist
+          ignoredDependencies: ['@reely/utils'],
         },
       ],
     },
@@ -20,6 +22,7 @@ export default [
     },
   },
   {
-    ignores: ['**/out-tsc'],
+    // checked by scripts/consumer-check.mjs
+    ignores: ['**/out-tsc', 'consumer'],
   },
 ];

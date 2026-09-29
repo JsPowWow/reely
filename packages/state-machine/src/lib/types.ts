@@ -1,5 +1,5 @@
 import type { EventsMap, EventType, IEventEmitter } from '@reely/emitter';
-import type { KeysWithType, Nullable, PromiseResolver } from '@reely/utils';
+import type { KeysWithType, Nullable } from '@reely/utils';
 
 export type StateMachineState = PropertyKey;
 
@@ -77,17 +77,12 @@ export type StateMachineTransition<
     }
   | StateMachineTransitionExecutor<Transitions, StateFrom, StateTo, Transition, Context>;
 
-export type StateMachinePendingTransition<
-  Transitions extends EventsMap,
-  State extends StateMachineState,
-  Context extends NonNullable<unknown>
-> = {
+export type StateMachinePendingTransition<Transitions extends EventsMap, State extends StateMachineState> = {
   status: 'pending';
   success: false;
   state: State;
   transition: EventType<Transitions>;
   parameters: Transitions[EventType<Transitions>] extends undefined ? [] : [Transitions[EventType<Transitions>]];
-  resolver: PromiseResolver<StateMachineTransitionResult<Transitions, State, Context>>;
 };
 
 export type StateMachineTransitionResult<

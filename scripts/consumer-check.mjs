@@ -31,7 +31,17 @@ const withLocalDependencies = (dir, seen = new Set()) => {
 };
 
 try {
-  const tarballs = [...withLocalDependencies(packageDir)].map(
+  const shakeFile = join(packageDir, 'consumer', 'shake.json');
+  const shakeCases = existsSync(shakeFile) ? JSON.parse(readFileSync(shakeFile, 'utf8')) : [];
+  // the other @reely packages a case bundles together with this one
+  const bundledTogether = shakeCases.flatMap(({ code }) =>
+    [...code.matchAll(/['"`]@reely\/([\w-]+)['"`]/g)].map(([, dir]) => dir)
+  );
+  const packageDirs = new Set();
+  for (const dir of [packageDir, ...bundledTogether.map((name) => join(packagesDir, name))]) {
+    withLocalDependencies(dir, packageDirs);
+  }
+  const tarballs = [...packageDirs].map(
     (dir) => `./${run('npm', ['pack', '--silent', '--pack-destination', work], dir).trim().split('\n').at(-1)}`
   );
   writeFileSync(join(work, 'package.json'), JSON.stringify({ name: 'consumer', private: true, type: 'module' }));
@@ -83,8 +93,7 @@ try {
     });
     assert.equal(outputFiles[0].text.trim(), '', `importing ${manifest.name} ships code (ignoreAnnotations: ${ignoreAnnotations})`);
   }
-  const shakeFile = join(packageDir, 'consumer', 'shake.json');
-  for (const { name, code, absent = [], once = [] } of existsSync(shakeFile) ? JSON.parse(readFileSync(shakeFile, 'utf8')) : []) {
+  for (const { name, code, absent = [], once = [] } of shakeCases) {
     const text = await bundle(code, false);
     const declarations = (declared) =>
       text.match(new RegExp(`\\b(?:var|let|const|function|class) ${declared}\\d*\\b`, 'g'))?.length ?? 0;

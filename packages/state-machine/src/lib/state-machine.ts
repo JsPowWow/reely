@@ -1,6 +1,6 @@
 import type { EventsMap, EventType } from '@reely/emitter';
 import { EventEmitter } from '@reely/emitter';
-import { ConcurrentQueue } from '@reely/queue';
+import { AsyncQueue } from '@reely/queue';
 import type { AnyFunction } from '@reely/utils';
 import {
   hasProperty,
@@ -8,7 +8,6 @@ import {
   isPromise,
   isSomeFunction,
   isString,
-  promiseResolver,
   toErrorWithMessage,
 } from '@reely/utils';
 
@@ -37,32 +36,9 @@ export class StateMachine<
 
   private readonly contextData: Context;
 
-  private readonly processingQueue = new ConcurrentQueue<StateMachinePendingTransition<Transitions, State, Context>>({
-    concurrency: 15, // TODO AR from definition
-  }).process((task): Promise<StateMachineTransitionResult<Transitions, State, Context>> => {
-    try {
-      const result = this.processTransitionTask(task);
-      if (isPromise(result)) {
-        result.then(task.resolver.resolve).catch((anyError) => {
-          task.resolver.resolve(
-            this.createFailedTransitionResult(
-              `The error occurred on "${String(this.currentState)}" pending transition processing.`,
-              toErrorWithMessage(anyError)
-            )
-          );
-        });
-      } else {
-        task.resolver.resolve(result);
-      }
-    } catch (anyError) {
-      task.resolver.resolve(
-        this.createFailedTransitionResult(
-          `The error occurred on "${String(this.currentState)}" transition processing.`,
-          toErrorWithMessage(anyError)
-        )
-      );
-    }
-    return task.resolver.promise;
+  // TODO AR the old behaviour until the machine runs on SyncQueue / AsyncQueue(1), ADR 0001
+  private readonly processingQueue = new AsyncQueue<StateMachineTransitionResult<Transitions, State, Context>>({
+    concurrency: Number.POSITIVE_INFINITY,
   });
 
   constructor(definition: StateMachineDefinition<State, Transitions, Context>, context: Context) {
@@ -93,18 +69,24 @@ export class StateMachine<
     transition: T,
     ...parameters: D extends undefined ? [] : [D]
   ): Promise<StateMachineTransitionResult<Transitions, State, Context>> {
-    const resolver = promiseResolver<StateMachineTransitionResult<Transitions, State, Context>>();
-
-    this.processingQueue.add({
+    const task: StateMachinePendingTransition<Transitions, State> = {
       status: 'pending',
       success: false,
       state: this.currentState,
       transition,
       parameters,
-      resolver,
-    });
+    };
 
-    return resolver.promise;
+    return this.processingQueue.add(async () => {
+      try {
+        return await this.processTransitionTask(task);
+      } catch (anyError) {
+        return this.createFailedTransitionResult(
+          `The error occurred on "${String(this.currentState)}" transition processing.`,
+          toErrorWithMessage(anyError)
+        );
+      }
+    });
   }
 
   public on<P extends Parameters<typeof this.emitter.on>>(...parameters: P): () => void {
@@ -117,7 +99,7 @@ export class StateMachine<
 
    
   protected processTransitionTask(
-    transitionTask: StateMachinePendingTransition<Transitions, State, Context>
+    transitionTask: StateMachinePendingTransition<Transitions, State>
   ):
     | StateMachineTransitionResult<Transitions, State, Context>
     | Promise<StateMachineTransitionResult<Transitions, State, Context>> {

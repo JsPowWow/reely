@@ -3,31 +3,23 @@
   "compilerOptions": {
     "baseUrl": ".",
     "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
+    "outDir": "out-tsc/lib",
+    "tsBuildInfoFile": "out-tsc/lib/tsconfig.lib.tsbuildinfo",
     "emitDeclarationOnly": false,
     "forceConsistentCasingInFileNames": true,
-    "types": [
-      "node",
-      "vite/client",
-      "vitest/globals",
-      "vitest/importMeta",
-      "vitest"
-    ],
+    "types": ["node", "vite/client", "vitest/globals", "vitest/importMeta", "vitest"],
     "moduleResolution": "node",
     "module": "esnext",
-    "lib": [
-      "es2024",
-      "dom"
-    ],
+    "lib": ["es2024", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "ignoreDeprecations": "6.0"
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "references": [
+    {
+      "path": "../emitter/tsconfig.lib.json"
+    },
     {
       "path": "../utils/tsconfig.lib.json"
     }
