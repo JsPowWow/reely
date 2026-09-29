@@ -458,3 +458,8 @@ const Search = (): Node => {
 ## License
 
 MIT
+
+## Credits
+
+- The signal core (`reelx`) is adapted from [act](https://github.com/artalar/act) by artalar, MIT licence.
+- The signal tests are adapted from [@preact/signals-core](https://github.com/preactjs/signals), Copyright (c) 2022-present Preact Team, MIT licence.

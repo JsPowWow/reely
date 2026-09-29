@@ -1,3 +1,4 @@
+// Adapted from act by artalar (https://github.com/artalar/act), MIT licence.
 import type { Nullable } from '@reely/utils';
 import { hasProperty, hasSome, isSomeFunction } from '@reely/utils';
 

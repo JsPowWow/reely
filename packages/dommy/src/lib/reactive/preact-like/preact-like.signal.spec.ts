@@ -1,3 +1,5 @@
+// Adapted from the tests of @preact/signals-core (https://github.com/preactjs/signals),
+// Copyright (c) 2022-present Preact Team, MIT licence.
 import { batch, computed, effect, signal, type Signal, untracked } from './preact-like.signal';
 import { onCleanup } from '../owner';
 import { reelxDebug } from '../reelx/reelx.core';
