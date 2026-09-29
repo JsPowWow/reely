@@ -19,7 +19,6 @@ export { Maybe } from './lib/fp/maybe/Maybe';
 export { mapNullable } from './lib/nullable/mapNullable';
 export { withDefault } from './lib/nullable/withDefault';
 
-
 export { pipe } from './lib/fp/pipe';
 export { default as flow } from './lib/fp/flow';
 export { default as flowRight } from './lib/fp/flowRight';
@@ -50,6 +49,7 @@ export { isNonEmpty } from './lib/objects/isNonEmpty';
 export { default as isObjectTypeOf } from './lib/objects/isObjectTypeOf';
 export { default as objectTypeOf } from './lib/objects/objectTypeOf';
 export { isPlainObject } from '@reely/basics';
+export { isKeyValueObject } from './lib/objects/isKeyValueObject';
 export { default as isPromiseLike } from './lib/objects/isPromiseLike';
 export { default as isPromise } from './lib/objects/isPromise';
 export { default as hasOwnProperty } from './lib/objects/hasOwnProperty';

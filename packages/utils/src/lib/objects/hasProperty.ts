@@ -1,4 +1,4 @@
-import { hasSome , isSomeFunction } from '@reely/basics';
+import { hasSome, isSomeFunction } from '@reely/basics';
 
 import isValidRecordKey from './isValidRecordKey';
 
