@@ -6,7 +6,7 @@
 export const measured = {
   signalsOnly: '1.3 kB',
   jsxApp: '4.7 kB',
-  wholePackage: '6.5 kB',
+  wholePackage: '6.6 kB',
   lapMedian: '7.7 ms',
   lapP95: '8.7 ms',
 } as const;

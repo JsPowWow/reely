@@ -297,6 +297,14 @@ export const docTopics: readonly DocTopic[] = [
           Press Next lap and count one text edit. Press Finish and count the nodes: the fallback paragraph goes, the
           winner’s plate comes.
         </p>
+        <h2>A new branch for a new value</h2>
+        <p>
+          <code>Show</code> keeps its branch while the truthiness stays. <code>Keyed</code> builds the branch anew, with
+          new state, whenever its value changes: <code>
+            {'<Keyed value={reviewer}>{(name) => <ReviewForm name={name} />}</Keyed>'}
+          </code>{' '}
+          gives every reviewer an empty form.
+        </p>
       </>
     ),
   },
@@ -360,8 +368,8 @@ export const docTopics: readonly DocTopic[] = [
             <code>unmount()</code>, the function <code>mount</code> returned.
           </li>
           <li>
-            <code>For</code>, for a row whose key is gone; <code>Show</code> and <code>Await</code>, for the branch they
-            hide.
+            <code>For</code>, for a row whose key is gone; <code>Show</code>, <code>Keyed</code> and{' '}
+            <code>Await</code>, for the branch they hide.
           </li>
           <li>An effect, before its next run and when it is stopped.</li>
         </ul>

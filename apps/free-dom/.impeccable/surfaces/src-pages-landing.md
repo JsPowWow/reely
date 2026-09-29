@@ -9,7 +9,7 @@ related_targets: []
 
 Scope: the reely landing page at `/`. Mode: Persuade.
 
-Audience: any JS/TS developer arriving from npm, GitHub or a talk. Job: decide reely is worth trying. Action: open the docs (primary); install with `npm i @reely/dommy@next` and read the source on GitHub (secondary). Proof: live demos with their DOM writes counted, the measured sizes (1.3 / 4.7 / 6.5 kB gzip) and speed (500-row lap, 7.7 ms median), and the fact that this page and the whole site are built with reely. Constraints: no invented adopters or claims; only `@reely/*` at runtime; the world is race timing, same world, bolder.
+Audience: any JS/TS developer arriving from npm, GitHub or a talk. Job: decide reely is worth trying. Action: open the docs (primary); install with `npm i @reely/dommy@next` and read the source on GitHub (secondary). Proof: live demos with their DOM writes counted, the measured sizes (1.3 / 4.7 / 6.6 kB gzip) and speed (500-row lap, 7.7 ms median), and the fact that this page and the whole site are built with reely. Constraints: no invented adopters or claims; only `@reely/*` at runtime; the world is race timing, same world, bolder.
 
 Memorable moment: the sector bar filling in signal yellow as you scroll the lap, each sector proving its claim live.
 
