@@ -46,6 +46,7 @@ export { default as isValidRecordKey } from './lib/objects/isValidRecordKey';
 export { isNonEmpty } from './lib/objects/isNonEmpty';
 
 export { default as isObjectTypeOf } from './lib/objects/isObjectTypeOf';
+export { default as objectTypeOf } from './lib/objects/objectTypeOf';
 export { default as isPlainObject } from './lib/objects/isPlainObject';
 export { default as isPromiseLike } from './lib/objects/isPromiseLike';
 export { default as isPromise } from './lib/objects/isPromise';
