@@ -1,0 +1,7 @@
+[
+  {
+    "name": "an emitter",
+    "code": "import { EventEmitter } from '@reely/emitter'; new EventEmitter().emit('lap');",
+    "once": ["EventEmitter"]
+  }
+]

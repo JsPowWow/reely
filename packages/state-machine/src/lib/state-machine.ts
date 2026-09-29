@@ -107,7 +107,7 @@ export class StateMachine<
     return resolver.promise;
   }
 
-  public on<P extends Parameters<typeof this.emitter.on>>(...parameters: P): void {
+  public on<P extends Parameters<typeof this.emitter.on>>(...parameters: P): () => void {
     return this.emitter.on.apply(this, parameters);
   }
 

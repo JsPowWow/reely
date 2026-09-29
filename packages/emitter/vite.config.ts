@@ -1,14 +1,32 @@
 /// <reference types='vitest' />
+import { resolve } from 'path';
+
 import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/packages/emitter',
-  plugins: [],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [],
-  // },
+  plugins: [
+    dts({
+      entryRoot: 'src',
+      tsconfigPath: './tsconfig.lib.json',
+      // one declaration file with the private @reely/utils inlined, as in the JS
+      rollupTypes: true,
+      bundledPackages: ['@reely/utils'],
+    }),
+  ],
+  build: {
+    lib: {
+      entry: resolve(import.meta.dirname, 'src/index.ts'),
+      fileName: (): string => 'index.js',
+      formats: ['es' as const],
+    },
+    // the app's bundler minifies; unminified, a consumer's stack traces keep the real names
+    minify: false,
+    outDir: 'dist',
+    sourcemap: true,
+  },
   test: {
     name: '@reely/emitter',
     watch: false,

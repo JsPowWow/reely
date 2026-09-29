@@ -1,3 +1,2 @@
-export * from './lib/emitter';
-export * from './lib/events-listeners';
-export * from './lib/types';
+export { EventEmitter } from './lib/emitter';
+export type * from './lib/types';
