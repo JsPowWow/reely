@@ -17,6 +17,9 @@ export { Maybe } from './lib/fp/maybe/Maybe';
 
 export { mapNullable } from './lib/nullable/mapNullable';
 export { withDefault } from './lib/nullable/withDefault';
+export { assertIsNonNullable } from './lib/nullable/assertIsNonNullable';
+
+export { default as promiseResolver, type PromiseResolver } from './lib/async/promiseResolver';
 
 export { pipe } from './lib/fp/pipe';
 export { default as flow } from './lib/fp/flow';
