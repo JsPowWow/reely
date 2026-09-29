@@ -45,13 +45,13 @@ export class AppElement extends HTMLElement {
               },
               span(
                 {
-                  onMousedown: {
+                  onMouseDown: {
                     handleEvent: (e) => {
                       console.log('via descriptor: ', e.type, e.currentTarget);
                     },
                     signal: this.testSignal.signal,
                   },
-                  onMouseleave: addListener((e) => {
+                  onMouseLeave: addListener((e) => {
                     console.log('via handleEvent: ', e.type, e.eventPhase, e.currentTarget);
                   }),
                 },
