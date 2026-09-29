@@ -7,7 +7,6 @@ type NaiveFlowFunction = {
   <A, B, C, D>(f1: (v: A) => B, f2: (v: B) => C, f3: (v: C) => D): (v: A) => D;
   <A, B, C, D, E>(f1: (v: A) => B, f2: (v: B) => C, f3: (v: C) => D, f4: (v: D) => E): (v: A) => E;
   <A, B, C, D, E, F>(f1: (v: A) => B, f2: (v: B) => C, f3: (v: C) => D, f4: (v: D) => E, f5: (v: E) => F): (v: A) => F;
-  // ... etc.
 };
 
 const flow: NaiveFlowFunction = <T>(...fns: UnaryFunction<T, T>[]) => {

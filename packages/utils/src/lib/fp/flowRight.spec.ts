@@ -38,7 +38,6 @@ describe('flowRight', () => {
     });
 
     it('should apply the array arguments and continue', () => {
-      // const checkIfTsError = flowRight(oneOrTwo, toTuple)(1); // expected error
       const result = flowRight(stringSplitBy(','), tupleToString, toTuple, oneOrTwo, say('hi'))([1, 2, 3]); // [string]
       expect(result).toStrictEqual(['2', '2', '3']);
     });

@@ -1,33 +1,23 @@
-/**
- * RGB color representation
- */
 export interface RgbColor {
     r: number;
     g: number;
     b: number;
 }
 
-/**
- * HSL color representation
- */
 export interface HslColor {
     h: number;
     s: number;
     l: number;
 }
 
-/**
- * Convert hex color to RGB
- */
+/** Accepts 3- or 6-digit hex, `#` optional; throws on anything else. */
 export function hexToRgb(hex: string): RgbColor {
     if (!isValidHex(hex)) {
         throw new Error('Invalid hex color');
     }
 
-    // Remove # if present
     const cleanHex = hex.replace('#', '');
 
-    // Handle 3-digit hex
     const fullHex = cleanHex.length === 3
         ? cleanHex.split('').map(char => char + char).join('')
         : cleanHex;
@@ -41,9 +31,7 @@ export function hexToRgb(hex: string): RgbColor {
     };
 }
 
-/**
- * Convert RGB to hex color
- */
+/** Lowercase `#rrggbb`; throws unless each channel is an integer from 0 to 255. */
 export function rgbToHex(r: number, g: number, b: number): string;
 export function rgbToHex(rgb: RgbColor): string;
 export function rgbToHex(
@@ -73,9 +61,7 @@ export function rgbToHex(
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
-/**
- * Darken a color by percentage
- */
+/** Moves each channel toward 0 by `percent` (0–100). */
 export function darken(color: string, percent: number): string {
     if (!isValidHex(color)) {
         throw new Error('Invalid hex color');
@@ -94,9 +80,7 @@ export function darken(color: string, percent: number): string {
     );
 }
 
-/**
- * Lighten a color by percentage
- */
+/** Moves each channel toward 255 by `percent` (0–100). */
 export function lighten(color: string, percent: number): string {
     if (!isValidHex(color)) {
         throw new Error('Invalid hex color');
@@ -115,17 +99,12 @@ export function lighten(color: string, percent: number): string {
     );
 }
 
-/**
- * Validate hex color code
- */
 export function isValidHex(color: unknown): color is string {
     if (typeof color !== 'string') return false;
     return /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
 }
 
-/**
- * Validate RGB values
- */
+/** Whether each channel is an integer from 0 to 255. */
 export function isValidRgb(r: number, g: number, b: number): boolean;
 export function isValidRgb(rgb: Partial<RgbColor>): boolean;
 export function isValidRgb(
@@ -147,9 +126,7 @@ export function isValidRgb(
     return isValid(r) && isValid(g) && isValid(b);
 }
 
-/**
- * Get contrast ratio between two colors
- */
+/** The WCAG contrast ratio, from 1 to 21. */
 export function getContrastRatio(color1: string, color2: string): number {
     const getLuminance = (rgb: RgbColor): number => {
         const toLinear = (val: number): number => {
@@ -175,17 +152,12 @@ export function getContrastRatio(color1: string, color2: string): number {
     return (lighter + 0.05) / (darker + 0.05);
 }
 
-/**
- * Generate a random hex color
- */
 export function randomHex(): string {
     const random = (): number => Math.floor(Math.random() * 256);
     return rgbToHex(random(), random(), random());
 }
 
-/**
- * Convert RGB to HSL
- */
+/** Hue in degrees, saturation and lightness in percent, rounded. */
 export function rgbToHsl(r: number, g: number, b: number): HslColor;
 export function rgbToHsl(rgb: RgbColor): HslColor;
 export function rgbToHsl(

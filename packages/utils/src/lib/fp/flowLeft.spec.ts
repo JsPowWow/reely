@@ -40,7 +40,6 @@ describe('flowLeft', () => {
     });
 
     it('should apply the array arguments and continue', () => {
-      //const checkIfTsError = flowLeft(oneOrTwo, toTuple)(1); // expected error
       const result = flowLeft(say('hi'), oneOrTwo, toTuple, tupleToString, stringSplitBy(','))([1, 2, 3]); // [string]
       expect(result).toStrictEqual(['2', '2', '3']);
     });

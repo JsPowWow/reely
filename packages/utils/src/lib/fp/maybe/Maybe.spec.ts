@@ -71,17 +71,3 @@ describe('Maybe tests', () => {
     });
   });
 });
-
-// container.addEventListener(
-//   'click',
-//   flow(preventDefault, getEventTarget, (target) => {
-//     Maybe.from(target)
-//       .flatMap(maybeInstanceOf(Element))
-//       .mapNullable(getClosestByDataAttribute('action'))
-//       .flatMap(maybeInstanceOf(HTMLElement))
-//       .mapNullable(getDataAttributeValue('action'))
-//       .flatMap(maybeKeyOf(actions))
-//       .unwrap((a) => actions[a](), noop);
-//   }),
-//   { signal },
-// );

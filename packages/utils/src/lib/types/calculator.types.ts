@@ -58,32 +58,3 @@ export type Calculator<T extends string, NoSpace extends string = Remove<T, ' '>
 ] extends true[]
   ? T
   : never;
-
-// function validate<T extends string>(input: Calculator<T>): T {
-//   return input;
-// }
-//
-// const v1 = validate('(1 * (2 + 3))');
-// const v2 = validate('3 * (5 + 2) / (4 - 1)');
-// const v3 = validate('((7 - 2) * 4) / (3 + 1)');
-// const v4 = validate('10 - ((2 + 3) * 4)');
-// const v5 = validate('((2 * 3) + 5) / (6 - 1)');
-// const v6 = validate('(1 + 2) * 3 - 4 / (5 + 6)');
-// const v7 = validate('2 * ((3 + 4) * (5 - 1)) / 6');
-// const v8 = validate('((8 / 2) + (7 * 2)) * (9 - 1)');
-// const v9 = validate('(2 * (3 + 4) / (5 - 1))');
-// const v10 = validate('(10 - 2) / (3 + (5 - 4))');
-//
-// const e2 = validate('(4 * 6 + 3) / )2 - 1('); //(mismatched brackets)
-// const e3 = validate('3 * / 2'); //(missing operand)
-// const e4 = validate('(2+3)*(4-)'); //(missing operand)
-// const e5 = validate('5 + * 3'); // (misplaced operator)
-// const e6 = validate('((7 - 2) * 4 / (3 + 1)'); // (missing closing bracket)
-// const e7 = validate('2 * (3 + 4)) * (5 - 1)) / 6'); // (mismatched brackets)
-// const e8 = validate('((8 / 2) + (7 * 2)) * (9 - 1'); // (missing closing bracket)
-// const e9 = validate('2 * (3 + 4) / (5 - 1))'); // (mismatched brackets)
-// const e10 = validate('(10 - 2) / (3 + (5 - 4)) + '); // (missing operand)
-//
-// const print = () => {
-//   console.log(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, e2, e3, e4, e5, e6, e7, e8, e9, e10);
-// };

@@ -38,14 +38,3 @@ export default function flowLeft<F extends VariadicFunction, Fns extends F[], Al
     return parameters.reduce((acc, f) => f(acc), data.length === 1 ? data[0] : data);
   };
 }
-
-//
-// declare function foo(v: string): [1, 2, 3];
-// declare function baz(x: number[]): number;
-// declare function bar(x: number): string[];
-// declare function fin(x: string[]): symbol[];
-//
-// const check = flowLeft(foo, baz, bar, fin)('hello'); // string[]
-// const check3 = flowLeft(baz, bar)([2]); // string[]
-// const check2 = flowLeft(baz, bar)('hello'); // expected error
-// console.log(check, check2, check3);

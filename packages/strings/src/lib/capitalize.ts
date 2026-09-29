@@ -1,8 +1,6 @@
 import { validateType } from '@reely/utils';
 
-/**
- * Capitalize first letter of each word
- */
+/** Capitalizes each word; with `allWords` false, only the first letter, lowercasing the rest. */
 export function capitalize(text: string, allWords = true): string {
   if (!validateType(text, 'string')) {
     throw new TypeError('Input must be a string');

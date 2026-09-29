@@ -36,11 +36,3 @@ export default function flowRight<F extends VariadicFunction, Fns extends F[], A
     return parameters.reduceRight((acc, f) => f(acc), data.length === 1 ? data[0] : data);
   };
 }
-//
-// declare function foo(a: number): number[];
-// declare function bar(a: string, s: symbol): number;
-// declare function baz(a: number[]): string;
-//
-// const check = flowRight(foo, bar, baz)([1, 2, 3]); // [number]
-// const check2 = flowRight(bar, foo)(1); // expected error
-// console.log(check, check2);

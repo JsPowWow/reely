@@ -318,33 +318,3 @@ export function hexToRgb(hex: string): number[] | null {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
 }
-//
-// $(document).ready(() => {
-//   $('button.execute').click(() => {
-//     const rgb = hexToRgb($('input.target').val());
-//     if (rgb.length !== 3) {
-//       alert('Invalid format!');
-//       return;
-//     }
-//
-//     const color = new Color(rgb[0], rgb[1], rgb[2]);
-//     const solver = new Solver(color);
-//     const result = solver.solve();
-//
-//     let lossMsg;
-//     if (result.loss < 1) {
-//       lossMsg = 'This is a perfect result.';
-//     } else if (result.loss < 5) {
-//       lossMsg = 'The is close enough.';
-//     } else if (result.loss < 15) {
-//       lossMsg = 'The color is somewhat off. Consider running it again.';
-//     } else {
-//       lossMsg = 'The color is extremely off. Run it again!';
-//     }
-//
-//     $('.realPixel').css('background-color', color.toString());
-//     $('.filterPixel').attr('style', result.filter);
-//     $('.filterDetail').text(result.filter);
-//     $('.lossDetail').html(`Loss: ${result.loss.toFixed(1)}. <b>${lossMsg}</b>`);
-//   });
-// });

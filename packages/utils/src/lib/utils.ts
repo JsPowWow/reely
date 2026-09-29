@@ -1,3 +1,3 @@
 export function validateType(value: unknown, typeToValidate: string): boolean {
-  return typeof value === typeToValidate; // test2
+  return typeof value === typeToValidate;
 }

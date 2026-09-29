@@ -1,8 +1,5 @@
 import { validateType } from '@reely/utils';
 
-/**
- * Convert text to URL-friendly slug
- */
 export function slugify(text: string): string {
   if (!validateType(text, 'string')) {
     throw new TypeError('Input must be a string');

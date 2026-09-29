@@ -38,15 +38,12 @@ describe('async-retry', () => {
 
       const promise = retry(fn, { retries: 3, delay: 100 });
 
-      // First attempt fails immediately
       await vi.advanceTimersByTimeAsync(0);
       expect(fn).toHaveBeenCalledTimes(1);
 
-      // Wait for first retry
       await vi.advanceTimersByTimeAsync(100);
       expect(fn).toHaveBeenCalledTimes(2);
 
-      // Wait for second retry
       await vi.advanceTimersByTimeAsync(200);
       expect(fn).toHaveBeenCalledTimes(3);
 
@@ -232,19 +229,6 @@ describe('async-retry', () => {
         reason: expect.objectContaining({ message: 'persistent-fail' }),
       });
     });
-
-    // INTENTIONAL FAILURE: This test is designed to fail for CI demo purposes
-    // It demonstrates Nx's self-healing CI feature (nx fix-ci)
-    // it('[CI DEMO] should demonstrate self-healing CI with intentional failure', () => {
-    //   // This test intentionally fails to showcase how nx fix-ci works
-    //   expect(true).toBe(false); // This will always fail
-
-    //   // In a real scenario, nx fix-ci would:
-    //   // 1. Detect this failure
-    //   // 2. Analyze the error pattern
-    //   // 3. Suggest or apply appropriate fixes
-    //   // 4. Help maintain CI pipeline health
-    // });
   });
 
   describe('TimeoutError', () => {

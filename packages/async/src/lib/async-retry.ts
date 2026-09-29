@@ -1,6 +1,3 @@
-/**
- * Options for retry function
- */
 export interface RetryOptions {
   /** Maximum number of retries (default: 3) */
   retries?: number;
@@ -10,25 +7,18 @@ export interface RetryOptions {
   maxDelay?: number;
   /** Exponential backoff factor (default: 2) */
   factor?: number;
-  /** Callback on each retry */
+  /** Called before the delay of each retry. */
   onRetry?: (error: Error, attempt: number, nextDelay: number) => void;
-  /** Function to determine if should retry */
+  /** Returning `false` stops retrying and rethrows the error. */
   shouldRetry?: (error: Error, attempt: number) => boolean;
 }
 
-/**
- * Options for retry with timeout
- */
 export interface RetryWithTimeoutOptions extends RetryOptions {
   /** Timeout in milliseconds for each attempt */
   timeout?: number;
-  /** Custom timeout error message */
   timeoutMessage?: string;
 }
 
-/**
- * Timeout error class
- */
 export class TimeoutError extends Error {
   code = 'TIMEOUT';
 
@@ -68,15 +58,12 @@ export async function retry<T>(
     } catch (error) {
       lastError = error as Error;
 
-      // Check if we should retry
       if (attempt === retries || !shouldRetry(lastError, attempt)) {
         throw error;
       }
 
-      // Call onRetry callback
       onRetry(lastError, attempt, currentDelay);
 
-      // Wait before retrying
       await sleep(currentDelay);
 
       currentDelay = Math.min(currentDelay * factor, maxDelay);

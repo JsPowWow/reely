@@ -231,11 +231,9 @@ describe('colors', () => {
 
   describe('getContrastRatio', () => {
     it('should calculate contrast ratio between colors', () => {
-      // Black and white have maximum contrast
       const blackWhite = getContrastRatio('#000000', '#FFFFFF');
       expect(blackWhite).toBeCloseTo(21, 1);
 
-      // Same colors have minimum contrast
       const sameColor = getContrastRatio('#FF0000', '#FF0000');
       expect(sameColor).toBeCloseTo(1, 1);
     });
@@ -263,11 +261,9 @@ describe('colors', () => {
     });
 
     it('should meet WCAG AA standards for certain combinations', () => {
-      // Dark gray on white should meet AA standard (>4.5)
       const darkGrayWhite = getContrastRatio('#333333', '#FFFFFF');
       expect(darkGrayWhite).toBeGreaterThan(4.5);
 
-      // Light gray on white should not meet AA standard
       const lightGrayWhite = getContrastRatio('#CCCCCC', '#FFFFFF');
       expect(lightGrayWhite).toBeLessThan(4.5);
     });
@@ -287,26 +283,22 @@ describe('colors', () => {
       for (let i = 0; i < 100; i++) {
         colors.add(randomHex());
       }
-      // With random generation, we should get many different colors
       expect(colors.size).toBeGreaterThan(50);
     });
   });
 
   describe('rgbToHsl', () => {
     it('should convert RGB to HSL with separate parameters', () => {
-      // Pure red
       const red = rgbToHsl(255, 0, 0);
       expect(red.h).toBe(0);
       expect(red.s).toBe(100);
       expect(red.l).toBe(50);
 
-      // Pure green
       const green = rgbToHsl(0, 255, 0);
       expect(green.h).toBe(120);
       expect(green.s).toBe(100);
       expect(green.l).toBe(50);
 
-      // Pure blue
       const blue = rgbToHsl(0, 0, 255);
       expect(blue.h).toBe(240);
       expect(blue.s).toBe(100);
@@ -321,19 +313,16 @@ describe('colors', () => {
     });
 
     it('should handle grayscale colors', () => {
-      // Black
       const black = rgbToHsl(0, 0, 0);
       expect(black.h).toBe(0);
       expect(black.s).toBe(0);
       expect(black.l).toBe(0);
 
-      // White
       const white = rgbToHsl(255, 255, 255);
       expect(white.h).toBe(0);
       expect(white.s).toBe(0);
       expect(white.l).toBe(100);
 
-      // Gray
       const gray = rgbToHsl(128, 128, 128);
       expect(gray.h).toBe(0);
       expect(gray.s).toBe(0);
@@ -341,19 +330,16 @@ describe('colors', () => {
     });
 
     it('should handle mixed colors', () => {
-      // Orange (255, 165, 0)
       const orange = rgbToHsl(255, 165, 0);
       expect(orange.h).toBeCloseTo(39, 0);
       expect(orange.s).toBe(100);
       expect(orange.l).toBe(50);
 
-      // Purple (128, 0, 128)
       const purple = rgbToHsl(128, 0, 128);
       expect(purple.h).toBe(300);
       expect(purple.s).toBe(100);
       expect(purple.l).toBeCloseTo(25, 0);
 
-      // Cyan (0, 255, 255)
       const cyan = rgbToHsl(0, 255, 255);
       expect(cyan.h).toBe(180);
       expect(cyan.s).toBe(100);
@@ -361,11 +347,9 @@ describe('colors', () => {
     });
 
     it('should handle edge cases', () => {
-      // Almost black
       const almostBlack = rgbToHsl(1, 1, 1);
       expect(almostBlack.l).toBeCloseTo(0, 0);
 
-      // Almost white
       const almostWhite = rgbToHsl(254, 254, 254);
       expect(almostWhite.l).toBeCloseTo(100, 0);
     });
@@ -388,12 +372,10 @@ describe('colors', () => {
       const lightenedRgb = hexToRgb(lightened);
       const originalRgb = hexToRgb(original);
 
-      // Darkened should have lower RGB values
       expect(darkenedRgb.r).toBeLessThan(originalRgb.r);
       expect(darkenedRgb.g).toBeLessThan(originalRgb.g);
       expect(darkenedRgb.b).toBeLessThan(originalRgb.b);
 
-      // Lightened should have higher RGB values
       expect(lightenedRgb.r).toBeGreaterThan(originalRgb.r);
       expect(lightenedRgb.g).toBeGreaterThan(originalRgb.g);
       expect(lightenedRgb.b).toBeGreaterThan(originalRgb.b);
@@ -405,13 +387,11 @@ describe('colors', () => {
 
       const contrast1 = getContrastRatio(color1, color2);
 
-      // Darken both colors by same amount
       const darkColor1 = darken(color1, 20);
       const darkColor2 = darken(color2, 20);
 
       const contrast2 = getContrastRatio(darkColor1, darkColor2);
 
-      // Contrast should change but both should still be valid
       expect(contrast1).toBeGreaterThan(1);
       expect(contrast2).toBeGreaterThan(1);
     });
