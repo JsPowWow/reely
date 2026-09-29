@@ -1,7 +1,6 @@
 import type { Head, Last } from './utility.types';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnyFunction = (...parameters: any) => any;
+export type { AnyFunction } from '@reely/basics';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyAsyncFunction = (...parameters: any[]) => Promise<any>;

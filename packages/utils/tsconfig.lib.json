@@ -17,5 +17,9 @@
     "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
-  "references": []
+  "references": [
+    {
+      "path": "../basics/tsconfig.lib.json"
+    }
+  ]
 }

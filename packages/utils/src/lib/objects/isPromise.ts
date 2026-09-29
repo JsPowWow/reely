@@ -1,6 +1,6 @@
+import { hasSome , isSomeFunction } from '@reely/basics';
+
 import { hasProperty } from './hasProperty';
-import { hasSome } from './hasSome';
-import { isSomeFunction } from './isSomeFunction';
 
 export default function isPromise<T>(source: unknown): source is Promise<T> {
   return (

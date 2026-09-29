@@ -21,13 +21,15 @@ describe('@reely/utils tree shaking', () => {
     expect((await bundle(`import '${index}';`)).trim()).toBe('');
   });
 
-  it('ships only the helpers used and what they call', async () => {
-    const text = await bundle(`import { isSomeFunction } from '${index}';\nexport const used = isSomeFunction;`);
+  it('ships only the helpers used and what they call, @reely/basics included', async () => {
+    const text = await bundle(`import { withDefault } from '${index}';\nexport const used = withDefault;`);
 
-    expect(text.match(/^\/\/ .*$/gm)?.map((line) => line.slice('// '.length).split('/').at(-1))).toStrictEqual([
-      'hasSome.ts',
-      'isSomeFunction.ts',
+    expect(text.match(/^\/\/ .*$/gm)?.map((line) => line.slice('// '.length).split('/').slice(-3).join('/'))).toStrictEqual([
+      'basics/dist/index.js',
+      'lib/nullable/withDefault.ts',
       '<stdin>',
     ]);
+    expect(text).toContain('function hasSome');
+    expect(text).not.toMatch(/forEachSettled|isPlainObject|reportUncaught/);
   });
 });

@@ -9,7 +9,7 @@ export { default as toErrorString } from './lib/errors/toErrorString';
 export { default as exhaustiveGuard } from './lib/errors/exhaustiveGuard';
 export { default as reThrow } from './lib/errors/reThrow';
 export { hasStringMessage } from './lib/errors/hasStringMessage';
-export { reportUncaught } from './lib/errors/reportUncaught';
+export { reportUncaught } from '@reely/basics';
 
 export { Either } from './lib/fp/either/Either';
 export { default as maybeInstanceOf } from './lib/fp/maybe/maybeInstanceOf';
@@ -33,10 +33,10 @@ export { default as toggle } from './lib/fp/toggle';
 export { tap } from './lib/fp/tap';
 
 export { default as isNil } from './lib/objects/isNil';
-export { hasSome } from './lib/objects/hasSome';
+export { hasSome } from '@reely/basics';
 export { toNonNullableItems } from './lib/objects/toNonNullableItems';
 export { default as isInstanceOf } from './lib/objects/isInstanceOf';
-export { isSomeFunction } from './lib/objects/isSomeFunction';
+export { isSomeFunction } from '@reely/basics';
 export { default as isString } from './lib/objects/isString';
 export { default as isNumber } from './lib/objects/isNumber';
 export { isBigInt } from './lib/objects/isBigInt';
@@ -49,7 +49,7 @@ export { isNonEmpty } from './lib/objects/isNonEmpty';
 
 export { default as isObjectTypeOf } from './lib/objects/isObjectTypeOf';
 export { default as objectTypeOf } from './lib/objects/objectTypeOf';
-export { default as isPlainObject } from './lib/objects/isPlainObject';
+export { isPlainObject } from '@reely/basics';
 export { default as isPromiseLike } from './lib/objects/isPromiseLike';
 export { default as isPromise } from './lib/objects/isPromise';
 export { default as hasOwnProperty } from './lib/objects/hasOwnProperty';

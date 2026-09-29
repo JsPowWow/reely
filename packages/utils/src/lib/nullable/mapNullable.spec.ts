@@ -28,9 +28,9 @@ describe('mapNullable tests', () => {
 
   it('safe', () => {
     expect(mapNullable(toUndefined, { foo: 'bar' })).toBe(null);
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+     
     expect(mapNullable(null as unknown as MapFn<null, unknown>, null)).toBe(null);
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+     
     expect(mapNullable(null as unknown as MapFn<null, unknown>)(null)).toBe(null);
     expect(mapNullable(toUpperCase)(null)).toEqual(null);
     expect(mapNullable(toUpperCase, notDefined)).toBe(null);

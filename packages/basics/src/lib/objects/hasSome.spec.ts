@@ -1,5 +1,6 @@
 import { hasSome } from './hasSome';
-import noop from '../fp/noop';
+
+const noop = (): void => undefined;
 
 const notDefined = undefined;
 

@@ -41,6 +41,9 @@
     },
     {
       "path": "./packages/state-machine"
+    },
+    {
+      "path": "./packages/basics"
     }
   ],
   "compilerOptions": {

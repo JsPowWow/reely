@@ -1,4 +1,4 @@
-import { hasSome } from './hasSome';
+import { hasSome } from '@reely/basics';
 
 import type { Nullable } from '../types/core.types';
 

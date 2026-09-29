@@ -1,4 +1,5 @@
-import { hasSome } from './hasSome';
+import { hasSome } from '@reely/basics';
+
 import isValidRecordKey from './isValidRecordKey';
 
 import type { KeyValueObject } from '../types/core.types';

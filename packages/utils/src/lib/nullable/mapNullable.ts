@@ -1,4 +1,4 @@
-import { hasSome } from '../objects/hasSome';
+import { hasSome } from '@reely/basics';
 
 import type { Nullable } from '../types/core.types';
 import type { MapFn } from '../types/function.types';

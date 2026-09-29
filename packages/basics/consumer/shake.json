@@ -1,0 +1,14 @@
+[
+  {
+    "name": "forEachSettled alone",
+    "code": "import { forEachSettled } from '@reely/basics'; forEachSettled([1], () => undefined);",
+    "absent": ["reportUncaught", "isPlainObject", "isSomeFunction", "hasSome"],
+    "once": ["forEachSettled"]
+  },
+  {
+    "name": "isSomeFunction alone",
+    "code": "import { isSomeFunction } from '@reely/basics'; console.log(isSomeFunction(1));",
+    "absent": ["forEachSettled", "reportUncaught", "isPlainObject"],
+    "once": ["isSomeFunction", "hasSome"]
+  }
+]

@@ -1,5 +1,5 @@
-import { hasSome } from './hasSome';
-import { isSomeFunction } from './isSomeFunction';
+import { hasSome , isSomeFunction } from '@reely/basics';
+
 import isValidRecordKey from './isValidRecordKey';
 
 export function hasProperty<Property extends PropertyKey, Source>(
