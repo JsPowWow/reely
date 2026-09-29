@@ -48,4 +48,10 @@ describe('media', () => {
     expect(listening).toBe(1);
     expect(screen.listeners()).toBe(0);
   });
+
+  it('reads `false` where there is no `matchMedia`, as in jsdom', () => {
+    vi.stubGlobal('matchMedia', undefined);
+
+    expect(media('(max-width: 700px)').value).toBe(false);
+  });
 });
