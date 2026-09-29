@@ -38,7 +38,7 @@ const final = createStateMachine<Final>({
 
 final.send('play'); // { status: 'done', state: 'counting', change }
 final.send('selectStage', 2); // the data is required here…
-final.send('countdownDone'); // …and not allowed where the event carries none
+final.send('countdownDone'); // …and left out where the event carries none
 final.can('play'); // is there a transition for `play` from here? never runs a selector
 final.state; // 'ready'
 ```
