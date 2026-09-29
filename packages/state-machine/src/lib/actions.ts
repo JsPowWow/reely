@@ -1,5 +1,5 @@
 import type { EventsMap } from '@reely/emitter';
-import { hasProperty, isPromiseLike } from '@reely/utils';
+import { hasProperty, isPromiseLike, noop } from '@reely/utils';
 
 import type { StateMachineChange, StateMachineMode, StateMachineState } from './types';
 
@@ -36,9 +36,10 @@ export interface ActionEffect<Change extends MatchableChange> {
   readonly when: ActionRule<Change, ActionEffect<Change>>;
 }
 
-/** The `pipe` form: matches the change in hand on the spot, without waiting for promises. */
+/** The `pipe` form: matches the change in hand; `done` is the wait for what its functions returned, if any. */
 export interface ActionMatcher<Change extends MatchableChange> {
   readonly when: ActionRule<Change, ActionMatcher<Change>>;
+  readonly done: void | PromiseLike<void>;
 }
 
 function isMatch<Change extends MatchableChange, Type, To>(
@@ -59,17 +60,17 @@ const rule =
   (change: Change): unknown =>
     isMatch(pattern, change) ? action(change) : undefined;
 
-function inOrder<Argument>(
+const settled = (value: unknown): void | PromiseLike<void> => (isPromiseLike(value) ? value.then(noop) : undefined);
+
+// the next function runs at once, or after the promise before it settles
+const andThen = (done: void | PromiseLike<void>, next: () => unknown): void | PromiseLike<void> =>
+  isPromiseLike(done) ? done.then(() => settled(next())) : settled(next());
+
+const inOrder = <Argument>(
   actions: readonly ((argument: Argument) => unknown)[],
   argument: Argument
-): void | PromiseLike<void> {
-  for (const [index, action] of actions.entries()) {
-    const returned = action(argument);
-    if (isPromiseLike(returned)) {
-      return returned.then(() => inOrder(actions.slice(index + 1), argument));
-    }
-  }
-}
+): void | PromiseLike<void> =>
+  actions.reduce<void | PromiseLike<void>>((done, action) => andThen(done, () => action(argument)), undefined);
 
 /** One action made of several, run in order; one returning a promise is awaited before the next. */
 export const sequence =
@@ -77,18 +78,24 @@ export const sequence =
   (change: Change): void | PromiseLike<void> =>
     inOrder(actions, change);
 
+const matcherOf = <Change extends MatchableChange>(
+  change: Change,
+  done: void | PromiseLike<void>
+): ActionMatcher<Change> => {
+  const when: ActionRule<Change, ActionMatcher<Change>> = (pattern, action) =>
+    matcherOf(
+      change,
+      andThen(done, () => rule(pattern, action)(change))
+    );
+  return { when, done };
+};
+
 /**
- * Matches a change in hand (the `pipe` form): `matchAction(change).when({ type: 'start' }, …)`. Its functions run on the
- * spot and are not awaited; in an async machine, `runActionEffect` awaits them.
+ * Matches a change in hand (the `pipe` form): `matchAction(change).when({ type: 'start' }, …)`. Its functions run in
+ * order, one returning a promise awaited before the next; in an async machine, return `.done` to have it awaited.
  */
-export function matchAction<Change extends MatchableChange>(change: Change): ActionMatcher<Change> {
-  const when: ActionRule<Change, ActionMatcher<Change>> = (pattern, action) => {
-    rule(pattern, action)(change);
-    return matcher;
-  };
-  const matcher: ActionMatcher<Change> = { when };
-  return matcher;
-}
+export const matchAction = <Change extends MatchableChange>(change: Change): ActionMatcher<Change> =>
+  matcherOf(change, undefined);
 
 const effectOf = <Change extends MatchableChange>(
   rules: readonly ((change: Change) => unknown)[]

@@ -51,6 +51,47 @@ describe('matchAction', () => {
   });
 });
 
+describe('matchAction in an async machine', () => {
+  it('runs its functions in order, the next after a promise settles, and hands the wait out as `done`', async () => {
+    const seen: string[] = [];
+    const machine = createAsyncStateMachine<Phase, RaceEvents>({
+      initial: 'ready',
+      states: {
+        ready: { on: { start: 'running' } },
+        running: {
+          entry: (change) =>
+            matchAction(change)
+              .when({ type: 'start' }, async () => {
+                await new Promise((resolve) => setTimeout(resolve));
+                seen.push('uploaded');
+              })
+              .when({ to: 'running' }, () => seen.push('shown')).done,
+        },
+        paused: {},
+      },
+    });
+    machine.on('stateChanged', () => seen.push('changed'));
+
+    await machine.send('start', 1);
+
+    expect(seen).toStrictEqual(['uploaded', 'shown', 'changed']);
+  });
+
+  it('lets the machine catch what a function rejects with', async () => {
+    const broken = new Error('offline');
+    const machine = createAsyncStateMachine<Phase, RaceEvents>({
+      initial: 'ready',
+      states: {
+        ready: { on: { start: 'running' } },
+        running: { entry: (change) => matchAction(change).when({ type: 'start' }, () => Promise.reject(broken)).done },
+        paused: {},
+      },
+    });
+
+    expect(await machine.send('start', 1)).toMatchObject({ status: 'failed', state: 'running', error: broken });
+  });
+});
+
 describe('runActionEffect', () => {
   it('describes the matching first and takes the change later, as an action', () => {
     const seen: string[] = [];

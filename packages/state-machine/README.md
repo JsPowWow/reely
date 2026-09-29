@@ -117,7 +117,7 @@ exit: async ({ machine }) => {
 
 ## Helpers
 
-`matchAction(change)` matches a change in hand; `runActionEffect()` describes the matching first and becomes an action for the config — the `pipe` and `flow` forms of one thing. `matchAction` runs its functions on the spot and does not await them; in an async machine, use `runActionEffect`, which awaits each before the next. A pattern takes the event `type`, the target `to`, or both, and narrows the change for its function.
+`matchAction(change)` matches a change in hand; `runActionEffect()` describes the matching first and becomes an action for the config — the `pipe` and `flow` forms of one thing. Both run their functions in order and wait for a promise before the next; in an async machine, return `matchAction(change)…done` from the action so the machine awaits it, errors included. A pattern takes the event `type`, the target `to`, or both, and narrows the change for its function.
 
 ```ts
 import { logAction, matchAction, runActionEffect, sequence } from '@reely/state-machine';
