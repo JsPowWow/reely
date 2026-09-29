@@ -1,4 +1,6 @@
 // What reely's signals guarantee beyond the tests ported from Preact: the contract any core under them keeps.
+import { noop } from '@reely/utils';
+
 import { batch, computed, effect, signal } from './preact-like.signal';
 import { reelxDebug } from '../reelx/reelx.core';
 
@@ -131,5 +133,19 @@ describe('the signal contract', () => {
       reelxDebug(double).subscriberCount(),
       reelxDebug(label).subscriberCount(),
     ]).toStrictEqual([0, 0, 0]);
+  });
+
+  it('releases a signal read through a computed that a subscriber and an effect share, once both are gone', () => {
+    const lap = signal(0);
+    const double = computed(() => lap.value * 2);
+    const unsubscribe = double.subscribe(noop); // as a binding does
+    const tick = signal(0);
+    const stop = effect(() => void (tick.value, double.value));
+    lap.value = 1; // the effect reads `double` in the same flush as the subscriber
+
+    stop();
+    unsubscribe();
+
+    expect(reelxDebug(lap).subscriberCount()).toBe(0);
   });
 });

@@ -82,7 +82,6 @@ type ReelxSource<T> =
   | { readonly kind: 'state'; readonly initial: T };
 
 const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => boolean): RlxSelfInstance<T> => {
-  let queueVersion = -1;
   let subscriberVersion = -1;
   let state: T;
   let rlxSelf: RlxSelfInstance<T>;
@@ -97,44 +96,32 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
     // @ts-expect-error expected properties assigned below
     rlxSelf = (): T => {
       if (subscriberVersion !== SUBSCRIBER_VERSION) {
-        if (queueVersion === QUEUE_VERSION && SUBSCRIBER !== null && rlxSelf._subscribers.size !== 0) {
-          const [firstS] = rlxSelf._subscribers ?? [];
-          if (firstS) {
-            for (const { _subscribers } of firstS._values) {
-              if (_subscribers.size !== _subscribers.add(SUBSCRIBER).size) {
-                SUBSCRIBER._values.push(rlxSelf);
-              }
-            }
-          }
-        } else {
-          const prevDeps = DEPS;
-          DEPS = null;
+        const prevDeps = DEPS;
+        DEPS = null;
 
-          try {
-            if (!hasRun || !deps.every(isUnchanged)) {
-              (DEPS = deps).length = 0;
+        try {
+          if (!hasRun || !deps.every(isUnchanged)) {
+            (DEPS = deps).length = 0;
 
-              try {
-                const newState = init();
-                thrown = null;
-                if (
-                  equal === undefined ||
-                  // first call
-                  state === undefined ||
-                  !equal(state, newState)
-                ) {
-                  state = newState;
-                }
-              } catch (error) {
-                thrown = { error };
+            try {
+              const newState = init();
+              thrown = null;
+              if (
+                equal === undefined ||
+                // first call
+                state === undefined ||
+                !equal(state, newState)
+              ) {
+                state = newState;
               }
-              hasRun = true;
+            } catch (error) {
+              thrown = { error };
             }
-          } finally {
-            DEPS = prevDeps;
+            hasRun = true;
           }
+        } finally {
+          DEPS = prevDeps;
         }
-        queueVersion = QUEUE_VERSION;
         subscriberVersion = SUBSCRIBER_VERSION;
       }
 
