@@ -6,36 +6,15 @@ import { removeAttribute, setAttribute } from './element.attributes';
 import type { DOMElementAria } from '../../types/attributes.types';
 import type { DommyElement } from '../../types/dommy.types';
 
-/**
- * Determines if the given props object contains an `aria` object with at least one entry.
- *
- * @template T - The type of the props object being checked.
- * @param {T} props - The object to validate for the presence of the `aria` attribute.
- * @returns {boolean} True if the `props` object has an `aria` object.
- */
 export const hasAriaAttribute = <T>(props: T): props is T & { aria: DOMElementAria } => {
   return hasProperty('aria', props) && hasSome(props.aria);
 };
 
-/**
- * Converts an `ARIAMixin` property name to its attribute; ARIA names are one lowercase word after
- * `aria-`: `ariaCurrent` → `aria-current`, `ariaKeyShortcuts` → `aria-keyshortcuts`; `role` stays.
- *
- * @param {string} property - The `ARIAMixin` property name.
- * @returns {string} The attribute name.
- */
+// ARIA names are one lowercase word after `aria-`: `ariaKeyShortcuts` → `aria-keyshortcuts`.
 const toAriaAttributeName = (property: string): string =>
   property.startsWith('aria') ? `aria-${property.slice('aria'.length).toLowerCase()}` : property;
 
-/**
- * Renders ARIA props as `role` and `aria-*` attributes; a signal or a getter keeps an attribute
- * updated, and `null`/`undefined` removes it. Attributes, unlike ARIA reflection, work everywhere.
- *
- * @template Element - The type of the HTML element being modified.
- * @param {Element} element - The target HTML element.
- * @param {DOMElementAria} aria - ARIA values by `ARIAMixin` property name.
- * @returns {Element} The same element.
- */
+// Attributes, unlike ARIA reflection, work everywhere.
 export const setAriaAttributes = <Element extends DommyElement>(element: Element, aria: DOMElementAria): Element => {
   for (const [property, value] of Object.entries(aria)) {
     const attributeName = toAriaAttributeName(property);

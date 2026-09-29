@@ -68,12 +68,6 @@ const svgTagTable = {
 // pure, so a bundle that never creates an element drops the table
 const svgTags: ReadonlySet<string> = /* @__PURE__ */ new Set(/* @__PURE__ */ Object.keys(svgTagTable));
 
-/**
- * Checks whether a tag exists only in SVG, so it is created in the SVG namespace.
- *
- * @param {string} tag - A tag name.
- * @returns {boolean} True for `svg`, `path`, `circle` and the other SVG-only tags.
- */
 export function isSvgTag(tag: string): tag is SvgElementTag {
   return svgTags.has(tag);
 }

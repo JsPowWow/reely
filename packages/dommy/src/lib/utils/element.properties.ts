@@ -23,13 +23,6 @@ export const isElementFactoryOptionProp = (
   return isValidRecordKey(property) && hasProperty(property, elementFactoryOptionsProps);
 };
 
-/**
- * Passes the element to `props.elementRef`: a callback ref or an object ref.
- *
- * @template Element - The type of the element.
- * @param {unknown} maybeProps - Props of the element; checked at runtime, since JSX passes them untyped.
- * @returns {PipeableFn<Element>} A step that returns the same element.
- */
 export const assignElementRef =
   <Element extends DommyElement>(maybeProps: unknown): PipeableFn<Element> =>
   (element: Element) => {
@@ -44,15 +37,7 @@ export const assignElementRef =
     return element;
   };
 
-/**
- * Applies props to the element: styles, ARIA, event listeners and attributes; a signal or a
- * getter keeps its prop updated. Live state (`value`, `checked`…) waits for
- * `assignLiveProperties`, after the children.
- *
- * @template Element - The type of the element.
- * @param {unknown} maybeProps - Props of the element; checked at runtime, since JSX passes them untyped.
- * @returns {PipeableFn<Element>} A step that returns the same element.
- */
+// Live state (`value`, `checked`…) waits for `assignLiveProperties`, after the children.
 export const assignProperties =
   <Element extends DommyElement>(maybeProps: unknown): PipeableFn<Element> =>
   (element: Element) => {
@@ -90,14 +75,7 @@ export const assignProperties =
     return element;
   };
 
-/**
- * Applies the live state props (`value`, `checked`, `selected`…) once the children are in:
- * a `select` value then finds the option it names, and `multiple`, an attribute, is already set.
- *
- * @template Element - The type of the element.
- * @param {unknown} maybeProps - Props of the element; checked at runtime, since JSX passes them untyped.
- * @returns {PipeableFn<Element>} A step that returns the same element.
- */
+// After the children: a `select` value then finds the option it names, and `multiple` is already set.
 export const assignLiveProperties =
   <Element extends DommyElement>(maybeProps: unknown): PipeableFn<Element> =>
   (element: Element) => {

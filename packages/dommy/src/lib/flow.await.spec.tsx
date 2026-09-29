@@ -19,7 +19,6 @@ const deferred = <T,>(): Deferred<T> => {
   return { promise, resolve, reject };
 };
 
-/** Lets the handlers of settled promises run. */
 const settle = (): Promise<void> => new Promise((done) => setTimeout(done, 0));
 
 /** Collects the rejections nobody handled while `run` goes on, instead of failing the run. */

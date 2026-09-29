@@ -1283,7 +1283,6 @@ describe('computed', () => {
       const compute = vi.fn(() => 'd: ' + c.value);
       const d = computed(compute);
 
-      // Trigger read
       expect(d.value).toBe('d: 3');
       expect(compute).toHaveBeenCalledOnce();
       compute.mockClear();

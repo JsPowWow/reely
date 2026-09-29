@@ -27,10 +27,4 @@ const mappedAttributes = [
 
 const mappedAttributeNamesMap: Map<string, string> = new Map<string, string>(mappedAttributes);
 
-/**
- * Converts a DOM property name to its attribute name: `className` → `class`; other names stay.
- *
- * @param {string} property - The prop name.
- * @returns {string} The attribute name.
- */
 export const toAttributeName = (property: string): string => mappedAttributeNamesMap.get(property) ?? property;

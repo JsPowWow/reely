@@ -8,14 +8,8 @@ import type { Computed } from '../reactive/preact-like/preact-like.signal';
 import type { ReactiveValue } from '../types/dommy.types';
 
 /**
- * A computed that follows `source` at most once per `ms`: the first change passes at once,
- * later ones within the interval wait, and the latest of them passes when it ends. For a board
- * whose source changes every frame but whose rows should move a few times a second.
- *
- * @template T - The value type.
- * @param {ReactiveValue<T>} source - A signal or a getter.
- * @param {number} ms - The shortest time between two changes, in milliseconds.
- * @returns {Computed<T>} The throttled value.
+ * Follows `source` at most once per `ms`: the first change passes at once, the latest one within
+ * the interval passes when it ends.
  */
 export const throttled = <T>(source: ReactiveValue<T>, ms: number): Computed<T> => {
   const output = signal(untracked(source));

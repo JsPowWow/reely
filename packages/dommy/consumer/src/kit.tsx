@@ -1,7 +1,6 @@
 import { effect } from '@reely/dommy';
 import { flip, later, listen, media, persisted, size, throttled } from '@reely/dommy/kit';
 
-// the kit as a consumer types it
 export const start = (board: HTMLElement): void => {
   const phone = media('(max-width: 700px)');
   const tab = persisted('tab', 'race');

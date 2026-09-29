@@ -10,17 +10,6 @@ import { assignSvgAttribute } from './attributes/element.svg.attributes';
 
 import type { DommyElement } from '../types/dommy.types';
 
-/**
- * Applies one static prop value: live state as a property, a boolean attribute,
- * a `null`/`undefined` as a removed attribute, a primitive as an attribute.
- * DOM property names map to attribute names first (`className` → `class`, `readOnly` → `readonly`).
- *
- * @template Element - The type of the HTML element being modified.
- * @param {Element} element - The target element.
- * @param {string} property - The prop name.
- * @param {unknown} value - The prop value.
- * @returns {Element} The same element.
- */
 export const assignProperty = <Element extends DommyElement>(
   element: Element,
   property: string,

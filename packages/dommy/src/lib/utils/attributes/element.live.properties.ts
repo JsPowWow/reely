@@ -10,15 +10,6 @@ const livePropertiesSet: Set<string> = new Set(liveProperties);
 export const isLiveProperty = (property: string): property is (typeof liveProperties)[number] =>
   livePropertiesSet.has(property);
 
-/**
- * Sets a live state prop as an element property (`el.value = v`), not as an attribute.
- *
- * @template Element - The type of the HTML element being modified.
- * @param {Element} element - The target element.
- * @param {string} property - One of the live properties (`value`, `checked`, …).
- * @param {unknown} value - The new value.
- * @returns {Element} The same element.
- */
 export const setLiveProperty = <Element extends DommyElement>(
   element: Element,
   property: (typeof liveProperties)[number],

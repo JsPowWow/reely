@@ -6,24 +6,20 @@ const toRegExp = (route: string): RegExp => {
   const usedNames = {};
   return new RegExp(
     route
-      /** replaces literal dot "." in the route with the escaped dot (\\.) */
       .replaceAll('.', String.raw`\.`)
-      /** escape literal slashes */
       .replaceAll('/', '/')
-      /** replaces literal question marks (?) with escaped question marks (\\?) */
       .replaceAll('?', String.raw`\?`)
-      /** removes any trailing slashes (/) at the end of the route string */
       .replace(/\/+$/, '')
-      /** a bare wildcard `*` matches anything; a named one, `*rest`, also captures it as the `rest` param */
+      // a bare `*` matches anything; a named one, `*rest`, also captures it as the `rest` param
       .replaceAll(/\*+([A-Za-z_]\w*)?/g, (_, parameterName?: string) =>
         isNil(parameterName) ? '.*' : `(?<${makeRegexWithUniqueGroups(parameterName, usedNames)}>.*)`
       )
-      /** converts params from form of `:paramName` (e.g., :id) into regular expression named capturing groups. */
+      // `:paramName` becomes a named capturing group
       .replaceAll(
         /:([^\d/^|]\w*(?=(?:\/|\\.)|$))/g,
         (_, parameterName) => `(?<${makeRegexWithUniqueGroups(parameterName, usedNames)}>[^/]+?)`
       )
-      /** Allow optional trailing slash */
+      // an optional trailing slash
       .concat(String.raw`(\/|$)`),
     'gi'
   );

@@ -20,51 +20,24 @@ export interface Computed<T> extends RlxSubscribe<T> {
   peek(): T;
 }
 
-/**
- * Creates a signal: a value that bindings, effects and computeds re-read when it is written.
- *
- * @template T - The value type; a function is held as a value too.
- * @param {T} init - The initial value.
- * @returns {Signal<T>} The signal; read and write it through `.value`.
- */
+/** A value that bindings, effects and computeds re-read when it is written; a function is held as a value too. */
 export const signal = <T>(init: T): Signal<T> => setPrototype<Signal<T>>(signalProto, reelx.state(init));
 
 /**
- * Creates a computed: a value derived from signals, recomputed only after one of them changes.
- * What `fn` throws is kept and thrown on read the same way, until a dependency changes.
- *
- * @template T - The value type.
- * @param {() => T} fn - Derives the value.
- * @returns {Computed<T>} The computed; read it through `.value`.
+ * A value derived from signals, recomputed only after one of them changes. What `fn` throws is
+ * rethrown on every read until then.
  */
 export const computed = <T>(fn: () => T): Computed<T> => setPrototype<Computed<T>>(computedProto, reelx(fn));
 
-/**
- * Groups writes: effects and bindings run once, when the outermost `batch` ends.
- *
- * @template T - The callback result type.
- * @param {() => T} fn - The callback that writes signals.
- * @returns {T} The callback result.
- */
+/** Groups writes: effects and bindings run once, when the outermost `batch` ends. */
 export const batch = <T>(fn: () => T): T => reelx.batch(fn);
 
-/**
- * Runs `fn` without subscribing the running effect or computed to the signals it reads.
- *
- * @template T - The callback result type.
- * @param {() => T} fn - Reads signals.
- * @returns {T} The callback result.
- */
+/** Runs `fn` without subscribing the running effect or computed to the signals it reads. */
 export const untracked = <T>(fn: () => T): T => reelx.untracked(fn);
 
 /**
- * Runs `fn` now and again after every change of the signals it reads. Each run has its own
- * owner: `onCleanup` inside `fn` and the effects and bindings `fn` creates are released before
- * the next run and when the effect is disposed. A cleanup that throws disposes the effect, and
- * the error goes to the write that triggered the run.
- *
- * @param {VoidFunction} fn - The effect body; `this.dispose()` inside it disposes the effect.
- * @returns {VoidFunction} Disposes the effect; it is also disposed with the owner it was created in.
+ * Runs `fn` now and after every change of what it reads; what a run registers is released before
+ * the next one. Returns `dispose`, also reachable as `this.dispose()` inside `fn`.
  */
 export const effect = (fn: VoidFunction): VoidFunction => {
   const parent = getOwner();

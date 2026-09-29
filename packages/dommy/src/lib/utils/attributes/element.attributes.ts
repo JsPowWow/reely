@@ -4,14 +4,7 @@ import { isEventHandlerName } from '../element.addListeners';
 
 import type { DommyElement } from '../../types/dommy.types';
 
-/**
- * Checks whether a prop can be rendered as an attribute: a primitive value under a name
- * that is not an `on*` handler slot, so a string never becomes an inline handler.
- *
- * @param {string} attributeName - The attribute name.
- * @param {unknown} value - The prop value.
- * @returns {boolean} True when the value may be written with `setAttribute`.
- */
+/** A primitive under a name that is not an `on*` slot, so a string never becomes an inline handler. */
 export const isSafeAttributeEntry = (attributeName: string, value: unknown): value is string => {
   return (
     isString(attributeName) &&

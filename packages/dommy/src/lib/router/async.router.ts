@@ -38,11 +38,7 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
     this.root = routes;
   }
 
-  /**
-   * Traverses the list of routes in the order they are defined until it finds
-   * the first route that matches provided URL path string and whose action function
-   * returns anything other than `null` or `undefined`.
-   */
+  /** Resolves the first route, in definition order, that matches and whose action returns non-nil. */
   public async resolve(
     pathnameOrContext: string | (RouterContext & { pathname: string })
   ): Promise<RouteResult<unknown>> {
@@ -90,7 +86,7 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
             params,
           },
           next: async function (): Promise<unknown> {
-            return 'aa'; //currentContext.route.action(currentContext, currentContext.params);
+            return 'aa';
           },
         };
 
@@ -103,7 +99,7 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
         result = gen.next();
       }
     }
-    throw new Error('Route not found'); //Error('No route resolved');
+    throw new Error('Route not found');
   }
 }
 

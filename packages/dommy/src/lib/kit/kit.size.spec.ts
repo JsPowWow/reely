@@ -1,7 +1,6 @@
 import { mount } from '../../index';
 import { size } from '../../kit';
 
-/** A `ResizeObserver` the test drives by hand. */
 class FakeResizeObserver {
   public static readonly observers = new Set<FakeResizeObserver>();
   public constructor(private readonly callback: ResizeObserverCallback) {

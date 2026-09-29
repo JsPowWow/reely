@@ -5,20 +5,17 @@ import type { Reelx, RlxDerivedState, RlxState } from './reelx.types';
 
 type WithSubscribers<T> = T & { _subscribers: Set<Subscriber> };
 
-/** value subscriber */
 interface Subscriber {
   (): void;
   _values: Array<WithSubscribers<RlxState<unknown>>>;
 }
 
-/** Unlinks a subscriber from every value it read, so none of them runs it again. */
 const unlink = (subscriber: Subscriber): void => {
   for (const { _subscribers } of subscriber._values.splice(0)) {
     _subscribers.delete(subscriber);
   }
 };
 
-/** Removes, in place, the items of `list` that match. */
 const removeWhere = <T>(list: T[], matches: (item: T) => boolean): void => {
   let kept = 0;
   for (const item of list) {
@@ -29,7 +26,6 @@ const removeWhere = <T>(list: T[], matches: (item: T) => boolean): void => {
   list.length = kept;
 };
 
-/** node dependencies list */
 interface Dependency<T> {
   readonly computation: RlxState<T> | RlxDerivedState<T>;
   /** What the read gave: the value, or what it threw. */
@@ -38,7 +34,6 @@ interface Dependency<T> {
 }
 type Dependencies<T> = Dependency<T>[];
 
-/** Whether a dependency would give the same as when it was read: the same value, or the same throw. */
 const isUnchanged = <T>({ computation, value, threw }: Dependency<T>): boolean => {
   try {
     return !threw && Object.is(value, computation());
@@ -303,7 +298,6 @@ reelx.flushSync = (): void => {
   }
 };
 
-/** Runs `fn` without subscribing the running computation or effect to what `fn` reads. */
 reelx.untracked = <T>(fn: () => T): T => {
   const prevSubscriber = SUBSCRIBER;
   const prevDeps = DEPS;

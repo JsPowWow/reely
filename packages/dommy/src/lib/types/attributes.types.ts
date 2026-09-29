@@ -2,9 +2,7 @@ import type { AnyFunction, Nullable } from '@reely/utils';
 
 import type { HtmlElementEvent, ReactiveValue } from './dommy.types';
 
-/**
- * A prop value or a signal/getter of it; a bound `null`/`undefined` removes the attribute.
- */
+/** A prop value or a signal/getter of it; a bound `null`/`undefined` removes the attribute. */
 export type MaybeReactive<T> = T | ReactiveValue<Nullable<T>>;
 
 export type DOMElementAttributes<T extends HTMLElement> = Exclude<Partial<SafeAttributes<T>>, HtmlElementEvent> & {
@@ -26,20 +24,14 @@ type AriaIdReference =
   | 'ariaLabelledby'
   | 'ariaOwns';
 
-/**
- * ARIA values by `ARIAMixin` property name (`role`, `ariaLabel`, `ariaCurrent`…) or ID-reference
- * name (`ariaLabelledby`), each static or reactive.
- */
+/** ARIA values by `ARIAMixin` property name (`ariaLabel`) or ID-reference name (`ariaLabelledby`). */
 export type DOMElementAria = {
   [K in keyof ARIAMixin as ARIAMixin[K] extends Nullable<string> ? K : never]?: MaybeReactive<string>;
 } & {
   [K in AriaIdReference]?: MaybeReactive<string>;
 };
 
-/**
- * Inline styles by camelCase property name (`marginTop`) or custom property name (`--flip`),
- * each static or reactive.
- */
+/** Inline styles by camelCase property name (`marginTop`) or custom property name (`--flip`). */
 export type DOMElementStyles = {
   [K in keyof CSSStyleDeclaration as CSSStyleDeclaration[K] extends string ? K : never]?: MaybeReactive<string>;
 } & {

@@ -107,24 +107,6 @@ describe('UniversalRouterSync', () => {
     );
   });
 
-  // test.skip('finds the first route whose action method !== undefined or null', async () => {
-  //   const action1: Mock = vi.fn(() => undefined);
-  //   const action2: Mock = vi.fn(() => null);
-  //   const action3: Mock = vi.fn(() => 'c');
-  //   const action4: Mock = vi.fn(() => 'd');
-  //   const router = createAsyncRouter([
-  //     { path: '/a', action: action1 },
-  //     { path: '/a', action: action2 },
-  //     { path: '/a', action: action3 },
-  //     { path: '/a', action: action4 },
-  //   ]);
-  //   await expect(router.resolve('/a')).resolves.toBe('c');
-  //   expect(action1.mock.calls.length).toBe(1);
-  //   expect(action2.mock.calls.length).toBe(1);
-  //   expect(action3.mock.calls.length).toBe(1);
-  //   expect(action4.mock.calls.length).toBe(0);
-  // });
-
   test('allows to pass context variables to action methods', async () => {
     const action: Mock = vi.fn(() => true);
     const router = createAsyncRouter([{ path: '/a', action }]);
@@ -561,7 +543,6 @@ describe('UniversalRouterSync', () => {
     expect(action.mock.calls[0]?.[0]).toHaveProperty('path', '/c');
     expect(action.mock.calls[0]?.[0]).toHaveProperty('baseUrl', '/base/a/b');
     expect(action.mock.calls[0]?.[0]).toHaveProperty('route', routes.children[0]?.children[0]);
-    // expect(action.mock.calls[0]?.[0]).toHaveProperty('router', router);
 
     let err;
     try {
@@ -659,7 +640,7 @@ describe('UniversalRouterSync', () => {
       action: (ctx) => ctx.params,
     });
     const result = await router.resolve('/%AF');
-    expect(result).toEqual({ a: '%AF' }); // { a: '%AF' }
+    expect(result).toEqual({ a: '%AF' });
   });
 
   test('decodes params correctly', async () => {

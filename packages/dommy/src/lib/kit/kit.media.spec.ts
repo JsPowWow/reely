@@ -1,7 +1,6 @@
 import { effect, mount } from '../../index';
 import { media } from '../../kit';
 
-/** A `matchMedia` whose single query list the test can flip. */
 const fakeMatchMedia = (initial: boolean): { flip: (matches: boolean) => void; listeners: () => number } => {
   const target = new EventTarget();
   let count = 0;

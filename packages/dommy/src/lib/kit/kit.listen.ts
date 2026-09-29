@@ -16,16 +16,8 @@ export type EventMapOf<T extends EventTarget> = T extends Window
           : Record<string, Event>;
 
 /**
- * Adds an event listener that goes away with the render that added it: `window` and `document`
- * listeners of a view stop when the view is disposed. Outside a render it stays until stopped.
- *
- * @template T - The event target.
- * @template K - The event type.
- * @param {T} target - Where to listen: `window`, `document`, an element, a media query list.
- * @param {K} type - The event type.
- * @param {(event: EventMapOf<T>[K]) => void} handler - Called with the typed event.
- * @param {AddEventListenerOptions} [options] - Listener options; its `signal` stops it too.
- * @returns {VoidFunction} Removes the listener now.
+ * Adds a typed event listener that goes away with the render that added it, or when the returned
+ * function or `options.signal` stops it.
  */
 export function listen<T extends EventTarget, K extends keyof EventMapOf<T> & string>(
   target: T,

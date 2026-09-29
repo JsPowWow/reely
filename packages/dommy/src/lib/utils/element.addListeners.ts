@@ -28,20 +28,8 @@ export function isEventListenerHandler<Evt extends DOMElementEventType, Elt exte
   );
 }
 
-/**
- * Checks whether a property name is an event handler slot (`on*`), whatever its value is.
- *
- * @param {string} property - The property or attribute name.
- * @returns {boolean} True for `onclick`, `onClick` and other `on*` names.
- */
 export const isEventHandlerName = (property: string): property is `on${string}` => property.startsWith('on');
 
-/**
- * Converts a handler property name to its DOM event type: `onclick` and `onClick` → `click`.
- *
- * @param {string} handlerProperty - The `on*` property name.
- * @returns {string} The event type to listen to.
- */
 export const toEventType = (handlerProperty: string): string => handlerProperty.slice(2).toLowerCase();
 
 export function addListener<Evt extends DOMElementEventType, Elt extends DommyElement>(

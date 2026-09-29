@@ -1,4 +1,3 @@
-// Small helpers over signals and the owner, as their own entry: `@reely/dommy/kit`.
 // The signal types the helpers return, so a consumer's declarations can name them.
 export type { Computed, Signal } from './lib/reactive/preact-like/preact-like.signal';
 export { flip } from './lib/kit/kit.flip';

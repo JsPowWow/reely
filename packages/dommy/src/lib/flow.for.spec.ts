@@ -10,7 +10,6 @@ interface Racer {
 
 const racer = (id: string, name = id.toUpperCase()): Racer => ({ id, name });
 
-/** Renders a board of racers, one `li` per racer with its place and name. */
 const renderBoard = (racers: Signal<readonly Racer[]>, lap = signal(1)): { board: HTMLUListElement; dispose: VoidFunction } => {
   const board = ul();
   const dispose = mount(board, () =>

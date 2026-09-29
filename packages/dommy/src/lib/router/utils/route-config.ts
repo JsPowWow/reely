@@ -1,8 +1,3 @@
-// export type RouteDefinition<Handler extends CallableFunction> = {
-//   action: Handler;
-//   params: Record<string, string>;
-// };
-
 export type RouteConfig<Handler extends CallableFunction, P extends string = string> = {
   path: P;
   action: Handler;

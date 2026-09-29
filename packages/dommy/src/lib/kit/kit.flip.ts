@@ -4,15 +4,8 @@ const reducedMotion = (): boolean =>
   isSomeFunction(window.matchMedia) && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
- * Makes a reorder visible: measures the children of `container`, runs `change` (a signal write
- * that makes `For` move rows, for one), then animates each child that moved from where it was
- * to where it is. New children and children that stayed do not move; under reduced motion
- * nothing does.
- *
- * @param {Element} container - The parent of the rows.
- * @param {VoidFunction} change - Changes the DOM synchronously.
- * @param {KeyframeAnimationOptions} [options] - The animation timing; 250 ms ease-out by default.
- * @returns {void}
+ * Runs `change`, a synchronous DOM change such as a `For` reorder, and animates each child of
+ * `container` that moved from its old place; nothing animates under reduced motion.
  */
 export const flip = (
   container: Element,

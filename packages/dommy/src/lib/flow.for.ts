@@ -11,19 +11,15 @@ import type { Signal } from './reactive/preact-like/preact-like.signal';
 import type { ReactiveValue, ReelyNode } from './types/dommy.types';
 
 export interface ForProps<T> {
-  /** The items: a signal or a getter of an array. */
   each: ReactiveValue<readonly T[]>;
-  /**
-   * The key of an item: an item with the same key keeps its row. Named `by`, since JSX keeps
-   * `key` for itself.
-   */
+  /** An item with the same key keeps its row. Named `by`, since JSX keeps `key` for itself. */
   by: (item: T) => PropertyKey;
   /** Renders one row, once per key; `item` and `index` follow later updates of that key. */
   children: (item: ReactiveValue<T>, index: ReactiveValue<number>) => ReelyNode;
 }
 
 interface Row<T> {
-  /** The first and the last node of the row: it is moved and removed as the range between them. */
+  /** The row is moved and removed as the range from `first` to `last`. */
   readonly first: Node;
   readonly last: Node;
   readonly item: Signal<T>;
@@ -31,12 +27,7 @@ interface Row<T> {
   readonly dispose: VoidFunction;
 }
 
-/**
- * Finds the rows that stay in place: the longest increasing run of old positions.
- * Rows outside it are the fewest that must move to reach the new order.
- *
- * @returns {Set<number>} The indices, in `oldPositions`, of the rows that stay.
- */
+// The longest increasing run of old positions: rows outside it are the fewest that must move.
 const findStaying = (oldPositions: readonly number[]): Set<number> => {
   // tails[k]: index in oldPositions of the smallest tail of an increasing run of length k + 1
   const tails: number[] = [];
@@ -65,7 +56,7 @@ const findStaying = (oldPositions: readonly number[]): Set<number> => {
   return staying;
 };
 
-/** Gives focus back to an element that lost it while its row moved. */
+// Moving a node blurs the element focused inside it.
 const keepFocus = (move: VoidFunction): void => {
   const focused = document.activeElement;
   move();
@@ -75,14 +66,8 @@ const keepFocus = (move: VoidFunction): void => {
 };
 
 /**
- * Renders a keyed list: one row per key, created once. When the items change, a row whose key
- * stays keeps its node and gets the new item and index through `item()` and `index()`; rows of
- * new keys are created, rows of gone keys are removed with their subscriptions, and the nodes
- * that changed places are moved, never recreated, so focus and state inside rows survive.
- *
- * @template T - The item type.
- * @param {ForProps<T>} props - The items, their key (`by`) and the row renderer.
- * @returns {DocumentFragment} The rows between the two anchors the list keeps its place by.
+ * Renders a keyed list: one row per key, created once and moved, never recreated, so focus and
+ * state inside rows survive; a row of a gone key is removed with its subscriptions.
  */
 export const For = <T,>({ each, by, children }: ForProps<T>): DocumentFragment => {
   const owner = getOwner();
