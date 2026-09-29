@@ -2,14 +2,7 @@ import type { EventsMap, EventType } from '@reely/emitter';
 import { EventEmitter } from '@reely/emitter';
 import { AsyncQueue } from '@reely/queue';
 import type { AnyFunction } from '@reely/utils';
-import {
-  hasProperty,
-  isPlainObject,
-  isPromise,
-  isSomeFunction,
-  isString,
-  toErrorWithMessage,
-} from '@reely/utils';
+import { hasProperty, isKeyValueObject, isPromise, isSomeFunction, isString, toErrorWithMessage } from '@reely/utils';
 
 import type {
   IStateMachine,
@@ -97,7 +90,6 @@ export class StateMachine<
     return this.emitter.off.apply(this, parameters);
   }
 
-   
   protected processTransitionTask(
     transitionTask: StateMachinePendingTransition<Transitions, State>
   ):
@@ -187,7 +179,7 @@ export class StateMachine<
 
     this.currentState = to;
 
-    if (isPlainObject(destinationTransition)) {
+    if (isKeyValueObject(destinationTransition)) {
       destinationTransition?.action?.(this.createAction('stateTransition', from, to, by, inputData));
     }
     if (from !== to) {
