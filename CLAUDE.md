@@ -17,7 +17,7 @@ The repo exists for `@reely/dommy` and the small `@reely/*` helpers it stands on
 - `packages/basics` — `@reely/basics`, published (`scope:shared`): production-grade helpers promoted from utils (`forEachSettled`, `reportUncaught`, `hasSome`, `isSomeFunction`, `isPlainObject`).
 - `packages/utils` — `@reely/utils`, private (`scope:shared`): type guards, fp (`pipe`, `flow`, `Either`, `Maybe`), nullable helpers, errors, shared types. **One function — one file** (`src/lib/<group>/<fnName>.ts`) with a spec next to it.
 - `packages/logger` — `@reely/logger` (`scope:shared`): `scopedLogger(scope)`, `logWith(level, prefix)` for `pipe`, `WithUseLogger<T>`.
-- `packages/dommy` — `@reely/dommy`: DOM element factories, JSX runtime, signals (`reelx`, port of artalar/act), async router. Current work: JsPowWow/reely#1 (dommy 0.1 for JsPowWow/ai-race).
+- `packages/dommy` — `@reely/dommy`: DOM element factories, JSX runtime, signals (`reelx`, a push-pull graph), async router. Current work: JsPowWow/reely#1 (dommy 0.1 for JsPowWow/ai-race).
 - `packages/async`, `strings`, `colors` — small published helpers (older, looser style — don't copy it).
 - `apps/free-dom` — dommy playground; `apps/star-battle` — canvas game; `labs-ignore/` — experiments, not linted, not shipped.
 

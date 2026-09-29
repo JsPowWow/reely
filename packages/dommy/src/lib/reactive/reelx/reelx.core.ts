@@ -1,329 +1,422 @@
-// Adapted from act by artalar (https://github.com/artalar/act), MIT licence.
-import { hasSome, isSomeFunction } from '@reely/basics';
+// A push-pull signal graph: a write marks what may have changed, a read brings a node up to date.
+import { hasSome } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
-import { hasProperty, isInstanceOf } from '@reely/utils';
+import { isInstanceOf, noop } from '@reely/utils';
 
-import type { Reelx, RlxDerivedState, RlxState } from './reelx.types';
+/** A function that reads a signal or a computed and subscribes the running effect or computed to it. */
+export type Reader<T> = () => T;
 
-type WithSubscribers<T> = T & { _subscribers: Set<Subscriber> };
-
-interface Subscriber {
-  (): void;
-  _values: Array<WithSubscribers<RlxState<unknown>>>;
+interface Source {
+  // grows with every change of the value, so an observer can tell whether what it read is still current
+  readonly version: number;
+  readonly observers: ReadonlySet<Computation<unknown>>;
+  refresh(): void;
+  observe(observer: Computation<unknown>): void;
+  unobserve(observer: Computation<unknown>): void;
 }
 
-const unlink = (subscriber: Subscriber): void => {
-  for (const { _subscribers } of subscriber._values.splice(0)) {
-    _subscribers.delete(subscriber);
-  }
-};
-
-const removeWhere = <T>(list: T[], matches: (item: T) => boolean): void => {
-  let kept = 0;
-  for (const item of list) {
-    if (!matches(item)) {
-      list[kept++] = item;
-    }
-  }
-  list.length = kept;
-};
-
-interface Dependency<T> {
-  readonly computation: RlxState<T> | RlxDerivedState<T>;
-  /** What the read gave: the value, or what it threw. */
-  readonly value: unknown;
-  readonly threw: boolean;
+interface Link {
+  version: number;
+  readIn: number;
 }
-type Dependencies<T> = Dependency<T>[];
 
-const isUnchanged = <T>({ computation, value, threw }: Dependency<T>): boolean => {
-  try {
-    return !threw && Object.is(value, computation());
-  } catch (error) {
-    return threw && Object.is(value, error);
-  }
-};
+// the value, or what the computation threw
+type Outcome<T> = { readonly threw: false; readonly value: T } | { readonly threw: true; readonly value: unknown };
 
-type RlxSelfInstance<T> = WithSubscribers<
-  RlxState<T> &
-    RlxDerivedState<T> & {
-      toString(): string;
-      toJSON(): T;
-    }
->;
+type Scheduler = (flush: VoidFunction) => void;
 
-/** subscribers from all touched signals */
-let QUEUE: Array<Set<Subscriber>> = [];
-
-/** global queue cache flag */
-let QUEUE_VERSION = 0;
-
-/** current subscriber during invalidation */
-let SUBSCRIBER: null | Subscriber = null;
-
-/** global subscriber pull cache flag */
-let SUBSCRIBER_VERSION = 0;
-
-/** stack-based parent ref to silently link nodes */
-let DEPS: null | Dependencies<unknown> = null;
-
-/** nesting depth of `batch` calls; subscribers run when the outermost one ends */
-let BATCH_DEPTH = 0;
-
-/** true while `flushSync` runs subscribers; writes made meanwhile join the same flush */
-let FLUSHING = false;
-
-/** How many waves of writes one flush runs before it takes them for a cycle of effects. */
 const MAX_FLUSH_WAVES = 100;
 
-/** What a reelx is made from: a computation, or the initial value of a state, a function included. */
-type ReelxSource<T> =
-  | { readonly kind: 'computed'; readonly compute: () => T }
-  | { readonly kind: 'state'; readonly initial: T };
+// grows with every write: an unlinked computed hears no writes, but one checked at this epoch is current
+let epoch = 0;
+let tracker: Nullable<Computation<unknown>> = null;
+// the computation whose `fn` runs now, tracked or not: its own writes never run it again
+let running: Nullable<Computation<unknown>> = null;
+let batchDepth = 0;
+let queue: Effect[] = [];
+let flushing = false;
+let schedule: Scheduler = (flush) => flush();
 
-const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => boolean): RlxSelfInstance<T> => {
-  let subscriberVersion = -1;
-  let state: T;
-  let rlxSelf: RlxSelfInstance<T>;
-
-  if (source.kind === 'computed') {
-    const init = source.compute;
-    const deps: Dependencies<T> = [];
-    // a computation that tracked nothing is a constant once it has run
-    let hasRun = false;
-    // what the last run threw: kept like a result and thrown on every read until a dependency changes
-    let thrown: Nullable<{ readonly error: unknown }> = null;
-    // checking the dependencies is what links them to the reader: a check made untracked links nothing
-    let checkedFor: Nullable<Subscriber> = null;
-    // @ts-expect-error expected properties assigned below
-    rlxSelf = (): T => {
-      if (subscriberVersion !== SUBSCRIBER_VERSION || checkedFor !== SUBSCRIBER) {
-        const prevDeps = DEPS;
-        DEPS = null;
-
-        try {
-          if (!hasRun || !deps.every(isUnchanged)) {
-            (DEPS = deps).length = 0;
-
-            try {
-              const newState = init();
-              thrown = null;
-              if (
-                equal === undefined ||
-                // first call
-                state === undefined ||
-                !equal(state, newState)
-              ) {
-                state = newState;
-              }
-            } catch (error) {
-              thrown = { error };
-            }
-            hasRun = true;
-          }
-        } finally {
-          DEPS = prevDeps;
-        }
-        subscriberVersion = SUBSCRIBER_VERSION;
-        checkedFor = SUBSCRIBER;
-      }
-
-      DEPS?.push({ computation: rlxSelf, value: hasSome(thrown) ? thrown.error : state, threw: hasSome(thrown) });
-
-      if (hasSome(thrown)) {
-        throw thrown.error;
-      }
-      return state;
-    };
-  } else {
-    state = source.initial;
-    // @ts-expect-error expected properties assigned below
-    rlxSelf = (...args: [] | [newState: T]): T => {
-      // a call with an argument writes, even `undefined`; a call without one reads
-      if (args.length === 1) {
-        const [newState] = args;
-        // an equal value changes nothing, and a write is never a read
-        if (Object.is(newState, state)) {
-          return state;
-        }
-        // mark all computed(s) dirty
-        ++SUBSCRIBER_VERSION;
-
-        state = newState;
-
-        const subscribers = rlxSelf._subscribers;
-        // replace before scheduling: a synchronous flush re-subscribes to the new set
-        rlxSelf._subscribers = new Set();
-
-        // a run does not depend on what it writes, even after reading it: its own write
-        // neither runs it again nor unlinks it from the rest of what it read
-        if (SUBSCRIBER !== null && subscribers.delete(SUBSCRIBER)) {
-          removeWhere(SUBSCRIBER._values, (value) => value === rlxSelf);
-        }
-        if (DEPS !== null) {
-          removeWhere(DEPS, ({ computation }) => computation === rlxSelf);
-        }
-
-        if (QUEUE.push(subscribers) === 1) {
-          QUEUE_VERSION++;
-          reelx.schedule?.();
-        }
-        return state;
-      }
-
-      if (SUBSCRIBER !== null && rlxSelf._subscribers.size !== rlxSelf._subscribers.add(SUBSCRIBER).size) {
-        SUBSCRIBER._values.push(rlxSelf);
-      }
-
-      DEPS?.push({ computation: rlxSelf, value: state, threw: false });
-
-      return state;
-    };
-  }
-
-  rlxSelf.subscribe = (cb) => {
-    let queueVersion = -1;
-    let lastState: unknown;
-    let prevState: T | undefined;
-    let isDisposed = false;
-
-    const subscriber: Subscriber = () => {
-      // a subscriber disposed inside `batch` may still be queued
-      if (!isDisposed && queueVersion !== QUEUE_VERSION) {
-        // a subscription made inside another computation is a new root: it must not
-        // steal the outer subscriber or leak into the outer dependencies
-        const prevSubscriber = SUBSCRIBER;
-        const prevDeps = DEPS;
-        DEPS = null;
-        try {
-          queueVersion = QUEUE_VERSION;
-
-          unlink(subscriber);
-
-          SUBSCRIBER = subscriber;
-
-          SUBSCRIBER_VERSION++;
-
-          if (!Object.is(rlxSelf(), lastState)) {
-            cb((lastState = state), prevState);
-            prevState = state;
-          }
-        } finally {
-          SUBSCRIBER = prevSubscriber;
-          DEPS = prevDeps;
-        }
-      }
-    };
-    subscriber._values = [];
-
-    try {
-      subscriber();
-    } catch (error) {
-      // a first run that throws leaves no subscription behind
-      unlink(subscriber);
-      throw error;
-    }
-    rlxSelf._subscribers.add(subscriber);
-
-    return (): void => {
-      isDisposed = true;
-      rlxSelf._subscribers.delete(subscriber);
-      if (rlxSelf._subscribers.size === 0) {
-        unlink(subscriber);
-      }
-    };
-  };
-
-  rlxSelf._subscribers = new Set();
-  rlxSelf.toString = (): string => state + '';
-  // @ts-expect-error state as object
-  rlxSelf.valueOf = (): object => state;
-  rlxSelf.toJSON = (): T => state;
-
-  return rlxSelf;
+const setTracker = (observer: Nullable<Computation<unknown>>): Nullable<Computation<unknown>> => {
+  const outer = tracker;
+  tracker = observer;
+  return outer;
 };
 
-export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) => boolean) =>
-  createReelx<T>(isSomeFunction(init) ? { kind: 'computed', compute: init } : { kind: 'state', initial: init }, equal);
+const setRunning = (computation: Nullable<Computation<unknown>>): Nullable<Computation<unknown>> => {
+  const outer = running;
+  running = computation;
+  return outer;
+};
 
-reelx.state = <T>(initial: T): RlxState<T> => createReelx({ kind: 'state', initial });
+class Signal<T> implements Source {
+  public version = 0;
+  public readonly observers = new Set<Computation<unknown>>();
+  public readonly refresh = noop;
 
-export function reelxDebug<S>(rlx: RlxState<S> | RlxDerivedState<S>): {
-  /** How many subscriptions read it now: tests count them to prove that `dispose` released them. */
-  subscriberCount: () => number;
-} {
-  return {
-    subscriberCount: (): number =>
-      hasProperty('_subscribers', rlx) && isInstanceOf(Set, rlx._subscribers) ? rlx._subscribers.size : 0,
+  constructor(private value: T) {}
+
+  public readonly read = (): T => {
+    tracker?.onRead(this);
+    return this.value;
   };
+
+  public observe(observer: Computation<unknown>): void {
+    this.observers.add(observer);
+  }
+
+  public unobserve(observer: Computation<unknown>): void {
+    this.observers.delete(observer);
+  }
+
+  public write(value: T): void {
+    if (Object.is(value, this.value)) {
+      return;
+    }
+    this.value = value;
+    this.version++;
+    epoch++;
+    running?.onOwnWrite(this);
+    const idle = queue.length === 0;
+    for (const observer of this.observers) {
+      observer.mark(this);
+    }
+    if (idle && queue.length > 0 && batchDepth === 0 && !flushing) {
+      schedule(flushSync);
+    }
+  }
 }
 
-reelx.flushSync = (): void => {
-  if (FLUSHING) {
+// runs `fn` recording what it reads, and reruns it on demand only when one of those sources changed
+abstract class Computation<T> {
+  public version = 0;
+  // a source may have changed; the versions of the sources tell whether one did
+  protected needsCheck = false;
+  // in the order first read
+  protected readonly sources = new Map<Source, Link>();
+  protected outcome: Nullable<Outcome<T>> = null;
+  private runCount = 0;
+  private checkedAt = -1;
+  private markedAt = -1;
+  private deafTo: Nullable<Set<Source>> = null;
+
+  constructor(private readonly fn: () => T) {}
+
+  // whether its sources hold it, so that their writes reach it
+  protected abstract get linked(): boolean;
+
+  // `written` is the signal whose write this mark carries
+  public mark(written: Source): void {
+    // once per write: a node already marked by an earlier write still passes a new one on
+    if (this.markedAt === epoch) {
+      return;
+    }
+    this.markedAt = epoch;
+    // A run does not depend on a signal it writes, read directly or through a computed: its own
+    // write coming back makes it deaf to that signal until it reads it again or runs again.
+    if (this === running) {
+      (this.deafTo ??= new Set()).add(written);
+    } else if (!this.deafTo?.has(written)) {
+      this.onMarked(written);
+    }
+  }
+
+  // what a run writes itself is not a change it missed
+  public onOwnWrite(source: Source): void {
+    const link = this.sources.get(source);
+    if (hasSome(link)) {
+      link.version = source.version;
+    }
+  }
+
+  public onRead(source: Source): void {
+    this.deafTo?.delete(source);
+    const link = this.sources.get(source);
+    if (hasSome(link)) {
+      link.version = source.version;
+      link.readIn = this.runCount;
+      return;
+    }
+    this.sources.set(source, { version: source.version, readIn: this.runCount });
+    if (this.linked) {
+      source.observe(this);
+    }
+  }
+
+  public refresh(): Outcome<T> {
+    const current = this.outcome;
+    if (hasSome(current) && !this.needsCheck && (this.linked || this.checkedAt === epoch)) {
+      return current;
+    }
+    this.needsCheck = false;
+    this.checkedAt = epoch;
+    if (hasSome(current) && !this.sourceChanged()) {
+      return current;
+    }
+
+    const { fn } = this;
+    this.runCount++;
+    this.deafTo = null;
+    const outer = setTracker(this);
+    const outerRunning = setRunning(this);
+    let next: Outcome<T>;
+    try {
+      next = { threw: false, value: fn() };
+    } catch (error) {
+      next = { threw: true, value: error };
+    }
+    setTracker(outer);
+    setRunning(outerRunning);
+    this.dropUnread();
+    if (!hasSome(current) || current.threw !== next.threw || !Object.is(current.value, next.value)) {
+      this.version++;
+    }
+    return (this.outcome = next);
+  }
+
+  protected detach(): void {
+    for (const source of this.sources.keys()) {
+      source.unobserve(this);
+    }
+  }
+
+  private unlink(source: Source): void {
+    this.sources.delete(source);
+    source.unobserve(this);
+  }
+
+  private sourceChanged(): boolean {
+    for (const [source, { version }] of this.sources) {
+      source.refresh();
+      if (source.version !== version) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private dropUnread(): void {
+    for (const [source, link] of this.sources) {
+      if (link.readIn !== this.runCount) {
+        this.unlink(source);
+      }
+    }
+  }
+
+  protected abstract onMarked(written: Source): void;
+}
+
+class Computed<T> extends Computation<T> implements Source {
+  public readonly observers = new Set<Computation<unknown>>();
+
+  protected get linked(): boolean {
+    return this.observers.size > 0;
+  }
+
+  public readonly read = (): T => {
+    const outcome = this.refresh();
+    tracker?.onRead(this);
+    if (outcome.threw) {
+      throw outcome.value;
+    }
+    return outcome.value;
+  };
+
+  public observe(observer: Computation<unknown>): void {
+    if (this.observers.size === 0) {
+      for (const source of this.sources.keys()) {
+        source.observe(this);
+      }
+    }
+    this.observers.add(observer);
+  }
+
+  public unobserve(observer: Computation<unknown>): void {
+    if (this.observers.delete(observer) && this.observers.size === 0) {
+      this.detach();
+    }
+  }
+
+  protected onMarked(written: Source): void {
+    this.needsCheck = true;
+    for (const observer of this.observers) {
+      observer.mark(written);
+    }
+  }
+}
+
+// stays linked until disposed; a mark queues it to run
+class Effect extends Computation<void> {
+  private disposed = false;
+
+  protected get linked(): boolean {
+    return !this.disposed;
+  }
+
+  public readonly dispose = (): void => {
+    this.disposed = true;
+    this.detach();
+    this.sources.clear();
+  };
+
+  // runs it if what it read has changed, and throws what that run threw
+  public run(): void {
+    if (this.disposed) {
+      return;
+    }
+    const before = this.outcome;
+    const after = this.refresh();
+    if (after !== before && after.threw) {
+      throw after.value;
+    }
+  }
+
+  // taken out of the queue without running: the next write queues it again
+  public dequeue(): void {
+    this.needsCheck = false;
+  }
+
+  protected onMarked(): void {
+    if (!this.needsCheck) {
+      this.needsCheck = true;
+      queue.push(this);
+    }
+  }
+}
+
+/** Runs the queued effects now; what they write joins as the next wave. Every effect runs, the first error is rethrown. */
+export const flushSync = (): void => {
+  if (flushing) {
     return;
   }
-  FLUSHING = true;
-  // every subscriber runs even if one throws; the first error is rethrown at the end
-  const errors: unknown[] = [];
-  let waves = 0;
+  flushing = true;
+  let failure: Nullable<{ readonly error: unknown }> = null;
   try {
-    while (QUEUE.length > 0) {
-      if (++waves > MAX_FLUSH_WAVES) {
-        QUEUE = [];
+    for (let wave = 1; queue.length > 0; wave++) {
+      if (wave > MAX_FLUSH_WAVES) {
+        const dropped = queue;
+        queue = [];
+        dropped.forEach((effect) => effect.dequeue());
         throw new Error(
           `reelx: a cycle of effects, each writes a signal another one reads (${MAX_FLUSH_WAVES} waves)`,
-          {
-            cause: errors[0],
-          }
+          { cause: failure?.error }
         );
       }
-      const iterator = QUEUE;
-      QUEUE = [];
-      for (const subscribers of iterator) {
-        for (const subscriber of subscribers) {
-          try {
-            subscriber();
-          } catch (error) {
-            errors.push(error);
-          }
+      const effects = queue;
+      queue = [];
+      for (const effect of effects) {
+        try {
+          effect.run();
+        } catch (error) {
+          failure ??= { error };
         }
       }
     }
   } finally {
-    FLUSHING = false;
+    flushing = false;
   }
-  if (errors.length > 0) {
-    throw errors[0];
-  }
-};
-
-reelx.untracked = <T>(fn: () => T): T => {
-  const prevSubscriber = SUBSCRIBER;
-  const prevDeps = DEPS;
-  SUBSCRIBER = null;
-  DEPS = null;
-  try {
-    return fn();
-  } finally {
-    SUBSCRIBER = prevSubscriber;
-    DEPS = prevDeps;
+  if (hasSome(failure)) {
+    throw failure.error;
   }
 };
 
-reelx.batch = <T>(fn: () => T): T => {
-  BATCH_DEPTH++;
+/**
+ * Replaces how a write outside `batch` gets its effects run: `next` is called with `flushSync` once
+ * the first effect is queued. By default it runs them at once; `batch` always flushes when it ends.
+ * Returns the scheduler it replaced.
+ */
+export const setScheduler = (next: Scheduler): Scheduler => {
+  const previous = schedule;
+  schedule = next;
+  return previous;
+};
+
+// the node behind each reader, for writes and for `reelxDebug`
+const nodes = new WeakMap<Reader<unknown>, Signal<unknown> | Computed<unknown>>();
+
+const toReader = <T>(node: Signal<T> | Computed<T>): Reader<T> => {
+  nodes.set(node.read, node);
+  return node.read;
+};
+
+/** A value that effects and computeds re-read when it is written; a function is held as a value too. */
+export const signal = <T>(initial: T): Reader<T> => toReader(new Signal(initial));
+
+/** A value derived from what `fn` reads, recomputed on read after one of them changes; what `fn` throws is rethrown until then. */
+export const computed = <T>(fn: () => T): Reader<T> => toReader(new Computed(fn));
+
+/** Writes `value` to the signal `read` reads (a computed's reader is ignored); an equal value (by `Object.is`) changes nothing. */
+export const write = <T>(read: Reader<T>, value: T): void => {
+  const node = nodes.get(read);
+  if (isInstanceOf(Signal, node)) {
+    node.write(value);
+  }
+};
+
+/** Runs `fn` now and again after every change of what it read. Returns `dispose`; creation that throws leaves nothing subscribed. */
+export const effect = (fn: VoidFunction): VoidFunction => {
+  const node = new Effect(fn);
+  try {
+    batch(() => {
+      try {
+        node.run();
+      } catch (error) {
+        // before the flush that ends the batch, so it never runs an effect whose creation threw
+        node.dispose();
+        throw error;
+      }
+    });
+  } catch (error) {
+    node.dispose();
+    throw error;
+  }
+  return node.dispose;
+};
+
+/**
+ * Calls `cb` with every new value of `read` (by `Object.is`, starting from `undefined`) and the one
+ * before it, now and after each change. Returns `unsubscribe`.
+ */
+export const subscribe = <T>(read: Reader<T>, cb: (value: T, prevValue?: T) => void): VoidFunction => {
+  let last: T | undefined;
+  return effect(() => {
+    const value = read();
+    if (!Object.is(value, last)) {
+      const previous = last;
+      last = value;
+      untracked(() => cb(value, previous));
+    }
+  });
+};
+
+/** Groups writes: effects run once, when the outermost `batch` ends, even if `fn` throws. */
+export const batch = <T>(fn: () => T): T => {
+  batchDepth++;
   try {
     return fn();
   } finally {
-    if (--BATCH_DEPTH === 0) {
-      reelx.flushSync();
+    if (--batchDepth === 0) {
+      flushSync();
     }
   }
 };
 
-/** Runs subscribers synchronously after a write, or at the end of the outermost `batch`. */
-reelx.schedule = (): void => {
-  if (BATCH_DEPTH === 0) {
-    reelx.flushSync();
+/** Runs `fn` without subscribing the running effect or computed to what it reads. */
+export const untracked = <T>(fn: () => T): T => {
+  const outer = setTracker(null);
+  try {
+    return fn();
+  } finally {
+    setTracker(outer);
   }
 };
+
+/** Introspection for tests. */
+export const reelxDebug = (
+  read: Reader<unknown>
+): {
+  /** How many effects and computeds read it now: tests count them to prove that `dispose` released them. */
+  subscriberCount: () => number;
+} => ({
+  subscriberCount: (): number => nodes.get(read)?.observers.size ?? 0,
+});

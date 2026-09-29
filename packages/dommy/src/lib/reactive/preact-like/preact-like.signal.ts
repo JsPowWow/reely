@@ -1,11 +1,15 @@
 import { noop, setPrototype } from '@reely/utils';
 
 import { getOwner, withOwner } from '../owner';
-import { reelx } from '../reelx/reelx.core';
+import * as reelx from '../reelx/reelx.core';
 
-import type { RlxDerivedState, RlxState, RlxSubscribe } from '../reelx/reelx.types';
+import type { Reader } from '../reelx/reelx.core';
 
-export interface Signal<T> extends RlxSubscribe<T> {
+interface Subscribable<T> {
+  subscribe(cb: (value: T, prevValue?: T) => void): VoidFunction;
+}
+
+export interface Signal<T> extends Subscribable<T> {
   (): T;
   get value(): T;
   set value(value: T);
@@ -17,7 +21,7 @@ export interface Signal<T> extends RlxSubscribe<T> {
   peek(): T;
 }
 
-export interface Computed<T> extends RlxSubscribe<T> {
+export interface Computed<T> extends Subscribable<T> {
   (): T;
   get value(): T;
   /** Reads the value without subscribing the running effect or computed to it. */
@@ -25,13 +29,13 @@ export interface Computed<T> extends RlxSubscribe<T> {
 }
 
 /** A value that bindings, effects and computeds re-read when it is written; a function is held as a value too. */
-export const signal = <T>(init: T): Signal<T> => setPrototype<Signal<T>>(signalProto, reelx.state(init));
+export const signal = <T>(init: T): Signal<T> => setPrototype<Signal<T>>(signalProto, reelx.signal(init));
 
 /**
  * A value derived from signals, recomputed only after one of them changes. What `fn` throws is
  * rethrown on every read until then.
  */
-export const computed = <T>(fn: () => T): Computed<T> => setPrototype<Computed<T>>(computedProto, reelx(fn));
+export const computed = <T>(fn: () => T): Computed<T> => setPrototype<Computed<T>>(computedProto, reelx.computed(fn));
 
 /** Groups writes: effects and bindings run once, when the outermost `batch` ends. */
 export const batch = <T>(fn: () => T): T => reelx.batch(fn);
@@ -77,8 +81,7 @@ export const effect = (fn: VoidFunction): VoidFunction => {
   // `this` in the body: a run can dispose its own effect, the first run included
   body = fn.bind({ dispose });
 
-  // the body runs as the computation; writes inside it are grouped, so its dependants run once
-  const s = computed<void>(() => {
+  const run = (): void => {
     try {
       releaseRun();
     } catch (error) {
@@ -92,7 +95,7 @@ export const effect = (fn: VoidFunction): VoidFunction => {
     try {
       withOwner((disposeOwner) => {
         disposeRun = disposeOwner;
-        reelx.batch(body);
+        body();
       }, null);
     } finally {
       running = false;
@@ -100,10 +103,11 @@ export const effect = (fn: VoidFunction): VoidFunction => {
         releaseRun();
       }
     }
-  });
+  };
+
   parent?.cleanups.add(dispose);
   try {
-    const release = s.subscribe(noop);
+    const release = reelx.effect(run);
     // the first run may have disposed the effect before its subscription existed
     if (disposed) {
       release();
@@ -117,29 +121,40 @@ export const effect = (fn: VoidFunction): VoidFunction => {
   return dispose;
 };
 
-const signalProto: ThisType<RlxState<unknown>> = {
-  get value() {
+const computedProto: ThisType<Reader<unknown>> = {
+  get value(): unknown {
     return this();
   },
-  peek() {
+  peek(): unknown {
     return reelx.untracked(this);
   },
-  set value(v) {
-    this(v);
+  subscribe(cb: (value: unknown, prevValue?: unknown) => void): VoidFunction {
+    return reelx.subscribe(this, cb);
   },
-  set(value: unknown) {
-    this(value);
+  toString(): string {
+    return String(reelx.untracked(this));
   },
-  update(fn: (value: unknown) => unknown) {
-    this(fn(reelx.untracked(this)));
+  valueOf(): unknown {
+    return reelx.untracked(this);
+  },
+  toJSON(): unknown {
+    return reelx.untracked(this);
   },
 };
 
-const computedProto: ThisType<RlxDerivedState<unknown>> = {
-  get value() {
+const signalMembers: ThisType<Reader<unknown>> = {
+  get value(): unknown {
     return this();
   },
-  peek() {
-    return reelx.untracked(this);
+  set value(value: unknown) {
+    reelx.write(this, value);
+  },
+  set(value: unknown): void {
+    reelx.write(this, value);
+  },
+  update(fn: (value: unknown) => unknown): void {
+    reelx.write(this, fn(reelx.untracked(this)));
   },
 };
+
+const signalProto = setPrototype(computedProto, signalMembers);

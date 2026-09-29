@@ -1,7 +1,7 @@
 // What reely's signals guarantee beyond the tests ported from Preact: the contract any core under them keeps.
 import { noop } from '@reely/utils';
 
-import { batch, computed, effect, signal } from './preact-like.signal';
+import { batch, computed, effect, signal, untracked } from './preact-like.signal';
 import { reelxDebug } from '../reelx/reelx.core';
 
 describe('the signal contract', () => {
@@ -77,6 +77,51 @@ describe('the signal contract', () => {
     effect(() => void seen.push(lap.value));
     lap.value = 1;
     expect(seen).toStrictEqual([0, 1]);
+  });
+
+  it('keeps running an effect that was waiting when it stopped a cycle', () => {
+    const ping = signal(0);
+    const pong = signal(0);
+    const other = signal(0);
+    const spy = vi.fn(() => void (ping.value = pong.value + other.value + 1));
+    effect(spy);
+    expect(() => effect(() => void (pong.value = ping.value + 1))).toThrow(/cycle/);
+    const runs = spy.mock.calls.length;
+
+    other.value = 99;
+
+    expect(spy.mock.calls.length).toBe(runs + 1);
+  });
+
+  it('runs an effect again for what an effect nested in it writes on its first run', () => {
+    const open = signal(true);
+    const seen: boolean[] = [];
+
+    effect(() => {
+      seen.push(open.value);
+      effect(() => {
+        if (open.peek()) {
+          open.value = false;
+        }
+      });
+    });
+
+    expect(seen).toStrictEqual([true, false]);
+  });
+
+  it('never runs again an effect whose creation threw', () => {
+    const s = signal(0);
+    const t = signal(0);
+    effect(() => void (t.value = s.value + 1));
+    const broken = vi.fn(() => {
+      t.value;
+      s.value = 1;
+      throw new Error('broken');
+    });
+
+    expect(() => effect(broken)).toThrow('broken');
+
+    expect(broken).toHaveBeenCalledOnce();
   });
 
   it('reads a chain of a thousand computeds', () => {
@@ -161,5 +206,156 @@ describe('the signal contract', () => {
     lap.value = 2;
 
     expect(seen).toStrictEqual([2, 4]);
+  });
+
+  it('runs a subscriber callback untracked', () => {
+    const lap = signal(1);
+    const other = signal(0);
+    const heard = vi.fn((value: number) => value + other.value);
+    lap.subscribe(heard);
+
+    other.value = 1;
+
+    expect(heard).toHaveBeenCalledOnce();
+  });
+
+  it('tells a subscriber nothing at once when the value is `undefined`, then every change', () => {
+    const lap = signal<number | undefined>(undefined);
+    const calls: unknown[][] = [];
+    lap.subscribe((...args) => void calls.push(args));
+
+    lap.value = 1;
+
+    expect(calls).toStrictEqual([[1, undefined]]);
+  });
+
+  it("runs the effects an effect's first run triggers after that run", () => {
+    const lap = signal(0);
+    const order: string[] = [];
+    effect(() => void order.push(`watch ${lap.value}`));
+
+    effect(() => {
+      order.push('start');
+      lap.value = 1;
+      order.push('end');
+    });
+
+    expect(order).toStrictEqual(['watch 0', 'start', 'end', 'watch 1']);
+  });
+
+  it('prints the current value of a computed', () => {
+    const lap = signal(1);
+    const label = computed(() => `lap ${lap.value}`);
+    expect(String(label)).toBe('lap 1');
+
+    lap.value = 2;
+
+    expect([String(label), `${label}`, JSON.stringify({ label })]).toStrictEqual([
+      'lap 2',
+      'lap 2',
+      '{"label":"lap 2"}',
+    ]);
+  });
+
+  it('does not run an effect again for what its own run writes, untracked too', () => {
+    const lap = signal(0);
+    const spy = vi.fn(() => {
+      lap.value;
+      untracked(() => (lap.value = lap.peek() + 1));
+    });
+
+    effect(spy);
+
+    expect([spy.mock.calls.length, lap.peek()]).toStrictEqual([1, 1]);
+  });
+
+  it('runs once an effect that writes a signal it read through a computed', () => {
+    const lap = signal(0);
+    const next = computed(() => lap.value + 1);
+    const spy = vi.fn(() => {
+      if (next.value < 3) {
+        lap.value = next.value;
+      }
+    });
+
+    effect(spy);
+
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
+  it('leaves nothing subscribed when an effect is created into a cycle', () => {
+    const ping = signal(0);
+    const pong = signal(0);
+    const stop = effect(() => void (ping.value = pong.value + 1));
+    expect(() => effect(() => void (pong.value = ping.value + 1))).toThrow(/cycle/);
+
+    stop();
+
+    expect([reelxDebug(ping).subscriberCount(), reelxDebug(pong).subscriberCount()]).toStrictEqual([0, 0]);
+  });
+
+  it('runs an effect once per write and once per batch', () => {
+    const a = signal(0);
+    const b = signal(0);
+    const spy = vi.fn(() => void (a.value + b.value));
+    effect(spy);
+
+    a.value = 1;
+    batch(() => {
+      a.value = 2;
+      b.value = 2;
+    });
+
+    expect(spy).toHaveBeenCalledTimes(3);
+  });
+
+  describe('an effect that writes a signal it read', () => {
+    it('does not see later writes of it (README, Self-referencing in effects)', () => {
+      const laps = signal(0);
+      const spy = vi.fn(() => {
+        if (laps.value > 10) {
+          laps.value = 10;
+        }
+      });
+      effect(spy);
+
+      laps.value = 20;
+      laps.value = 30;
+
+      expect([spy.mock.calls.length, laps.value]).toStrictEqual([2, 30]);
+    });
+
+    it('still hears the other signals of a computed it read', () => {
+      const a = signal(0);
+      const b = signal(0);
+      const sum = computed(() => a.value + b.value);
+      const spy = vi.fn(() => {
+        if (sum.value > 10) {
+          a.value = 0;
+        }
+      });
+      effect(spy);
+
+      a.value = 20;
+      b.value = 1;
+
+      expect(spy).toHaveBeenCalledTimes(3);
+    });
+
+    it('does not see them either when it read the signal through a computed', () => {
+      const laps = signal(0);
+      const read = computed(() => laps.value);
+      const spy = vi.fn(() => {
+        if (read.value > 10) {
+          laps.value = 10;
+        }
+      });
+      effect(spy);
+
+      laps.value = 20;
+      laps.value = 30;
+
+      expect([spy.mock.calls.length, laps.value]).toStrictEqual([2, 30]);
+    });
   });
 });

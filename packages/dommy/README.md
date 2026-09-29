@@ -504,5 +504,5 @@ MIT
 
 ## Credits
 
-- The signal core (`reelx`) is adapted from [act](https://github.com/artalar/act) by artalar, MIT licence.
+- The signal core (`reelx`) implements the push-pull graph known from [Reactively](https://github.com/milomg/reactively), [@preact/signals-core](https://github.com/preactjs/signals) and [alien-signals](https://github.com/stackblitz/alien-signals), written from the concept.
 - The signal tests are adapted from [@preact/signals-core](https://github.com/preactjs/signals), Copyright (c) 2022-present Preact Team, MIT licence.
