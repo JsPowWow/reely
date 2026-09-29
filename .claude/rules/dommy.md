@@ -24,7 +24,7 @@ Goal of the current work — JsPowWow/reely#1: signals bound to the DOM (point u
 - Unused destructured fields — `_ignored*`.
 
 ## Reuse, don't duplicate
-- Narrowing: `hasSome`, `isNil`, `isSomeFunction`, `isString`/`isNumber`/`isBoolean`, `isPrimitiveValue`, `hasProperty`, `isInstanceOf`, `isPlainObject`, `isNonEmpty` — from `@reely/utils`. `switch` over a union ends with `exhaustiveGuard`.
+- Narrowing: `hasSome`, `isSomeFunction`, `isPlainObject` — from `@reely/basics`; `isNil`, `isString`/`isNumber`/`isBoolean`, `isPrimitiveValue`, `hasProperty`, `isInstanceOf`, `isNonEmpty` — from `@reely/utils`. `switch` over a union ends with `exhaustiveGuard`.
 - Unknown thrown values → `toErrorWithMessage`; risky calls → `Either.tryCatch`; defaults → `withDefault`/`mapNullable`.
 - `noop`/`identity` instead of inline `() => {}` / `(x) => x`.
 - Logging only through the dommy config logger (`getDommyLogger()?.warn(...)`), read **at call time**, never cached at module load. No `console.*`.

@@ -119,6 +119,21 @@ export default [
     rules: { 'import/max-dependencies': ['error', { max: 60, ignoreTypeImports: true }] },
   },
   {
+    // guards live in @reely/basics and @reely/utils; their eslint configs turn this off
+    files: ['**/*.{ts,tsx,js}'],
+    ignores: ['**/*.{spec,test}.{ts,tsx,js}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "BinaryExpression[operator=/^[!=]==?$/] > UnaryExpression[operator='typeof']",
+          message:
+            'Use a guard from @reely/basics or @reely/utils (hasSome, isSomeFunction, isString…); add a missing one to @reely/utils first.',
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*spec.js', '**/*spec.ts', '**/*test.js', '**/*test.ts'],
     // Override or add rules here
     rules: {

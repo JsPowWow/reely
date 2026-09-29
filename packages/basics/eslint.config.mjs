@@ -23,4 +23,9 @@ export default [
     // checked by scripts/consumer-check.mjs
     ignores: ['**/out-tsc', 'consumer'],
   },
+  {
+    // the guards live here
+    files: ['**/*.ts', '**/*.js'],
+    rules: { 'no-restricted-syntax': 'off' },
+  },
 ];

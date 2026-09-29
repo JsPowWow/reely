@@ -14,6 +14,7 @@ The repo exists for `@reely/dommy` and the small `@reely/*` helpers it stands on
 
 ## Layout
 
+- `packages/basics` — `@reely/basics`, published (`scope:shared`): production-grade helpers promoted from utils (`forEachSettled`, `reportUncaught`, `hasSome`, `isSomeFunction`, `isPlainObject`).
 - `packages/utils` — `@reely/utils`, private (`scope:shared`): type guards, fp (`pipe`, `flow`, `Either`, `Maybe`), nullable helpers, errors, shared types. **One function — one file** (`src/lib/<group>/<fnName>.ts`) with a spec next to it.
 - `packages/logger` — `@reely/logger` (`scope:shared`): `scopedLogger(scope)`, `logWith(level, prefix)` for `pipe`, `WithUseLogger<T>`.
 - `packages/dommy` — `@reely/dommy`: DOM element factories, JSX runtime, signals (`reelx`, port of artalar/act), async router. Current work: JsPowWow/reely#1 (dommy 0.1 for JsPowWow/ai-race).
@@ -26,7 +27,7 @@ Always through Nx (caching, `^build` deps): `npx nx test dommy`, `npx nx lint do
 
 ## Rules that must not break
 
-- **Reuse `@reely/utils` first.** Guards (`hasSome`, `isNil`, `isSomeFunction`, `isString`, `hasProperty`…), `pipe`/`flow`, `noop`/`identity`, `exhaustiveGuard`, `toErrorWithMessage`, shared types (`Nullable`, `PipeableFn`, `AnyFunction`…). No hand-written `typeof` checks or local copies. Missing a general helper → add it to utils (own file + spec + named export), then use it.
+- **Reuse `@reely/basics` and `@reely/utils` first**, in new code and in fixes alike. Guards (`hasSome`, `isNil`, `isSomeFunction`, `isString`, `hasProperty`…), `forEachSettled`, `reportUncaught`, `pipe`/`flow`, `noop`/`identity`, `exhaustiveGuard`, `toErrorWithMessage`, shared types (`Nullable`, `PipeableFn`, `AnyFunction`…). A published package imports a helper from `@reely/basics` where it lives there. No hand-written `typeof` checks (ESLint `no-restricted-syntax` rejects them) and no local copies. Missing a general helper → add it to utils (own file + spec + named export), then use it; it moves to basics once production-grade.
 - **No `as`** (ESLint `consistent-type-assertions: never`; allowed only in specs) — narrow with guards. No `any`, no `@ts-nocheck`/`@ts-ignore` in new code.
 - **Explicit return types**, `import type` for types, `import/order` groups (`@reely/**` after externals), no import cycles.
 - **Lean comments:** a short JSDoc on public API only; a code comment only for a non-obvious why. Never restate what the code says.
