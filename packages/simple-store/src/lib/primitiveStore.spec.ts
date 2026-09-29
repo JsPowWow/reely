@@ -81,6 +81,27 @@ describe('PrimitiveStore', () => {
       lap.value = 1;
     }).toThrow(/keep changing the store/);
   });
+
+  it('keeps the errors of the listeners when it stops them', () => {
+    const lap = new PrimitiveStore(0);
+    const broken = new Error('broken sensor');
+    lap.on('changed', (value) => {
+      if (value === 1) {
+        throw broken;
+      }
+    });
+    lap.on('changed', (value) => {
+      lap.value = value + 1;
+    });
+
+    expect(() => {
+      lap.value = 1;
+    }).toThrow(
+      expect.objectContaining({
+        errors: [broken, expect.objectContaining({ message: expect.stringMatching(/keep changing/) })],
+      })
+    );
+  });
 });
 
 // never run: the compiler checks these calls

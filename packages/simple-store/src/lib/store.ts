@@ -77,15 +77,19 @@ export abstract class Store<T> {
     }
     this.notifying = true;
     try {
-      forEachSettled(this.rounds(), () => this.emitter.emit('changed', this.read()), 'Notifications of the store threw');
+      forEachSettled(
+        this.rounds(),
+        () => this.emitter.emit('changed', this.read()),
+        'Notifications of the store threw'
+      );
     } finally {
       this.notifying = false;
       this.changedMeanwhile = false;
     }
   }
 
-  /** One round per change made during the notification before it. */
-  private *rounds(): Generator<number> {
+  // a notification, then one more whenever a listener changed the store during the last one
+  private *rounds(): Generator<void> {
     for (let round = 1; round === 1 || this.changedMeanwhile; round++) {
       if (round > maxNotifications) {
         throw new Error(`The listeners keep changing the store: ${maxNotifications} notifications for one change`, {
@@ -93,7 +97,7 @@ export abstract class Store<T> {
         });
       }
       this.changedMeanwhile = false;
-      yield round;
+      yield;
     }
   }
 
