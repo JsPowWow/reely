@@ -95,7 +95,7 @@ describe('reelx tests', () => {
       }
     }).subscribe(noop);
 
-    expect(reelxDebug(a).subs()?.size).toBe(1);
+    expect(reelxDebug(a).subscriberCount()).toBe(1);
   });
 
   test('should not have stale subscription', () => {
@@ -103,10 +103,10 @@ describe('reelx tests', () => {
     const b = reelx(0);
     reelx(() => b() || a()).subscribe(noop);
 
-    expect(reelxDebug(a).subs()?.size).toBe(1);
+    expect(reelxDebug(a).subscriberCount()).toBe(1);
     b(123);
     reelx.flushSync();
-    expect(reelxDebug(a).subs()?.size).toBe(0);
+    expect(reelxDebug(a).subscriberCount()).toBe(0);
   });
 
   test('should correct provide `previous state value` in subscriber', async () => {

@@ -42,7 +42,7 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
   /** Resolves the first route, in definition order, that matches and whose action returns non-nil. */
   public async resolve(
     pathnameOrContext: string | (RouterContext & { pathname: string })
-  ): Promise<RouteResult<unknown>> {
+  ): Promise<RouteResult<R>> {
     const baseContext = {
       router: this,
       ...(isString(pathnameOrContext) ? { pathname: pathnameOrContext } : pathnameOrContext),

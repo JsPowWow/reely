@@ -30,7 +30,8 @@ export const assignElementRef =
     if (hasProperty('elementRef', maybeProps)) {
       const { elementRef } = maybeProps;
       if (isSomeFunction(elementRef)) {
-        elementRef(element);
+        // the props are unknown here; their types at `createElement` promise a `(element) => void`
+        Reflect.apply(elementRef, undefined, [element]);
       } else if (hasProperty('current', elementRef)) {
         elementRef.current = element;
       }

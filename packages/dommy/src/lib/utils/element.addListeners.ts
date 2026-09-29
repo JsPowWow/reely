@@ -61,6 +61,9 @@ export function addListeners<Evt extends DOMElementEventType, Elt extends DommyE
   );
 }
 
+// method parameters compare both ways: the DOM dispatches to a handler the event of its own type
+type DispatchedListener = { handle(event: Event): void }['handle'];
+
 export function addEventListenerHandler<Evt extends DOMElementEventType, Elt extends DommyElement>(
   element: Elt,
   eventType: string,
@@ -73,8 +76,9 @@ export function addEventListenerHandler<Evt extends DOMElementEventType, Elt ext
     );
     return true;
   }
-  if (isSomeFunction<EventListener>(eventHandler)) {
-    element.addEventListener(eventType, eventHandler, {
+  if (isSomeFunction(eventHandler)) {
+    const listener: DispatchedListener = eventHandler;
+    element.addEventListener(eventType, listener, {
       signal: eventListenersAbortSignal,
     });
     return true;

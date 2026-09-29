@@ -1,7 +1,7 @@
 // Adapted from act by artalar (https://github.com/artalar/act), MIT licence.
 import { hasSome, isSomeFunction } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
-import { hasProperty } from '@reely/utils';
+import { hasProperty, isInstanceOf } from '@reely/utils';
 
 import type { Reelx, RlxDerivedState, RlxState } from './reelx.types';
 
@@ -253,15 +253,13 @@ export const reelx: Reelx = <T>(init: (() => T) | T, equal?: (prev: T, next: T) 
 reelx.state = <T>(initial: T): RlxState<T> => createReelx({ kind: 'state', initial });
 
 export function reelxDebug<S>(rlx: RlxState<S> | RlxDerivedState<S>): {
-  subs: () => Nullable<Set<Subscriber>>;
   /** How many subscriptions read it now: tests count them to prove that `dispose` released them. */
   subscriberCount: () => number;
 } {
-  const subs = (): Nullable<Set<Subscriber>> => {
-    const maybeSubs: unknown = hasProperty('_subscribers', rlx) ? rlx._subscribers : undefined;
-    return hasSome<Set<Subscriber>>(maybeSubs) ? maybeSubs : undefined;
+  return {
+    subscriberCount: (): number =>
+      hasProperty('_subscribers', rlx) && isInstanceOf(Set, rlx._subscribers) ? rlx._subscribers.size : 0,
   };
-  return { subs, subscriberCount: (): number => subs()?.size ?? 0 };
 }
 
 reelx.flushSync = (): void => {
