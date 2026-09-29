@@ -1,6 +1,7 @@
 import type { Routes } from '@reely/dommy/router';
 import { DocsPage } from '../pages/docs/docs.page';
 import { EvolutionPage } from '../pages/evolution/evolution.page';
+import { LabsPage } from '../pages/labs/labs.page';
 import { LandingPage } from '../pages/landing/landing.page';
 import { NotFoundPage } from '../site/not-found.page';
 
@@ -21,5 +22,6 @@ export const routes = [
       { path: '/:step', action: (_ctx, { step }) => () => <EvolutionPage slug={String(step)} /> },
     ],
   },
+  { path: '/labs', action: () => () => <LabsPage /> },
   { path: '/*rest', action: (ctx) => () => <NotFoundPage pathname={ctx.pathname} /> },
 ] as const satisfies Routes<() => Node>;

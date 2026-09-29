@@ -1,0 +1,58 @@
+import { mount } from '@reely/dommy';
+
+import { DiamondLog } from './demos/diamond.log';
+import { MarkupList } from './demos/markup.list';
+import { SharedParent } from './demos/shared.parent';
+import { LabsPage } from './labs.page';
+
+const render = (view: () => Node): HTMLElement => {
+  const host = document.createElement('div');
+  mount(host, view);
+  return host;
+};
+
+const click = (host: Element, text: string): void => {
+  Array.from(host.querySelectorAll('button'))
+    .find((button) => button.textContent === text)
+    ?.click();
+};
+
+const texts = (root: ParentNode, selector: string): (string | null)[] =>
+  Array.from(root.querySelectorAll(selector), (node) => node.textContent);
+
+describe('labs', () => {
+  it('shows each lab with its question, live demos and verdict', () => {
+    const page = render(() => <LabsPage />);
+
+    expect(document.title).toBe('Labs | reely');
+    expect(texts(page, 'main h2')).toEqual(['Statements inside markup', 'A signal graph in the shape of Angular’s']);
+    expect(page.querySelectorAll('figure')).toHaveLength(3);
+    expect(page.querySelector('header a[href="/labs"]')?.getAttribute('aria-current')).toBe('true');
+  });
+
+  it('builds children with a loop and a condition inside JSX', () => {
+    const list = render(MarkupList);
+
+    expect(texts(list, 'li')).toEqual(['1. Write the spec', '3. Ship next.2', 'Done: 1']);
+  });
+
+  it('shows two builds that share a parent across an `await` land in the wrong lists', async () => {
+    const host = render(SharedParent);
+
+    click(host, 'Build both');
+    await new Promise((done) => setTimeout(done, 0));
+    const [first, second] = Array.from(host.querySelectorAll('ul'));
+
+    expect(texts(first ?? host, 'li')).toEqual(['A 1', 'B 2']);
+    expect(texts(second ?? host, 'li')).toEqual(['B 1', 'A 2']);
+  });
+
+  it('logs one current pair per change of the diamond', () => {
+    const host = render(DiamondLog);
+
+    click(host, 'count + 1');
+    click(host, 'count + 1');
+
+    expect(texts(host, 'li')).toEqual(['1 / 2', '2 / 4', '3 / 6']);
+  });
+});

@@ -1,15 +1,16 @@
 import css from './site.module.css';
 
 /** The parts of the site; the header marks the one the page belongs to. */
-export type SiteSection = 'home' | 'docs' | 'evolution';
+export type SiteSection = 'home' | 'docs' | 'evolution' | 'labs';
 
 const sections = [
   { section: 'docs', href: '/docs', label: 'Docs' },
   { section: 'evolution', href: '/evolution', label: 'Evolution' },
+  { section: 'labs', href: '/labs', label: 'Labs' },
 ] as const satisfies readonly { section: SiteSection; href: string; label: string }[];
 
 /**
- * The bar on top of every page: the reely wordmark home, the two guides, and the source. The part
+ * The bar on top of every page: the reely wordmark home, the guides, the labs, and the source. The part
  * of the site the page belongs to is marked; a page outside them marks nothing.
  */
 export const SiteHeader = ({ current }: { current?: SiteSection }): Node => (

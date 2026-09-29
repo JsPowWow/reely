@@ -1,4 +1,3 @@
-import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
 import { measured } from '../../site/measurements';
 import { Board as KeyedBoard } from '../evolution/steps/step12.keyed-list';
@@ -43,8 +42,7 @@ import listsSource from './snippets/lists.for.tsx?highlight';
 import signalsSource from './snippets/signals.api.ts?highlight';
 import mountSource from './snippets/start.mount.tsx?highlight';
 
-import guide from '../../site/guide.module.css';
-import css from './docs.module.css';
+import { Live } from './docs.live';
 
 import type { SourceLines } from '../../highlight/source.types';
 
@@ -74,16 +72,6 @@ const plain = (text: string): SourceLines => text.split('\n').map((line) => [{ c
 
 const Code = ({ caption, source }: { caption: string; source: SourceLines }): Node => (
   <SourceView caption={caption} source={source} />
-);
-
-/** A second live demo inside the details, with its DOM writes counted beside its source. */
-const Live = ({ Demo, caption, source }: { Demo: () => Node; caption: string; source: SourceLines }): Node => (
-  <div className={`${guide.panels} ${css.live}`}>
-    <MutationMeter>
-      <Demo />
-    </MutationMeter>
-    <SourceView source={source} caption={caption} />
-  </div>
 );
 
 export const docTopics: readonly DocTopic[] = [
