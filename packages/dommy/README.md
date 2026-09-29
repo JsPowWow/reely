@@ -57,10 +57,11 @@ const same = (
 );
 ```
 
-- Props are DOM names: `className`, `htmlFor`, `tabIndex`. `value`, `checked` and other live state are set as properties.
+- Props are DOM property names: `className`, `htmlFor`, `tabIndex`, and lowercase where the DOM has them so: `autocomplete`, `autofocus`. `value`, `checked` and other live state are set as properties, after the children, so `<select value="b">` selects its option `b`.
+- `list` and `form`, which the DOM types as elements, take an id: `<input list="cars" />`.
 - `styles={{ marginTop: '1rem', '--accent': 'red' }}` sets inline styles, custom properties included.
 - `aria={{ role: 'status', ariaLabel: 'Score' }}` sets `role` and `aria-*` attributes.
-- `onClick`, `onInput` and every other `on*` prop takes a function; the event and `event.currentTarget` are typed by the element. A string is never rendered as an inline handler.
+- Handler props take a function, named the DOM way (`onkeydown`) or in camelCase with every word capitalised, as in React (`onKeyDown`, `onPointerMove`; `dblclick` is `onDblClick`). The event and `event.currentTarget` are typed by the element. A string is never rendered as an inline handler.
 - `elementRef` gets the element: an object from `createObjectReference()` or a function `(element) => void`.
 - Text is always inserted as text, so user input cannot become markup.
 
@@ -81,7 +82,9 @@ const Laps = (): ReelyNode => () => `${laps.value} laps`;
 document.body.append(<Link href="/race"><Laps /></Link>);
 ```
 
-A fragment, whether from such a component, `<>…</>`, `Show`, `Await` or `For`, empties into its parent on `append`, so place it once. To move or remove it later, keep it inside an element, or render it with `mount`.
+A component is a plain function, so it can be called as one: `mount(el, () => Card({ file }))` is `<Card file={file} />`.
+
+A fragment, whether from such a component, `<>…</>`, `Show`, `Keyed`, `Await` or `For`, empties into its parent on `append`, so place it once. To move or remove it later, keep it inside an element, or render it with `mount`.
 
 ## Signals
 
@@ -130,7 +133,7 @@ const gauge = (
 );
 ```
 
-A function child renders text; to switch between nodes, use `Show`. A bound `null` or `undefined` removes the attribute; boolean props such as `hidden` or `disabled` take `true` and `false`.
+A function child renders text; to switch between nodes, use `Show` or `Keyed`. To toggle one class among static ones, bind the whole `className`: `className={() => (flash.value ? 'cell flash' : 'cell')}`, still one attribute write per change. A bound `null` or `undefined` removes the attribute; boolean props such as `hidden` or `disabled` take `true` and `false`.
 
 ## Lists
 
@@ -178,6 +181,18 @@ const banner = (
     {() => <p>Winner: {winner}</p>}
   </Show>
 );
+```
+
+`Show` keeps its branch while the truthiness stays. `Keyed` builds the branch anew, with new state, whenever the value changes: the review form of another participant, the card of another file.
+
+```tsx
+import { Keyed, signal } from '@reely/dommy';
+
+const reviewer = signal('Ada');
+
+const review = <Keyed value={reviewer}>{(name) => <textarea placeholder={`Review by ${name}`} />}</Keyed>;
+
+reviewer.value = 'Linus'; // a new, empty textarea
 ```
 
 ## Async
@@ -249,7 +264,7 @@ const unmount = mount(document.body, () => <Clock />);
 unmount(); // the timer stops, the bindings are released, the view is gone
 ```
 
-A row of `For` and a branch of `Show` or `Await` run their cleanups when they go away.
+A row of `For` and a branch of `Show`, `Keyed` or `Await` run their cleanups when they go away.
 
 ## SVG
 

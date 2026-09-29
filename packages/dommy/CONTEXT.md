@@ -23,7 +23,7 @@ _Avoid_: reactive prop, effect (an effect is the general primitive)
 ## Flows
 
 **Flow**:
-`Show`, `Await` or `For`: content that changes shape over time, kept between two comment anchors (`<!--For-->…<!--/For-->`).
+`Show`, `Keyed`, `Await` or `For`: content that changes shape over time, kept between two comment anchors (`<!--For-->…<!--/For-->`).
 _Avoid_: control flow component, directive
 
 **Owner**:

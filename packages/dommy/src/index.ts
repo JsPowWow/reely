@@ -5,6 +5,7 @@ export { onCleanup } from './lib/reactive/owner';
 export { For, type ForProps } from './lib/flow.for';
 export { Show, type ShowProps } from './lib/flow.show';
 export { Await, type AwaitProps } from './lib/flow.await';
+export { Keyed, type KeyedProps } from './lib/flow.keyed';
 export { createObjectReference } from '@reely/utils';
 export { addListener, addListeners } from './lib/utils/element.addListeners';
 export { appendTo, appendChildren, replaceChildrenOf } from './lib/utils/element.children';
