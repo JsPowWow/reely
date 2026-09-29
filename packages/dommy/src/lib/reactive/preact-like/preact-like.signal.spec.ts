@@ -75,6 +75,18 @@ describe('signal', () => {
     expect(second).not.toHaveBeenCalled();
   });
 
+  it('should not make an effect depend on a signal it writes an equal value to', () => {
+    const laps = signal(0);
+    const spy = vi.fn(() => {
+      laps.value = laps.peek();
+    });
+    effect(spy);
+
+    laps.value = 10;
+
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
   describe('.peek()', () => {
     it('should get value', () => {
       const s = signal(1);

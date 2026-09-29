@@ -77,7 +77,9 @@ let FLUSHING = false;
 const MAX_FLUSH_WAVES = 100;
 
 /** What a reelx is made from: a computation, or the initial value of a state, a function included. */
-type ReelxSource<T> = { readonly kind: 'computed'; readonly compute: () => T } | { readonly kind: 'state'; readonly initial: T };
+type ReelxSource<T> =
+  | { readonly kind: 'computed'; readonly compute: () => T }
+  | { readonly kind: 'state'; readonly initial: T };
 
 const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => boolean): RlxSelfInstance<T> => {
   let queueVersion = -1;
@@ -148,8 +150,12 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
     // @ts-expect-error expected properties assigned below
     rlxSelf = (...args: [] | [newState: T]): T => {
       // a call with an argument writes, even `undefined`; a call without one reads
-      if (args.length === 1 && !Object.is(args[0], state)) {
+      if (args.length === 1) {
         const [newState] = args;
+        // an equal value changes nothing, and a write is never a read
+        if (Object.is(newState, state)) {
+          return state;
+        }
         // mark all computed(s) dirty
         ++SUBSCRIBER_VERSION;
 
@@ -274,9 +280,12 @@ reelx.flushSync = (): void => {
     while (QUEUE.length > 0) {
       if (++waves > MAX_FLUSH_WAVES) {
         QUEUE = [];
-        throw new Error(`reelx: a cycle of effects, each writes a signal another one reads (${MAX_FLUSH_WAVES} waves)`, {
-          cause: errors[0],
-        });
+        throw new Error(
+          `reelx: a cycle of effects, each writes a signal another one reads (${MAX_FLUSH_WAVES} waves)`,
+          {
+            cause: errors[0],
+          }
+        );
       }
       const iterator = QUEUE;
       QUEUE = [];
