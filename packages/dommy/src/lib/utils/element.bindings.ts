@@ -1,5 +1,6 @@
 import { isInstanceOf, isSomeFunction } from '@reely/utils';
 
+import { getDommyLogger } from '../config';
 import { isFalsyElement } from './element.utils';
 import { onCleanup } from '../reactive/owner';
 import { computed } from '../reactive/preact-like/preact-like.signal';
@@ -36,12 +37,18 @@ export const applyValue = (value: unknown, write: (value: unknown) => void): voi
 };
 
 /**
- * Converts a child value to text node data: `null`, `undefined` and `false` render nothing.
+ * Converts a bound child value to text node data: `null`, `undefined` and `false` render nothing.
+ * A node renders as its string and is reported: a signal of nodes is a switch, `Show` or `Keyed`.
  *
  * @param {unknown} value - The child value.
  * @returns {string} The text to render.
  */
-const toTextData = (value: unknown): string => (isFalsyElement(value) ? '' : String(value));
+const toTextData = (value: unknown): string => {
+  if (isInstanceOf(Node, value)) {
+    getDommyLogger()?.warn('A bound child renders text, not a node; switch nodes with `Show` or `Keyed`:', value);
+  }
+  return isFalsyElement(value) ? '' : String(value);
+};
 
 /**
  * Creates a text node bound to a reactive value: a change updates `text.data` in place,

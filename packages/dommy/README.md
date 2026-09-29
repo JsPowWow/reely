@@ -293,8 +293,8 @@ const icon = (
 Small helpers over signals and the owner live in their own entry, `@reely/dommy/kit`; an app that does not import it does not ship it. Each one that listens or times stops with the render that created it.
 
 ```tsx
-import { effect, onCleanup } from '@reely/dommy';
-import { flip, listen, machine, media, persisted, size, throttled } from '@reely/dommy/kit';
+import { effect } from '@reely/dommy';
+import { flip, later, listen, machine, media, persisted, size, throttled } from '@reely/dommy/kit';
 
 // a state machine: the state moves only along its transitions; states and events are typed from the config
 const race = machine({
@@ -305,8 +305,7 @@ race.send('start'); // true: idle → countdown
 race.can('finish'); // false, and reactive like any read of `race.state`
 effect(() => {
   if (race.state.value === 'countdown') {
-    const timer = setTimeout(() => race.send('go'), 3000); // entering the state
-    onCleanup(() => clearTimeout(timer)); // leaving it
+    later(3000, () => race.send('go')); // entering the state; leaving it cancels the timer
   }
 });
 
@@ -326,7 +325,114 @@ effect(() => console.log(phone.value, theme.value, width.value));
 - `media(query)`, `size(element)` and `throttled(source, ms)` give computeds.
 - `persisted(key, initial, { storage, is })` gives a signal; what is read back must be of the kind of `initial`, or pass `is` to check it; a storage that throws leaves it working in memory.
 - `listen(target, type, handler, options)` types the event by target and returns the function that removes it.
+- `later(ms, fn)` runs `fn` once after `ms`, unless the view is disposed or the effect runs again first; it returns its own cancel. `later(0, fn)` runs after the render is in the document.
 - `flip(container, change)` animates the children `change` moved, not those it added; nothing moves under reduced motion.
+
+## Advanced topics
+
+The pitfalls [VanJS lists](https://vanjs.org/advanced), and how each one goes in reely. Each answer is checked in `src/lib/advanced.topics.spec.tsx`.
+
+### DOM attributes vs. properties
+
+Live state (`value`, `checked`, `selected`, `indeterminate`, `muted`) is set as a property, so a form shows it and a bound change is not lost to a user edit. Everything else is an attribute (`className` → `class`, `htmlFor` → `for`), a read-only `list` included. A property that has no attribute and takes an object goes through `elementRef`, which gets the element before its props:
+
+```tsx
+const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+const camera = <video autoplay elementRef={(video) => (video.srcObject = stream)} />;
+```
+
+### Why can't a signal hold a DOM node?
+
+A bound child is text: `{name}` writes `name.value` into one text node. TypeScript rejects a signal of nodes as a child; from JavaScript the node renders as `[object HTMLElement]` and the dommy logger reports it. To switch nodes, use `Show` (by truthiness) or `Keyed` (by value); each builds its branch as its own nodes.
+
+```tsx
+import { Show, signal } from '@reely/dommy';
+
+const bold = signal(false);
+
+const welcome = (
+  <p>
+    Welcome to{' '}
+    <Show when={bold} fallback={() => 'reely'}>
+      {() => <b>reely</b>}
+    </Show>
+  </p>
+);
+```
+
+### Signal granularity
+
+A binding runs again when any signal it read changes, so a signal of a whole object rewrites every binding that reads any of its fields. Prefer a signal per field that changes on its own. When the object stays one signal, read a field through a `computed`: it passes a change on only when its result differs.
+
+```ts
+import { computed, signal } from '@reely/dommy';
+
+const settings = signal({ theme: 'dark', laps: 5 });
+const theme = computed(() => settings.value.theme); // a new `laps` does not reach theme bindings
+```
+
+### The scope of DOM updates
+
+The problem VanJS describes (a binding function that rebuilds a whole `<p>` on every keystroke) has no counterpart here: a function child renders text only, and `Show` keeps its branch while the truthiness of `when` stays, so typing a name rewrites only the text node bound to it:
+
+```tsx
+import { Show, signal } from '@reely/dommy';
+
+const name = signal('');
+
+const greeting = (
+  <Show when={() => name.value.trim() !== ''} fallback={() => <p>Enter your name</p>}>
+    {() => (
+      <p>
+        Hello <b>{name}</b>
+      </p>
+    )}
+  </Show>
+);
+```
+
+### Conditional bindings
+
+A binding, `computed` or `effect` depends on the signals its last run read. `() => (formula.value === 'a + b' ? a.value + b.value : c.value)` does not run for `c` while the formula is `a + b`, and stops running for `a` and `b` once it is `c`.
+
+### Self-referencing in effects
+
+An effect does not run again for a signal it writes in the same run, even if it read it first, so a counter can count in the effect that watches its source:
+
+```ts
+import { effect, signal } from '@reely/dommy';
+
+const checked = signal(false);
+const timesChecked = signal(0);
+
+effect(() => {
+  if (checked.value) timesChecked.value += 1; // resetting `timesChecked` does not re-run it
+});
+```
+
+It still runs for the signals it only reads. To read a signal without depending on it, use `untracked` or `.peek()`.
+
+### Releasing bindings
+
+reely has no garbage collection of bindings, so nothing is dropped behind your back: a view keeps its bindings while it is built, before it is connected, and across an `await`. They are released by the owner instead: `mount` returns the dispose, and a branch of `For`, `Show`, `Keyed` or `Await` releases what was created in it (computeds and effects included) when it goes away.
+
+The cost is the other side: a node built outside any owner (at module level, or in an event handler and appended by hand) keeps its bindings as long as their signals live. Build views inside `mount`, and show nodes that come and go through `Show`, `Keyed`, `For` or `Await`.
+
+### Lifecycle hooks
+
+A component runs once and returns its nodes before they are in the document; there is no mount hook. What must run once the view is connected, such as focusing a field or measuring a node, goes in `later(0, fn)` from the kit: it runs after the render that called it and is cancelled if the view is disposed first. The cleanup side is `onCleanup`. Effects run synchronously, so a signal written in a component is seen at once, not in a later cycle.
+
+```tsx
+import { input } from '@reely/dommy';
+import { later } from '@reely/dommy/kit';
+
+const Search = (): Node => {
+  const field = input({ type: 'search' }); // a factory gives the element type; a JSX tag is a `Node`
+  later(0, () => field.focus());
+  return field;
+};
+```
 
 ## Router
 
