@@ -35,11 +35,13 @@ describe('size', () => {
       return canvas;
     });
 
+    const before = box?.value;
     const [observer] = FakeResizeObserver.observers;
     observer?.resize(320, 180);
     const resized = box?.value;
     dispose();
 
+    expect(before).toEqual({ width: 0, height: 0 });
     expect(resized).toEqual({ width: 320, height: 180 });
     expect(FakeResizeObserver.observers.size).toBe(0);
   });

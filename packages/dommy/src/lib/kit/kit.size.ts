@@ -17,7 +17,8 @@ export interface ElementSize {
  * @returns {Computed<ElementSize>} Its size now; `0 × 0` until the first measurement.
  */
 export const size = (element: Element): Computed<ElementSize> => {
-  const box = signal<ElementSize>({ width: element.clientWidth, height: element.clientHeight });
+  // the observer reports the content box once the element is laid out; nothing is measured before
+  const box = signal<ElementSize>({ width: 0, height: 0 });
   const observer = new ResizeObserver(([entry]) => {
     if (entry) {
       box.value = { width: entry.contentRect.width, height: entry.contentRect.height };
