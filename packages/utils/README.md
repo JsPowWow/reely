@@ -1,76 +1,19 @@
 # @reely/utils
 
-Shared utility functions used across all packages in the monorepo.
+The monorepo's own helpers: type guards, `pipe` and `flow`, `Either` and `Maybe`, nullable helpers, error helpers and shared types. Private: it is not published, so a published package never imports it; helpers ready for that move to `@reely/basics`.
 
-## 📦 Package Information
+One function per file, `src/lib/<group>/<fnName>.ts`, with its spec next to it, and a named export from `src/index.ts`.
 
-- **Version**: 0.0.1
-- **Publishable**: ❌ No (Private Package)
-- **Tag**: `scope:shared`
-- **Module Boundaries**: Base library - no external dependencies allowed
+```ts
+import { hasProperty, isString, mapNullable, pipe, withDefault } from '@reely/utils';
 
-## 🔒 Private Package
+// a query string gives `string | null`; the page needs a number
+const perPage = pipe(
+  new URLSearchParams(location.search).get('perPage'),
+  mapNullable((text) => Number.parseInt(text, 10) || null), // null stays null, and so do 'abc' and '0'
+  withDefault(20)
+);
 
-This is an **internal library** that:
-- Will NOT be published to NPM
-- Provides shared utilities for other packages
-- Serves as the foundation layer for the monorepo
-
-## 🚀 Features
-
-This package provides core utilities that are shared across all other packages:
-
-- Common helper functions
-- Shared types and interfaces
-- Base utilities used by `@reely/strings`, `@reely/async`, and `@reely/colors`
-
-## 📝 Usage
-
-This package is automatically available to all other packages in the monorepo:
-
-```typescript
-// In any other package (strings, async, colors)
-import { someUtility } from '@reely/utils';
-
-// Use the shared functionality
-const result = someUtility(input);
+// a message from a WebSocket is `unknown` until guards say otherwise
+if (hasProperty('text', message) && isString(message.text)) render(message.text);
 ```
-
-## 🏗️ Building
-
-```bash
-# Build the package
-nx build utils
-
-# The build output will be in dist/packages/utils
-```
-
-## 📋 Available Commands
-
-```bash
-nx build utils    # Build the package
-nx lint utils     # Lint the package
-```
-
-## 🔒 Module Boundaries
-
-This package has the tag `scope:shared` which means:
-- **Can be imported by**: All packages (`scope:strings`, `scope:async`, `scope:colors`)
-- **Can import from**: Nothing (it's the base layer)
-
-This ensures a clean dependency hierarchy where `utils` serves as the foundation without creating circular dependencies.
-
-## 🏛️ Architecture Role
-
-As the shared foundation of the monorepo:
-1. Contains no business logic specific to strings, async, or colors
-2. Provides only generic, reusable utilities
-3. Has no external dependencies beyond TypeScript's standard library
-4. Ensures consistency across all packages
-
-## ⚠️ Important Notes
-
-- This package is marked as `"private": true` in package.json
-- It will be excluded from NPM publishing when running `nx release`
-- Changes to this package may affect all other packages in the monorepo
-- Keep utilities generic and well-tested as they form the foundation
