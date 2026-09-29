@@ -20,8 +20,6 @@ export type * from './lib/types/svg.types';
 export { setAttribute, removeAttribute, isSafeAttributeEntry } from './lib/utils/attributes/element.attributes';
 export { setStyleAttributes, hasStylesAttribute } from './lib/utils/attributes/element.style.attributes';
 
-export { reelx } from './lib/reactive/reelx/reelx.core';
-export * from './lib/reactive/reelx/reelx.types';
 export {
   type Signal,
   signal,
