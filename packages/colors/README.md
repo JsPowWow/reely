@@ -1,83 +1,34 @@
 # @reely/colors
 
-Color conversion and manipulation utilities for TypeScript applications.
+Convert, lighten and darken hex colours, and check the contrast between two.
 
-## 📦 Package Information
-
-- **Version**: 0.0.1
-- **Publishable**: ✅ Yes
-- **Tag**: `scope:colors`
-- **Module Boundaries**: Can only import from `scope:shared` packages
-
-## 🚀 Features
-
-This package provides comprehensive color utilities:
-
-- **hexToRgb** - Convert hex color codes to RGB values
-- **rgbToHex** - Convert RGB values to hex color codes
-- **lighten** - Make colors lighter by a percentage
-- **darken** - Make colors darker by a percentage
-
-## 📝 Usage Examples
-
-```typescript
-import { hexToRgb, rgbToHex, lighten, darken } from '@reely/colors';
-
-// Convert hex to RGB
-hexToRgb('#FF5733');  // { r: 255, g: 87, b: 51 }
-hexToRgb('#000');     // { r: 0, g: 0, b: 0 }
-
-// Convert RGB to hex
-rgbToHex(255, 87, 51);  // '#FF5733'
-rgbToHex(0, 0, 0);      // '#000000'
-
-// Lighten colors
-lighten('#FF5733', 20);  // Returns a 20% lighter shade
-lighten('#000000', 50);  // Returns a 50% lighter shade (gray)
-
-// Darken colors
-darken('#FF5733', 20);   // Returns a 20% darker shade
-darken('#FFFFFF', 30);   // Returns a 30% darker shade
+```sh
+npm i @reely/colors
 ```
 
-## 🧪 Testing
+## Shades of a brand colour
 
-```bash
-# Run tests for this package
-nx test colors
+```ts
+import { darken, getContrastRatio, lighten } from '@reely/colors';
 
-# Run tests in watch mode
-nx test colors --watch
+const brand = '#2563eb';
+
+button.style.setProperty('--hover', lighten(brand, 10)); // '#3b73ed'
+button.style.setProperty('--active', darken(brand, 10)); // '#2159d4'
+
+getContrastRatio('#ffffff', brand); // 5.17: white text passes WCAG AA (4.5) on it
+getContrastRatio('#ffffff', '#facc15'); // 1.53: on yellow it does not
 ```
 
-## 🏗️ Building
+## Conversions
 
-```bash
-# Build the package
-nx build colors
+```ts
+import { hexToRgb, isValidHex, rgbToHex, rgbToHsl } from '@reely/colors';
 
-# The build output will be in dist/packages/colors
+hexToRgb('#2563eb'); // { r: 37, g: 99, b: 235 }; `#rgb` works too
+rgbToHex(37, 99, 235); // '#2563eb'; or rgbToHex({ r, g, b })
+rgbToHsl({ r: 37, g: 99, b: 235 }); // { h, s, l }
+isValidHex(userInput); // before converting what a colour picker or a URL gave you
 ```
 
-## 📋 Available Commands
-
-```bash
-nx build colors    # Build the package
-nx test colors     # Run tests
-nx lint colors     # Lint the package
-```
-
-## 🔒 Module Boundaries
-
-This package has the tag `scope:colors` and can only import from:
-- `@reely/utils` (tagged with `scope:shared`)
-
-Attempting to import from `@reely/strings` or `@reely/async` will result in a linting error due to module boundary constraints.
-
-## 🎨 Color Format Support
-
-The utilities support various color formats:
-- **Hex**: `#RGB`, `#RRGGBB`
-- **RGB**: Object with `r`, `g`, `b` properties (0-255)
-
-All functions include proper validation and error handling for invalid color formats.
+An invalid hex or an RGB channel outside 0–255 throws an `Error`.
