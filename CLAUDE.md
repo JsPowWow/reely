@@ -27,7 +27,7 @@ Always through Nx (caching, `^build` deps): `npx nx test dommy`, `npx nx lint do
 
 ## Rules that must not break
 
-- **Reuse `@reely/basics` and `@reely/utils` first**, in new code and in fixes alike. Guards (`hasSome`, `isNil`, `isSomeFunction`, `isString`, `hasProperty`…), `forEachSettled`, `reportUncaught`, `pipe`/`flow`, `noop`/`identity`, `exhaustiveGuard`, `toErrorWithMessage`, shared types (`Nullable`, `PipeableFn`, `AnyFunction`…). A published package imports a helper from `@reely/basics` where it lives there. No hand-written `typeof` checks (ESLint `no-restricted-syntax` rejects them) and no local copies. Missing a general helper → add it to utils (own file + spec + named export), then use it; it moves to basics once production-grade.
+- **Reuse `@reely/basics` and `@reely/utils` first**, in new code and in fixes alike. Guards (`hasSome`, `isNil`, `isSomeFunction`, `isString`, `hasProperty`…), `forEachSettled`, `reportUncaught`, `pipe`/`flow`, `noop`/`identity`, `exhaustiveGuard`, `toErrorWithMessage`, shared types (`Nullable`, `PipeableFn`, `AnyFunction`…). A published package imports a helper from `@reely/basics` where it lives there. No hand-written `typeof` checks and no local copies. Missing a general helper → add it to utils (own file + spec + named export), then use it; it moves to basics once production-grade.
 - **No `as`** (ESLint `consistent-type-assertions: never`; allowed only in specs) — narrow with guards. No `any`, no `@ts-nocheck`/`@ts-ignore` in new code.
 - **Explicit return types**, `import type` for types, `import/order` groups (`@reely/**` after externals), no import cycles.
 - **Lean comments:** a short JSDoc on public API only; a code comment only for a non-obvious why. Never restate what the code says.
