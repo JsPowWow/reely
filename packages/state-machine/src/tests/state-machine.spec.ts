@@ -7,7 +7,6 @@ import { enqueue, log, logAction, logWithContext, matchAction, runActionEffect }
 
 import type { StateMachineDefinition, StateMachineTransitionActionEffect } from '../lib/types';
 
-
 // from @powwow-js/core `sleep` and `waitFor`, needed by this spec only
 const sleep = <T>(ms: number, data: T): Promise<T> => new Promise((resolve) => setTimeout(() => resolve(data), ms));
 const waitFor =
@@ -572,6 +571,47 @@ describe('stateMachine simple', () => {
 
     fsm.send('done', { status: 'success' });
     expect(fsm.state).toBe('finish');
+  });
+
+  it('matches an action by its target state, and by transition and state together', () => {
+    const fsm = createStateMachine(simpleFsm, new PrimitiveStore(0));
+    const seen: string[] = [];
+    fsm.on('stateChanged', (action) => {
+      matchAction(action)
+        .when({ to: 'processing' }, ({ by, to }) => {
+          expectTypeOf(to).toEqualTypeOf<'processing'>();
+          seen.push(`${to} by ${by}`);
+        })
+        .when({ by: 'run' }, ({ data }) => {
+          expectTypeOf(data).toEqualTypeOf<{ processId: number }>();
+          seen.push(`run ${data.processId}`);
+        })
+        .when({ by: 'stop', to: 'init' }, () => seen.push('stopped'))
+        .when({ by: 'stop', to: 'finish' }, () => seen.push('never'));
+    });
+
+    fsm.send('run', { processId: 7 });
+    fsm.send('stop');
+
+    expect(seen).toStrictEqual(['processing by run', 'run 7', 'stopped']);
+  });
+
+  it('runs every effect given for a pattern, the same pattern object included', () => {
+    const fsm = createStateMachine(simpleFsm, new PrimitiveStore(0));
+    const seen: string[] = [];
+    const onStop = { by: 'stop' } as const;
+    fsm.on(
+      'stateChanged',
+      runActionEffect<SimpleFsmState, SimpleFsmTransitions, SimpleFsmContext>()
+        .when(onStop, () => seen.push('first'))
+        .when(onStop, () => seen.push('second'))
+        .when({ to: 'processing' }, ({ to }) => seen.push(to)).invokeAction
+    );
+
+    fsm.send('run', { processId: 1 });
+    fsm.send('stop');
+
+    expect(seen).toStrictEqual(['processing', 'first', 'second']);
   });
 
   it('should correctly update context `data`', () => {

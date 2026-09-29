@@ -1,5 +1,5 @@
 import type { EventsMap, EventType } from '@reely/emitter';
-import { hasSome } from '@reely/utils';
+import { hasProperty, hasSome } from '@reely/utils';
 
 import type { StateMachineState, StateMachineTransitionAction, StateMachineTransitionActionEffect } from './types';
 
@@ -72,7 +72,10 @@ function isActionOf<
   pattern: { by?: T; to?: S },
   action: StateMachineTransitionAction<Transitions, State, Context>
 ): action is StateMachineTransitionAction<Transitions, State, Context, S, T> {
-  return (!('by' in pattern) || action.by === pattern.by) && (!('to' in pattern) || action.to === pattern.to);
+  return (
+    (!hasProperty('by', pattern) || action.by === pattern.by) &&
+    (!hasProperty('to', pattern) || action.to === pattern.to)
+  );
 }
 
 export function matchAction<
