@@ -59,7 +59,7 @@
       }
     }
   },
-  "devDependencies": {
-    "@reely/utils": "*"
+  "dependencies": {
+    "@reely/basics": "*"
   }
 }

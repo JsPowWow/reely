@@ -2,18 +2,34 @@
   {
     "name": "a SyncQueue alone",
     "code": "import { SyncQueue } from '@reely/queue'; new SyncQueue().add(() => 1);",
-    "absent": ["AsyncQueue", "EventEmitter"],
-    "once": ["SyncQueue"]
+    "absent": [
+      "AsyncQueue",
+      "EventEmitter"
+    ],
+    "once": [
+      "SyncQueue"
+    ]
   },
   {
     "name": "an AsyncQueue alone",
     "code": "import { AsyncQueue } from '@reely/queue'; void new AsyncQueue().add(() => 1);",
-    "absent": ["SyncQueue"],
-    "once": ["AsyncQueue", "EventEmitter"]
+    "absent": [
+      "SyncQueue"
+    ],
+    "once": [
+      "AsyncQueue",
+      "EventEmitter"
+    ]
   },
   {
     "name": "both queues and a store",
     "code": "import { AsyncQueue, SyncQueue } from '@reely/queue'; import { PrimitiveStore } from '@reely/simple-store'; new SyncQueue().add(() => 1); void new AsyncQueue().add(() => 1); new PrimitiveStore(0).value = 1;",
-    "once": ["AsyncQueue", "SyncQueue", "EventEmitter"]
+    "once": [
+      "AsyncQueue",
+      "SyncQueue",
+      "EventEmitter",
+      "forEachSettled",
+      "reportUncaught"
+    ]
   }
 ]

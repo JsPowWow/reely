@@ -1,6 +1,6 @@
+import { reportUncaught } from '@reely/basics';
 import { EventEmitter } from '@reely/emitter';
 import type { IEventEmitter } from '@reely/emitter';
-import { reportUncaught } from '@reely/utils';
 
 import type { AsyncQueueEvents } from './queue.types';
 

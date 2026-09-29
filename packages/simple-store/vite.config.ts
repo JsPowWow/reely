@@ -4,8 +4,8 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
-// published @reely packages stay imports, so an app ships each once; @reely/utils is bundled
-const external: string[] = ['@reely/emitter'];
+// published @reely packages stay imports, so an app ships each once
+const external: string[] = ['@reely/basics', '@reely/emitter'];
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
@@ -15,7 +15,6 @@ export default defineConfig(() => ({
       entryRoot: 'src',
       tsconfigPath: './tsconfig.lib.json',
       rollupTypes: true,
-      bundledPackages: ['@reely/utils'],
     }),
   ],
   build: {

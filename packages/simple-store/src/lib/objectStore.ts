@@ -1,4 +1,4 @@
-import { isPlainObject, isSomeFunction } from '@reely/utils';
+import { isPlainObject, isSomeFunction } from '@reely/basics';
 
 import { Store } from './store';
 

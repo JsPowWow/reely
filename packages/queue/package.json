@@ -60,9 +60,7 @@
     }
   },
   "dependencies": {
+    "@reely/basics": "*",
     "@reely/emitter": "*"
-  },
-  "devDependencies": {
-    "@reely/utils": "*"
   }
 }

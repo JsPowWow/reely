@@ -4,6 +4,9 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
+// published @reely packages stay imports, so an app ships each once
+const external: string[] = ['@reely/basics'];
+
 export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/packages/emitter',
@@ -12,7 +15,6 @@ export default defineConfig(() => ({
       entryRoot: 'src',
       tsconfigPath: './tsconfig.lib.json',
       rollupTypes: true,
-      bundledPackages: ['@reely/utils'],
     }),
   ],
   build: {
@@ -25,6 +27,7 @@ export default defineConfig(() => ({
     minify: false,
     outDir: 'dist',
     sourcemap: true,
+    rolldownOptions: { external },
   },
   test: {
     name: '@reely/emitter',

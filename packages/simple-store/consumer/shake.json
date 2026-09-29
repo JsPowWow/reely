@@ -27,7 +27,10 @@
     "once": [
       "EventEmitter",
       "ObjectStore",
-      "PrimitiveStore"
+      "PrimitiveStore",
+      "isSomeFunction",
+      "hasSome",
+      "forEachSettled"
     ]
   }
 ]

@@ -1,4 +1,4 @@
-import { isSomeFunction } from '@reely/utils';
+import { forEachSettled, isSomeFunction } from '@reely/basics';
 
 import type { EventArguments, EventData, EventsMap, EventType, IEventEmitter, Listener, Unsubscribe } from './types';
 
@@ -42,22 +42,15 @@ export class EventEmitter<Events extends EventsMap> implements IEventEmitter<Eve
     event: Event,
     ...[data]: EventArguments<EventData<Events, Event>>
   ): void => {
-    const errors: unknown[] = [];
-    for (const listener of [...(this.listeners.get(event)?.keys() ?? [])]) {
-      if (this.listeners.get(event)?.has(listener) === true) {
-        try {
+    forEachSettled(
+      [...(this.listeners.get(event)?.keys() ?? [])],
+      (listener) => {
+        if (this.listeners.get(event)?.has(listener) === true) {
           listener(data);
-        } catch (error) {
-          errors.push(error);
         }
-      }
-    }
-    if (errors.length === 1) {
-      throw errors[0];
-    }
-    if (errors.length > 1) {
-      throw new AggregateError(errors, `${errors.length} listeners of "${event}" threw`);
-    }
+      },
+      `Listeners of "${event}" threw`
+    );
   };
 
   public hasListener(event: EventType<Events>): boolean {

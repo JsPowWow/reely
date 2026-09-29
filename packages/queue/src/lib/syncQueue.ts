@@ -1,4 +1,4 @@
-import { reportUncaught } from '@reely/utils';
+import { reportUncaught } from '@reely/basics';
 
 import type { SyncRun } from './queue.types';
 

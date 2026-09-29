@@ -1,7 +1,6 @@
+import { forEachSettled, hasSome } from '@reely/basics';
 import { EventEmitter } from '@reely/emitter';
 import type { IEventEmitter, Unsubscribe } from '@reely/emitter';
-import { hasSome } from '@reely/utils';
-import type { Nullable } from '@reely/utils';
 
 import type { StoreEvents } from './store.types';
 
@@ -77,30 +76,24 @@ export abstract class Store<T> {
       return;
     }
     this.notifying = true;
-    const errors: unknown[] = [];
     try {
-      for (let notifications = 1; notifications === 1 || this.changedMeanwhile; notifications++) {
-        if (notifications > maxNotifications) {
-          throw new Error(`The listeners keep changing the store: ${maxNotifications} notifications for one change`, {
-            cause: this.read(),
-          });
-        }
-        this.changedMeanwhile = false;
-        try {
-          this.emitter.emit('changed', this.read());
-        } catch (error) {
-          errors.push(error);
-        }
-      }
+      forEachSettled(this.rounds(), () => this.emitter.emit('changed', this.read()), 'Notifications of the store threw');
     } finally {
       this.notifying = false;
       this.changedMeanwhile = false;
     }
-    if (errors.length === 1) {
-      throw errors[0];
-    }
-    if (errors.length > 1) {
-      throw new AggregateError(errors, `${errors.length} notifications of the store threw`);
+  }
+
+  /** One round per change made during the notification before it. */
+  private *rounds(): Generator<number> {
+    for (let round = 1; round === 1 || this.changedMeanwhile; round++) {
+      if (round > maxNotifications) {
+        throw new Error(`The listeners keep changing the store: ${maxNotifications} notifications for one change`, {
+          cause: this.read(),
+        });
+      }
+      this.changedMeanwhile = false;
+      yield round;
     }
   }
 
@@ -119,7 +112,7 @@ interface Followed<R> {
 }
 
 class SelectedStore<R> extends Store<R> implements StoreSelection<R> {
-  private followed: Nullable<Followed<R>> = null;
+  private followed: Followed<R> | null = null;
 
   public constructor(
     private readonly follow: (event: 'changed', listener: () => void) => Unsubscribe,
