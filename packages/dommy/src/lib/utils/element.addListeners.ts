@@ -1,32 +1,44 @@
-import { hasSome, isSomeFunction } from '@reely/basics';
-import type { WithRequiredNonNullable } from '@reely/utils';
-import { hasProperty, isNonEmpty, toNonNullableItems } from '@reely/utils';
+import { isSomeFunction } from '@reely/basics';
+import type { Bivariant, Nullable } from '@reely/utils';
+import { hasProperty, isBoolean, isInstanceOf, isNil, isNonEmpty, toNonNullableItems } from '@reely/utils';
 
 import type { DommyElement } from '../types/dommy.types';
 import type {
   DOMElementEventHandler,
   DOMElementEventHandlerDescriptor,
-  DOMElementEventHandlerProp,
   DOMElementEventType,
 } from '../types/event.types';
 
-type ValidEventListenerDescriptor<Evt extends DOMElementEventType, Elt extends DommyElement> = Omit<
-  WithRequiredNonNullable<DOMElementEventHandlerDescriptor<Evt, Elt>, 'handleEvent'>,
-  'handleEvent'
-> & {
-  handleEvent: EventListener;
+// what `addListener` builds, checked field by field: props reach dommy untyped
+type ListenerDescriptor = {
+  handleEvent: Bivariant<EventListener>;
+  signal?: Nullable<AbortSignal>;
+  once?: Nullable<boolean>;
+  capture?: Nullable<boolean>;
+  passive?: Nullable<boolean>;
 };
 
-export function isEventListenerHandler<Evt extends DOMElementEventType, Elt extends DommyElement>(
-  maybeEventType: string,
-  maybeListener: unknown
-): maybeListener is DOMElementEventHandlerProp<Evt, Elt> {
+const listenerFlags = ['once', 'capture', 'passive'] as const;
+
+function isListenerDescriptor(maybeDescriptor: unknown): maybeDescriptor is ListenerDescriptor {
+  return (
+    hasProperty('handleEvent', maybeDescriptor) &&
+    isSomeFunction(maybeDescriptor.handleEvent) &&
+    (!hasProperty('signal', maybeDescriptor) ||
+      isNil(maybeDescriptor.signal) ||
+      isInstanceOf(AbortSignal, maybeDescriptor.signal)) &&
+    listenerFlags.every(
+      (flag) => !hasProperty(flag, maybeDescriptor) || isNil(maybeDescriptor[flag]) || isBoolean(maybeDescriptor[flag])
+    )
+  );
+}
+
+/** Whether `maybeListener` in an `on*` prop is a handler, a descriptor from `addListener`, or a list of them. */
+export function isEventListenerHandler(maybeEventType: string, maybeListener: unknown): boolean {
   if (Array.isArray(maybeListener)) {
     return maybeListener.every((listener) => isEventListenerHandler(maybeEventType, listener));
   }
-  return (
-    isEventHandlerName(maybeEventType) && (isSomeFunction(maybeListener) || isEventListenerDescriptor(maybeListener))
-  );
+  return isEventHandlerName(maybeEventType) && (isSomeFunction(maybeListener) || isListenerDescriptor(maybeListener));
 }
 
 export const isEventHandlerName = (property: string): property is `on${string}` => property.startsWith('on');
@@ -61,13 +73,10 @@ export function addListeners<Evt extends DOMElementEventType, Elt extends DommyE
   );
 }
 
-// method parameters compare both ways: the DOM dispatches to a handler the event of its own type
-type DispatchedListener = { handle(event: Event): void }['handle'];
-
-export function addEventListenerHandler<Evt extends DOMElementEventType, Elt extends DommyElement>(
-  element: Elt,
+export function addEventListenerHandler(
+  element: DommyElement,
   eventType: string,
-  eventHandler: DOMElementEventHandlerProp<Evt, Elt>,
+  eventHandler: unknown,
   eventListenersAbortSignal?: AbortSignal
 ): boolean {
   if (Array.isArray(eventHandler) && isNonEmpty(eventHandler)) {
@@ -77,34 +86,19 @@ export function addEventListenerHandler<Evt extends DOMElementEventType, Elt ext
     return true;
   }
   if (isSomeFunction(eventHandler)) {
-    const listener: DispatchedListener = eventHandler;
-    element.addEventListener(eventType, listener, {
-      signal: eventListenersAbortSignal,
-    });
+    const listener: Bivariant<EventListener> = eventHandler;
+    element.addEventListener(eventType, listener, { signal: eventListenersAbortSignal });
     return true;
   }
-
-  if (isEventListenerDescriptor(eventHandler)) {
+  if (isListenerDescriptor(eventHandler)) {
     const { handleEvent, signal: handlerSignal, once, capture, passive } = eventHandler;
     element.addEventListener(eventType, handleEvent, {
       signal: AbortSignal.any(toNonNullableItems([handlerSignal, eventListenersAbortSignal])),
-      once,
-      capture,
-      passive,
+      once: once ?? undefined,
+      capture: capture ?? undefined,
+      passive: passive ?? undefined,
     });
-
     return true;
   }
-
   return false;
-}
-
-function isEventListenerDescriptor<Evt extends DOMElementEventType, Elt extends DommyElement>(
-  maybeDescriptor: unknown
-): maybeDescriptor is ValidEventListenerDescriptor<Evt, Elt> {
-  return (
-    hasSome(maybeDescriptor) &&
-    hasProperty('handleEvent', maybeDescriptor) &&
-    isSomeFunction(maybeDescriptor.handleEvent)
-  );
 }

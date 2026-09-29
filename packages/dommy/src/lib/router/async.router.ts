@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { hasSome, isSomeFunction } from '@reely/basics';
+import type { Nullable } from '@reely/utils';
 import { Either, hasProperty, isNil, isString } from '@reely/utils';
 
 import { getMatchingRoutes, RouteNotFoundError } from './utils/match-path';
@@ -42,7 +43,7 @@ class AsyncRouter<R = any, C extends RouterContext = RouterContext> {
   /** Resolves the first route, in definition order, that matches and whose action returns non-nil. */
   public async resolve(
     pathnameOrContext: string | (RouterContext & { pathname: string })
-  ): Promise<RouteResult<R>> {
+  ): Promise<Nullable<R>> {
     const baseContext = {
       router: this,
       ...(isString(pathnameOrContext) ? { pathname: pathnameOrContext } : pathnameOrContext),

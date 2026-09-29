@@ -1,5 +1,5 @@
 import { isSomeFunction } from '@reely/basics';
-import type { PipeableFn } from '@reely/utils';
+import type { Bivariant, PipeableFn } from '@reely/utils';
 import { hasProperty, isInstanceOf, isKeyValueObject, isValidRecordKey } from '@reely/utils';
 
 import { hasAriaAttribute, setAriaAttributes } from './attributes/element.aria.attributes';
@@ -30,8 +30,9 @@ export const assignElementRef =
     if (hasProperty('elementRef', maybeProps)) {
       const { elementRef } = maybeProps;
       if (isSomeFunction(elementRef)) {
-        // the props are unknown here; their types at `createElement` promise a `(element) => void`
-        Reflect.apply(elementRef, undefined, [element]);
+        // the props are unknown here; their types at `createElement` promise an `ElementRef`
+        const ref: Bivariant<(element: Element) => void> = elementRef;
+        ref(element);
       } else if (hasProperty('current', elementRef)) {
         elementRef.current = element;
       }

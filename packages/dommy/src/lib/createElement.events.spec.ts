@@ -76,6 +76,23 @@ describe('createElement: events', () => {
     expect(warn).toHaveBeenCalledWith(expect.any(String), 'onclick', 'alert(1)');
   });
 
+  it('rejects a listener descriptor with options of the wrong type, as it rejects a string', () => {
+    const warn = vi.fn();
+    const logger = { info: vi.fn(), warn, error: vi.fn(), log: vi.fn(), logWith: vi.fn() } as unknown as ILogger;
+    const descriptor = { handleEvent: vi.fn(), signal: 'abort' };
+    defineDommyConfig({ useLogger: true, logger });
+    const props = { onclick: descriptor } as Record<string, unknown> as DOMElementFactoryProps<'button'>;
+
+    try {
+      createElement('button', props).click();
+    } finally {
+      defineDommyConfig({ useLogger: false });
+    }
+
+    expect(warn).toHaveBeenCalledWith(expect.any(String), 'onclick', descriptor);
+    expect(descriptor.handleEvent).not.toHaveBeenCalled();
+  });
+
   it('calls every handler of an array', () => {
     const first = vi.fn();
     const second = vi.fn();
