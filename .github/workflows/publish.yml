@@ -45,9 +45,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # the tarball ships `dist`, built here
-      - name: Build packages
-        run: npx nx run-many -t build --projects "$PROJECTS"
+      # the tarball ships `dist`, built here; a package with a `consumer` target is installed from
+      # its tarball into a clean project and checked there (types, run, tree shaking) first
+      - name: Build and check packages
+        run: npx nx run-many -t build consumer --projects "$PROJECTS"
         env:
           PROJECTS: ${{ inputs.projects }}
 
