@@ -1,12 +1,12 @@
 import { mount } from '@reely/dommy';
 
-import { CheckboxCounter } from './checkbox.counter';
-import { ConditionalBinding } from './conditional.binding';
+import { AddressView } from './address.view';
+import { CouponHint } from './coupon.hint';
+import { DeliveryCost } from './delivery.cost';
 import { Flavours } from './flavours';
-import { Greeting } from './greeting';
-import { LabelAfterMount } from './label.after.mount';
-import { PreOrSpan } from './pre.or.span';
-import { TurnBold } from './turn.bold';
+import { PlayCounter } from './play.counter';
+import { SalePrice } from './sale.price';
+import { SlideCaption } from './slide.caption';
 
 const render = (view: () => Node): HTMLElement => {
   const host = document.createElement('div');
@@ -44,50 +44,50 @@ describe('Flavours', () => {
   });
 });
 
-describe('TurnBold', () => {
-  it('turns both names bold, each in its own node', () => {
-    const host = render(TurnBold);
+describe('SalePrice', () => {
+  it('marks both prices, each in its own node', () => {
+    const host = render(SalePrice);
 
-    click(host, 'Turn bold');
+    click(host, 'Start the sale');
 
-    expect(host.querySelectorAll('b')).toHaveLength(2);
-    expect(host.querySelector('p')?.textContent).toBe('Welcome to reely. reely is awesome!');
+    expect(host.querySelectorAll('mark')).toHaveLength(2);
+    expect(host.querySelector('p')?.textContent).toBe('Rain jacket, €32. Pay €32 at checkout.');
   });
 });
 
-describe('Greeting', () => {
-  it('keeps the greeting while the name is not empty, and rewrites only the name in it', () => {
-    const host = render(Greeting);
+describe('CouponHint', () => {
+  it('keeps the hint while the code is not empty, and rewrites only the code in it', () => {
+    const host = render(CouponHint);
     const field = host.querySelector('input');
-    type(field, 'A');
-    const greeting = host.querySelector('p');
+    type(field, 'S');
+    const hint = host.querySelector('p');
 
-    type(field, 'Ada');
+    type(field, 'SPRING10');
 
-    expect(host.querySelector('p')).toBe(greeting);
-    expect(greeting?.textContent).toBe('Hello, Ada');
+    expect(host.querySelector('p')).toBe(hint);
+    expect(hint?.textContent).toBe('SPRING10 will be applied at checkout');
   });
 });
 
-describe('ConditionalBinding', () => {
-  it('runs the sum only for the inputs of the chosen formula', () => {
-    const host = render(ConditionalBinding);
-    const [, , c] = Array.from(host.querySelectorAll('input'));
+describe('DeliveryCost', () => {
+  it('runs the cost only for the fees of the chosen delivery', () => {
+    const host = render(DeliveryCost);
+    const [, , lockerFee] = Array.from(host.querySelectorAll('input'));
     const runs = (): string | undefined => host.querySelector('[data-runs]')?.textContent ?? undefined;
 
-    type(c ?? null, '9');
-    const afterC = runs();
-    type(host.querySelector('select'), 'c + d');
+    type(lockerFee ?? null, '9');
+    const afterLockerFee = runs();
+    type(host.querySelector('select'), 'Pickup');
 
-    expect(afterC).toBe('1');
+    expect(afterLockerFee).toBe('1');
     expect(runs()).toBe('2');
-    expect(host.querySelector('output')?.textContent).toBe('13');
+    expect(host.querySelector('output')?.textContent).toBe('€12');
   });
 });
 
-describe('CheckboxCounter', () => {
-  it('counts checks, and a reset does not run the effect that counts', () => {
-    const host = render(CheckboxCounter);
+describe('PlayCounter', () => {
+  it('counts plays, and a reset does not run the effect that counts', () => {
+    const host = render(PlayCounter);
     const box = host.querySelector('input');
 
     box?.click();
@@ -101,21 +101,21 @@ describe('CheckboxCounter', () => {
   });
 });
 
-describe('PreOrSpan', () => {
-  it('keeps one branch alive however often it switches', () => {
-    const host = render(PreOrSpan);
+describe('AddressView', () => {
+  it('keeps one view alive however often it switches', () => {
+    const host = render(AddressView);
 
-    click(host, 'Switch');
-    click(host, 'Switch');
-    click(host, 'Switch');
+    click(host, 'Switch view');
+    click(host, 'Switch view');
+    click(host, 'Switch view');
 
     expect(host.querySelector('span[data-alive]')?.textContent).toBe('1');
     expect(host.querySelector('span[data-built]')?.textContent).toBe('4');
-    expect(host.querySelector('pre')?.textContent).toBe('Prefix - Suffix');
+    expect(host.querySelector('pre')?.textContent).toBe('Rua Augusta 24\nLisbon\nPortugal');
   });
 });
 
-describe('LabelAfterMount', () => {
+describe('SlideCaption', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -124,12 +124,12 @@ describe('LabelAfterMount', () => {
     vi.useRealTimers();
   });
 
-  it('reads the new label from the document once it is in it', () => {
-    const host = render(LabelAfterMount);
+  it('reads the new caption from the document once it is in it', () => {
+    const host = render(SlideCaption);
 
-    click(host, 'Increment');
+    click(host, 'Next slide');
     vi.advanceTimersByTime(0);
 
-    expect(host.querySelector('[data-message]')?.textContent).toBe('Current label: 1');
+    expect(host.querySelector('[data-message]')?.textContent).toBe('Read from the page: Slide 2');
   });
 });

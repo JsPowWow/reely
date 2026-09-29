@@ -2,53 +2,61 @@ import { signal } from '@reely/dommy';
 
 import css from '../demos.module.css';
 
-type Formula = 'a + b' | 'c + d';
+type Delivery = 'Courier' | 'Pickup';
 
-const isFormula = (value: string): value is Formula => value === 'a + b' || value === 'c + d';
+const isDelivery = (value: string): value is Delivery => value === 'Courier' || value === 'Pickup';
 
-// The sum depends on what its last run read: a and b, or c and d, never all four.
-export const ConditionalBinding = (): Node => {
-  const formula = signal<Formula>('a + b');
-  const values = { a: signal(1), b: signal(2), c: signal(3), d: signal(4) };
+// The cost depends on what its last run read: the courier fees or the pickup fees, never all four.
+export const DeliveryCost = (): Node => {
+  const delivery = signal<Delivery>('Courier');
+  const courier = signal(5);
+  const evening = signal(2);
+  const locker = signal(1);
+  const storage = signal(3);
+  const fees = [
+    { label: 'Courier fee', fee: courier },
+    { label: 'Evening slot', fee: evening },
+    { label: 'Locker fee', fee: locker },
+    { label: 'Storage fee', fee: storage },
+  ];
   const runs = document.createTextNode('0');
 
-  const sum = (): number => {
+  const cost = (): number => {
     runs.data = String(Number(runs.data) + 1);
-    const { a, b, c, d } = values;
-    return formula.value === 'a + b' ? a.value + b.value : c.value + d.value;
+    return delivery.value === 'Courier' ? courier.value + evening.value : locker.value + storage.value;
   };
 
   return (
     <div className={css.row}>
       <label className={css.field}>
-        Formula
+        Delivery
         <select
           onInput={(event) => {
             const { value } = event.currentTarget;
-            if (isFormula(value)) {
-              formula.value = value;
+            if (isDelivery(value)) {
+              delivery.value = value;
             }
           }}
         >
-          <option>a + b</option>
-          <option>c + d</option>
+          <option>Courier</option>
+          <option>Pickup</option>
         </select>
       </label>
-      {Object.entries(values).map(([name, value]) => (
+      {fees.map(({ label, fee }) => (
         <label className={css.field}>
-          {name}
+          {label}
           <input
             type='number'
             min='0'
             max='9'
-            value={() => String(value.value)}
-            onInput={(event) => (value.value = Number(event.currentTarget.value))}
+            value={() => String(fee.value)}
+            onInput={(event) => (fee.value = Number(event.currentTarget.value))}
           />
         </label>
       ))}
-      <output className={css.value}>{sum}</output>
+      <output className={css.value}>€{cost}</output>
       <p className={css.status}>
-        The sum ran <span data-runs>{runs}</span> time(s)
+        The cost ran <span data-runs>{runs}</span> time(s)
       </p>
     </div>
   );

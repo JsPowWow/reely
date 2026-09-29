@@ -1,17 +1,17 @@
 import { For, signal } from '@reely/dommy';
 
-interface Racer {
+interface Message {
   id: string;
-  name: string;
+  subject: string;
 }
 
-const racers = signal<readonly Racer[]>([]);
+const inbox = signal<readonly Message[]>([]);
 
-// One row per `by` key; `racer()` and `index()` follow later updates of that key.
-export const Standings = (): Node => (
+// One row per `by` key; `message()` and `index()` follow later updates of that key.
+export const Inbox = (): Node => (
   <ol>
-    <For each={racers} by={(racer) => racer.id}>
-      {(racer, index) => <li className={() => (index() === 0 ? 'leader' : '')}>{() => racer().name}</li>}
+    <For each={inbox} by={(message) => message.id}>
+      {(message, index) => <li className={() => (index() === 0 ? 'newest' : '')}>{() => message().subject}</li>}
     </For>
   </ol>
 );

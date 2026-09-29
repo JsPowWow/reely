@@ -37,12 +37,12 @@ describe('demo', () => {
       expect([text, attributes, moved, nodes]).toEqual([0, 0, 1, 1]);
     });
 
-    it('flashes the rows a lap moved, not the list that holds them', async () => {
+    it('flashes the rows an update moved, not the list that holds them', async () => {
       const animate = vi.fn();
       Element.prototype.animate = animate;
       const meter = renderStep('keyed-list');
 
-      clickButton(meter, 'Race a lap');
+      clickButton(meter, 'Update prices');
       await flushMutations();
       const flashed = new Set<unknown>(animate.mock.contexts);
 
@@ -60,8 +60,8 @@ describe('demo', () => {
       await flushMutations();
       const flashedForSmall = animate.mock.calls.length;
       animate.mockClear();
-      for (let lap = 0; lap < 12; lap++) {
-        clickButton(large, 'Race a lap');
+      for (let update = 0; update < 12; update++) {
+        clickButton(large, 'Update prices');
       }
       await flushMutations();
 

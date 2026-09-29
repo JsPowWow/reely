@@ -2,25 +2,25 @@ import { effect, signal } from '@reely/dommy';
 
 import css from '../demos.module.css';
 
-// The effect reads and writes `timesChecked`; its own write, and the reset, do not run it again.
-export const CheckboxCounter = (): Node => {
-  const checked = signal(false);
-  const timesChecked = signal(0);
+// The effect reads and writes `plays`; its own write, and the reset, do not run it again.
+export const PlayCounter = (): Node => {
+  const playing = signal(false);
+  const plays = signal(0);
   effect(() => {
-    if (checked.value) {
-      timesChecked.value += 1;
+    if (playing.value) {
+      plays.value += 1;
     }
   });
 
   return (
     <div className={css.row}>
       <label className={css.check}>
-        <input type='checkbox' checked={checked} onChange={(event) => (checked.value = event.currentTarget.checked)} />
-        Checked
+        <input type='checkbox' checked={playing} onChange={(event) => (playing.value = event.currentTarget.checked)} />
+        Playing
       </label>
-      <output className={css.value}>{timesChecked}</output>
-      <span>time(s)</span>
-      <button onClick={() => (timesChecked.value = 0)}>Reset</button>
+      <output className={css.value}>{plays}</output>
+      <span>play(s)</span>
+      <button onClick={() => (plays.value = 0)}>Reset</button>
     </div>
   );
 };

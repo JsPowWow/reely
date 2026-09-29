@@ -1,13 +1,13 @@
 import { mount, signal } from '@reely/dommy';
 
-const count = signal(0);
+const message = signal('');
 
 // `mount` appends the view and returns the function that takes it down.
 const unmount = mount(document.body, () => (
-  <p>
-    <button onClick={() => (count.value += 1)}>+1</button>
-    <output>{count}</output>
-  </p>
+  <label>
+    <textarea maxLength={280} onInput={(event) => message.set(event.currentTarget.value)} />
+    <output>{() => 280 - message.value.length}</output> characters left
+  </label>
 ));
 
 export { unmount };

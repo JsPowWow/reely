@@ -2,55 +2,64 @@ import { batch, For, signal } from '@reely/dommy';
 
 import css from './board.module.css';
 
-interface Racer {
+interface Stock {
   id: string;
-  name: string;
-  /** Metres covered since the start. */
-  distance: number;
+  symbol: string;
+  /** Today's change, in hundredths of a percent. */
+  change: number;
 }
 
-const startingGrid = (size: number): Racer[] =>
-  Array.from({ length: size }, (_, slot) => ({ id: String(slot), name: `Car ${slot + 1}`, distance: 0 }));
+// three letters per stock, all different: 263 and 26³ share no factor
+const symbolOf = (slot: number): string => {
+  const code = (slot * 263 + 1331) % 26 ** 3;
+  return [code / 26 ** 2, code / 26, code].map((digit) => String.fromCharCode(65 + (Math.floor(digit) % 26))).join('');
+};
 
-// Every car has its own pace, and its own good and bad laps: a made-up race, the same on every visit.
-const lapLength = (racer: Racer, lap: number): number => 400 + ((Number(racer.id) * 37 + lap * 13 + racer.distance) % 97);
+const marketAtOpen = (size: number): Stock[] =>
+  Array.from({ length: size }, (_, slot) => ({ id: String(slot), symbol: symbolOf(slot), change: 0 }));
 
-const raceLap = (field: readonly Racer[], lap: number): Racer[] =>
-  field
-    .map((racer) => ({ ...racer, distance: racer.distance + lapLength(racer, lap) }))
-    .toSorted((first, second) => second.distance - first.distance);
+// Every stock has its own drift, and its own good and bad ticks: a made-up market, the same on every visit.
+const tickMove = (stock: Stock, tick: number): number =>
+  ((Number(stock.id) * 37 + tick * 13 + Math.abs(stock.change)) % 97) - 48;
 
-// `For` renders a row once per `by` key. A new order moves the rows that changed places, and each
-// row's bindings rewrite only the texts that changed.
+const priceTick = (market: readonly Stock[], tick: number): Stock[] =>
+  market
+    .map((stock) => ({ ...stock, change: stock.change + tickMove(stock, tick) }))
+    .toSorted((first, second) => second.change - first.change);
+
+const formatChange = (change: number): string => `${change < 0 ? '−' : '+'}${(Math.abs(change) / 100).toFixed(2)}%`;
+
+// Top movers: `For` renders a row once per `by` key. A new order moves the rows that changed
+// places, and each row's bindings rewrite only the texts that changed.
 export const Board = (): Node => {
-  const field = signal<readonly Racer[]>(startingGrid(8));
-  const lap = signal(0);
+  const market = signal<readonly Stock[]>(marketAtOpen(8));
+  const tick = signal(0);
 
-  const raceOneLap = (): void => {
+  const updatePrices = (): void => {
     batch(() => {
-      lap.value += 1;
-      field.value = raceLap(field.value, lap.value);
+      tick.value += 1;
+      market.value = priceTick(market.value, tick.value);
     });
   };
 
   return (
     <div className={css.board}>
       <ol className={css.tower}>
-        <For each={field} by={(racer) => racer.id}>
-          {(racer, place) => (
+        <For each={market} by={(stock) => stock.id}>
+          {(stock, rank) => (
             <li className={css.row}>
-              <b className={css.place}>{() => place() + 1}</b>
-              <span className={css.name}>{() => racer().name}</span>
-              <data className={css.distance} value={() => String(racer().distance)}>
-                {() => `${racer().distance} m`}
+              <b className={css.place}>{() => rank() + 1}</b>
+              <span className={css.name}>{() => stock().symbol}</span>
+              <data className={css.change} value={() => String(stock().change)}>
+                {() => formatChange(stock().change)}
               </data>
             </li>
           )}
         </For>
       </ol>
       <div className={css.controls}>
-        <button onClick={raceOneLap}>Race a lap</button>
-        <p className={css.status}>Lap {lap}</p>
+        <button onClick={updatePrices}>Update prices</button>
+        <p className={css.status}>Update {tick}</p>
       </div>
     </div>
   );

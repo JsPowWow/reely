@@ -4,7 +4,7 @@ import { KeyedNotes } from './examples/keyed.notes';
 import notesSource from './examples/keyed.notes.tsx?highlight';
 import { LivePreview } from './examples/live.preview';
 import previewSource from './examples/live.preview.tsx?highlight';
-import { ShakeButton } from './examples/real.element';
+import { AddToCart } from './examples/real.element';
 import elementSource from './examples/real.element.ts?highlight';
 
 import type { SourceLines } from '../../highlight/source.types';
@@ -25,7 +25,7 @@ export const landingExamples: readonly LandingExample[] = [
     id: 'signals',
     title: 'One keystroke, two text edits',
     claim:
-      'Type in the field. The greeting and the letter count are the two text nodes bound to the name, so each keystroke edits those two, and the board counts nothing else.',
+      'Type a username. The page address and the characters left are the two text nodes bound to it, so each keystroke edits those two, and the board counts nothing else.',
     file: 'live.preview.tsx',
     Demo: LivePreview,
     source: previewSource,
@@ -34,9 +34,9 @@ export const landingExamples: readonly LandingExample[] = [
     id: 'elements',
     title: 'The element itself',
     claim:
-      'A tag factory returns the real HTMLButtonElement, typed as one, so shake.animate() needs no ref, and the animation writes nothing to the DOM.',
+      'A tag factory returns the real HTMLButtonElement, typed as one, so addButton.animate() needs no ref, and the little pop writes nothing to the DOM.',
     file: 'real.element.ts',
-    Demo: ShakeButton,
+    Demo: AddToCart,
     source: elementSource,
   },
   {

@@ -1,9 +1,9 @@
 import { mount } from '@reely/dommy';
 
 import { clickButton } from '../../testing/dom.testing';
-import { LapClock } from './demos/lap.clock';
-import { PitWall, pitStopDelay } from './demos/pit.stop';
-import { RaceFinish } from './demos/race.finish';
+import { DeliveryTracker } from './demos/delivery.tracker';
+import { ExchangeRate, quoteDelay } from './demos/exchange.rate';
+import { StopwatchSlot } from './demos/stopwatch';
 import { DocsPage } from './docs.page';
 import { docTopics } from './docs.topics';
 
@@ -32,8 +32,9 @@ describe('docs', () => {
     it('shows a topic with its live demo, its source and its details', () => {
       const page = renderPage('conditions');
 
-      expect(page.querySelector('figure button')?.textContent).toBe('Next lap');
-      expect(page.querySelector('pre')?.textContent).toContain('<Show when={winner}');
+      expect(page.querySelector('figure button')?.textContent).toBe('Next stop');
+      expect(page.querySelector('pre')?.textContent).toContain('<Show');
+      expect(page.querySelector('pre')?.textContent).toContain('when={deliveredAt}');
       expect(page.querySelector('article h2')?.textContent).toBe('The props');
     });
 
@@ -77,29 +78,41 @@ describe('docs', () => {
   describe('demo "conditions"', () => {
     const renderDemo = (): Element => {
       const host = document.createElement('div');
-      host.append(<RaceFinish />);
+      host.append(<DeliveryTracker />);
       return host;
     };
 
-    it('updates the lap inside the shown branch without rebuilding it', () => {
+    it('updates the stops inside the shown branch without rebuilding it', () => {
       const demo = renderDemo();
       const branch = demo.querySelector('p');
 
-      clickButton(demo, 'Next lap');
+      clickButton(demo, 'Next stop');
 
-      expect(branch?.textContent).toBe('Racing, lap 2');
+      expect(branch?.textContent).toBe('Out for delivery, 4 stops away');
       expect(demo.querySelector('p')).toBe(branch);
     });
 
-    it('swaps the branch when the race finishes, and back on restart', () => {
+    it('stops at the last stop before the door', () => {
       const demo = renderDemo();
 
-      clickButton(demo, 'Finish');
-      const finished = demo.querySelector('p')?.textContent;
-      clickButton(demo, 'Restart');
+      for (let stop = 0; stop < 4; stop++) {
+        clickButton(demo, 'Next stop');
+      }
 
-      expect(finished).toBe('Winner: Car 3');
-      expect(demo.querySelector('p')?.textContent).toBe('Racing, lap 1');
+      expect(demo.querySelector('p')?.textContent).toBe('Out for delivery, 2 stops away');
+      expect(Array.from(demo.querySelectorAll('button')).find((item) => item.textContent === 'Next stop')?.disabled).toBe(true);
+    });
+
+    it('swaps the branch when the parcel is delivered, and back for another', () => {
+      const demo = renderDemo();
+
+      clickButton(demo, 'Next stop');
+      clickButton(demo, 'Deliver');
+      const delivered = demo.querySelector('p')?.textContent;
+      clickButton(demo, 'Send another');
+
+      expect(delivered).toBe('Delivered at 14:32');
+      expect(demo.querySelector('p')?.textContent).toBe('Out for delivery, 5 stops away');
     });
   });
 
@@ -114,34 +127,38 @@ describe('docs', () => {
       vi.useRealTimers();
     });
 
-    it('shows the crew at work, then the stop time', async () => {
+    it('shows the bank at work, then the rate', async () => {
       const host = document.createElement('div');
-      const dispose = mount(host, () => <PitWall />);
-      const onTrack = shown(host);
+      const dispose = mount(host, () => <ExchangeRate />);
+      const idle = shown(host);
 
-      clickButton(host, 'Box, box');
-      const inThePits = shown(host);
-      await vi.advanceTimersByTimeAsync(pitStopDelay);
+      clickButton(host, 'Refresh the rate');
+      const asking = shown(host);
+      await vi.advanceTimersByTimeAsync(quoteDelay);
 
-      expect([onTrack, inThePits, shown(host)]).toEqual(['On track', 'In the pits…', 'Stop 1: 2.4 s']);
+      expect([idle, asking, shown(host)]).toEqual([
+        'EUR to USD: not loaded yet',
+        'Asking the bank…',
+        '1 EUR = 1.084 USD',
+      ]);
       dispose();
     });
 
-    it('drops the stop a newer call replaced, shows a failed stop, and posts the retry', async () => {
+    it('drops the request a newer one replaced, shows a failed request, and the retry', async () => {
       const host = document.createElement('div');
-      const dispose = mount(host, () => <PitWall />);
+      const dispose = mount(host, () => <ExchangeRate />);
 
-      clickButton(host, 'Box, box');
-      await vi.advanceTimersByTimeAsync(pitStopDelay);
-      clickButton(host, 'Box, box');
-      clickButton(host, 'Box, box');
-      await vi.advanceTimersByTimeAsync(pitStopDelay);
+      clickButton(host, 'Refresh the rate');
+      await vi.advanceTimersByTimeAsync(quoteDelay);
+      clickButton(host, 'Refresh the rate');
+      clickButton(host, 'Refresh the rate');
+      await vi.advanceTimersByTimeAsync(quoteDelay);
       const failed = shown(host);
-      clickButton(host, 'Box, box');
-      await vi.advanceTimersByTimeAsync(pitStopDelay);
+      clickButton(host, 'Refresh the rate');
+      await vi.advanceTimersByTimeAsync(quoteDelay);
 
-      expect(failed).toBe('Stop 3: a wheel nut stuck. Box again.');
-      expect(shown(host)).toBe('Stop 4: 2.8 s');
+      expect(failed).toBe('The bank timed out. Refresh again.');
+      expect(shown(host)).toBe('1 EUR = 1.089 USD');
       expect(host.querySelectorAll('p')).toHaveLength(1);
       dispose();
     });
@@ -160,7 +177,7 @@ describe('docs', () => {
 
     it('runs the stopwatch while it is mounted, and stops its timer on unmount', () => {
       const host = document.createElement('div');
-      const dispose = mount(host, () => <LapClock />);
+      const dispose = mount(host, () => <StopwatchSlot />);
 
       clickButton(host, 'Mount a stopwatch');
       vi.advanceTimersByTime(1000);
@@ -178,7 +195,7 @@ describe('docs', () => {
 
     it('stops a running stopwatch when the page is taken down', () => {
       const host = document.createElement('div');
-      const dispose = mount(host, () => <LapClock />);
+      const dispose = mount(host, () => <StopwatchSlot />);
 
       clickButton(host, 'Mount a stopwatch');
       dispose();

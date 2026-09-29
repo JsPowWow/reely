@@ -28,7 +28,7 @@ No virtual DOM and no re-render: tag factories and JSX return real DOM nodes, a 
 ## Capabilities and Constraints
 
 - Documentation topics: getting started, elements and JSX, components, signals, bindings, `batch`, keyed lists (`For`), conditions (`Show`), async (`Await`), mount and cleanup, performance.
-- reely evolution keeps the chain: markup (tag factories, the same markup in JSX, components from data), then interactivity (a counter by hand, signals, bindings, derived values, `batch`), then keyed lists and a five-hundred-row race board; each step marks the lines that are new since the previous step.
+- reely evolution keeps the chain: markup (tag factories, the same markup in JSX, components from data), then interactivity (a ticket picker by hand, signals, bindings, derived values, `batch`), then keyed lists and a five-hundred-stock board of top movers; each step marks the lines that are new since the previous step.
 - All copy is in English for now; code and comments are English too. English and Russian are planned, on reely's own signals.
 - The whole site uses only `@reely/*` packages at runtime: no other UI framework or runtime dependency.
 - The repo principle applies to the site as well: minimal, yet mature.
@@ -39,7 +39,7 @@ No virtual DOM and no re-render: tag factories and JSX return real DOM nodes, a 
 - The name on the site is reely; the library users install is `@reely/dommy`. "free-dom" is only the app's name inside the repo and does not appear as a brand.
 - Author: JsPowWow; source at https://github.com/JsPowWow/reely.
 - Voice: plain and precise, like a good engineer explaining their own code to a teammate.
-- The visual world is a race-timing screen: asphalt ground, graphite ink, signal yellow and flag red, a condensed display face. The landing page keeps the look but tells no race story: plain headings, four live examples, the numbers.
+- The visual world is a race-timing screen: asphalt ground, graphite ink, signal yellow and flag red, a condensed display face. The look stays, the stories do not: the demos and examples take varied everyday subjects (a like button, concert tickets, a delivery, an exchange rate, a stock board) rather than one race told everywhere. The landing page has plain headings, four live examples, the numbers.
 
 ## Evidence on Hand
 

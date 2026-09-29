@@ -2,57 +2,67 @@ import { batch, computed, For, onCleanup, signal } from '@reely/dommy';
 
 import css from './board.module.css';
 
-interface Racer {
+interface Stock {
   id: string;
-  name: string;
-  /** Metres covered since the start. */
-  distance: number;
+  symbol: string;
+  /** Today's change, in hundredths of a percent. */
+  change: number;
 }
 
-const fieldSizes = [100, 300, 500] as const;
-const lapMs = 250;
-/** The median and the 95th percentile are taken over the last this many laps… */
+const marketSizes = [100, 300, 500] as const;
+const tickMs = 250;
+/** The median and the 95th percentile are taken over the last this many updates… */
 const timingWindow = 60;
 /** …once at least this many are timed: fewer say little about a percentile. */
 const timingMinimum = 20;
 
-const startingGrid = (size: number): Racer[] =>
-  Array.from({ length: size }, (_, slot) => ({ id: String(slot), name: `Car ${slot + 1}`, distance: 0 }));
+// three letters per stock, all different: 263 and 26³ share no factor
+const symbolOf = (slot: number): string => {
+  const code = (slot * 263 + 1331) % 26 ** 3;
+  return [code / 26 ** 2, code / 26, code].map((digit) => String.fromCharCode(65 + (Math.floor(digit) % 26))).join('');
+};
 
-// Every car has its own pace, and its own good and bad laps: a made-up race, the same on every visit.
-const lapLength = (racer: Racer, lap: number): number => 400 + ((Number(racer.id) * 37 + lap * 13 + racer.distance) % 97);
+const marketAtOpen = (size: number): Stock[] =>
+  Array.from({ length: size }, (_, slot) => ({ id: String(slot), symbol: symbolOf(slot), change: 0 }));
 
-const raceLap = (field: readonly Racer[], lap: number): Racer[] =>
-  field
-    .map((racer) => ({ ...racer, distance: racer.distance + lapLength(racer, lap) }))
-    .toSorted((first, second) => second.distance - first.distance);
+// Every stock has its own drift, and its own good and bad ticks: a made-up market, the same on every visit.
+const tickMove = (stock: Stock, tick: number): number =>
+  ((Number(stock.id) * 37 + tick * 13 + Math.abs(stock.change)) % 97) - 48;
+
+const priceTick = (market: readonly Stock[], tick: number): Stock[] =>
+  market
+    .map((stock) => ({ ...stock, change: stock.change + tickMove(stock, tick) }))
+    .toSorted((first, second) => second.change - first.change);
+
+const formatChange = (change: number): string => `${change < 0 ? '−' : '+'}${(Math.abs(change) / 100).toFixed(2)}%`;
 
 const formatMs = (ms: number | undefined): string => (ms === undefined ? '–' : `${ms.toFixed(1)} ms`);
 
-/** The time below which `share` of the timed laps fall; nothing until enough laps are timed. */
+/** The time below which `share` of the timed updates fall; nothing until enough are timed. */
 const percentile = (timings: readonly number[], share: number): number | undefined =>
   timings.length < timingMinimum
     ? undefined
     : timings.toSorted((first, second) => first - second)[Math.ceil(share * timings.length) - 1];
 
-// `For` renders a row once per `by` key. A new order moves the rows that changed places, and each
-// row's bindings rewrite only the texts that changed. A lap is timed from the write to the finished
-// layout, in this browser; a key that changes every lap makes `For` build every row again.
+// Top movers of a whole index: `For` renders a row once per `by` key. A new order moves the rows
+// that changed places, and each row's bindings rewrite only the texts that changed. An update is
+// timed from the write to the finished layout, in this browser; a key that changes every update
+// makes `For` build every row again.
 export const Board = (): Node => {
   const size = signal<number>(500);
-  const field = signal<readonly Racer[]>(startingGrid(size.value));
-  const lap = signal(0);
+  const market = signal<readonly Stock[]>(marketAtOpen(size.value));
+  const tick = signal(0);
   const timings = signal<readonly number[]>([]);
   const newKeys = signal(false);
   const running = signal(false);
   let tower: HTMLOListElement | undefined;
   let timer: ReturnType<typeof setInterval> | undefined;
 
-  const raceOneLap = (): void => {
+  const updatePrices = (): void => {
     const start = performance.now();
     batch(() => {
-      lap.value += 1;
-      field.value = raceLap(field.value, lap.value);
+      tick.value += 1;
+      market.value = priceTick(market.value, tick.value);
     });
     // reading the height makes the browser lay out the new order now, inside the timing
     void tower?.offsetHeight;
@@ -67,7 +77,7 @@ export const Board = (): Node => {
     if (running.value) {
       stop();
     } else {
-      timer = setInterval(raceOneLap, lapMs);
+      timer = setInterval(updatePrices, tickMs);
       running.value = true;
     }
   };
@@ -76,8 +86,8 @@ export const Board = (): Node => {
   const resize = (next: number): void => {
     batch(() => {
       size.value = next;
-      field.value = startingGrid(next);
-      lap.value = 0;
+      market.value = marketAtOpen(next);
+      tick.value = 0;
       timings.value = [];
     });
   };
@@ -89,7 +99,7 @@ export const Board = (): Node => {
     });
   };
   // `peek` reads without subscribing: the key is read while the list updates, not to update it
-  const keyOf = (racer: Racer): string => (newKeys.peek() ? `${lap.peek()}:${racer.id}` : racer.id);
+  const keyOf = (stock: Stock): string => (newKeys.peek() ? `${tick.peek()}:${stock.id}` : stock.id);
 
   const last = computed(() => formatMs(timings.value.at(-1)));
   const median = computed(() => formatMs(percentile(timings.value, 0.5)));
@@ -100,18 +110,18 @@ export const Board = (): Node => {
       <ol
         className={`${css.tower} ${css.scroller}`}
         tabIndex={0}
-        aria={{ ariaLabel: 'Standings' }}
+        aria={{ ariaLabel: 'Top movers' }}
         elementRef={(element) => {
           tower = element;
         }}
       >
-        <For each={field} by={keyOf}>
-          {(racer, place) => (
+        <For each={market} by={keyOf}>
+          {(stock, rank) => (
             <li className={css.row}>
-              <b className={css.place}>{() => place() + 1}</b>
-              <span className={css.name}>{() => racer().name}</span>
-              <data className={css.distance} value={() => String(racer().distance)}>
-                {() => `${racer().distance} m`}
+              <b className={css.place}>{() => rank() + 1}</b>
+              <span className={css.name}>{() => stock().symbol}</span>
+              <data className={css.change} value={() => String(stock().change)}>
+                {() => formatChange(stock().change)}
               </data>
             </li>
           )}
@@ -119,24 +129,24 @@ export const Board = (): Node => {
       </ol>
       <div className={css.controls}>
         <button onClick={startOrStop}>{() => (running.value ? 'Stop' : 'Start')}</button>
-        <p className={css.status}>Lap {lap}</p>
+        <p className={css.status}>Update {tick}</p>
         <fieldset className={css.sizes}>
-          <legend>Cars</legend>
-          {fieldSizes.map((option) => (
+          <legend>Stocks</legend>
+          {marketSizes.map((option) => (
             <label>
-              <input type='radio' name='field-size' checked={option === size.value} onChange={() => resize(option)} />
+              <input type='radio' name='market-size' checked={option === size.value} onChange={() => resize(option)} />
               {option}
             </label>
           ))}
         </fieldset>
         <label className={css.mode}>
           <input type='checkbox' onChange={(event) => switchKeys(event.currentTarget.checked)} />
-          New keys every lap
+          New keys every update
         </label>
       </div>
       <dl className={css.timing}>
         <div>
-          <dt>Last lap</dt>
+          <dt>Last update</dt>
           <dd>{last}</dd>
         </div>
         <div>

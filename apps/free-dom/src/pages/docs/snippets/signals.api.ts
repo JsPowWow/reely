@@ -1,8 +1,8 @@
 import { batch, computed, effect, onCleanup, signal, untracked } from '@reely/dommy';
 
-const lap = signal(1);
-const leader = signal('Car 3');
-const title = computed(() => `Lap ${lap.value}: ${leader.value} leads`);
+const unread = signal(0);
+const sender = signal('');
+const title = computed(() => (unread.value === 0 ? 'Inbox' : `(${unread.value}) ${sender.value} wrote`));
 
 // Runs now, and again after every change of what it read.
 const stop = effect(() => {
@@ -10,10 +10,11 @@ const stop = effect(() => {
   onCleanup(() => clearTimeout(timer)); // before the next run, and on stop()
 });
 
+// a message arrives
 batch(() => {
-  lap.value += 1; // the effect runs once, when the batch ends
-  leader.value = 'Car 7';
+  unread.value += 1; // the effect runs once, when the batch ends
+  sender.value = 'Maria';
 });
 
-untracked(() => lap.value); // reads without subscribing, like lap.peek()
+untracked(() => unread.value); // reads without subscribing, like unread.peek()
 stop();

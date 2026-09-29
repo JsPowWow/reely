@@ -1,16 +1,16 @@
 import { button, computed, div, output, signal } from '@reely/dommy';
 
-import css from './counter.module.css';
+import css from './tickets.module.css';
 
-// Any function in a prop is bound like a signal: `disabled` follows the count, no computed needed.
-export const Counter = (): HTMLElement => {
-  const count = signal(0);
-  const parity = computed(() => (count.value % 2 === 0 ? 'even' : 'odd'));
+// Any function in a prop is bound like a signal: `disabled` follows the tickets, no computed needed.
+export const Tickets = (): HTMLElement => {
+  const tickets = signal(0);
+  const plan = computed(() => (tickets.value === 0 ? 'empty' : tickets.value === 1 ? 'single' : 'group'));
 
   return div(
-    { className: css.counter },
-    output({ className: css.value, 'data-parity': parity }, count),
-    button({ onClick: () => (count.value += 1) }, '+1'),
-    button({ onClick: () => (count.value -= 1), disabled: () => count.value === 0 }, '−1')
+    { className: css.tickets },
+    output({ className: css.value, 'data-plan': plan }, tickets),
+    button({ onClick: () => (tickets.value += 1) }, '+1'),
+    button({ onClick: () => (tickets.value -= 1), disabled: () => tickets.value === 0 }, '−1')
   );
 };

@@ -1,15 +1,15 @@
 import { button, div, output, signal } from '@reely/dommy';
 
-import css from './counter.module.css';
+import css from './tickets.module.css';
 
 // Pass the signal itself: dommy binds it to one text node and updates only that node.
-export const Counter = (): HTMLElement => {
-  const count = signal(0);
+export const Tickets = (): HTMLElement => {
+  const tickets = signal(0);
 
   return div(
-    { className: css.counter },
-    output({ className: css.value }, count),
-    button({ onClick: () => (count.value += 1) }, '+1'),
-    button({ onClick: () => (count.value -= 1) }, '−1')
+    { className: css.tickets },
+    output({ className: css.value }, tickets),
+    button({ onClick: () => (tickets.value += 1) }, '+1'),
+    button({ onClick: () => (tickets.value -= 1) }, '−1')
   );
 };

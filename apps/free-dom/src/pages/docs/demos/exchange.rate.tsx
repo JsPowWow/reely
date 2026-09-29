@@ -2,50 +2,41 @@ import { Await, Show, signal } from '@reely/dommy';
 
 import css from './demos.module.css';
 
-interface PitStop {
-  stop: number;
-  seconds: number;
-}
+/** How long the bank takes to answer, in milliseconds of the page; the rates are made up. */
+export const quoteDelay = 900;
 
-/** How long the crew takes, in milliseconds of the page; the posted times are the race's own. */
-export const pitStopDelay = 900;
+const rates = [1.084, 1.086, 1.083, 1.089];
 
-const crewTimes = [2.4, 3.1, 2.2, 2.8];
-
-// the crew answers a call later: with the stop time, or, on the third stop, with a failure
-const callCrew = (stop: number): Promise<PitStop> =>
+// the bank answers a request later: with the rate, or, on the third request, with a failure
+const askBank = (request: number): Promise<number> =>
   new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (stop === 3) {
-        reject(new Error('Stop 3: a wheel nut stuck. Box again.'));
+      if (request === 3) {
+        reject(new Error('The bank timed out. Refresh again.'));
       } else {
-        resolve({ stop, seconds: crewTimes[(stop - 1) % crewTimes.length] ?? 0 });
+        resolve(rates[(request - 1) % rates.length] ?? 0);
       }
-    }, pitStopDelay);
+    }, quoteDelay);
   });
 
-// `Await` shows the fallback while the crew works, then the time or the failure; a newer call drops the older one.
-export const PitWall = (): Node => {
-  const stop = signal(0);
+// `Await` shows the fallback while the bank answers, then the rate or the failure; a newer request drops the older one.
+export const ExchangeRate = (): Node => {
+  const request = signal(0);
 
   return (
     <div className={css.row}>
-      <Show when={() => stop.value > 0} fallback={() => <p className={css.pending}>On track</p>}>
+      <Show when={() => request.value > 0} fallback={() => <p className={css.pending}>EUR to USD: not loaded yet</p>}>
         {() => (
           <Await
-            promise={() => callCrew(stop.value)}
-            fallback={() => <p className={css.pending}>In the pits…</p>}
+            promise={() => askBank(request.value)}
+            fallback={() => <p className={css.pending}>Asking the bank…</p>}
             catch={(error) => <p className={css.failed}>{error.message}</p>}
           >
-            {(result) => (
-              <p className={css.plate}>
-                Stop {result.stop}: {result.seconds.toFixed(1)} s
-              </p>
-            )}
+            {(rate) => <p className={css.plate}>1 EUR = {rate.toFixed(3)} USD</p>}
           </Await>
         )}
       </Show>
-      <button onClick={() => (stop.value += 1)}>Box, box</button>
+      <button onClick={() => (request.value += 1)}>Refresh the rate</button>
     </div>
   );
 };

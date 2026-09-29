@@ -2,7 +2,7 @@ import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
 import { measured } from '../../site/measurements';
 import { SiteHeader } from '../../site/site.header';
-import { Counter } from '../docs/demos/first.counter';
+import { LikeButton } from '../docs/demos/like.button';
 import { landingExamples } from './landing.examples';
 import css from './landing.module.css';
 
@@ -51,7 +51,7 @@ export const LandingPage = (): Node => {
           </div>
           <div className={css.startDemo}>
             <MutationMeter>
-              <Counter />
+              <LikeButton />
             </MutationMeter>
           </div>
         </section>

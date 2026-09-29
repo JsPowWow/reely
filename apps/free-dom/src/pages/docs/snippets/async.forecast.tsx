@@ -1,26 +1,31 @@
 import { Await, signal } from '@reely/dommy';
 
-interface LapResult {
-  lap: number;
-  leader: string;
+interface Forecast {
+  city: string;
+  celsius: number;
 }
 
-const loadLap = (lap: number): Promise<LapResult> => fetch(`/api/laps/${lap}`).then((response) => response.json());
+const loadForecast = (city: string): Promise<Forecast> =>
+  fetch(`/api/forecast?city=${encodeURIComponent(city)}`).then((response) => response.json());
 
-const lap = signal(1);
+const city = signal('Lisbon');
 
-// A resource: the getter reads `lap`, so a new lap loads again, and a late answer for an old lap is dropped.
-export const LapLeader = (): Node => (
+// A resource: the getter reads `city`, so a new city loads again, and a late answer for the old one is dropped.
+export const Weather = (): Node => (
   <section>
-    <button onClick={() => (lap.value += 1)}>Next lap</button>
+    <select onChange={(event) => city.set(event.currentTarget.value)}>
+      <option>Lisbon</option>
+      <option>Oslo</option>
+      <option>Nairobi</option>
+    </select>
     <Await
-      promise={() => loadLap(lap.value)}
-      fallback={() => <p>Loading lap {lap}…</p>}
-      catch={(error) => <p>Lap {lap} did not load: {error.message}</p>}
+      promise={() => loadForecast(city.value)}
+      fallback={() => <p>Loading {city}…</p>}
+      catch={(error) => <p>{city} did not load: {error.message}</p>}
     >
-      {(result) => (
+      {(forecast) => (
         <p>
-          Lap {result.lap}: {result.leader} leads
+          {forecast.city}: {forecast.celsius} °C
         </p>
       )}
     </Await>

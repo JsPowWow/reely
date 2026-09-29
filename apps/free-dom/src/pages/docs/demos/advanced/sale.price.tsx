@@ -3,19 +3,19 @@ import { Show, signal } from '@reely/dommy';
 import css from '../demos.module.css';
 
 // A signal of a node would put one node in two places. `Show` builds a node for each place.
-export const TurnBold = (): Node => {
-  const bold = signal(false);
-  const Name = (): Node => (
-    <Show when={bold} fallback={() => 'reely'}>
-      {() => <b>reely</b>}
+export const SalePrice = (): Node => {
+  const onSale = signal(false);
+  const Price = (): Node => (
+    <Show when={onSale} fallback={() => '€40'}>
+      {() => <mark>€32</mark>}
     </Show>
   );
 
   return (
     <div className={css.row}>
-      <button onClick={() => (bold.value = !bold.value)}>{() => (bold.value ? 'Turn plain' : 'Turn bold')}</button>
+      <button onClick={() => (onSale.value = !onSale.value)}>{() => (onSale.value ? 'End the sale' : 'Start the sale')}</button>
       <p className={css.status}>
-        Welcome to <Name />. <Name /> is awesome!
+        Rain jacket, <Price />. Pay <Price /> at checkout.
       </p>
     </div>
   );

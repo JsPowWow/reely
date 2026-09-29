@@ -173,7 +173,7 @@ Motion only answers the reader: the write board outlines the nodes a change touc
 A cool graphite-and-asphalt neutral scale with two race signals: a yellow for state and a red for node writes.
 
 ### Primary
-- **Signal Yellow** (signal): the current page plate in the rails, the leader's place plate, a posted result plate in a demo (the preview a field writes, the winner, a stop time), the lines added since the previous step in a code pane, the primary action button, and figures or rules on graphite bands. On light surfaces it is a fill under graphite text, never a text colour.
+- **Signal Yellow** (signal): the current page plate in the rails, the leader's place plate, a posted result plate in a demo (the preview a field writes, a delivery, a rate), the lines added since the previous step in a code pane, the primary action button, and figures or rules on graphite bands. On light surfaces it is a fill under graphite text, never a text colour.
 - **Signal Ink** (signal-ink): signal yellow darkened for marks on light surfaces (4.6:1 on the panel): the text-edit and attribute-edit pips and deltas on the write board, the outline that flashes on an edited or moved node, the odd-count mark in an evolution demo, list markers in docs prose.
 
 ### Secondary
@@ -269,7 +269,7 @@ The signature component. A white panel (6px, hairline) with the live demo on a s
 Graphite, 6px, code-text mono at 0.8125rem/1.6, lines kept on one line and scrolled horizontally with a light edge showing where a line runs on. Lines added since the previous step get a 4px signal left edge and a 14% signal wash. A slate caption names the module above it.
 
 ### Timing Plates
-Standings rows (hairline, 4px) lead with a graphite place plate in the display face; the first row's plate is signal, and moves with whichever row leads. Read-out boxes are white with a hairline, display at 3.5rem. A posted result (a preview, the winner, a stop time) is a signal plate with display text at 2rem; not yet settled, it is a dashed hairline with slate text; a failed call is a white plate with a 2px graphite border and bold body text. Result lists of code chips sit on graphite at 3px in mono.
+Ranked rows (hairline, 4px) lead with a graphite place plate in the display face; the first row's plate is signal, and moves with whichever row leads. Read-out boxes are white with a hairline, display at 3.5rem. A posted result (a preview, a delivery, a rate) is a signal plate with display text at 2rem; not yet settled, it is a dashed hairline with slate text; a failed call is a white plate with a 2px graphite border and bold body text. Result lists of code chips sit on graphite at 3px in mono.
 
 ### Timing Sheet
 Figures tables (docs sizes, the landing's size and speed band): a visible caption, tabular figures right-aligned in the display face, one rule per row, labels left in body weight 400.

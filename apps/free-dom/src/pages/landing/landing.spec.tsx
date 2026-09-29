@@ -53,17 +53,17 @@ describe('LandingPage', () => {
   it('animates the button a factory returned, and writes nothing to the DOM for it', async () => {
     const elements = section(host, 'elements');
     const animate = vi.fn();
-    const shake = elements.querySelector('button');
-    if (!shake) {
+    const add = elements.querySelector('button');
+    if (!add) {
       throw new Error('No button');
     }
-    shake.animate = animate;
+    add.animate = animate;
     await flushMutations();
 
-    clickButton(elements, 'Shake me');
+    clickButton(elements, 'Add to cart');
     await flushMutations();
 
-    expect(shake).toBeInstanceOf(HTMLButtonElement);
+    expect(add).toBeInstanceOf(HTMLButtonElement);
     expect(animate).toHaveBeenCalledOnce();
     expect(writes(elements)).toEqual([0, 0, 0, 0]);
   });
@@ -72,11 +72,11 @@ describe('LandingPage', () => {
     const signals = section(host, 'signals');
     await flushMutations();
 
-    typeInto(signals.querySelector('input'), 'Grace');
+    typeInto(signals.querySelector('input'), 'gracehopper');
     await flushMutations();
 
-    expect(signals.querySelector('figure p')?.textContent).toBe('Hello, Grace!');
-    expect(signals.textContent).toContain('5 letters');
+    expect(signals.querySelector('figure p')?.textContent).toBe('example.com/@gracehopper');
+    expect(signals.textContent).toContain('4 characters left');
     expect(writes(signals)).toEqual([2, 0, 0, 0]);
   });
 
@@ -98,16 +98,16 @@ describe('LandingPage', () => {
     expect(moved).toBeGreaterThan(0);
   });
 
-  it('greets a stranger and counts one letter in the singular', () => {
+  it('previews a placeholder address when empty, and one character in the singular', () => {
     const signals = section(host, 'signals');
 
     typeInto(signals.querySelector('input'), '');
     const empty = signals.querySelector('figure p')?.textContent;
-    typeInto(signals.querySelector('input'), 'A');
+    typeInto(signals.querySelector('input'), 'mariasilva2026');
 
-    expect(empty).toBe('Hello, stranger!');
-    expect(signals.textContent).toContain('1 letter');
-    expect(signals.textContent).not.toContain('1 letters');
+    expect(empty).toBe('example.com/@you');
+    expect(signals.textContent).toContain('1 character left');
+    expect(signals.textContent).not.toContain('1 characters');
   });
 
   describe('the async example', () => {

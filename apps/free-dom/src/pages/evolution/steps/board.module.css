@@ -4,7 +4,7 @@
   max-width: 32rem;
 }
 
-/* The standings: one row per car, the place on a graphite plate, like a timing tower. */
+/* The movers: one row per stock, the rank on a graphite plate, like a timing tower. */
 .tower,
 .scroller {
   margin: 0;
@@ -53,7 +53,7 @@
   line-height: 1;
 }
 
-/* The leader's plate is signal yellow; it moves with whichever row is first, with no binding. */
+/* The top mover's plate is signal yellow; it moves with whichever row is first, with no binding. */
 .row:first-child .place {
   background: var(--signal);
   color: var(--graphite);
@@ -66,7 +66,7 @@
   white-space: nowrap;
 }
 
-.distance {
+.change {
   color: var(--slate);
 }
 

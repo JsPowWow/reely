@@ -17,7 +17,7 @@ const Stopwatch = (): Node => {
   return <output className={css.value}>{() => (tenths.value / 10).toFixed(1)}</output>;
 };
 
-export const LapClock = (): Node => {
+export const StopwatchSlot = (): Node => {
   const slot = createObjectReference<HTMLDivElement>();
   const running = signal(false);
   let unmount: VoidFunction = noop;

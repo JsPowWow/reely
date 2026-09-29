@@ -2,21 +2,21 @@ import { effect, signal } from '@reely/dommy';
 import { later, persisted, throttled } from '@reely/dommy/kit';
 
 // Kept in localStorage, and synced across tabs.
-export const fullName = persisted('fullName', 'Tao Xin');
+export const email = persisted('email', 'kenji.watanabe@example.com');
 
 // Several signals from one source.
-export const firstName = signal('');
-export const lastName = signal('');
+export const user = signal('');
+export const domain = signal('');
 effect(() => {
-  [firstName.value = '', lastName.value = ''] = fullName.value.split(' ');
+  [user.value = '', domain.value = ''] = email.value.split('@');
 });
 
-// The same value a second later; a new name cancels the pending one.
-export const delayed = signal('');
+// Saved a second after typing stops; a new keystroke cancels the pending save.
+export const saved = signal('');
 effect(() => {
-  const name = fullName.value;
-  later(1000, () => (delayed.value = name));
+  const address = email.value;
+  later(1000, () => (saved.value = address));
 });
 
-// At most one change per 100 ms, the latest last.
-export const calm = throttled(fullName, 100);
+// At most one change per 300 ms, the latest last: what a lookup as you type should read.
+export const lookup = throttled(email, 300);

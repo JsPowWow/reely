@@ -1,22 +1,22 @@
 import { button, createObjectReference, div, output } from '@reely/dommy';
 
-import css from './counter.module.css';
+import css from './tickets.module.css';
 
-// `elementRef` hands over the output element; a listener redraws it by hand after every click.
-export const Counter = (): HTMLElement => {
+// Tickets for a concert: `elementRef` hands over the output, and a listener redraws it by hand after every click.
+export const Tickets = (): HTMLElement => {
   const result = createObjectReference<HTMLOutputElement>();
-  let count = 0;
+  let tickets = 0;
 
   const add = (step: number): void => {
-    count += step;
+    tickets += step;
     if (result.current) {
-      result.current.replaceChildren(String(count));
+      result.current.replaceChildren(String(tickets));
     }
   };
 
   return div(
-    { className: css.counter },
-    output({ className: css.value, elementRef: result }, count),
+    { className: css.tickets },
+    output({ className: css.value, elementRef: result }, tickets),
     button({ onClick: () => add(1) }, '+1'),
     button({ onClick: () => add(-1) }, '−1')
   );

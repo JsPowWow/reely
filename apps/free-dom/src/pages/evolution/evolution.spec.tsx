@@ -44,9 +44,9 @@ describe('evolution', () => {
     expect(components).toBe(factories);
   });
 
-  // Every counter step, after +1, +1, −1 clicked in turn: the first-render node count, then text
+  // Every ticket step, after +1, +1, −1 clicked in turn: the first-render node count, then text
   // edits, attribute edits, nodes moved and nodes added or removed, each with the last click's delta.
-  describe('counter steps', () => {
+  describe('ticket steps', () => {
     const clickInTurn = async (meter: Element, labels: readonly string[]): Promise<void> => {
       for (const label of labels) {
         clickButton(meter, label);
@@ -127,7 +127,7 @@ describe('evolution', () => {
 
   describe('board steps', () => {
     const rowsOf = (root: Element): HTMLLIElement[] => Array.from(root.querySelectorAll('li'));
-    const distanceOf = (row: Element): number => Number.parseFloat(row.querySelector('data')?.value ?? 'NaN');
+    const changeOf = (row: Element): number => Number.parseFloat(row.querySelector('data')?.value ?? 'NaN');
     const readMoves = (meter: Element): number => Number.parseInt(readWrites(meter)[3] ?? '', 10);
     const readNodeWrites = (meter: Element): number => Number.parseInt(readWrites(meter)[4] ?? '', 10);
 
@@ -135,13 +135,13 @@ describe('evolution', () => {
       const meter = renderStep('keyed-list');
       const before = rowsOf(meter);
 
-      clickButton(meter, 'Race a lap');
+      clickButton(meter, 'Update prices');
       await flushMutations();
       const after = rowsOf(meter);
 
       expect(before).toHaveLength(8);
       expect(new Set(after)).toEqual(new Set(before));
-      expect(after.map(distanceOf)).toEqual(after.map(distanceOf).toSorted((x, y) => y - x));
+      expect(after.map(changeOf)).toEqual(after.map(changeOf).toSorted((x, y) => y - x));
       expect(after.map((row) => row.querySelector('b')?.textContent)).toEqual(['1', '2', '3', '4', '5', '6', '7', '8']);
       // rows move; a rebuild would remove and add every row, 16 node writes
       expect(readMoves(meter)).toBeGreaterThan(0);
@@ -170,12 +170,12 @@ describe('evolution', () => {
       const findField = (root: Element, label: string): HTMLInputElement | undefined =>
         Array.from(root.querySelectorAll('label')).find((item) => item.textContent?.includes(label))?.querySelector('input') ??
         undefined;
-      const lapOf = (root: Element): string =>
-        Array.from(root.querySelectorAll('p')).find((item) => item.textContent?.startsWith('Lap '))?.textContent ?? '';
+      const updateOf = (root: Element): string =>
+        Array.from(root.querySelectorAll('p')).find((item) => item.textContent?.startsWith('Update '))?.textContent ?? '';
       const readoutOf = (root: Element, label: string): string =>
         Array.from(root.querySelectorAll('dt')).find((item) => item.textContent === label)?.nextElementSibling?.textContent ?? '';
 
-      it('races five hundred rows, moving the rows it keeps', async () => {
+      it('ranks five hundred stocks, moving the rows it keeps', async () => {
         const meter = renderStep('five-hundred');
         const before = new Set(rowsOf(meter));
 
@@ -185,18 +185,18 @@ describe('evolution', () => {
         await flushMutations();
 
         expect(before.size).toBe(500);
-        expect(lapOf(meter)).toBe('Lap 2');
-        expect(readoutOf(meter, 'Last lap')).toMatch(/ms$/);
-        // two laps say nothing about a percentile yet
+        expect(updateOf(meter)).toBe('Update 2');
+        expect(readoutOf(meter, 'Last update')).toMatch(/ms$/);
+        // two updates say nothing about a percentile yet
         expect(readoutOf(meter, '95th percentile')).toBe('–');
         expect(new Set(rowsOf(meter))).toEqual(before);
         expect(findButton(meter, 'Stop')).toBeDefined();
       });
 
-      it('builds every row again when the keys change every lap, and writes more nodes than moving them', async () => {
+      it('builds every row again when the keys change every update, and writes more nodes than moving them', async () => {
         const moving = renderConnected();
         const rebuilding = renderConnected();
-        findField(rebuilding, 'New keys every lap')?.click();
+        findField(rebuilding, 'New keys every update')?.click();
         const before = rowsOf(rebuilding);
 
         for (const meter of [moving, rebuilding]) {
@@ -210,21 +210,21 @@ describe('evolution', () => {
         expect(readNodeWrites(moving)).toBeLessThan(1000);
       });
 
-      it('times each key mode on its own, and gives a median once 20 laps are timed', () => {
+      it('times each key mode on its own, and gives a median once 20 updates are timed', () => {
         const meter = renderConnected();
         clickButton(meter, 'Start');
-        for (let lap = 0; lap < 20; lap++) {
+        for (let update = 0; update < 20; update++) {
           vi.advanceTimersToNextTimer();
         }
         const medianOf20 = readoutOf(meter, 'Median');
 
-        findField(meter, 'New keys every lap')?.click();
+        findField(meter, 'New keys every update')?.click();
 
         expect(medianOf20).toMatch(/ms$/);
         expect(readoutOf(meter, 'Median')).toBe('–');
       });
 
-      it('changes the field size between races', () => {
+      it('changes the market size between runs', () => {
         const meter = renderConnected();
 
         findField(meter, '100')?.click();
@@ -232,19 +232,19 @@ describe('evolution', () => {
         expect(rowsOf(meter)).toHaveLength(100);
       });
 
-      it('stops racing when stopped, and when the page is taken down', () => {
+      it('stops updating when stopped, and when the page is taken down', () => {
         const host = document.createElement('div');
         const dispose = mount(host, () => renderStep('five-hundred'));
         clickButton(host, 'Start');
         vi.advanceTimersToNextTimer();
         clickButton(host, 'Stop');
         vi.advanceTimersToNextTimer();
-        const afterStop = lapOf(host);
+        const afterStop = updateOf(host);
         clickButton(host, 'Start');
 
         dispose();
 
-        expect(afterStop).toBe('Lap 1');
+        expect(afterStop).toBe('Update 1');
         expect(vi.getTimerCount()).toBe(0);
       });
     });

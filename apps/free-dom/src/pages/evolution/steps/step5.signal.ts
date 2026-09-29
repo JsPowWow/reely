@@ -1,22 +1,22 @@
 import { button, createObjectReference, div, effect, output, signal } from '@reely/dommy';
 
-import css from './counter.module.css';
+import css from './tickets.module.css';
 
 // A signal holds the state; an effect reads it, so it redraws the output after every change.
-export const Counter = (): HTMLElement => {
+export const Tickets = (): HTMLElement => {
   const result = createObjectReference<HTMLOutputElement>();
-  const count = signal(0);
+  const tickets = signal(0);
 
   const view = div(
-    { className: css.counter },
+    { className: css.tickets },
     output({ className: css.value, elementRef: result }),
-    button({ onClick: () => (count.value += 1) }, '+1'),
-    button({ onClick: () => (count.value -= 1) }, '−1')
+    button({ onClick: () => (tickets.value += 1) }, '+1'),
+    button({ onClick: () => (tickets.value -= 1) }, '−1')
   );
 
   effect(() => {
     if (result.current) {
-      result.current.replaceChildren(String(count.value));
+      result.current.replaceChildren(String(tickets.value));
     }
   });
 

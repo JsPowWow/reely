@@ -1,21 +1,21 @@
 import { button, div, effect, output, signal } from '@reely/dommy';
 
-import css from './counter.module.css';
+import css from './tickets.module.css';
 
 // A function ref gets the output once it exists; subscribing it to the signal is a binding by hand.
-export const Counter = (): HTMLElement => {
-  const count = signal(0);
+export const Tickets = (): HTMLElement => {
+  const tickets = signal(0);
 
-  const showCount = (element: HTMLOutputElement): void => {
+  const showTickets = (element: HTMLOutputElement): void => {
     effect(() => {
-      element.textContent = String(count.value);
+      element.textContent = String(tickets.value);
     });
   };
 
   return div(
-    { className: css.counter },
-    output({ className: css.value, elementRef: showCount }),
-    button({ onClick: () => (count.value += 1) }, '+1'),
-    button({ onClick: () => (count.value -= 1) }, '−1')
+    { className: css.tickets },
+    output({ className: css.value, elementRef: showTickets }),
+    button({ onClick: () => (tickets.value += 1) }, '+1'),
+    button({ onClick: () => (tickets.value -= 1) }, '−1')
   );
 };

@@ -1,24 +1,25 @@
 import { button, computed, div, output, p, signal } from '@reely/dommy';
 
-import css from './counter.module.css';
+import css from './tickets.module.css';
 
-// Two signals change on every press, so the summary that reads both is written twice.
-export const Counter = (): HTMLElement => {
-  const count = signal(0);
-  const presses = signal(0);
-  const parity = computed(() => (count.value % 2 === 0 ? 'even' : 'odd'));
-  const summary = computed(() => `Presses: ${presses.value}, net: ${count.value}`);
+// A ticket in the cart is a seat taken from the hall: two signals change on every press, so the
+// summary that reads both is written twice.
+export const Tickets = (): HTMLElement => {
+  const tickets = signal(0);
+  const seatsLeft = signal(40);
+  const plan = computed(() => (tickets.value === 0 ? 'empty' : tickets.value === 1 ? 'single' : 'group'));
+  const summary = computed(() => `Tickets in your cart: ${tickets.value}, seats left: ${seatsLeft.value}`);
 
   const press = (step: number): void => {
-    count.value += step;
-    presses.value += 1;
+    tickets.value += step;
+    seatsLeft.value -= step;
   };
 
   return div(
-    { className: css.counter },
-    output({ className: css.value, 'data-parity': parity }, count),
+    { className: css.tickets },
+    output({ className: css.value, 'data-plan': plan }, tickets),
     button({ onClick: () => press(1) }, '+1'),
-    button({ onClick: () => press(-1), disabled: () => count.value === 0 }, '−1'),
+    button({ onClick: () => press(-1), disabled: () => tickets.value === 0 }, '−1'),
     p({ className: css.summary }, summary)
   );
 };

@@ -1,4 +1,4 @@
-.counter {
+.tickets {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -19,8 +19,8 @@
   text-align: center;
 }
 
-/* An odd count gets the signal mark, so the bound attribute is visible too. */
-.value[data-parity='odd'] {
+/* A group gets the signal mark, so the bound attribute is visible too. */
+.value[data-plan='group'] {
   border-bottom: 4px solid var(--signal-ink);
 }
 
