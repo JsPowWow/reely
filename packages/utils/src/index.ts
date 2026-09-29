@@ -5,6 +5,7 @@ export * from './lib/types/utility.types';
 export * from './lib/utils';
 
 export { default as toErrorWithMessage } from './lib/errors/toErrorWithMessage';
+export { default as toErrorString } from './lib/errors/toErrorString';
 export { default as exhaustiveGuard } from './lib/errors/exhaustiveGuard';
 export { default as reThrow } from './lib/errors/reThrow';
 export { hasStringMessage } from './lib/errors/hasStringMessage';
