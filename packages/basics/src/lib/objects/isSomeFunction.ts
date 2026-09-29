@@ -1,8 +1,7 @@
-import { hasSome } from './hasSome';
-
-import type { AnyFunction } from '../types/function.types';
-
-/** Whether `value` can be called. */
-export function isSomeFunction<SomeFunction extends AnyFunction>(value: unknown): value is NonNullable<SomeFunction> {
-  return hasSome(value) && typeof value === 'function';
+/**
+ * Whether `value` can be called. Narrows a union to its functions; an unknown value becomes a function that takes
+ * nothing it was not told about.
+ */
+export function isSomeFunction(value: unknown): value is (...parameters: never) => unknown {
+  return typeof value === 'function';
 }

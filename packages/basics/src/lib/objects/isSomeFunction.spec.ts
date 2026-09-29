@@ -30,4 +30,23 @@ describe('isFunction', () => {
   `('"$value" -> $expected', ({ value, expected }) => {
     expect(isSomeFunction(value)).toStrictEqual(expected);
   });
+
+  it('narrows a union to its functions', () => {
+    const listener = ((lap: number): number => lap) as ((lap: number) => number) | string;
+
+    if (isSomeFunction(listener)) {
+      expectTypeOf(listener).toEqualTypeOf<(lap: number) => number>();
+    }
+  });
+
+  it('never casts an unknown value to a function with a signature', () => {
+    const value: unknown = (lap: number): number => lap;
+
+    if (isSomeFunction(value)) {
+      // @ts-expect-error what the function takes is unknown
+      expect(value(1)).toBe(1);
+    }
+    // @ts-expect-error the type comes from the value, a type argument cannot cast it
+    expect(isSomeFunction<(lap: number) => number>(value)).toBe(true);
+  });
 });

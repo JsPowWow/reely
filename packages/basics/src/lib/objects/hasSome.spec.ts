@@ -27,4 +27,15 @@ describe('hasSome tests', () => {
       expect(hasSome(value)).toStrictEqual(expected);
     });
   });
+
+  it('narrows away null and undefined, and nothing else', () => {
+    const laps = new Set([1]) as Set<number> | undefined;
+    const value: unknown = { lap: 1 };
+
+    if (hasSome(laps)) {
+      expectTypeOf(laps).toEqualTypeOf<Set<number>>();
+    }
+    // @ts-expect-error the type comes from the value, a type argument cannot cast it
+    expect(hasSome<{ lap: number }>(value)).toBe(true);
+  });
 });

@@ -8,8 +8,8 @@
   {
     "name": "isSomeFunction alone",
     "code": "import { isSomeFunction } from '@reely/basics'; console.log(isSomeFunction(1));",
-    "absent": ["forEachSettled", "reportUncaught", "isPlainObject"],
-    "once": ["isSomeFunction", "hasSome"]
+    "absent": ["forEachSettled", "reportUncaught", "isPlainObject", "hasSome"],
+    "once": ["isSomeFunction"]
   },
   {
     "name": "isPlainObject alone",
