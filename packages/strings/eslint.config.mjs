@@ -4,8 +4,9 @@ import jsoncEslintParser from 'jsonc-eslint-parser';
 export default [
   ...baseConfig,
   {
-    files: ['**/*.ts', '**/*.js'],
-    rules: {},
+    files: ['src/**/*.ts'],
+    // built by tsc with `nodenext`: relative imports name the emitted `.js`, which tsc itself resolves
+    rules: { 'import/no-unresolved': ['error', { ignore: ['^\\./.*\\.js$'] }] },
   },
   {
     files: ['*.json'],

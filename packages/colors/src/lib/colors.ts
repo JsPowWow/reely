@@ -115,7 +115,7 @@ export function isValidRgb(
     let r: number | undefined;
 
     if (typeof rOrRgb === 'object') {
-        ({ r, g, b } = rOrRgb as RgbColor);
+        ({ r, g, b } = rOrRgb);
     } else {
         r = rOrRgb;
     }
