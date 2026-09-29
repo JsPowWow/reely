@@ -3,48 +3,34 @@ import { SourceView } from '../../demo/source.view';
 import { measured } from '../../site/measurements';
 import { SiteHeader } from '../../site/site.header';
 import { Counter } from '../docs/demos/first.counter';
-import { trackLap } from './lap.progress';
+import { landingExamples } from './landing.examples';
 import css from './landing.module.css';
-import { lapSectors } from './landing.sectors';
 
-import type { LapSector } from './landing.sectors';
+import type { LandingExample } from './landing.examples';
 
-const Sector = ({ sector, number }: { sector: LapSector; number: number }): Node => (
-  <section id={sector.id} className={css.sector} aria={{ ariaLabelledby: `${sector.id}-title` }}>
-    <header className={css.sectorHeading}>
-      <h2 id={`${sector.id}-title`} className={css.sectorTitle}>
-        <span className={css.sectorNumber}>S{number}</span> {sector.name}
+const Example = ({ example }: { example: LandingExample }): Node => (
+  <section id={example.id} className={css.example} aria={{ ariaLabelledby: `${example.id}-title` }}>
+    <header className={css.exampleHeading}>
+      <h2 id={`${example.id}-title`} className={css.exampleTitle}>
+        {example.title}
       </h2>
-      <p className={css.claim}>{sector.claim}</p>
-      <p className={css.split}>
-        <span className='visually-hidden'>Split: </span>
-        {sector.split}
-      </p>
+      <p className={css.claim}>{example.claim}</p>
     </header>
     <div className={css.panels}>
       <MutationMeter>
-        <sector.Demo />
+        <example.Demo />
       </MutationMeter>
-      <SourceView source={sector.source} caption={sector.file} />
+      <SourceView source={example.source} caption={example.file} />
     </div>
   </section>
 );
 
 /**
- * The landing page: one lap of reely. The start straight says what it is, four sectors prove it
- * live, and the finish gives the times and the way into the docs.
+ * The landing page: what reely is, four live examples with their DOM writes counted, then the
+ * size and speed and the way into the docs.
  */
-const finishId = 'finish';
-
-/** The sector bar: every sector, then the finish, each with the split it posts once driven. */
-const segments = [
-  ...lapSectors.map((sector, index) => ({ id: sector.id, number: `S${index + 1}`, name: sector.name, mark: sector.mark })),
-  { id: finishId, number: 'F', name: 'Finish', mark: measured.wholePackage },
-];
-
 export const LandingPage = (): Node => {
   document.title = 'reely: real DOM, one write per change';
-  const fills = trackLap(segments.map((segment) => segment.id));
 
   return (
     <>
@@ -65,7 +51,7 @@ export const LandingPage = (): Node => {
               </a>
               <code className={css.install}>npm i @reely/dommy@next</code>
             </div>
-            <p className={css.builtWith}>This site is built with reely, the sector bar below included.</p>
+            <p className={css.builtWith}>This page, its examples and their write counters are built with reely.</p>
           </div>
           <div className={css.startDemo}>
             <MutationMeter>
@@ -73,35 +59,13 @@ export const LandingPage = (): Node => {
             </MutationMeter>
           </div>
         </section>
-        <nav className={css.sectorBar} aria={{ ariaLabel: 'The lap' }}>
-          <ol className={css.segments}>
-            {segments.map((segment, index) => {
-              const fill = (): number => fills[index]?.() ?? 0;
-              return (
-                <li>
-                  <a
-                    className={css.segment}
-                    href={`#${segment.id}`}
-                    data-driven={() => String(fill() === 1)}
-                    styles={{ '--fill': () => String(fill()) }}
-                  >
-                    <span className={css.segmentNumber}>{segment.number}</span>
-                    <span className={css.segmentName}>{segment.name}</span>
-                    <span className={css.segmentMark}>{segment.mark}</span>
-                    <span className={css.track} aria={{ ariaHidden: 'true' }} />
-                  </a>
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
-        {lapSectors.map((sector, index) => (
-          <Sector sector={sector} number={index + 1} />
+        {landingExamples.map((example) => (
+          <Example example={example} />
         ))}
-        <section id={finishId} className={css.finish} aria={{ ariaLabelledby: 'finish-title' }}>
-          <div className={css.finishInner}>
-            <h2 id='finish-title' className={css.finishTitle}>
-              Finish
+        <section id='numbers' className={css.numbers} aria={{ ariaLabelledby: 'numbers-title' }}>
+          <div className={css.numbersInner}>
+            <h2 id='numbers-title' className={css.numbersTitle}>
+              Size and speed
             </h2>
             <table className={css.times}>
               <caption className='visually-hidden'>Size, minified and gzipped, and speed</caption>
@@ -119,17 +83,14 @@ export const LandingPage = (): Node => {
                   <td>{measured.wholePackage}</td>
                 </tr>
                 <tr>
-                  <th scope='row'>A lap of a 500-row board, median in headless Chrome</th>
+                  <th scope='row'>Re-sorting a 500-row list, median in headless Chrome</th>
                   <td>{measured.lapMedian}</td>
                 </tr>
               </tbody>
             </table>
-            <p className={css.finishNote}>
+            <p className={css.numbersNote}>
               Measured on the npm tarball, bundled with esbuild. Time the 500 rows in your own browser on{' '}
               <a href='/docs/performance'>Size and speed</a>.
-            </p>
-            <p className={css.finishBuilt}>
-              Every page of this site, every demo and every write counter is built with @reely/dommy.
             </p>
             <div className={css.actions}>
               <a className={css.primary} href='/docs'>

@@ -39,7 +39,7 @@ No virtual DOM and no re-render: tag factories and JSX return real DOM nodes, a 
 - The name on the site is reely; the library users install is `@reely/dommy`. "free-dom" is only the app's name inside the repo and does not appear as a brand.
 - Author: JsPowWow; source at https://github.com/JsPowWow/reely.
 - Voice: plain and precise, like a good engineer explaining their own code to a teammate.
-- The visual world is race timing: asphalt ground, graphite ink, signal yellow and flag red, a condensed display face; the landing page is the same world, bolder.
+- The visual world is a race-timing screen: asphalt ground, graphite ink, signal yellow and flag red, a condensed display face. The landing page keeps the look but tells no race story: plain headings, four live examples, the numbers.
 
 ## Evidence on Hand
 

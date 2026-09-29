@@ -1,0 +1,120 @@
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.note {
+  margin: 0;
+  color: var(--slate);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The one filled button of a demo: the action it is about. */
+.solid {
+  padding: 0.75rem 1.25rem;
+  border: 1px solid var(--graphite);
+  border-radius: 4px;
+  background: var(--graphite);
+  color: var(--asphalt);
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.solid:hover {
+  background: var(--slate);
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--slate);
+  font-weight: 700;
+}
+
+.field input,
+.item input {
+  min-width: 0;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--slate);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--graphite);
+  font: inherit;
+  font-weight: 400;
+}
+
+.field input::placeholder,
+.item input::placeholder {
+  color: var(--slate);
+}
+
+/* The preview the input writes into: a name plate in the display face. */
+.badge {
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  border-radius: 4px;
+  background: var(--signal);
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.list {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: row;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem 0.35rem 0.35rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.title {
+  font-weight: 700;
+}
+
+.results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.results code {
+  display: block;
+  padding: 0.3rem 0.55rem;
+  border-radius: 3px;
+  background: var(--graphite);
+  color: var(--code-text);
+  font-family: var(--mono);
+  font-size: 0.9375rem;
+}
+
+@media (max-width: 30em) {
+  .item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
