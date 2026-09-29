@@ -321,6 +321,37 @@ effect(() => console.log(phone.value, theme.value, width.value));
 - `later(ms, fn)` runs `fn` once after `ms`, unless the view is disposed or the effect runs again first; it returns its own cancel. `later(0, fn)` runs after the render is in the document.
 - `flip(container, change)` animates the children `change` moved, not those it added; nothing moves under reduced motion.
 
+## State machines
+
+A machine of [`@reely/state-machine`](../state-machine/README.md) has no signals of its own; a signal that follows its `stateChanged` makes the view follow it. Create it while rendering, so `onCleanup` unsubscribes with the view:
+
+```tsx
+import { Keyed, onCleanup, signal } from '@reely/dommy';
+import type { Signal } from '@reely/dommy';
+import type { IStateMachine, StateMachineMode, StateMachineTypes } from '@reely/state-machine';
+
+const stateOf = <M extends StateMachineTypes, Mode extends StateMachineMode>(
+  machine: IStateMachine<M, Mode>
+): Signal<M['state']> => {
+  const state = signal(machine.state);
+  onCleanup(machine.on('stateChanged', ({ to }) => (state.value = to)));
+  return state;
+};
+
+// `final` is the machine from the README of @reely/state-machine
+const Race = (): Node => {
+  const phase = stateOf(final);
+  return (
+    <section>
+      <button onClick={() => final.send('play')}>{() => (phase.value === 'running' ? 'Pause' : 'Play')}</button>
+      <Keyed value={phase}>{(now) => <PhaseView name={now} />}</Keyed>
+    </section>
+  );
+};
+```
+
+A transition to the same state leaves the signal as it is. What the view shows of the context is best kept in signals inside the context itself: actions write them, and the view reads them as any other signal.
+
 ## Advanced topics
 
 The pitfalls [VanJS lists](https://vanjs.org/advanced), and how each one goes in reely. Each answer is checked in `src/lib/advanced.topics.spec.tsx`.
