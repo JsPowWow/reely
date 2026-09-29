@@ -38,7 +38,9 @@ describe('forEachSettled', () => {
       );
 
     expect(settle).toThrow(AggregateError);
-    expect(settle).toThrow(expect.objectContaining({ errors: [first, second], message: 'connections failed to close' }));
+    expect(settle).toThrow(
+      expect.objectContaining({ errors: [first, second], message: 'connections failed to close' })
+    );
   });
 
   it('says how many calls threw when no message is given', () => {
@@ -60,5 +62,20 @@ describe('forEachSettled', () => {
     forEachSettled(laps(), (lap) => seen.push(lap));
 
     expect(seen).toStrictEqual([1, 1, 1, 2]);
+  });
+
+  it('keeps the errors of the calls made before the items themselves threw, that error last', () => {
+    const broken = new Error('broken');
+    const exhausted = new Error('no more laps');
+    function* laps(): Generator<number> {
+      yield 1;
+      throw exhausted;
+    }
+
+    expect(() =>
+      forEachSettled(laps(), () => {
+        throw broken;
+      })
+    ).toThrow(expect.objectContaining({ errors: [broken, exhausted] }));
   });
 });
