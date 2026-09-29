@@ -13,12 +13,12 @@ Each `set` makes a new object with the fields given, and notifies, even when the
 ```ts
 import { ObjectStore } from '@reely/simple-store';
 
-const race = new ObjectStore({ lap: 0, leader: 'Ada' });
+const cart = new ObjectStore({ items: 0, coupon: '' });
 
-race.on('changed', ({ lap, leader }) => console.log(`lap ${lap}: ${leader}`));
-race.set({ lap: 1 }); // { lap: 1, leader: 'Ada' }
-race.set(({ lap }) => ({ lap: lap + 1 })).set({ leader: 'Linus' }); // `set` returns the store
-race.get(); // { lap: 2, leader: 'Linus' }
+cart.on('changed', ({ items }) => (badge.textContent = String(items)));
+cart.set({ items: 1 }); // { items: 1, coupon: '' }
+cart.set(({ items }) => ({ items: items + 1 })).set({ coupon: 'SPRING10' }); // `set` returns the store
+cart.get(); // { items: 2, coupon: 'SPRING10' }
 ```
 
 It holds a plain object only; anything else throws a `TypeError` at creation.
@@ -30,11 +30,11 @@ A value that notifies when a different one (by `Object.is`) is set.
 ```ts
 import { PrimitiveStore } from '@reely/simple-store';
 
-const speed = new PrimitiveStore(120);
+const volume = new PrimitiveStore(40);
 
-speed.on('changed', (value) => console.log(`${value} km/h`));
-speed.value = 130; // notifies
-speed.value = 130; // the same value: nothing
+volume.on('changed', (percent) => (player.volume = percent / 100));
+volume.value = 65; // notifies
+volume.value = 65; // the same value: nothing
 ```
 
 ## Listeners
@@ -46,13 +46,13 @@ speed.value = 130; // the same value: nothing
 `select` makes a read-only store of a part of the value. It notifies only when that part changes, by `Object.is` or the `equals` you pass, and follows its store only while it has listeners.
 
 ```ts
-const leader = race.select(({ leader }) => leader);
-leader.on('changed', (name) => console.log(`${name} leads`)); // not on a new lap
-leader.value; // 'Linus'
+const coupon = cart.select(({ coupon }) => coupon);
+coupon.on('changed', (code) => checkCoupon(code)); // not when an item is added
+coupon.value; // 'SPRING10'
 
-const board = race.select(
-  ({ lap, leader }) => ({ lap, leader }),
-  (a, b) => a.lap === b.lap && a.leader === b.leader
+const summary = cart.select(
+  ({ items, coupon }) => ({ items, discounted: coupon !== '' }),
+  (before, after) => before.items === after.items && before.discounted === after.discounted
 );
 ```
 
