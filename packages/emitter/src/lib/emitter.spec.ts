@@ -153,6 +153,18 @@ describe('EventEmitter', () => {
     expect(lap).toHaveBeenCalledOnce();
   });
 
+  it('takes events named like the members of `Object.prototype`', () => {
+    const channel = new EventEmitter<{ constructor: number; toString: number }>();
+    const heard = vi.fn();
+
+    expect(channel.hasListener('constructor')).toBe(false);
+    channel.emit('toString', 1);
+    channel.on('constructor', heard);
+    channel.emit('constructor', 2);
+
+    expect(heard).toHaveBeenCalledExactlyOnceWith(2);
+  });
+
   it('removes every listener with `clearAllListeners`', () => {
     const race = new EventEmitter<RaceEvents>();
     const lap = vi.fn();

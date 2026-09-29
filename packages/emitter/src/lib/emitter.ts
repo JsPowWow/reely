@@ -2,7 +2,8 @@ import { forEachSettled, isSomeFunction } from '@reely/basics';
 
 import type { EventArguments, EventData, EventsMap, EventType, IEventEmitter, Listener, Unsubscribe } from './types';
 
-type AnyListener = Listener<unknown>;
+// method parameters compare both ways, so a listener of any event fits; `emit` passes each one its event's data
+type AnyListener = { call(data: unknown): void }['call'];
 
 /** Lets a stale `Unsubscribe` leave a later subscription of the same listener alone. */
 type Subscription = object;
@@ -18,7 +19,7 @@ export class EventEmitter<Events extends EventsMap> implements IEventEmitter<Eve
     event: Event,
     listener: Listener<EventData<Events, Event>>
   ): Unsubscribe => {
-    if (!isSomeFunction<AnyListener>(listener)) {
+    if (!isSomeFunction(listener)) {
       throw new TypeError(`The listener of "${event}" is not a function`);
     }
     const subscriptions = this.listeners.get(event) ?? new Map<AnyListener, Subscription>();
@@ -32,8 +33,11 @@ export class EventEmitter<Events extends EventsMap> implements IEventEmitter<Eve
     };
   };
 
-  public readonly off = <Event extends EventType<Events>>(event: Event, listener: Listener<EventData<Events, Event>>): void => {
-    if (isSomeFunction<AnyListener>(listener)) {
+  public readonly off = <Event extends EventType<Events>>(
+    event: Event,
+    listener: Listener<EventData<Events, Event>>
+  ): void => {
+    if (isSomeFunction(listener)) {
       this.remove(event, listener);
     }
   };
