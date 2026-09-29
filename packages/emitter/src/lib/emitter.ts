@@ -1,9 +1,10 @@
 import { forEachSettled, isSomeFunction } from '@reely/basics';
+import type { Bivariant } from '@reely/utils';
 
 import type { EventArguments, EventData, EventsMap, EventType, IEventEmitter, Listener, Unsubscribe } from './types';
 
-// method parameters compare both ways, so a listener of any event fits; `emit` passes each one its event's data
-type AnyListener = { call(data: unknown): void }['call'];
+// `emit` passes each listener the data of its own event
+type AnyListener = Bivariant<Listener<unknown>>;
 
 /** Lets a stale `Unsubscribe` leave a later subscription of the same listener alone. */
 type Subscription = object;

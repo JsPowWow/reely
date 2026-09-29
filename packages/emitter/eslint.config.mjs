@@ -12,6 +12,8 @@ export default [
             '{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}',
             '{projectRoot}/vite.config.{js,ts,mjs,mts}',
           ],
+          // a type of a private field only: it leaves neither the JS nor the .d.ts
+          ignoredDependencies: ['@reely/utils'],
         },
       ],
     },
