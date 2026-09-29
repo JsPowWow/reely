@@ -43,7 +43,7 @@ No virtual DOM and no re-render: tag factories and JSX return real DOM nodes, a 
 
 ## Evidence on Hand
 
-- Sizes, gzip, measured on the packed tarball with esbuild: an app that uses only signals ships 1.3 kB of dommy; a typical JSX app with `For`, `Show` and `mount` 4.7 kB; the whole package 6.6 kB. No runtime dependencies.
+- Sizes, gzip, measured on the packed tarball with esbuild: an app that uses only signals ships 1.5 kB of dommy; a typical JSX app with `For`, `Show` and `mount` 4.6 kB; the whole package 6.7 kB. No runtime dependencies.
 - Speed: not quoted as a number (a headless-browser figure says nothing about the reader's machine); the performance page times a 500-row keyed board live in the visitor's own browser.
 - The live demos and their DOM-write counts: `apps/free-dom/src/pages/`.
 - The library source and its tests: `packages/dommy`; first real consumer: JsPowWow/ai-race.

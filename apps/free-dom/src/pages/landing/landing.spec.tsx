@@ -47,7 +47,7 @@ describe('LandingPage', () => {
     const examples = landingExamples.map(({ id }) => section(host, id));
 
     expect(examples.every((example) => example.querySelector('figure') && example.querySelector('pre'))).toBe(true);
-    expect(section(host, 'numbers').querySelector('td')?.textContent).toBe('1.3 kB');
+    expect(section(host, 'numbers').querySelector('td')?.textContent).toBe('1.5 kB');
   });
 
   it('animates the button a factory returned, and writes nothing to the DOM for it', async () => {
