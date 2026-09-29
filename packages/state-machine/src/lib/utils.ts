@@ -1,5 +1,5 @@
 import type { EventsMap, EventType } from '@reely/emitter';
-import { hasSome, isSomeFunction } from '@reely/utils';
+import { hasSome } from '@reely/utils';
 
 import type { StateMachineState, StateMachineTransitionAction, StateMachineTransitionActionEffect } from './types';
 
@@ -58,9 +58,22 @@ type MatchActionHelper<
 > = {
   when: <T extends EventType<Transitions>, S extends State>(
     pattern: { by?: T; to?: S },
-    f: StateMachineTransitionActionEffect<Transitions, S, Context, S, T>
+    f: StateMachineTransitionActionEffect<Transitions, State, Context, S, T>
   ) => MatchActionHelper<State, Transitions, Context>;
 };
+
+function isActionOf<
+  State extends StateMachineState,
+  Transitions extends EventsMap,
+  Context extends NonNullable<unknown>,
+  S extends State,
+  T extends EventType<Transitions>
+>(
+  pattern: { by?: T; to?: S },
+  action: StateMachineTransitionAction<Transitions, State, Context>
+): action is StateMachineTransitionAction<Transitions, State, Context, S, T> {
+  return (!('by' in pattern) || action.by === pattern.by) && (!('to' in pattern) || action.to === pattern.to);
+}
 
 export function matchAction<
   State extends StateMachineState,
@@ -70,32 +83,13 @@ export function matchAction<
   action: StateMachineTransitionAction<Transitions, State, Context, State>
 ): MatchActionHelper<State, Transitions, Context> {
   const matcher: MatchActionHelper<State, Transitions, Context> = {
-    when: function (pattern, f): typeof this {
-      const hasBy = 'by' in pattern;
-      const matchedWithBy = hasBy && hasSome(action) && action.by === pattern.by;
-      const hasStateTo = 'to' in pattern;
-      const matchedWithTo = hasStateTo && hasSome(action) && action.to === pattern.to;
-
-      if (
-        hasSome<
-          StateMachineTransitionAction<
-            Transitions,
-            NonNullable<typeof pattern.to>,
-            Context,
-            NonNullable<typeof pattern.to>,
-            NonNullable<typeof pattern.by>
-          >
-        >(action) &&
-        (!hasBy || matchedWithBy) &&
-        (!hasStateTo || matchedWithTo)
-      ) {
+    when: (pattern, f) => {
+      if (isActionOf(pattern, action)) {
         f(action);
       }
-      return this;
+      return matcher;
     },
   };
-
-  matcher.when = matcher.when.bind(matcher);
   return matcher;
 }
 
@@ -106,7 +100,7 @@ type ActionEffectRunner<
 > = {
   when: <T extends EventType<Transitions>, S extends State>(
     pattern: { by?: T; to?: S },
-    f: StateMachineTransitionActionEffect<Transitions, State, Context, State, T>
+    f: StateMachineTransitionActionEffect<Transitions, State, Context, S, T>
   ) => ActionEffectRunner<State, Transitions, Context>;
   invokeAction: (a: StateMachineTransitionAction<Transitions, State, Context, State>) => void;
 };
@@ -116,41 +110,20 @@ export const runActionEffect = <
   Transitions extends EventsMap,
   Context extends NonNullable<unknown>
 >(): ActionEffectRunner<State, Transitions, Context> => {
-  const listeners = new Map<{ by?: EventType<Transitions>; to?: State }, CallableFunction>();
+  const effects: StateMachineTransitionActionEffect<Transitions, State, Context>[] = [];
 
   const runner: ActionEffectRunner<State, Transitions, Context> = {
-    when: function (pattern, f): typeof this {
-      listeners.set(pattern, f);
-      return this;
-    },
-    invokeAction: function (action: StateMachineTransitionAction<Transitions, State, Context, State>): void {
-      listeners.forEach((listener, pattern) => {
-        if (isSomeFunction(listener)) {
-          const hasBy = 'by' in pattern;
-          const matchedWithBy = hasBy && hasSome(action) && action.by === pattern.by;
-          const hasStateTo = 'to' in pattern;
-          const matchedWithTo = hasStateTo && hasSome(action) && action.to === pattern.to;
-          if (
-            hasSome<
-              StateMachineTransitionAction<
-                Transitions,
-                NonNullable<typeof pattern.to>,
-                Context,
-                NonNullable<typeof pattern.to>,
-                NonNullable<typeof pattern.by>
-              >
-            >(action) &&
-            (!hasBy || matchedWithBy) &&
-            (!hasStateTo || matchedWithTo)
-          ) {
-            listener(action);
-          }
+    when: (pattern, f) => {
+      effects.push((action) => {
+        if (isActionOf(pattern, action)) {
+          f(action);
         }
       });
+      return runner;
+    },
+    invokeAction: (action) => {
+      effects.forEach((effect) => effect(action));
     },
   };
-
-  runner.when = runner.when.bind(runner);
-  runner.invokeAction = runner.invokeAction.bind(runner);
   return runner;
 };

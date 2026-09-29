@@ -1,7 +1,6 @@
 import type { EventsMap, EventType } from '@reely/emitter';
 import { EventEmitter } from '@reely/emitter';
 import { AsyncQueue } from '@reely/queue';
-import type { AnyFunction } from '@reely/utils';
 import { hasProperty, isKeyValueObject, isPromise, isSomeFunction, isString, toErrorWithMessage } from '@reely/utils';
 
 import type {
@@ -113,7 +112,7 @@ export class StateMachine<
         );
       }
 
-      if (isSomeFunction<AnyFunction>(destination)) {
+      if (isSomeFunction(destination)) {
         const destinationTransition = destination({
           from: previousState,
           by: transition,
