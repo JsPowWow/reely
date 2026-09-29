@@ -5,17 +5,17 @@ Real DOM from tag factories and JSX, bound to signals. There is no virtual DOM a
 ```tsx
 import { mount, signal } from '@reely/dommy';
 
-const count = signal(0);
+const message = signal('');
 
 mount(document.body, () => (
-  <p>
-    <button onClick={() => (count.value += 1)}>+1</button>
-    <output>{count}</output>
-  </p>
+  <label>
+    <textarea maxLength={280} onInput={(event) => message.set(event.currentTarget.value)} />
+    <output>{() => 280 - message.value.length}</output> characters left
+  </label>
 ));
 ```
 
-Each click changes the text of one text node inside `<output>`; nothing else in the page is touched.
+Each keystroke changes the text of one text node inside `<output>`; nothing else in the page is touched.
 
 ## Install
 
@@ -58,9 +58,9 @@ const same = (
 ```
 
 - Props are DOM property names: `className`, `htmlFor`, `tabIndex`, and lowercase where the DOM has them so: `autocomplete`, `autofocus`. `value`, `checked` and other live state are set as properties, after the children, so `<select value="b">` selects its option `b`; attributes go before them.
-- `list` and `form`, which the DOM types as elements, take an id: `<input list="cars" />`.
+- `list` and `form`, which the DOM types as elements, take an id: `<input list="cities" />`.
 - `styles={{ marginTop: '1rem', '--accent': 'red' }}` sets inline styles, custom properties included.
-- `aria={{ role: 'status', ariaLabel: 'Score' }}` sets `role` and `aria-*` attributes.
+- `aria={{ role: 'status', ariaLabel: 'Cart total' }}` sets `role` and `aria-*` attributes.
 - Handler props take a function, named the DOM way (`onkeydown`) or in camelCase with every word capitalised, as in React (`onKeyDown`, `onPointerMove`; `dblclick` is `onDblClick`). The event and `event.currentTarget` are typed by the element. A string is never rendered as an inline handler.
 - `elementRef` gets the element: an object from `createObjectReference()` or a function `(element) => void`.
 - Text is always inserted as text, so user input cannot become markup.
@@ -75,11 +75,11 @@ A JSX expression is always a `Node`, ready for `append`. A tag gives its element
 import { signal } from '@reely/dommy';
 import type { ReelyNode } from '@reely/dommy';
 
-const laps = signal(0);
+const unread = signal(3);
 const Link = ({ href, children }: { href: string; children?: ReelyNode }): Node => <a href={href}>{children}</a>;
-const Laps = (): ReelyNode => () => `${laps.value} laps`;
+const Unread = (): ReelyNode => () => `Inbox (${unread.value})`;
 
-document.body.append(<Link href="/race"><Laps /></Link>);
+document.body.append(<Link href="/inbox"><Unread /></Link>);
 ```
 
 A component is a plain function, so it can be called as one: `mount(el, () => Card({ file }))` is `<Card file={file} />`.
@@ -91,21 +91,21 @@ A fragment, whether from such a component, `<>…</>`, `Show`, `Keyed`, `Await` 
 ```ts
 import { batch, computed, effect, signal, untracked } from '@reely/dommy';
 
-const laps = signal(0);
-const done = computed(() => laps.value >= 3);
+const tickets = signal(1);
+const total = computed(() => tickets.value * 12.5); // euros
 
-effect(() => console.log(`lap ${laps.value}`)); // runs now, then after every change
+effect(() => console.log(`Pay €${total.value}`)); // runs now, then after every change
 batch(() => {
-  laps.value += 1; // effects run once, when the batch ends
-  laps.value += 1;
+  tickets.value += 1; // effects run once, when the batch ends
+  tickets.value += 1;
 });
-untracked(() => laps.value); // reads without subscribing; same as `laps.peek()`
+untracked(() => tickets.value); // reads without subscribing; same as `tickets.peek()`
 
 // the style of Angular works as well: a signal and a computed are functions
-laps(); // reads, as `laps.value` does
-laps.set(3); // writes, as `laps.value = 3` does
-laps.update((n) => n + 1); // writes from the value, read without subscribing
-done(); // a computed reads the same way
+tickets(); // reads, as `tickets.value` does
+tickets.set(4); // writes, as `tickets.value = 4` does
+tickets.update((n) => n + 1); // writes from the value, read without subscribing
+total(); // a computed reads the same way
 ```
 
 Pick the style you like; the two mix freely.
@@ -117,11 +117,14 @@ Each run of an effect has its own owner: `onCleanup` inside it runs before the n
 ```ts
 import { effect, onCleanup, signal } from '@reely/dommy';
 
-const lap = signal(1);
+const draft = signal('');
+const typing = signal(false); // shows "typing…" to the other side of a chat
 
 effect(() => {
-  const timer = setTimeout(() => console.log(`lap ${lap.value} is slow`), 30_000);
-  onCleanup(() => clearTimeout(timer)); // the next lap, or dispose, cancels it
+  if (draft.value === '') return;
+  typing.value = true;
+  const timer = setTimeout(() => (typing.value = false), 2000);
+  onCleanup(() => clearTimeout(timer)); // the next keystroke, or dispose, cancels it
 });
 ```
 
@@ -132,12 +135,12 @@ A signal, or any function, in a child or a prop (other than `on*`) is bound: whe
 ```tsx
 import { signal } from '@reely/dommy';
 
-const speed = signal(120);
+const uploaded = signal(0); // percent
 
-const gauge = (
-  <meter value={speed} max={300} className={() => (speed.value > 200 ? 'fast' : 'slow')}>
-    {() => `${speed.value} km/h`}
-  </meter>
+const progress = (
+  <progress value={uploaded} max={100} className={() => (uploaded.value === 100 ? 'done' : 'uploading')}>
+    {() => `${uploaded.value}%`}
+  </progress>
 );
 ```
 
@@ -150,30 +153,30 @@ A function child renders text; to switch between nodes, use `Show` or `Keyed`. T
 ```tsx
 import { For, signal } from '@reely/dommy';
 
-interface Racer {
+interface Track {
   id: string;
-  name: string;
-  lap: number;
+  title: string;
+  plays: number;
 }
 
-const racers = signal<readonly Racer[]>([]);
+const playlist = signal<readonly Track[]>([]);
 
-const board = (
+const tracks = (
   <ol>
-    <For each={racers} by={(racer) => racer.id}>
-      {(racer, index) => (
-        <li className={() => (index() === 0 ? 'leader' : '')}>
-          {() => racer().name} — lap {() => racer().lap}
+    <For each={playlist} by={(track) => track.id}>
+      {(track, index) => (
+        <li className={() => (index() === 0 ? 'up-next' : '')}>
+          {() => track().title} ({() => track().plays} plays)
         </li>
       )}
     </For>
   </ol>
 );
 
-racers.value = [...racers.value].sort((x, y) => y.lap - x.lap); // moves rows, rewrites changed text
+playlist.value = [...playlist.value].sort((one, other) => other.plays - one.plays); // most played first: moves rows, rewrites changed text
 ```
 
-`racer()` and `index()` follow later updates of that key.
+`track()` and `index()` follow later updates of that key.
 
 ## Conditions
 
@@ -182,25 +185,27 @@ racers.value = [...racers.value].sort((x, y) => y.lap - x.lap); // moves rows, r
 ```tsx
 import { Show, signal } from '@reely/dommy';
 
-const winner = signal<string | null>(null);
+const online = signal(navigator.onLine);
+addEventListener('online', () => online.set(true));
+addEventListener('offline', () => online.set(false));
 
-const banner = (
-  <Show when={winner} fallback={() => <p>Racing…</p>}>
-    {() => <p>Winner: {winner}</p>}
+const status = (
+  <Show when={online} fallback={() => <p role="alert">You are offline. Changes will sync when you are back.</p>}>
+    {() => <p>All changes saved</p>}
   </Show>
 );
 ```
 
-`Show` keeps its branch while the truthiness stays. `Keyed` builds the branch anew, with new state, whenever the value changes: the review form of another participant, the card of another file.
+`Show` keeps its branch while the truthiness stays. `Keyed` builds the branch anew, with new state, whenever the value changes: the notes on another contact, the card of another file.
 
 ```tsx
 import { Keyed, signal } from '@reely/dommy';
 
-const reviewer = signal('Ada');
+const contact = signal('Maria Silva');
 
-const review = <Keyed value={reviewer}>{(name) => <textarea placeholder={`Review by ${name}`} />}</Keyed>;
+const notes = <Keyed value={contact}>{(name) => <textarea placeholder={`Notes on ${name}`} />}</Keyed>;
 
-reviewer.value = 'Linus'; // a new, empty textarea
+contact.value = 'Kenji Watanabe'; // a new, empty textarea
 ```
 
 ## Async
@@ -210,18 +215,19 @@ reviewer.value = 'Linus'; // a new, empty textarea
 ```tsx
 import { Await } from '@reely/dommy';
 
-interface Final {
-  winner: string;
-  laps: number;
+interface Forecast {
+  city: string;
+  celsius: number;
+  sky: string;
 }
 
-const loadFinal = (): Promise<Final> => fetch('/final.json').then((response) => response.json());
+const loadForecast = (): Promise<Forecast> => fetch('/api/forecast?city=Lisbon').then((response) => response.json());
 
-const result = (
-  <Await promise={loadFinal()} fallback={() => <p>Loading the final…</p>} catch={(error) => <p>{error.message}</p>}>
-    {(final) => (
+const today = (
+  <Await promise={loadForecast()} fallback={() => <p>Checking the sky…</p>} catch={(error) => <p>{error.message}</p>}>
+    {(forecast) => (
       <p>
-        {final.winner} wins after {final.laps} laps
+        {forecast.city}: {forecast.celsius} °C, {forecast.sky}
       </p>
     )}
   </Await>
@@ -233,30 +239,31 @@ const result = (
 ```tsx
 import { Await, signal } from '@reely/dommy';
 
-const loadLap = (lap: number): Promise<string[]> => fetch(`/laps/${lap}.json`).then((response) => response.json());
+const loadOrders = (page: number): Promise<string[]> =>
+  fetch(`/api/orders?page=${page}`).then((response) => response.json());
 
-const lap = signal(1);
+const page = signal(1);
 
-const standings = (
+const orders = (
   <Await
-    promise={() => loadLap(lap.value)}
-    fallback={() => <p>Loading lap {lap}…</p>}
-    catch={(error) => <p>Lap {lap} did not load: {error.message}</p>}
+    promise={() => loadOrders(page.value)}
+    fallback={() => <p>Loading page {page}…</p>}
+    catch={(error) => <p>Page {page} did not load: {error.message}</p>}
   >
-    {(cars) => (
-      <ol>
-        {cars.map((car) => (
-          <li>{car}</li>
+    {(orderIds) => (
+      <ul>
+        {orderIds.map((id) => (
+          <li>Order {id}</li>
         ))}
-      </ol>
+      </ul>
     )}
   </Await>
 );
 
-lap.value = 2; // the fallback again, then lap 2; a late answer for lap 1 is dropped
+page.value = 2; // the fallback again, then page 2; a late answer for page 1 is dropped
 ```
 
-`promise={loadFinal}` starts the load when the view renders. A getter that throws counts as a rejection (`Await` calls it through `Promise.try`, in every browser since 2025). To retry, read a signal in the getter and change it. To wait for several promises under one fallback, give `Await` their `Promise.all`.
+`promise={loadForecast}` starts the load when the view renders. A getter that throws counts as a rejection (`Await` calls it through `Promise.try`, in every browser since 2025). To retry, read a signal in the getter and change it. To wait for several promises under one fallback, give `Await` their `Promise.all`.
 
 ## Mount and clean up
 
@@ -285,11 +292,12 @@ SVG-only tags are created in the SVG namespace, in JSX and with factories (`svg`
 ```tsx
 import { signal } from '@reely/dommy';
 
-const dot = signal('red');
+const goal = signal(0.4); // the share of today's steps goal
 
-const icon = (
-  <svg viewBox="0 0 24 24" className="icon">
-    <circle cx={12} cy={12} r={10} fill={dot} stroke-width={2} />
+const ring = (
+  <svg viewBox="0 0 36 36" className="goal">
+    <circle cx={18} cy={18} r={15.9} fill="none" stroke="#e5e7eb" stroke-width={3} />
+    <circle cx={18} cy={18} r={15.9} fill="none" stroke="#16a34a" stroke-width={3} stroke-dasharray={() => `${goal.value * 100} 100`} />
   </svg>
 );
 ```
@@ -349,14 +357,14 @@ const stateOf = <State,>(machine: Followed<State>): Signal<State> => {
   return state;
 };
 
-type Phase = 'ready' | 'running' | 'paused';
+type Playback = 'stopped' | 'playing' | 'paused';
 
-const Race = ({ final }: { final: Followed<Phase> & { send(type: 'play'): unknown } }): Node => {
-  const phase = stateOf(final);
+const Player = ({ player }: { player: Followed<Playback> & { send(type: 'toggle'): unknown } }): Node => {
+  const playback = stateOf(player);
   return (
     <section>
-      <button onClick={() => final.send('play')}>{() => (phase() === 'running' ? 'Pause' : 'Play')}</button>
-      <Keyed value={phase}>{(now) => <p className={now}>{now}</p>}</Keyed>
+      <button onClick={() => player.send('toggle')}>{() => (playback() === 'playing' ? 'Pause' : 'Play')}</button>
+      <Keyed value={playback}>{(now) => <span className={`badge ${now}`}>{now}</span>}</Keyed>
     </section>
   );
 };
@@ -385,13 +393,13 @@ A bound child is text: `{name}` writes `name.value` into one text node. TypeScri
 ```tsx
 import { Show, signal } from '@reely/dommy';
 
-const bold = signal(false);
+const onSale = signal(false);
 
-const welcome = (
+const price = (
   <p>
-    Welcome to{' '}
-    <Show when={bold} fallback={() => 'reely'}>
-      {() => <b>reely</b>}
+    Price:{' '}
+    <Show when={onSale} fallback={() => '€40'}>
+      {() => <mark>€32 on sale</mark>}
     </Show>
   </p>
 );
@@ -404,24 +412,24 @@ A binding runs again when any signal it read changes, so a signal of a whole obj
 ```ts
 import { computed, signal } from '@reely/dommy';
 
-const settings = signal({ theme: 'dark', laps: 5 });
-const theme = computed(() => settings.value.theme); // a new `laps` does not reach theme bindings
+const profile = signal({ name: 'Maria Silva', avatarUrl: '/avatars/maria.png' });
+const name = computed(() => profile.value.name); // a new avatar does not reach name bindings
 ```
 
 ### The scope of DOM updates
 
-The problem VanJS describes (a binding function that rebuilds a whole `<p>` on every keystroke) has no counterpart here: a function child renders text only, and `Show` keeps its branch while the truthiness of `when` stays, so typing a name rewrites only the text node bound to it:
+The problem VanJS describes (a binding function that rebuilds a whole `<p>` on every keystroke) has no counterpart here: a function child renders text only, and `Show` keeps its branch while the truthiness of `when` stays, so typing a code rewrites only the text node bound to it:
 
 ```tsx
 import { Show, signal } from '@reely/dommy';
 
-const name = signal('');
+const coupon = signal('');
 
-const greeting = (
-  <Show when={() => name.value.trim() !== ''} fallback={() => <p>Enter your name</p>}>
+const hint = (
+  <Show when={() => coupon.value.trim() !== ''} fallback={() => <p>Have a coupon? Enter it above.</p>}>
     {() => (
       <p>
-        Hello <b>{name}</b>
+        <b>{coupon}</b> will be applied at checkout
       </p>
     )}
   </Show>
@@ -430,7 +438,7 @@ const greeting = (
 
 ### Conditional bindings
 
-A binding, `computed` or `effect` depends on the signals its last run read. `() => (formula.value === 'a + b' ? a.value + b.value : c.value)` does not run for `c` while the formula is `a + b`, and stops running for `a` and `b` once it is `c`.
+A binding, `computed` or `effect` depends on the signals its last run read. `` () => (delivery.value === 'pickup' ? 'Free' : `€${shipping.value}`) `` does not run for `shipping` while the delivery is `pickup`, and runs for it again once it is not.
 
 ### Advanced state derivation
 
@@ -440,17 +448,17 @@ An effect can write several signals from one source, and the kit covers the time
 import { effect, signal } from '@reely/dommy';
 import { later } from '@reely/dommy/kit';
 
-const fullName = signal('Tao Xin');
-const firstName = signal('');
-const lastName = signal('');
-const delayed = signal('');
+const email = signal('maria.silva@example.com');
+const user = signal('');
+const domain = signal('');
+const saved = signal('');
 
 effect(() => {
-  [firstName.value = '', lastName.value = ''] = fullName.value.split(' ');
+  [user.value = '', domain.value = ''] = email.value.split('@');
 });
 effect(() => {
-  const name = fullName.value;
-  later(1000, () => (delayed.value = name)); // the next change cancels the pending one
+  const address = email.value;
+  later(1000, () => (saved.value = address)); // saves a second after typing stops: the next change cancels the pending one
 });
 ```
 
@@ -458,20 +466,20 @@ A stream of every value (VanJS's `for await` example) is not provided: an effect
 
 ### Self-referencing in effects
 
-A signal an effect reads and then writes in the same run stops being its dependency (as in VanJS 1.3): the write does not run the effect again, so a counter can count in the effect that watches its source:
+A signal an effect reads and then writes in the same run stops being its dependency (as in VanJS 1.3): the write does not run the effect again, so an effect can count plays while it watches playback:
 
 ```ts
 import { effect, signal } from '@reely/dommy';
 
-const checked = signal(false);
-const timesChecked = signal(0);
+const playing = signal(false);
+const plays = signal(0);
 
 effect(() => {
-  if (checked.value) timesChecked.value += 1; // resetting `timesChecked` does not re-run it
+  if (playing.value) plays.value += 1; // resetting `plays` does not re-run it
 });
 ```
 
-It still runs for the signals it only reads, and a read after the write depends on the signal again. The price: it does not see later writes of a signal it wrote, so an effect that clamps `laps` to 10 stops clamping; derive the clamped value with `computed` instead. To read a signal without depending on it, use `untracked` or `.peek()`. Two effects that each write what the other reads would run forever; after 100 waves of writes the flush stops and throws a cycle error instead of hanging the page.
+It still runs for the signals it only reads, and a read after the write depends on the signal again. The price: it does not see later writes of a signal it wrote, so an effect that clamps `volume` to 100 stops clamping; derive the clamped value with `computed` instead. To read a signal without depending on it, use `untracked` or `.peek()`. Two effects that each write what the other reads would run forever; after 100 waves of writes the flush stops and throws a cycle error instead of hanging the page.
 
 ### Releasing bindings
 
