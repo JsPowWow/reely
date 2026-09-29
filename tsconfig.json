@@ -29,6 +29,18 @@
     },
     {
       "path": "./apps/star-battle"
+    },
+    {
+      "path": "./packages/emitter"
+    },
+    {
+      "path": "./packages/queue"
+    },
+    {
+      "path": "./packages/simple-store"
+    },
+    {
+      "path": "./packages/state-machine"
     }
   ],
   "compilerOptions": {

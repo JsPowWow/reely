@@ -44,6 +44,10 @@ export default [
               sourceTag: 'scope:logger',
               onlyDependOnLibsWithTags: ['scope:shared', 'scope:logger'],
             },
+            {
+              sourceTag: 'scope:state-machine',
+              onlyDependOnLibsWithTags: ['scope:shared', 'scope:state-machine'],
+            },
             // *************** Apps settings ****************************
             {
               sourceTag: 'scope:free-dom',

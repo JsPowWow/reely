@@ -1,0 +1,7 @@
+# Sync by default, one transition at a time
+
+The machine ported from powwow-js was async only: `send` returned a promise, and a queue with a concurrency of 15 could compute two transitions from the same state at once. We keep one transition core and let the queue decide the mode, both queues from `@reely/queue`: `createStateMachine` runs transitions through a `SyncQueue`, so a transition finishes inside `send`, and `createAsyncStateMachine` runs them through an `AsyncQueue` with a concurrency of 1. Sync is the default because callers send from a frame loop and need the new state in the same frame (AI::Race: a late `stageEnded` fires twice, and `flip` measures before the change). A send from a hook or listener waits in the `SyncQueue` and runs after the current transition, still before the outer `send` returns (run-to-completion).
+
+A transition runs `onExit` of the old state, the transition's own hook, the state change, `onEnter` of the new state, then `stateChanged`. A throw before the state change leaves the state as it was; a throw after it keeps the new state. Either way `send` reports `status: 'error'` and never throws, so a frame loop can send without checking the state first.
+
+`can(event)` says only whether a transition for the event is declared from the current state (an any-state transition included); it never calls a target selector, which runs only on `send`. It answers the same way in both schedulers, and synchronously.
