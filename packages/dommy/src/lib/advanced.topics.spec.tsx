@@ -1,4 +1,5 @@
-import { Show, computed, defineDommyConfig, effect, mount, signal } from '../index';
+import { For, Show, computed, defineDommyConfig, effect, mount, signal } from '../index';
+import { later } from '../kit';
 import { reelxDebug } from './reactive/reelx/reelx.core';
 
 import type { ILogger } from '@reely/logger';
@@ -112,6 +113,41 @@ describe('Conditional bindings', () => {
   });
 });
 
+describe('Advanced state derivation', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('derives several signals in one effect, and a delayed one with `later`', () => {
+    const fullName = signal('Tao Xin');
+    const firstName = signal('');
+    const lastName = signal('');
+    const delayed = signal('');
+    mount(document.createElement('div'), () => {
+      effect(() => {
+        [firstName.value = '', lastName.value = ''] = fullName.value.split(' ');
+      });
+      effect(() => {
+        const name = fullName.value;
+        later(1000, () => (delayed.value = name));
+      });
+      return null;
+    });
+
+    fullName.value = 'Ada Lovelace';
+    const beforeTheDelay = delayed.value;
+    vi.advanceTimersByTime(1000);
+
+    expect([firstName.value, lastName.value]).toEqual(['Ada', 'Lovelace']);
+    expect(beforeTheDelay).toBe('');
+    expect(delayed.value).toBe('Ada Lovelace');
+  });
+});
+
 describe('Self-referencing in effects', () => {
   it('does not re-run an effect for a signal it writes, so a counter of checks does not loop', () => {
     const checked = signal(false);
@@ -164,6 +200,19 @@ describe('Self-referencing in effects', () => {
 
     expect(laps.value).toBe(20);
     expect(clamped.value).toBe(10);
+  });
+
+  it('stays dependent on a signal it writes first and reads after', () => {
+    const lap = signal(1);
+    const seen: number[] = [];
+    effect(() => {
+      lap.value = Math.max(lap.peek(), 1);
+      seen.push(lap.value);
+    });
+
+    lap.value = 2;
+
+    expect(seen).toEqual([1, 2]);
   });
 
   it('keeps a binding that writes a signal it read bound to the rest', () => {
@@ -249,6 +298,27 @@ describe('Releasing bindings', () => {
     expect(reelxDebug(prefix).subscriberCount()).toBe(0);
   });
 
+  it('releases what a row of `For` made when its key goes', () => {
+    const prefix = signal('Car');
+    const cars = signal(['7', '3']);
+    render(() => (
+      <ol>
+        <For each={cars} by={(car) => car}>
+          {(car) => {
+            const label = computed(() => `${prefix.value} ${car()}`);
+            return <li>{label}</li>;
+          }}
+        </For>
+      </ol>
+    ));
+    const withTwoRows = reelxDebug(prefix).subscriberCount();
+
+    cars.value = ['7'];
+
+    expect(withTwoRows).toBe(2);
+    expect(reelxDebug(prefix).subscriberCount()).toBe(1);
+  });
+
   it('keeps the bindings of a node built outside any owner as long as their signals live', () => {
     const text = signal('a');
 
@@ -256,5 +326,47 @@ describe('Releasing bindings', () => {
 
     expect(orphan.textContent).toBe('a');
     expect(reelxDebug(text).subscriberCount()).toBe(1);
+  });
+});
+
+describe('Lifecycle hooks', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('runs a component before its nodes are in the document, and `later(0)` after', () => {
+    const host = document.createElement('div');
+    document.body.append(host);
+    const states: boolean[] = [];
+    mount(host, () => {
+      const field = document.createElement('input');
+      states.push(field.isConnected);
+      later(0, () => states.push(field.isConnected));
+      return field;
+    });
+
+    vi.advanceTimersByTime(0);
+    host.remove();
+
+    expect(states).toEqual([false, true]);
+  });
+
+  it('runs effects synchronously: a write in a component is seen at once', () => {
+    const lap = signal(1);
+    const seen: number[] = [];
+    mount(document.createElement('div'), () => {
+      effect(() => {
+        seen.push(lap.value);
+      });
+      lap.value = 2;
+      seen.push(0);
+      return null;
+    });
+
+    expect(seen).toEqual([1, 2, 0]);
   });
 });

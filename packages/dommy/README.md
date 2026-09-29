@@ -396,9 +396,33 @@ const greeting = (
 
 A binding, `computed` or `effect` depends on the signals its last run read. `() => (formula.value === 'a + b' ? a.value + b.value : c.value)` does not run for `c` while the formula is `a + b`, and stops running for `a` and `b` once it is `c`.
 
+### Advanced state derivation
+
+An effect can write several signals from one source, and the kit covers the timed derivations: `persisted` keeps a signal in storage, `throttled` passes at most one change per interval, and `later` delays one:
+
+```ts
+import { effect, signal } from '@reely/dommy';
+import { later } from '@reely/dommy/kit';
+
+const fullName = signal('Tao Xin');
+const firstName = signal('');
+const lastName = signal('');
+const delayed = signal('');
+
+effect(() => {
+  [firstName.value = '', lastName.value = ''] = fullName.value.split(' ');
+});
+effect(() => {
+  const name = fullName.value;
+  later(1000, () => (delayed.value = name)); // the next change cancels the pending one
+});
+```
+
+A stream of every value (VanJS's `for await` example) is not provided: an effect already sees every change, synchronously.
+
 ### Self-referencing in effects
 
-An effect does not run again for a signal it writes in the same run, even if it read it first, so a counter can count in the effect that watches its source:
+A signal an effect reads and then writes in the same run stops being its dependency (as in VanJS 1.3): the write does not run the effect again, so a counter can count in the effect that watches its source:
 
 ```ts
 import { effect, signal } from '@reely/dommy';
@@ -411,7 +435,7 @@ effect(() => {
 });
 ```
 
-It still runs for the signals it only reads. The price: it does not see later writes of a signal it wrote, so an effect that clamps `laps` to 10 stops clamping; derive the clamped value with `computed` instead. To read a signal without depending on it, use `untracked` or `.peek()`. Two effects that each write what the other reads would run forever; after 100 waves of writes the flush stops and throws a cycle error instead of hanging the page.
+It still runs for the signals it only reads, and a read after the write depends on the signal again. The price: it does not see later writes of a signal it wrote, so an effect that clamps `laps` to 10 stops clamping; derive the clamped value with `computed` instead. To read a signal without depending on it, use `untracked` or `.peek()`. Two effects that each write what the other reads would run forever; after 100 waves of writes the flush stops and throws a cycle error instead of hanging the page.
 
 ### Releasing bindings
 
@@ -421,7 +445,7 @@ The cost is the other side: a node built outside any owner (at module level, or 
 
 ### Lifecycle hooks
 
-A component runs once and returns its nodes before they are in the document; there is no mount hook. What must run once the view is connected, such as focusing a field or measuring a node, goes in `later(0, fn)` from the kit: it runs after the render that called it and is cancelled if the view is disposed first. The cleanup side is `onCleanup`. Effects run synchronously, so a signal written in a component is seen at once, not in a later cycle.
+A component runs once and returns its nodes before they are in the document; there is no mount hook. What must run once the view is connected, such as focusing a field or measuring a node, goes in `later(0, fn)` from the kit: it runs after the render that called it and is cancelled if the view is disposed first. The cleanup side is `onCleanup`, which runs when the owner lets the view go; a node that leaves the document some other way (moved by hand, or by outside code) is not noticed, and only a custom element's `disconnectedCallback` sees that. Effects run synchronously, so a signal written in a component is seen at once, not in a later cycle.
 
 ```tsx
 import { input } from '@reely/dommy';
