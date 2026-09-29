@@ -11,6 +11,8 @@ import { Store } from './store';
  *   instance would lose its methods.
  */
 export class ObjectStore<T extends object> extends Store<T> {
+  private current: T;
+
   /**
    * @param initialValue - The object held until the first `set`.
    * @throws {TypeError} When `initialValue` is not a plain object (an array, a `Map`, `null`…).
@@ -19,7 +21,8 @@ export class ObjectStore<T extends object> extends Store<T> {
     if (!isPlainObject(initialValue)) {
       throw new TypeError(`An ObjectStore holds a plain object, not ${String(initialValue)}`);
     }
-    super(initialValue);
+    super();
+    this.current = initialValue;
   }
 
   /** The object held now. */
@@ -36,7 +39,12 @@ export class ObjectStore<T extends object> extends Store<T> {
    * @returns The store, to chain another `set`.
    */
   public set<K extends keyof T>(part: Pick<T, K> | ((current: T) => Pick<T, K>)): this {
-    this.hold({ ...this.current, ...(isSomeFunction(part) ? part(this.current) : part) });
+    this.current = { ...this.current, ...(isSomeFunction(part) ? part(this.current) : part) };
+    this.notify();
     return this;
+  }
+
+  protected read(): T {
+    return this.current;
   }
 }

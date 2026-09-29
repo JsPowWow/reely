@@ -8,9 +8,12 @@ import { Store } from './store';
  * @template T - The value held.
  */
 export class PrimitiveStore<T> extends Store<T> {
+  private current: T;
+
   /** @param initialValue - The value held until a different one is set. */
   public constructor(initialValue: T) {
-    super(initialValue);
+    super();
+    this.current = initialValue;
   }
 
   /** The value held now. */
@@ -25,7 +28,12 @@ export class PrimitiveStore<T> extends Store<T> {
    */
   public set value(next: T) {
     if (!Object.is(next, this.current)) {
-      this.hold(next);
+      this.current = next;
+      this.notify();
     }
+  }
+
+  protected read(): T {
+    return this.current;
   }
 }
