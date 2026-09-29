@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import {
   retry,
   createRetry,
@@ -49,6 +50,19 @@ describe('async-retry', () => {
 
       const result = await promise;
       expect(result).toBe('success');
+    });
+
+    it('hands onRetry and shouldRetry an Error for a thrown string, and rethrows the string itself', async () => {
+      const onRetry = vi.fn();
+      const shouldRetry = vi.fn().mockReturnValue(true);
+      const promise = retry(() => Promise.reject('offline'), { retries: 1, delay: 10, onRetry, shouldRetry });
+      const settled = expect(promise).rejects.toBe('offline');
+
+      await vi.runAllTimersAsync();
+      await settled;
+
+      expect(shouldRetry.mock.calls[0][0]).toBeInstanceOf(Error);
+      expect(onRetry.mock.calls[0][0]).toMatchObject({ message: 'offline' });
     });
 
     it('should provide attempt number to function', async () => {

@@ -20,7 +20,7 @@ export interface RetryWithTimeoutOptions extends RetryOptions {
 }
 
 export class TimeoutError extends Error {
-  code = 'TIMEOUT';
+  public code = 'TIMEOUT';
 
   constructor(message = 'Operation timed out') {
     super(message);
@@ -43,10 +43,10 @@ export async function retry<T>(
     delay = 1000,
     maxDelay = 30000,
     factor = 2,
-    onRetry = () => {
+    onRetry = (): void => {
       return;
     },
-    shouldRetry = () => true,
+    shouldRetry = (): boolean => true,
   } = options;
 
   let lastError: Error | undefined;
@@ -56,7 +56,7 @@ export async function retry<T>(
     try {
       return await fn(attempt);
     } catch (error) {
-      lastError = error as Error;
+      lastError = error instanceof Error ? error : new Error(String(error));
 
       if (attempt === retries || !shouldRetry(lastError, attempt)) {
         throw error;
@@ -76,7 +76,9 @@ export async function retry<T>(
 /**
  * Create a reusable retry wrapper with preset options
  */
-export function createRetry(defaultOptions: RetryOptions = {}) {
+export function createRetry(
+  defaultOptions: RetryOptions = {}
+): <T>(fn: (attempt: number) => Promise<T>, overrides?: RetryOptions) => Promise<T> {
   return <T>(
     fn: (attempt: number) => Promise<T>,
     overrides: RetryOptions = {}
@@ -88,13 +90,12 @@ export function createRetry(defaultOptions: RetryOptions = {}) {
 /**
  * Wrap a function to always retry on failure
  */
-export function withRetry<T extends (...args: any[]) => Promise<any>>(
-  fn: T,
+export function withRetry<T extends (...args: any[]) => Promise<any>>(fn: T, options?: RetryOptions): T;
+export function withRetry(
+  fn: (...args: unknown[]) => Promise<unknown>,
   options: RetryOptions = {}
-): T {
-  return (async (...args: Parameters<T>) => {
-    return retry(() => fn(...args), options);
-  }) as T;
+): (...args: unknown[]) => Promise<unknown> {
+  return (...args) => retry(() => fn(...args), options);
 }
 
 /**
