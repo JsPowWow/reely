@@ -74,4 +74,22 @@ describe('Show', () => {
     expect(() => (shown.value = true)).toThrow('broken branch');
     expect(reelxDebug(lap).subscriberCount()).toBe(0);
   });
+
+  it('does not subscribe the condition to what a branch reads while it is built', () => {
+    const shown = signal(true);
+    const lap = signal(1);
+    const renders = vi.fn(() => <p>Lap {String(lap.value)}</p>);
+    mount(document.createElement('div'), () => (
+      <Show when={shown} fallback={renders}>
+        {() => <p>Finished</p>}
+      </Show>
+    ));
+    shown.value = false;
+
+    lap.value = 2;
+
+    expect(renders).toHaveBeenCalledOnce();
+    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+  });
 });
+

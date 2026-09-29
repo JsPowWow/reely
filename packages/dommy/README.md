@@ -229,7 +229,7 @@ const standings = (
 lap.value = 2; // the fallback again, then lap 2; a late answer for lap 1 is dropped
 ```
 
-`promise={loadFinal}` starts the load when the view renders. Without `catch`, a rejection clears the fallback and stays unhandled, so the browser reports it; to retry, read a signal in the getter and change it.
+`promise={loadFinal}` starts the load when the view renders. A getter that throws counts as a rejection. Without `catch`, a rejection clears the fallback and stays unhandled, so the browser reports it; a replaced promise is dropped whole, its rejection too. To retry, read a signal in the getter and change it. To wait for several promises under one fallback, give `Await` their `Promise.all`.
 
 ## Mount and clean up
 

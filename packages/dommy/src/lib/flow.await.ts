@@ -10,8 +10,9 @@ import type { ReactiveValue, ReelyNode } from './types/dommy.types';
 export interface AwaitProps<T> {
   /**
    * The promise, or a signal or getter of it. A getter is tracked: when a signal it reads
-   * changes, it is called again, the fallback is shown again, and the result of the promise it
-   * replaced is dropped. `promise={loadFinal}` starts the load when the flow renders.
+   * changes, it is called again, the fallback is shown again, and the promise it replaced is
+   * dropped, its result and its rejection alike. A getter that throws counts as a rejection.
+   * `promise={loadFinal}` starts the load when the flow renders.
    */
   promise: PromiseLike<T> | ReactiveValue<PromiseLike<T>>;
   /** Renders the branch shown once the promise resolves, with its value. */
@@ -67,7 +68,15 @@ export const Await = <T,>({ promise, children, fallback, catch: renderError }: A
     latest += 1;
   });
   if (isSomeFunction(promise)) {
-    bindValue(promise, wait);
+    // a getter that throws before it returns a promise fails like a rejected one; the reason is
+    // kept as thrown (not `Either.tryCatch`, which makes it an `Error`) for the unhandled path
+    bindValue((): PromiseLike<T> => {
+      try {
+        return promise();
+      } catch (reason) {
+        return Promise.reject(reason);
+      }
+    }, wait);
   } else {
     wait(promise);
   }

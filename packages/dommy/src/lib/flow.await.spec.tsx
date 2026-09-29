@@ -1,6 +1,8 @@
 import { Await, For, mount, signal } from '../index';
 import { reelxDebug } from './reactive/reelx/reelx.core';
 
+import type { AwaitProps } from '../index';
+
 interface Deferred<T> {
   promise: Promise<T>;
   resolve: (value: T) => void;
@@ -86,8 +88,49 @@ describe('Await', () => {
 
     expect(Array.from(panel.querySelectorAll('p'), (p) => p.textContent)).toEqual([
       'TypeError: No timing data',
-      '"offline"',
+      'offline',
     ]);
+  });
+
+  it('shows the catch branch when the promise getter throws before it returns a promise', async () => {
+    const lap = signal(1);
+    const load = (n: number): Promise<string> => {
+      if (n > 1) {
+        throw new RangeError(`No timing for lap ${n}`);
+      }
+      return Promise.resolve('Car 7');
+    };
+    const panel = document.createElement('section');
+    mount(panel, () => (
+      <Await promise={() => load(lap.value)} catch={(error) => <p>{error.message}</p>}>
+        {(leader) => <p>{leader}</p>}
+      </Await>
+    ));
+    await settle();
+
+    lap.value = 2;
+    await settle();
+
+    expect(panel.textContent).toBe('No timing for lap 2');
+  });
+
+  it('leaves a throw from the shown branch unhandled rather than lost', async () => {
+    const panel = document.createElement('section');
+    const failure = new Error('broken results');
+
+    const unhandled = await collectUnhandled(async () => {
+      mount(panel, () => (
+        <Await promise={Promise.resolve('Car 7')}>
+          {() => {
+            throw failure;
+          }}
+        </Await>
+      ));
+      await settle();
+    });
+
+    expect(unhandled).toEqual([failure]);
+    expect(panel.textContent).toBe('');
   });
 
   it('clears the fallback and leaves the rejection unhandled when there is no catch branch', async () => {
@@ -207,6 +250,23 @@ describe('Await', () => {
     expect(reelxDebug(dots).subscriberCount()).toBe(0);
   });
 
+  it('does not subscribe the promise getter to what the fallback reads while it is built', () => {
+    const stop = signal(1);
+    const lap = signal(1);
+    const load = vi.fn(() => (stop.value, deferred<string>().promise));
+    mount(document.createElement('div'), () => (
+      <Await promise={load} fallback={() => <p>In the pits on lap {String(lap.value)}</p>}>
+        {(time) => <p>{time}</p>}
+      </Await>
+    ));
+    stop.value = 2;
+
+    lap.value = 2;
+
+    expect(load).toHaveBeenCalledTimes(2);
+    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+  });
+
   it('keeps each row of a list waiting on its own promise', async () => {
     const cars = signal(['7', '3']);
     const times = new Map([
@@ -248,7 +308,8 @@ describe('Await', () => {
     await settle();
 
     expect(panel.textContent).toBe('5');
-    // @ts-expect-error a string promise cannot feed children that expect a number
-    expect(() => Await({ promise: Promise.resolve('5'), children: (laps: number) => laps })).not.toThrow();
+    expectTypeOf<{ promise: Promise<string>; children: (laps: number) => number }>().not.toMatchTypeOf<
+      AwaitProps<number>
+    >();
   });
 });
