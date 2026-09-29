@@ -9,7 +9,7 @@ related_targets: []
 
 Scope: the reely landing page at `/`. Mode: Persuade.
 
-Audience: any JS/TS developer arriving from npm, GitHub or a talk. Job: decide reely is worth trying. Action: open the docs (primary); install with `npm i @reely/dommy@next` and read the source on GitHub (secondary). Proof: live demos with their DOM writes counted, the measured sizes (1.5 / 4.7 / 6.8 kB gzip), a pointer to time a 500-row board in the reader's own browser (no headless speed figure), and the fact that this page and the whole site are built with reely. Constraints: no invented adopters or claims; only `@reely/*` at runtime; the palette and type of the site's timing-screen world, with no race story on this page (the author found the lap, sectors and splits confusing).
+Audience: any JS/TS developer arriving from npm, GitHub or a talk. Job: decide reely is worth trying. Action: open the docs (primary); install with `npm i @reely/dommy@next` and read the source on GitHub (secondary). Proof: live demos with their DOM writes counted, the measured sizes (1.7 / 5.1 / 7.1 kB gzip), a pointer to time a 500-row board in the reader's own browser (no headless speed figure), and the fact that this page and the whole site are built with reely. Constraints: no invented adopters or claims; only `@reely/*` at runtime; the palette and type of the site's timing-screen world, with no race story on this page (the author found the lap, sectors and splits confusing).
 
 Memorable moment: an example the visitor can break with their own hands (type, reverse, type fast) while the board under it counts the DOM writes.
 
