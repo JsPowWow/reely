@@ -1,37 +1,203 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-29T00:00:00.000Z",
+  "generatedAt": "2026-09-29T12:00:00.000Z",
   "title": "Design System: reely",
   "extensions": {
     "colorMeta": {
-      "signal": { "role": "primary", "displayName": "Signal Yellow", "canonical": "oklch(84.2% 0.168 90.4)", "tonalRamp": ["oklch(15% 0.071 90.4)", "oklch(25% 0.085 90.4)", "oklch(35% 0.099 90.4)", "oklch(45% 0.113 90.4)", "oklch(55% 0.127 90.4)", "oklch(65% 0.141 90.4)", "oklch(80% 0.162 90.4)", "oklch(95% 0.153 90.4)"] },
-      "signal-ink": { "role": "primary", "displayName": "Signal Ink", "canonical": "oklch(56.9% 0.118 78.8)", "tonalRamp": ["oklch(15% 0.077 78.8)", "oklch(25% 0.087 78.8)", "oklch(35% 0.097 78.8)", "oklch(45% 0.107 78.8)", "oklch(55% 0.116 78.8)", "oklch(65% 0.110 78.8)", "oklch(80% 0.095 78.8)", "oklch(95% 0.081 78.8)"] },
-      "flag": { "role": "secondary", "displayName": "Flag Red", "canonical": "oklch(59.7% 0.182 24.5)", "tonalRamp": ["oklch(15% 0.114 24.5)", "oklch(25% 0.129 24.5)", "oklch(35% 0.144 24.5)", "oklch(45% 0.160 24.5)", "oklch(55% 0.175 24.5)", "oklch(65% 0.174 24.5)", "oklch(80% 0.151 24.5)", "oklch(95% 0.128 24.5)"] },
-      "asphalt": { "role": "neutral", "displayName": "Asphalt", "canonical": "oklch(94.4% 0.007 247.9)", "tonalRamp": ["oklch(15% 0.002 247.9)", "oklch(25% 0.003 247.9)", "oklch(35% 0.003 247.9)", "oklch(45% 0.004 247.9)", "oklch(55% 0.005 247.9)", "oklch(65% 0.005 247.9)", "oklch(80% 0.006 247.9)", "oklch(95% 0.007 247.9)"] },
-      "panel": { "role": "neutral", "displayName": "Panel White", "canonical": "oklch(100% 0 0)", "tonalRamp": ["oklch(15% 0 0)", "oklch(25% 0 0)", "oklch(35% 0 0)", "oklch(45% 0 0)", "oklch(55% 0 0)", "oklch(65% 0 0)", "oklch(80% 0 0)", "oklch(95% 0 0)"] },
-      "graphite": { "role": "neutral", "displayName": "Graphite", "canonical": "oklch(27.6% 0.023 248.7)", "tonalRamp": ["oklch(15% 0.021 248.7)", "oklch(25% 0.023 248.7)", "oklch(35% 0.022 248.7)", "oklch(45% 0.020 248.7)", "oklch(55% 0.018 248.7)", "oklch(65% 0.016 248.7)", "oklch(80% 0.013 248.7)", "oklch(95% 0.010 248.7)"] },
-      "slate": { "role": "neutral", "displayName": "Slate", "canonical": "oklch(52% 0.031 246.7)", "tonalRamp": ["oklch(15% 0.021 246.7)", "oklch(25% 0.024 246.7)", "oklch(35% 0.026 246.7)", "oklch(45% 0.029 246.7)", "oklch(55% 0.030 246.7)", "oklch(65% 0.027 246.7)", "oklch(80% 0.024 246.7)", "oklch(95% 0.020 246.7)"] },
-      "line": { "role": "neutral", "displayName": "Hairline", "canonical": "oklch(86% 0.012 248)", "tonalRamp": ["oklch(15% 0.005 248)", "oklch(25% 0.006 248)", "oklch(35% 0.007 248)", "oklch(45% 0.008 248)", "oklch(55% 0.009 248)", "oklch(65% 0.010 248)", "oklch(80% 0.012 248)", "oklch(95% 0.011 248)"] },
-      "code-text": { "role": "neutral", "displayName": "Code Text", "canonical": "oklch(92.7% 0.006 255.5)", "tonalRamp": ["oklch(15% 0.002 255.5)", "oklch(25% 0.003 255.5)", "oklch(35% 0.003 255.5)", "oklch(45% 0.004 255.5)", "oklch(55% 0.004 255.5)", "oklch(65% 0.005 255.5)", "oklch(80% 0.006 255.5)", "oklch(95% 0.006 255.5)"] }
+      "signal": {
+        "role": "primary",
+        "displayName": "Signal Yellow",
+        "canonical": "oklch(84.2% 0.168 90.4)",
+        "tonalRamp": [
+          "oklch(15% 0.071 90.4)",
+          "oklch(25% 0.085 90.4)",
+          "oklch(35% 0.099 90.4)",
+          "oklch(45% 0.113 90.4)",
+          "oklch(55% 0.127 90.4)",
+          "oklch(65% 0.141 90.4)",
+          "oklch(80% 0.162 90.4)",
+          "oklch(95% 0.153 90.4)"
+        ]
+      },
+      "signal-ink": {
+        "role": "primary",
+        "displayName": "Signal Ink",
+        "canonical": "oklch(56.9% 0.118 78.8)",
+        "tonalRamp": [
+          "oklch(15% 0.077 78.8)",
+          "oklch(25% 0.087 78.8)",
+          "oklch(35% 0.097 78.8)",
+          "oklch(45% 0.107 78.8)",
+          "oklch(55% 0.116 78.8)",
+          "oklch(65% 0.110 78.8)",
+          "oklch(80% 0.095 78.8)",
+          "oklch(95% 0.081 78.8)"
+        ]
+      },
+      "flag": {
+        "role": "secondary",
+        "displayName": "Flag Red",
+        "canonical": "oklch(59.7% 0.182 24.5)",
+        "tonalRamp": [
+          "oklch(15% 0.114 24.5)",
+          "oklch(25% 0.129 24.5)",
+          "oklch(35% 0.144 24.5)",
+          "oklch(45% 0.160 24.5)",
+          "oklch(55% 0.175 24.5)",
+          "oklch(65% 0.174 24.5)",
+          "oklch(80% 0.151 24.5)",
+          "oklch(95% 0.128 24.5)"
+        ]
+      },
+      "asphalt": {
+        "role": "neutral",
+        "displayName": "Asphalt",
+        "canonical": "oklch(94.4% 0.007 247.9)",
+        "tonalRamp": [
+          "oklch(15% 0.002 247.9)",
+          "oklch(25% 0.003 247.9)",
+          "oklch(35% 0.003 247.9)",
+          "oklch(45% 0.004 247.9)",
+          "oklch(55% 0.005 247.9)",
+          "oklch(65% 0.005 247.9)",
+          "oklch(80% 0.006 247.9)",
+          "oklch(95% 0.007 247.9)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Panel White",
+        "canonical": "oklch(100% 0 0)",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(25% 0 0)",
+          "oklch(35% 0 0)",
+          "oklch(45% 0 0)",
+          "oklch(55% 0 0)",
+          "oklch(65% 0 0)",
+          "oklch(80% 0 0)",
+          "oklch(95% 0 0)"
+        ]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "oklch(27.6% 0.023 248.7)",
+        "tonalRamp": [
+          "oklch(15% 0.021 248.7)",
+          "oklch(25% 0.023 248.7)",
+          "oklch(35% 0.022 248.7)",
+          "oklch(45% 0.020 248.7)",
+          "oklch(55% 0.018 248.7)",
+          "oklch(65% 0.016 248.7)",
+          "oklch(80% 0.013 248.7)",
+          "oklch(95% 0.010 248.7)"
+        ]
+      },
+      "slate": {
+        "role": "neutral",
+        "displayName": "Slate",
+        "canonical": "oklch(52% 0.031 246.7)",
+        "tonalRamp": [
+          "oklch(15% 0.021 246.7)",
+          "oklch(25% 0.024 246.7)",
+          "oklch(35% 0.026 246.7)",
+          "oklch(45% 0.029 246.7)",
+          "oklch(55% 0.030 246.7)",
+          "oklch(65% 0.027 246.7)",
+          "oklch(80% 0.024 246.7)",
+          "oklch(95% 0.020 246.7)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(86% 0.012 248)",
+        "tonalRamp": [
+          "oklch(15% 0.005 248)",
+          "oklch(25% 0.006 248)",
+          "oklch(35% 0.007 248)",
+          "oklch(45% 0.008 248)",
+          "oklch(55% 0.009 248)",
+          "oklch(65% 0.010 248)",
+          "oklch(80% 0.012 248)",
+          "oklch(95% 0.011 248)"
+        ]
+      },
+      "code-text": {
+        "role": "neutral",
+        "displayName": "Code Text",
+        "canonical": "oklch(92.7% 0.006 255.5)",
+        "tonalRamp": [
+          "oklch(15% 0.002 255.5)",
+          "oklch(25% 0.003 255.5)",
+          "oklch(35% 0.003 255.5)",
+          "oklch(45% 0.004 255.5)",
+          "oklch(55% 0.004 255.5)",
+          "oklch(65% 0.005 255.5)",
+          "oklch(80% 0.006 255.5)",
+          "oklch(95% 0.006 255.5)"
+        ]
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "The landing thesis; the finish title runs larger." },
-      "headline": { "displayName": "Headline", "purpose": "Landing sector titles with their number plate." },
-      "title": { "displayName": "Title", "purpose": "Docs and evolution page titles." },
-      "subtitle": { "displayName": "Subtitle", "purpose": "Section headings in docs prose, the guide ending, the wordmark." },
-      "readout": { "displayName": "Readout", "purpose": "Write-board figures and every posted number, tabular." },
-      "body": { "displayName": "Body", "purpose": "Prose at 62 to 68ch." },
-      "label": { "displayName": "Label", "purpose": "Board labels, code captions, table heads; slate." },
-      "code": { "displayName": "Code", "purpose": "Code panes, inline code and the install line only." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "The landing thesis; the size and speed title runs close to it."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Landing example headings that state what the example proves."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Docs and evolution page titles."
+      },
+      "subtitle": {
+        "displayName": "Subtitle",
+        "purpose": "Section headings in docs prose, the guide ending, the wordmark."
+      },
+      "readout": {
+        "displayName": "Readout",
+        "purpose": "Write-board figures and every posted number, tabular."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose at 62 to 68ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Board labels, code captions, table heads; slate."
+      },
+      "code": {
+        "displayName": "Code",
+        "purpose": "Code panes, inline code and the install line only."
+      }
     },
     "shadows": [],
     "motion": [
-      { "name": "control-shift", "value": "background-color 120ms ease-out, border-color 120ms ease-out", "purpose": "Primary and secondary actions changing colour on hover; only under prefers-reduced-motion: no-preference." },
-      { "name": "timing-sweep", "value": "linear, scroll-driven (--fill 0 to 1)", "purpose": "The sector bar track filling as its sector is scrolled through; no easing, nothing moves on its own." }
+      {
+        "name": "control-shift",
+        "value": "background-color 120ms ease-out, border-color 120ms ease-out",
+        "purpose": "Primary and secondary actions changing colour on hover; only under prefers-reduced-motion: no-preference."
+      },
+      {
+        "name": "write-flash",
+        "value": "outline 3px solid (signal-ink | flag), offset 2px, to transparent over 700ms ease-out",
+        "purpose": "The write board outlines each element a small change touched (up to 100 records): signal ink for edits and moves, flag for inserted nodes. Under reduced motion the outline shows and hides without fading."
+      }
     ],
     "breakpoints": [
-      { "name": "stack", "value": "68.75em", "purpose": "Demo and source stack; landing start straight goes to one column." },
-      { "name": "phone", "value": "45em", "purpose": "Rail becomes chips or plates; tighter demo stage; sector names hidden visually." }
+      {
+        "name": "stack",
+        "value": "68.75em",
+        "purpose": "Demo and source stack; the landing's opening band goes to one column."
+      },
+      {
+        "name": "phone",
+        "value": "45em",
+        "purpose": "Rail becomes chips or plates; tighter demo stage and board figures; smaller code."
+      }
     ]
   },
   "components": [
@@ -71,9 +237,9 @@
       "name": "Demo Panel with Write Board",
       "kind": "card",
       "refersTo": "demo-panel",
-      "description": "Signature: the live demo on a white panel with its DOM writes posted underneath.",
-      "html": "<figure class=\"ds-meter\"><div class=\"ds-stage\"><output class=\"ds-value\">7</output></div><dl class=\"ds-board\"><div class=\"ds-cell\"><dt>Built at first render</dt><dd class=\"ds-built\">7</dd></div><div class=\"ds-cell\"><dt class=\"ds-pip-edit\">Text edits</dt><dd>2<span class=\"ds-delta ds-edit\">+1</span></dd></div><div class=\"ds-cell\"><dt class=\"ds-pip-edit\">Attribute edits</dt><dd>0</dd></div><div class=\"ds-cell\"><dt class=\"ds-pip-node\">Nodes added or removed</dt><dd>4<span class=\"ds-delta ds-node\">+4</span></dd></div></dl></figure>",
-      "css": ".ds-meter { margin: 0; max-width: 28rem; border: 1px solid var(--line, #cbd2d9); border-radius: 6px; background: var(--panel, #fff); color: var(--graphite, #1f2933); font-family: var(--body, 'Atkinson Hyperlegible', system-ui, sans-serif); } .ds-stage { padding: 2rem 1.5rem; } .ds-value { display: inline-block; min-width: 3ch; padding: 0.1em 0.35em; border: 1px solid var(--line, #cbd2d9); border-radius: 4px; font-family: var(--display, 'Big Shoulders Display', 'Arial Narrow', sans-serif); font-size: 3.5rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; text-align: center; } .ds-board { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.5rem; margin: 0; padding: 1rem 1.5rem 1.25rem; border-top: 1px solid var(--line, #cbd2d9); } .ds-cell { display: flex; flex-direction: column; gap: 0.35rem; } .ds-board dt { order: 1; color: var(--slate, #5b6b7a); font-size: 0.875rem; line-height: 1.3; } .ds-board dd { margin: 0; font-family: var(--display, 'Big Shoulders Display', 'Arial Narrow', sans-serif); font-size: 2.75rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; } .ds-built { color: var(--slate, #5b6b7a); } .ds-pip-edit::before, .ds-pip-node::before { content: ''; display: inline-block; width: 0.65em; height: 0.65em; margin-right: 0.4em; border-radius: 50%; background: var(--signal-ink, #9c6d00); } .ds-pip-node::before { background: var(--flag, #d64545); } .ds-delta { margin-left: 0.3em; font-size: 0.5em; vertical-align: 0.6em; } .ds-edit { color: var(--signal-ink, #9c6d00); } .ds-node { color: var(--flag, #d64545); }"
+      "description": "Signature: the live demo on a white panel with its DOM writes posted underneath; built-at-first-render heads the board, four kinds of write follow in pairs.",
+      "html": "<figure class=\"ds-meter\"><div class=\"ds-stage\"><output class=\"ds-value\">7</output></div><dl class=\"ds-board\"><div class=\"ds-cell ds-built-cell\"><dt>Built at first render</dt><dd class=\"ds-built\">23</dd></div><div class=\"ds-cell\"><dt class=\"ds-pip-edit\">Text edits</dt><dd>2<span class=\"ds-delta ds-edit\">+1</span></dd></div><div class=\"ds-cell\"><dt class=\"ds-pip-edit\">Attribute edits</dt><dd>0</dd></div><div class=\"ds-cell\"><dt class=\"ds-pip-move\">Nodes moved</dt><dd>3<span class=\"ds-delta ds-move\">+3</span></dd></div><div class=\"ds-cell\"><dt class=\"ds-pip-node\">Nodes added or removed</dt><dd>0</dd></div></dl></figure>",
+      "css": ".ds-meter { margin: 0; max-width: 28rem; border: 1px solid var(--line, #cbd2d9); border-radius: 6px; background: var(--panel, #fff); color: var(--graphite, #1f2933); font-family: var(--body, 'Atkinson Hyperlegible', system-ui, sans-serif); } .ds-stage { padding: 2rem 1.5rem; } .ds-value { display: inline-block; min-width: 3ch; padding: 0.1em 0.35em; border: 1px solid var(--line, #cbd2d9); border-radius: 4px; font-family: var(--display, 'Big Shoulders Display', 'Arial Narrow', sans-serif); font-size: 3.5rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; text-align: center; } .ds-board { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.5rem; margin: 0; padding: 1rem 1.5rem 1.25rem; border-top: 1px solid var(--line, #cbd2d9); } .ds-cell { display: flex; flex-direction: column; gap: 0.35rem; } .ds-board dt { order: 1; color: var(--slate, #5b6b7a); font-size: 0.875rem; line-height: 1.3; } .ds-board dd { margin: 0; font-family: var(--display, 'Big Shoulders Display', 'Arial Narrow', sans-serif); font-size: 2.75rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; } .ds-built { color: var(--slate, #5b6b7a); } .ds-built-cell { grid-column: 1 / -1; } .ds-pip-edit::before, .ds-pip-move::before, .ds-pip-node::before { content: ''; display: inline-block; width: 0.65em; height: 0.65em; margin-right: 0.4em; border-radius: 50%; background: var(--signal-ink, #9c6d00); } .ds-pip-move::before { border: 2px solid var(--graphite, #1f2933); background: transparent; } .ds-pip-node::before { background: var(--flag, #d64545); } .ds-delta { margin-left: 0.3em; font-size: 0.5em; vertical-align: 0.6em; } .ds-edit { color: var(--signal-ink, #9c6d00); } .ds-move { color: var(--graphite, #1f2933); } .ds-node { color: var(--flag, #d64545); }"
     },
     {
       "name": "Code Pane",
@@ -92,39 +258,75 @@
       "css": ".ds-tower { display: grid; gap: 0.25rem; max-width: 24rem; margin: 0; padding: 0; list-style: none; font-family: var(--body, 'Atkinson Hyperlegible', system-ui, sans-serif); font-variant-numeric: tabular-nums; } .ds-row { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr) auto; align-items: center; gap: 0.75rem; padding-right: 0.75rem; border: 1px solid var(--line, #cbd2d9); border-radius: 4px; background: var(--panel, #fff); } .ds-place { align-self: stretch; display: grid; place-items: center; padding: 0.3rem 0; background: var(--graphite, #1f2933); color: var(--asphalt, #e9edf1); font-family: var(--display, 'Big Shoulders Display', 'Arial Narrow', sans-serif); font-size: 1.25rem; font-weight: 800; } .ds-row:first-child .ds-place { background: var(--signal, #f5c518); color: var(--graphite, #1f2933); } .ds-name { font-weight: 700; } .ds-time { color: var(--slate, #5b6b7a); }"
     },
     {
-      "name": "Sector Bar Segment",
-      "kind": "nav",
-      "refersTo": "rail-link-current",
-      "description": "Landing lap segment: number, name, split, and a track that fills linearly in signal.",
-      "html": "<ol class=\"ds-segments\"><li><a class=\"ds-segment\" data-driven=\"true\" style=\"--fill: 1\" href=\"#\"><span class=\"ds-num\">S1</span><span class=\"ds-sname\">Markup</span><span class=\"ds-mark\">0 writes</span><span class=\"ds-track\"></span></a></li><li><a class=\"ds-segment\" style=\"--fill: 0.6\" href=\"#\"><span class=\"ds-num\">S2</span><span class=\"ds-sname\">Signals</span><span class=\"ds-mark\">2 edits</span><span class=\"ds-track\"></span></a></li></ol>",
-      "css": ".ds-segments { display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; gap: 0 0.75rem; margin: 0; padding: 0 1rem; list-style: none; background: var(--asphalt, #e9edf1); font-family: var(--body, 'Atkinson Hyperlegible', system-ui, sans-serif); } .ds-segment { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; column-gap: 0.5rem; padding: 0.75rem 0 0.6rem; color: var(--graphite, #1f2933); text-decoration: none; } .ds-num { font-family: var(--display, 'Big Shoulders Display', 'Arial Narrow', sans-serif); font-size: 1.5rem; font-weight: 800; line-height: 1; } .ds-sname { overflow: hidden; color: var(--slate, #5b6b7a); font-weight: 700; text-overflow: ellipsis; white-space: nowrap; } .ds-segment:hover .ds-sname { color: var(--graphite, #1f2933); } .ds-mark { padding: 0.1rem 0.35rem; border-radius: 3px; color: var(--slate, #5b6b7a); font-family: var(--display, 'Big Shoulders Display', 'Arial Narrow', sans-serif); font-size: 1.125rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; white-space: nowrap; } .ds-segment[data-driven='true'] .ds-mark { background: var(--graphite, #1f2933); color: var(--signal, #f5c518); } .ds-track { grid-column: 1 / -1; height: 0.375rem; margin-top: 0.5rem; border-radius: 1px; background: linear-gradient(var(--signal, #f5c518), var(--signal, #f5c518)) 0 0 / calc(var(--fill, 0) * 100%) 100% no-repeat, var(--line, #cbd2d9); } .ds-segment:focus-visible { outline: 3px solid var(--graphite, #1f2933); outline-offset: 2px; }"
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "A demo field: bold slate label above a white input with a slate border.",
+      "html": "<label class=\"ds-field\">Your name<input class=\"ds-input\" placeholder=\"Ada\" /></label>",
+      "css": ".ds-field { display: grid; gap: 0.35rem; max-width: 20rem; color: var(--slate, #5b6b7a); font-family: var(--body, 'Atkinson Hyperlegible', system-ui, sans-serif); font-weight: 700; } .ds-input { min-width: 0; padding: 0.55rem 0.7rem; border: 1px solid var(--slate, #5b6b7a); border-radius: 4px; background: var(--panel, #fff); color: var(--graphite, #1f2933); font: inherit; font-weight: 400; } .ds-input::placeholder { color: var(--slate, #5b6b7a); } .ds-input:focus-visible { outline: 3px solid var(--graphite, #1f2933); outline-offset: 2px; }"
+    },
+    {
+      "name": "Result Plates",
+      "kind": "custom",
+      "refersTo": "result-plate",
+      "description": "A posted result on a signal plate, a pending one dashed in slate, a failed call on white with a graphite border (never flag).",
+      "html": "<div class=\"ds-plates\"><p class=\"ds-plate\">Hello, Ada!</p><p class=\"ds-pending\">Racing…</p><p class=\"ds-failed\">The request failed. Try again.</p></div>",
+      "css": ".ds-plates { display: grid; gap: 0.75rem; max-width: 22rem; } .ds-plate, .ds-pending, .ds-failed { margin: 0; padding: 0.6rem 0.9rem; border-radius: 4px; } .ds-plate, .ds-pending { font-family: var(--display, 'Big Shoulders Display', 'Arial Narrow', sans-serif); font-size: 2rem; font-weight: 800; line-height: 1.1; } .ds-plate { background: var(--signal, #f5c518); color: var(--graphite, #1f2933); } .ds-pending { border: 1px dashed var(--line, #cbd2d9); color: var(--slate, #5b6b7a); } .ds-failed { border: 2px solid var(--graphite, #1f2933); background: var(--panel, #fff); color: var(--graphite, #1f2933); font-family: var(--body, 'Atkinson Hyperlegible', system-ui, sans-serif); font-weight: 700; }"
     }
   ],
   "narrative": {
     "northStar": "The Timing Screen",
-    "overview": "The whole site reads like the timing screen of a race: an asphalt ground, graphite ink and bands, white panels where the live cars run, signal yellow for whatever is current, leading or driven, and flag red for the one kind of event that matters most. Every number that the reader might compare (DOM writes, split times, sizes, lap times) is set in a condensed display face with tabular figures, as a tower would post it. The site is built with the library it documents, so the visual system is there to make each live demo and its write count legible, not to decorate around them.\n\nDensity is that of a working tool: a docs rail, a demo beside its source, a write board under each demo. The landing page is the same world, bolder: graphite bands open and close the page, a kerb of signal-yellow and white blocks closes the start straight, a chequered edge opens the finish, and a sticky sector bar fills in signal yellow as each sector is scrolled through. Nothing is lifted by shadow; depth is the step from asphalt to white panel to graphite band.\n\nMotion is a timing sweep: fills are linear and driven by the reader's scroll, controls shift colour in 120ms, and nothing moves on its own.",
+    "overview": "The whole site reads like a race timing screen: an asphalt ground, graphite ink and bands, white panels where the live demos run, signal yellow for whatever is current, leading or posted, and flag red for the one kind of write that matters most. Every number that the reader might compare (DOM writes, sizes, times, places) is set in a condensed display face with tabular figures, as a timing tower would post it. The world is carried by palette, type and plates, not by a story: headings say plainly what they show. The site is built with the library it documents, so the visual system is there to make each live demo and its write count legible, not to decorate around them.\n\nDensity is that of a working tool: a docs rail, a demo beside its source, a write board under each demo. The landing page is the same world at a larger scale: a graphite band opens it with the thesis and the first live demo, plain example sections follow on asphalt, and a graphite band of measured figures closes it. Nothing is lifted by shadow; depth is the step from asphalt to white panel to graphite band.\n\nMotion only answers the reader: the write board outlines the nodes a change touched and fades the outline, controls shift colour in 120ms, and nothing moves on its own.",
     "keyCharacteristics": [
       "Asphalt ground, white demo panels, graphite bands and code panes; flat, bordered with 1px hairlines.",
-      "Signal yellow marks state (current page, driven sector, leader, primary action), never fills a surface for decoration.",
+      "Signal yellow marks state (current page, leader, posted result, primary action), never fills a surface for decoration.",
       "Big Shoulders Display at weight 800 for headings and every posted number; Atkinson Hyperlegible for prose; JetBrains Mono only for code.",
       "Small, even corners (3 to 6px); plates, not pills.",
       "Every live demo ships with its write board; every code pane is the module that runs."
     ],
     "rules": [
-      { "name": "The Signal Is State Rule", "body": "Signal yellow means \"this one\": current, leading, driven, or the one primary action. A yellow surface that does not answer \"which one?\" does not belong; the kerb is the single decorative use, and it is part of a graphite band's edge.", "section": "colors" },
-      { "name": "The Signal Ink Rule", "body": "Yellow as text or a small mark on asphalt or white is signal ink; pure signal is for fills under graphite text and for anything on graphite.", "section": "colors" },
-      { "name": "The Flag Means Nodes Rule", "body": "Flag red marks node insertions and removals and nothing else: no error states, no emphasis, no hover.", "section": "colors" },
-      { "name": "The Posted Number Rule", "body": "Any figure that changes or is compared (writes, splits, sizes, times, places, step numbers) is set in the display face at 800 with tabular figures.", "section": "typography" },
-      { "name": "The Mono Is Code Rule", "body": "JetBrains Mono appears only for code: code panes, inline code, and the install line. Labels and numbers never borrow it.", "section": "typography" },
-      { "name": "The Sentence Case Rule", "body": "Headings, labels and navigation are sentence case with default tracking; the build has no uppercase or letter-spaced labels.", "section": "typography" },
-      { "name": "The Flat Screen Rule", "body": "Surfaces never lift. To separate, change the tone (asphalt, panel, graphite) or draw a hairline; never add a shadow.", "section": "elevation" }
+      {
+        "name": "The Signal Is State Rule",
+        "body": "Signal yellow means \"this one\": current, leading, posted, or the one primary action. A yellow surface that does not answer \"which one?\" does not belong.",
+        "section": "colors"
+      },
+      {
+        "name": "The Signal Ink Rule",
+        "body": "Yellow as text or a small mark on asphalt or white is signal ink; pure signal is for fills under graphite text and for anything on graphite.",
+        "section": "colors"
+      },
+      {
+        "name": "The Flag Means Nodes Rule",
+        "body": "Flag red marks node insertions and removals and nothing else: no error states, no emphasis, no hover. A failure is a white plate with a 2px graphite border; a moved node is graphite and signal ink, because it is no new node.",
+        "section": "colors"
+      },
+      {
+        "name": "The Posted Number Rule",
+        "body": "Any figure that changes or is compared (writes, sizes, times, places, step numbers) is set in the display face at 800 with tabular figures.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mono Is Code Rule",
+        "body": "JetBrains Mono appears only for code: code panes, inline code, code chips in demo results, and the install line. Labels and numbers never borrow it.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "Headings, labels and navigation are sentence case with default tracking; the build has no uppercase or letter-spaced labels.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Screen Rule",
+        "body": "Surfaces never lift. To separate, change the tone (asphalt, panel, graphite) or draw a hairline; never add a shadow.",
+        "section": "elevation"
+      }
     ],
     "dos": [
       "Do put the write board under every live demo, and show the module that renders it in a code pane beside it.",
       "Do set every posted figure in Big Shoulders Display 800 with tabular figures.",
       "Do mark the current item with a signal plate or underline, and draw focus as a 3px graphite ring on light surfaces and a 3px signal ring on graphite.",
       "Do separate layers by tone and 1px hairlines (line on light, slate on graphite).",
-      "Do keep motion linear and reader-driven, and drop transitions under reduced motion."
+      "Do move only in answer to the reader, and under reduced motion drop transitions and fades."
     ],
     "donts": [
       "Don't use box-shadow or any lift; the screen is flat.",
@@ -132,7 +334,7 @@
       "Don't use flag red for anything but nodes added or removed.",
       "Don't use JetBrains Mono outside code, or a third accent hue.",
       "Don't round past 6px or use pill shapes.",
-      "Don't add uppercase, letter-spaced labels or kickers above headings; a heading carries its own number plate."
+      "Don't add uppercase, letter-spaced labels or kickers above headings; a heading states its point on its own."
     ]
   }
 }
