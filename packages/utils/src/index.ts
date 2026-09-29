@@ -9,6 +9,7 @@ export { default as toErrorString } from './lib/errors/toErrorString';
 export { default as exhaustiveGuard } from './lib/errors/exhaustiveGuard';
 export { default as reThrow } from './lib/errors/reThrow';
 export { hasStringMessage } from './lib/errors/hasStringMessage';
+export { reportUncaught } from './lib/errors/reportUncaught';
 
 export { Either } from './lib/fp/either/Either';
 export { default as maybeInstanceOf } from './lib/fp/maybe/maybeInstanceOf';
@@ -17,9 +18,7 @@ export { Maybe } from './lib/fp/maybe/Maybe';
 
 export { mapNullable } from './lib/nullable/mapNullable';
 export { withDefault } from './lib/nullable/withDefault';
-export { assertIsNonNullable } from './lib/nullable/assertIsNonNullable';
 
-export { default as promiseResolver, type PromiseResolver } from './lib/async/promiseResolver';
 
 export { pipe } from './lib/fp/pipe';
 export { default as flow } from './lib/fp/flow';
