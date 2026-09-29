@@ -148,4 +148,18 @@ describe('the signal contract', () => {
 
     expect(reelxDebug(lap).subscriberCount()).toBe(0);
   });
+
+  it('subscribes an effect to a computed it peeked before reading', () => {
+    const lap = signal(1);
+    const double = computed(() => lap.value * 2);
+    const seen: number[] = [];
+    effect(() => {
+      double.peek();
+      seen.push(double.value);
+    });
+
+    lap.value = 2;
+
+    expect(seen).toStrictEqual([2, 4]);
+  });
 });

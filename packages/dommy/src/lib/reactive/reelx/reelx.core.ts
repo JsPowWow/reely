@@ -93,9 +93,11 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
     let hasRun = false;
     // what the last run threw: kept like a result and thrown on every read until a dependency changes
     let thrown: Nullable<{ readonly error: unknown }> = null;
+    // checking the dependencies is what links them to the reader: a check made untracked links nothing
+    let checkedFor: Nullable<Subscriber> = null;
     // @ts-expect-error expected properties assigned below
     rlxSelf = (): T => {
-      if (subscriberVersion !== SUBSCRIBER_VERSION) {
+      if (subscriberVersion !== SUBSCRIBER_VERSION || checkedFor !== SUBSCRIBER) {
         const prevDeps = DEPS;
         DEPS = null;
 
@@ -123,6 +125,7 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
           DEPS = prevDeps;
         }
         subscriberVersion = SUBSCRIBER_VERSION;
+        checkedFor = SUBSCRIBER;
       }
 
       DEPS?.push({ computation: rlxSelf, value: hasSome(thrown) ? thrown.error : state, threw: hasSome(thrown) });
