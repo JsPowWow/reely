@@ -16,3 +16,9 @@ export const start = (board: HTMLElement): void => {
   listen(board, 'pointerdown', cancel);
   flip(board, () => board.append(...Array.from(board.children).reverse()));
 };
+
+// what a consumer exports from the kit must have a type its declarations can name
+export const theme = persisted('theme', 'light');
+export const phoneLayout = media('(max-width: 700px)');
+export const calmTheme = throttled(theme, 100);
+export const lights = machine({ initial: 'red', states: { red: { go: 'green' }, green: { stop: 'red' } } });

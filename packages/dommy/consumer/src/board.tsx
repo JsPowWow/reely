@@ -53,4 +53,6 @@ export const start = (root: HTMLElement): VoidFunction => {
   return mount(root, () => <Board racers={racers} finished={finished} />);
 };
 
-export const router = createAsyncRouter([{ path: '/', action: () => <main /> }]);
+// not exported: its declaration cannot be emitted yet (JsPowWow/reely#4)
+const router = createAsyncRouter([{ path: '/', action: () => <main /> }]);
+void router;
