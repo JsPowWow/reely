@@ -1,4 +1,4 @@
-import { Either } from '@reely/utils';
+import { Either, objectTypeOf } from '@reely/utils';
 
 import { listen } from './kit.listen';
 import { effect, signal } from '../reactive/preact-like/preact-like.signal';
@@ -13,8 +13,6 @@ export interface PersistedOptions<T> {
   is?: (stored: unknown) => stored is T;
 }
 
-const kindOf = (value: unknown): string => Object.prototype.toString.call(value);
-
 /**
  * A signal kept in storage under `key`: it starts from the stored value and stores every write
  * as JSON. A value written by another tab to `localStorage` comes in too, until the render that
@@ -28,7 +26,7 @@ const kindOf = (value: unknown): string => Object.prototype.toString.call(value)
  * @returns {Signal<T>} The signal.
  */
 export const persisted = <T>(key: string, initial: T, options: PersistedOptions<T> = {}): Signal<T> => {
-  const is = options.is ?? ((stored: unknown): stored is T => kindOf(stored) === kindOf(initial));
+  const is = options.is ?? ((stored: unknown): stored is T => objectTypeOf(stored) === objectTypeOf(initial));
   const parse = (text: string | null): T =>
     Either.tryCatch((): unknown => (text === null ? initial : JSON.parse(text)))
       .map((stored) => (is(stored) ? stored : initial))

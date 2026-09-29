@@ -1,4 +1,4 @@
-import { hasProperty } from '@reely/utils';
+import { hasProperty, hasSome, isNil } from '@reely/utils';
 
 import { computed, signal } from '../reactive/preact-like/preact-like.signal';
 
@@ -50,7 +50,7 @@ export const machine = <const C extends AnyMachineConfig>(
 ): Machine<MachineState<C>, MachineEvent<C>> => {
   type S = MachineState<C>;
   const transitions: Readonly<Record<string, Readonly<Record<string, string>>>> = config.states;
-  const isState = (name: string | undefined): name is S => name !== undefined && hasProperty(name, transitions);
+  const isState = (name: string | undefined): name is S => hasSome(name) && hasProperty(name, transitions);
   const current = signal<S>(config.initial);
   const next = (from: S, event: string): S | undefined => {
     const to = transitions[from]?.[event];
@@ -60,12 +60,12 @@ export const machine = <const C extends AnyMachineConfig>(
     state: computed(() => current.value),
     send: (event): boolean => {
       const to = next(current.peek(), event);
-      if (to === undefined) {
+      if (isNil(to)) {
         return false;
       }
       current.value = to;
       return true;
     },
-    can: (event): boolean => next(current.value, event) !== undefined,
+    can: (event): boolean => hasSome(next(current.value, event)),
   };
 };

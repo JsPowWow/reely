@@ -1,3 +1,5 @@
+import { hasSome } from '@reely/utils';
+
 import { onCleanup } from '../reactive/owner';
 
 /** The events a target dispatches, by type: `keydown` on `window` is a `KeyboardEvent`. */
@@ -38,7 +40,7 @@ export function listen(
   options: AddEventListenerOptions = {}
 ): VoidFunction {
   const controller = new AbortController();
-  const signals = options.signal ? [controller.signal, options.signal] : [controller.signal];
+  const signals = hasSome(options.signal) ? [controller.signal, options.signal] : [controller.signal];
   target.addEventListener(type, handler, { ...options, signal: AbortSignal.any(signals) });
   const stop = (): void => controller.abort();
   onCleanup(stop);

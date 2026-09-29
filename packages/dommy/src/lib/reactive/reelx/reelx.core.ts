@@ -18,6 +18,17 @@ const unlink = (subscriber: Subscriber): void => {
   }
 };
 
+/** Removes, in place, the items of `list` that match. */
+const removeWhere = <T>(list: T[], matches: (item: T) => boolean): void => {
+  let kept = 0;
+  for (const item of list) {
+    if (!matches(item)) {
+      list[kept++] = item;
+    }
+  }
+  list.length = kept;
+};
+
 /** node dependencies list */
 interface Dependency<T> {
   readonly computation: RlxState<T> | RlxDerivedState<T>;
@@ -153,14 +164,11 @@ const createReelx = <T>(source: ReelxSource<T>, equal?: (prev: T, next: T) => bo
 
         // a run does not depend on what it writes, even after reading it: its own write
         // neither runs it again nor unlinks it from the rest of what it read
-        if (SUBSCRIBER !== null) {
-          subscribers.delete(SUBSCRIBER);
-          const values = SUBSCRIBER._values;
-          SUBSCRIBER._values = values.filter((value) => value !== rlxSelf);
+        if (SUBSCRIBER !== null && subscribers.delete(SUBSCRIBER)) {
+          removeWhere(SUBSCRIBER._values, (value) => value === rlxSelf);
         }
         if (DEPS !== null) {
-          const deps = DEPS;
-          DEPS.splice(0, deps.length, ...deps.filter(({ computation }) => computation !== rlxSelf));
+          removeWhere(DEPS, ({ computation }) => computation === rlxSelf);
         }
 
         if (QUEUE.push(subscribers) === 1) {
@@ -271,7 +279,9 @@ reelx.flushSync = (): void => {
     while (QUEUE.length > 0) {
       if (++waves > MAX_FLUSH_WAVES) {
         QUEUE = [];
-        throw new Error(`reelx: a cycle of effects, each writes a signal another one reads (${MAX_FLUSH_WAVES} waves)`);
+        throw new Error(`reelx: a cycle of effects, each writes a signal another one reads (${MAX_FLUSH_WAVES} waves)`, {
+          cause: errors[0],
+        });
       }
       const iterator = QUEUE;
       QUEUE = [];
