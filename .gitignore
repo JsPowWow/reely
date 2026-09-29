@@ -58,3 +58,4 @@ vitest.config.*.timestamp*
 # impeccable critique archive and live-mode scratch, per machine
 /.impeccable/
 **/.impeccable/questions/
+*.tsbuildinfo
