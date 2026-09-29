@@ -36,6 +36,7 @@ import { PitWall } from './demos/pit.stop';
 import pitStopSource from './demos/pit.stop.tsx?highlight';
 import { RaceFinish } from './demos/race.finish';
 import raceFinishSource from './demos/race.finish.tsx?highlight';
+import derivationSource from './snippets/advanced.derivation.ts?highlight';
 import granularitySource from './snippets/advanced.granularity.ts?highlight';
 import resourceSource from './snippets/async.resource.tsx?highlight';
 import listsSource from './snippets/lists.for.tsx?highlight';
@@ -410,6 +411,7 @@ export const docTopics: readonly DocTopic[] = [
     source: conditionalBindingSource,
     Details: () => (
       <>
+        <h2>Conditional bindings</h2>
         <p>
           Change c while the formula is a + b: the run count stays. Switch the formula, and a and b stop counting
           instead. The same holds for a <code>computed</code> and an <code>effect</code>. Every answer on this page is also
@@ -446,11 +448,19 @@ export const docTopics: readonly DocTopic[] = [
           <code>when</code> stays. Type a name and count one text edit per key; clear it and count the nodes.
         </p>
         <Live Demo={Greeting} caption='greeting.tsx' source={greetingSource} />
+        <h2>Advanced state derivation</h2>
+        <p>
+          One effect can write several signals from one source. The timed derivations VanJS builds by hand come from{' '}
+          <code>@reely/dommy/kit</code>: <code>persisted</code> keeps a signal in storage, <code>throttled</code> passes
+          at most one change per interval, and <code>later</code> delays a write and is cancelled by the next change.
+        </p>
+        <Code caption='derivation.ts' source={derivationSource} />
         <h2>Self-referencing in effects</h2>
         <p>
-          The effect below reads <code>timesChecked</code> and writes it. As in VanJS 1.3, a signal an effect writes is
-          not its dependency, so its own write does not run it again and Reset sets the count to 0 for good. It still
-          runs for <code>checked</code>, which it only reads. Two effects that write what the other reads would run
+          The effect below reads <code>timesChecked</code> and then writes it. As in VanJS 1.3, a signal an effect reads
+          and then writes stops being its dependency, so its own write does not run it again and Reset sets the count to
+          0 for good. It still runs for <code>checked</code>, which it only reads. The price: an effect cannot clamp a
+          signal it writes; a <code>computed</code> can. Two effects that write what the other reads would run
           forever; after 100 waves of writes the flush throws a cycle error instead.
         </p>
         <Live Demo={CheckboxCounter} caption='checkbox.counter.tsx' source={checkboxCounterSource} />
@@ -470,7 +480,9 @@ export const docTopics: readonly DocTopic[] = [
         <p>
           A component runs before its nodes are in the document. What must run once they are, such as focusing a field
           or reading the rendered text, goes in <code>later(0, fn)</code> from <code>@reely/dommy/kit</code>; it is
-          cancelled if the view goes first. Increment rebuilds the label, and the message reads it from the document.
+          cancelled if the view goes first. Increment rebuilds the label, and the message reads it from the document. The
+          other end is <code>onCleanup</code>, run when the owner lets the view go; a node moved out of the document by
+          other code is noticed only by a custom element’s <code>disconnectedCallback</code>.
         </p>
         <Live Demo={LabelAfterMount} caption='label.after.mount.tsx' source={labelAfterMountSource} />
       </>

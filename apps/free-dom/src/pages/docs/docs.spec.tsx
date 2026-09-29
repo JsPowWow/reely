@@ -43,10 +43,12 @@ describe('docs', () => {
 
       expect(page.querySelectorAll('figure')).toHaveLength(7);
       expect(headings).toEqual([
+        'Conditional bindings',
         'DOM attributes vs. properties',
         'Why can’t a signal hold a DOM node?',
         'Signal granularity',
         'The scope of DOM updates',
+        'Advanced state derivation',
         'Self-referencing in effects',
         'Releasing bindings',
         'Lifecycle hooks',
