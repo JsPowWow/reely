@@ -29,6 +29,7 @@ Always through Nx (caching, `^build` deps): `npx nx test dommy`, `npx nx lint do
 - **Reuse `@reely/utils` first.** Guards (`hasSome`, `isNil`, `isSomeFunction`, `isString`, `hasProperty`…), `pipe`/`flow`, `noop`/`identity`, `exhaustiveGuard`, `toErrorWithMessage`, shared types (`Nullable`, `PipeableFn`, `AnyFunction`…). No hand-written `typeof` checks or local copies. Missing a general helper → add it to utils (own file + spec + named export), then use it.
 - **No `as`** (ESLint `consistent-type-assertions: never`; allowed only in specs) — narrow with guards. No `any`, no `@ts-nocheck`/`@ts-ignore` in new code.
 - **Explicit return types**, `import type` for types, `import/order` groups (`@reely/**` after externals), no import cycles.
+- **Lean comments:** a short JSDoc on public API only; a code comment only for a non-obvious why. Never restate what the code says.
 - **Module boundaries:** a package depends only on `scope:shared` and itself (`@nx/enforce-module-boundaries`).
 - **Every feature and fix ships with Vitest tests** next to the source (`*.spec.ts`).
 - Published packages must work for a consumer: `npm i @reely/<pkg>` + `tsc` in a clean project — no imports of unpublished `@reely/*` in the emitted `.d.ts`/JS.

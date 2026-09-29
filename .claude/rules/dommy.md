@@ -20,7 +20,7 @@ Goal of the current work — JsPowWow/reely#1: signals bound to the DOM (point u
 - Exported functions — `const` arrows with explicit return types; `function` only for guards, small internal helpers and overloaded exports (e.g. `createElement`), which a `const` cannot type without `as`. Guards are `is*`/`has*` with `x is T` predicates. `unknown` params are named `maybe*`.
 - Files: `<subject>.<detail>[.<kind>].ts`, lowercase with dots — `element.addListeners.ts`, `reelx.core.ts`, `element.bool.attributes.ts`, types in `*.types.ts`. One barrel — `src/index.ts`, explicit named exports (`export *` only for types).
 - Lookup tables — `as const` + `Set`/`Map`; config objects checked with `satisfies`.
-- Comments in English, JSDoc with `@template`/`@param`/`@returns` on public API; TODO as `// TODO AR`.
+- Comments in English and lean (see `CLAUDE.md`): `@param`/`@returns` only where the signature does not say it; TODO as `// TODO AR`.
 - Unused destructured fields — `_ignored*`.
 
 ## Reuse, don't duplicate
