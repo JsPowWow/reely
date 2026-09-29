@@ -22,6 +22,7 @@ import { PitWall } from './demos/pit.stop';
 import pitStopSource from './demos/pit.stop.tsx?highlight';
 import { RaceFinish } from './demos/race.finish';
 import raceFinishSource from './demos/race.finish.tsx?highlight';
+import resourceSource from './snippets/async.resource.tsx?highlight';
 import listsSource from './snippets/lists.for.tsx?highlight';
 import signalsSource from './snippets/signals.api.ts?highlight';
 import mountSource from './snippets/start.mount.tsx?highlight';
@@ -331,10 +332,17 @@ export const docTopics: readonly DocTopic[] = [
             <code>fallback</code>: shown while the promise is pending; nothing by default.
           </li>
           <li>
-            <code>catch</code>: a function of the reason, as an <code>Error</code>. Without it the slot is cleared and
-            the rejection stays unhandled, so the browser reports it.
+            <code>catch</code>: a function of the reason, as an <code>Error</code>. It is required, so a failure always
+            has a view; JavaScript that leaves it out shows the error as text.
           </li>
         </ul>
+        <h2>A resource from a getter</h2>
+        <p>
+          A getter of the promise is all a resource needs: it reads the signals the request depends on, so a change
+          loads again. The fallback shows while the new request runs, and an answer that comes late for the old one is
+          dropped.
+        </p>
+        <Code caption='lap.leader.tsx' source={resourceSource} />
         <h2>Only the latest promise</h2>
         <p>
           Press Box, box twice while the crew works: the first stop never posts, its answer is dropped. A promise that
