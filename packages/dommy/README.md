@@ -293,25 +293,19 @@ const icon = (
 Small helpers over signals and the owner live in their own entry, `@reely/dommy/kit`; an app that does not import it does not ship it. Each one that listens or times stops with the render that created it.
 
 ```tsx
-import { effect } from '@reely/dommy';
-import { flip, later, listen, machine, media, persisted, size, throttled } from '@reely/dommy/kit';
-
-// a state machine: the state moves only along its transitions; states and events are typed from the config
-const race = machine({
-  initial: 'idle',
-  states: { idle: { start: 'countdown' }, countdown: { go: 'running', cancel: 'idle' }, running: { finish: 'idle' } },
-});
-race.send('start'); // true: idle → countdown
-race.can('finish'); // false, and reactive like any read of `race.state`
-effect(() => {
-  if (race.state.value === 'countdown') {
-    later(3000, () => race.send('go')); // entering the state; leaving it cancels the timer
-  }
-});
+import { effect, signal } from '@reely/dommy';
+import { flip, later, listen, media, persisted, size, throttled } from '@reely/dommy/kit';
 
 const phone = media('(max-width: 700px)'); // follows the media query
 const theme = persisted('theme', 'light'); // kept in localStorage, synced across tabs
-listen(window, 'keydown', (event) => event.key === 'Escape' && race.send('cancel')); // removed with the view
+
+const menuOpen = signal(false);
+listen(window, 'keydown', (event) => event.key === 'Escape' && (menuOpen.value = false)); // removed with the view
+effect(() => {
+  if (menuOpen.value) {
+    later(5000, () => (menuOpen.value = false)); // closing it first, or disposing the view, cancels the timer
+  }
+});
 
 const board = document.createElement('ol');
 const box = size(board); // { width, height } through a ResizeObserver
@@ -321,7 +315,6 @@ flip(board, () => board.append(...Array.from(board.children).reverse())); // row
 effect(() => console.log(phone.value, theme.value, width.value));
 ```
 
-- `machine({ initial, states })` gives `state` (a computed), `send(event)` and `can(event)`; enter and leave a state with an effect and `onCleanup`.
 - `media(query)`, `size(element)` and `throttled(source, ms)` give computeds.
 - `persisted(key, initial, { storage, is })` gives a signal; what is read back must be of the kind of `initial`, or pass `is` to check it; a storage that throws leaves it working in memory.
 - `listen(target, type, handler, options)` types the event by target and returns the function that removes it.
