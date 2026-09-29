@@ -14,10 +14,6 @@ import css from './labs.module.css';
 
 const labSource = (path: string): string => `https://github.com/JsPowWow/reely/tree/main/labs-ignore/${path}`;
 
-/**
- * The labs: experiments around reely that are not shipped. Each asks one question, answers it
- * with specs in `labs-ignore/`, and ends on a verdict; the demos here run the idea on the site.
- */
 export const LabsPage = (): Node => {
   document.title = 'Labs | reely';
 

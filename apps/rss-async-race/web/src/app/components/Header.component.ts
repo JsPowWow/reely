@@ -13,7 +13,6 @@ export class HeaderComponent extends HTMLElement {
   #variant: Variant = 'tile';
 
   constructor() {
-    // Always call super first in constructor
     super();
   }
 
@@ -29,64 +28,31 @@ export class HeaderComponent extends HTMLElement {
     customElements.define(tagName, this);
   }
 
-  /**
-   * Called each time the element is added to the document.
-   * The specification recommends that, as far as possible, developers should implement custom element setup in this callback rather than the constructor.
-   */
+  /** Called each time the element is added to the document. */
   public connectedCallback(): void {
     this.render();
     console.log('Custom element added to page.');
   }
 
-  /**
-   * Called each time the element is removed from the document.
-   */
+  /** Called each time the element is removed from the document. */
   public disconnectedCallback(): void {
     console.log('Custom element removed from page.');
   }
 
-  /**
-   * When defined, this is called instead of connectedCallback() and disconnectedCallback() each time the element
-   * is moved to a different place in the DOM via Element.moveBefore().
-   * Use this to avoid running initialization/cleanup code in the connectedCallback() and disconnectedCallback() callbacks when the element
-   * is not actually being added to or removed from the DOM. See Lifecycle callbacks and state-preserving moves for more details.
-   */
+  /** Called instead of connect/disconnect when the element is moved via `Element.moveBefore()`. */
   public connectedMoveCallback(): void {
     console.log('Custom element moved with moveBefore()');
   }
 
-  /**
-   * Called each time the element is moved to a new document.
-   */
+  /** Called each time the element is moved to a new document. */
   public adoptedCallback(): void {
     console.log('Custom element moved to new page.');
   }
 
-  /**
-   * Called when attributes are changed, added, removed, or replaced. See Responding to attribute changes for more details about this callback.
-   * @param name
-   * @param oldValue
-   * @param newValue
-   */
+  /** Called when an observed attribute is changed, added, removed, or replaced. */
   public attributeChangedCallback(name: string, oldValue: unknown, newValue: unknown): void {
     console.log(`Attribute ${name} has changed. Old value: ${oldValue}. New value: ${newValue}`);
   }
-
-  // componentWillMount() {
-  //   console.log('component will mount');
-  // }
-  //
-  // componentDidMount() {
-  //   console.log('component did mount');
-  // }
-  //
-  // componentWillUnmount() {
-  //   console.log('component will unmount');
-  // }
-  //
-  // componentDidUnmount() {
-  //   console.log('component did unmount');
-  // }
 
   public render(): void {
     this.innerHTML = `

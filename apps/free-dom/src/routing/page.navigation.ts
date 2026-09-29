@@ -15,14 +15,7 @@ const opensInPlace = (link: HTMLAnchorElement): boolean =>
 const isPlaceOnPage = (link: HTMLAnchorElement): boolean =>
   link.pathname === location.pathname && link.search === location.search && link.hash !== '';
 
-/**
- * Follows same-site links without reloading the document: the URL goes to the history and
- * `render` draws its page; back and forward draw the page of their history entry. Clicks that
- * open a tab, a window, a download, another site or a place on the same page are left to the browser.
- *
- * @param {(pathname: string) => void} render - Draws the page for a pathname.
- * @returns {VoidFunction} Stops following links.
- */
+/** Follows same-site links and back/forward without a reload; returns the function that stops it. */
 export const navigateInPage = (render: (pathname: string) => void): VoidFunction => {
   const controller = new AbortController();
   let shownPathname = location.pathname;

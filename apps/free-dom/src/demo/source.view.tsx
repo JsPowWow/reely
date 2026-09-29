@@ -6,10 +6,7 @@ import css from './demo.module.css';
 
 import type { SourceLines, SourceToken } from '../highlight/source.types';
 
-/**
- * Marks the lines of `current` that are not part of the longest common subsequence with
- * `previous`: the lines a reader would type to get from one step to the next.
- */
+/** Marks the lines of `current` outside its longest common subsequence with `previous`. */
 const markInsertedLines = (previous: readonly string[], current: readonly string[]): boolean[] => {
   const columns = current.length + 1;
   // common[i * columns + j] — LCS length of previous[i..] and current[j..]
@@ -38,10 +35,7 @@ const markInsertedLines = (previous: readonly string[], current: readonly string
 
 const isBlank = (line: string): boolean => line.trim() === '';
 
-/**
- * A blank line belongs to an inserted block only when the code on both sides of it was
- * inserted; otherwise it separates the block from unchanged code and stays unmarked.
- */
+/** A blank line is inserted only between inserted code; next to unchanged code it is a separator. */
 const markBlankLines = (lines: readonly string[], inserted: readonly boolean[]): boolean[] => {
   const isInsertedCode = (index: number): boolean => !isBlank(lines[index] ?? '') && inserted[index] === true;
   const nearestCode = (from: number, step: 1 | -1): number => {
@@ -73,9 +67,7 @@ const renderToken = ({ content, color }: SourceToken): HTMLSpanElement =>
 
 let sourceViews = 0;
 
-/**
- * Shows the source of a demo under its caption, marking the lines added since `previous`.
- */
+/** Shows the source of a demo under its caption, marking the lines added since `previous`. */
 export const SourceView = ({ source, caption, previous }: SourceViewProps): HTMLElement => {
   // ids unique per view, for the listing's accessible name
   const titleId = `source-title-${++sourceViews}`;

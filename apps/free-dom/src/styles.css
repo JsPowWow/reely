@@ -29,7 +29,6 @@ body {
   color: var(--graphite);
 }
 
-/* Read by screen readers, not shown. */
 .visually-hidden {
   position: absolute;
   width: 1px;

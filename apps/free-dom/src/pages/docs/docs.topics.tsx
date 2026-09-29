@@ -52,10 +52,7 @@ export const docGroups = ['Start', 'Markup', 'Reactivity', 'Structure', 'Deeper'
 
 export type DocGroup = (typeof docGroups)[number];
 
-/**
- * One docs page: it answers one question, shows the answer running with its DOM writes
- * counted, then gives the details.
- */
+/** One docs page: one question, its answer running with DOM writes counted, then the details. */
 export interface DocTopic {
   slug: string;
   group: DocGroup;

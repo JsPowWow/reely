@@ -27,10 +27,7 @@ import getterSource from './steps/step9.getter.ts?highlight';
 
 import type { SourceLines } from '../../highlight/source.types';
 
-/**
- * One step of reely evolution: the markup steps build the same card three ways, the counter steps
- * add one reely feature at a time, and the board steps race a keyed list.
- */
+/** One step of reely evolution; each track adds one reely feature at a time to the same demo. */
 export interface EvolutionStep {
   slug: string;
   /** Steps that build the same demo share a track; a step's source is diffed against the previous step on its track. */

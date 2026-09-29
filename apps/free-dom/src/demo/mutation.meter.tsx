@@ -82,11 +82,7 @@ const countNodes = (root: Node): number => {
   return count;
 };
 
-/**
- * "Last change: 2 nodes added or removed. 4 writes since the first render." The running total
- * keeps the text different on every change, so a live region announces repeated clicks too.
- * Empty when nothing changed.
- */
+/** The running total keeps the text different on every change, so a live region announces repeated clicks too. */
 const describeChange = (delta: Readonly<Record<WriteKind, number>>, total: number): string => {
   const parts = writeKinds
     .filter((kind) => delta[kind] > 0)
@@ -102,17 +98,10 @@ const flashLimit = 100;
 const prefersReducedMotion = (): boolean =>
   isSomeFunction(window.matchMedia) && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/**
- * What a mutation left to see: the nodes it added, so a moved row lights up itself, or the node it
- * edited. A removed node is gone, so only the counts show it.
- */
+/** The added nodes, so a moved row lights up itself, or the edited node; a removed node is gone. */
 const touchedBy = (record: MutationRecord): Node[] =>
   record.type === 'childList' ? Array.from(record.addedNodes) : [record.target];
 
-/**
- * Outlines the elements a mutation touched (a text node's element for text), in the page's
- * `--signal-ink` or `--flag` color; with reduced motion the outline shows and hides without fading.
- */
 const flash = (record: MutationRecord, moved: ReadonlySet<Node>): void => {
   for (const node of touchedBy(record)) {
     const token = record.type === 'childList' && !moved.has(node) ? '--flag' : '--signal-ink';
@@ -143,11 +132,7 @@ interface MutationMeterProps {
   children?: ReelyNode;
 }
 
-/**
- * Wraps a demo: counts the nodes it builds on the first render, then the DOM writes it makes
- * by kind, flashes the nodes a small change touches, and announces what the last change did.
- * The observer is disconnected when the page is taken down.
- */
+/** Wraps a demo: counts its first-render nodes and its DOM writes by kind, flashes and announces each change. */
 export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => {
   const totals = countSignals();
   const deltas = countSignals();

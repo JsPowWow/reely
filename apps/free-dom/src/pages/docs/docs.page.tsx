@@ -17,10 +17,6 @@ const topicHref = (topic: DocTopic): string => `/docs/${topic.slug}`;
 const toPagerLink = (topic: DocTopic | undefined): Nullable<PagerLink> =>
   hasSome(topic) ? { href: topicHref(topic), title: topic.title } : null;
 
-/**
- * A docs page: the topic rail, the answer with its live demo and source, the details, and the
- * way to the neighbouring topics.
- */
 export const DocsPage = ({ slug }: { slug?: string }): Node => {
   const index = isNil(slug) ? 0 : docTopics.findIndex((item) => item.slug === slug);
   const topic = docTopics[index];

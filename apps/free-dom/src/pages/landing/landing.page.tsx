@@ -25,10 +25,6 @@ const Example = ({ example }: { example: LandingExample }): Node => (
   </section>
 );
 
-/**
- * The landing page: what reely is, four live examples with their DOM writes counted, then the
- * size and speed and the way into the docs.
- */
 export const LandingPage = (): Node => {
   document.title = 'reely: real DOM, one write per change';
 

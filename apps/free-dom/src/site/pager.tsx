@@ -17,9 +17,7 @@ interface PagerProps {
   children?: ReelyNode;
 }
 
-/**
- * The previous and next links under a page; `followPagerKey` follows them on ← and →, by their `rel`.
- */
+/** The previous and next links under a page; `followPagerKey` follows them by their `rel`. */
 export const Pager = ({ previous, next, children }: PagerProps): Node => (
   <footer className={guide.pager}>
     {hasSome(previous) && (

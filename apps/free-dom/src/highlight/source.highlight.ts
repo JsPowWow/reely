@@ -6,10 +6,7 @@ import type { SourceLines } from './source.types';
 import type { ThemeRegistration } from 'shiki';
 import type { Plugin } from 'vite';
 
-/**
- * Code colors on the graphite source panel; each keeps 5.6:1 or more on the panel and on the
- * yellow tint of new lines. Yellow itself is left out: on the panel it means "new since the last step".
- */
+/** Code colors, each 5.6:1 or more on the panel and on new lines; no yellow, which marks new lines. */
 export const reelyCodeTheme = {
   /** The panel itself: mirrors `--graphite` in the site styles. */
   background: '#1F2933',
@@ -41,13 +38,7 @@ const theme: ThemeRegistration = {
   ],
 };
 
-/**
- * Splits a source into lines of colored tokens with the reely theme.
- *
- * @param {string} code - The source text.
- * @param {'ts' | 'tsx'} lang - The source language.
- * @returns {Promise<SourceLines>} One array of tokens per source line.
- */
+/** Splits a source into lines of tokens colored with the reely theme. */
 export const highlightSource = async (code: string, lang: 'ts' | 'tsx'): Promise<SourceLines> => {
   const { tokens } = await codeToTokens(code, { lang, theme });
   return tokens.map((line) => line.map(({ content, color }) => ({ content, color })));
@@ -55,12 +46,7 @@ export const highlightSource = async (code: string, lang: 'ts' | 'tsx'): Promise
 
 const query = '?highlight';
 
-/**
- * Vite plugin: `import lines from './step.ts?highlight'` gives the module's source as
- * highlighted lines, computed at build time, so the page ships no highlighter.
- *
- * @returns {Plugin} The plugin.
- */
+/** Vite plugin: `./step.ts?highlight` is the source as highlighted lines, so the page ships no highlighter. */
 export const sourceHighlight = (): Plugin => ({
   name: 'free-dom:source-highlight',
   async load(id): Promise<string | null> {

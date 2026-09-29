@@ -1,6 +1,4 @@
-// ══════════════════════════════════════════════
-//  STAR DUEL — PartyKit Server (authoritative)
-// ══════════════════════════════════════════════
+// Star Duel: authoritative PartyKit server.
 const TICK_MS = 16; // ~60 fps (faster server updates)
 const GAME_TIME = 120;
 const WW = 4800,
@@ -9,7 +7,7 @@ const WW = 4800,
 let _bulletId = 0;
 const nextId = () => ++_bulletId;
 
-// ── Ship definitions (server-side physics only) ─
+// Server-side physics only.
 const DEFS = {
   scout: {
     speed: 4.2,
@@ -19,7 +17,7 @@ const DEFS = {
     mass: 1.0,
     radius: 18,
     fireRate: 180,
-    bulletSpeed: 18, // increased from 9
+    bulletSpeed: 18,
     bulletDmg: 12,
     isLaser: false,
     laserRange: 0,
@@ -33,7 +31,7 @@ const DEFS = {
     mass: 4.0,
     radius: 24,
     fireRate: 800,
-    bulletSpeed: 12, // increased from 6
+    bulletSpeed: 12,
     bulletDmg: 28,
     isLaser: false,
     laserRange: 0,
@@ -47,7 +45,7 @@ const DEFS = {
     mass: 1.5,
     radius: 20,
     fireRate: 1200,
-    bulletSpeed: 25, // increased from 15
+    bulletSpeed: 25,
     bulletDmg: 45,
     isLaser: false,
     laserRange: 0,
@@ -61,7 +59,7 @@ const DEFS = {
     mass: 3.0,
     radius: 22,
     fireRate: 600,
-    bulletSpeed: 8, // increased from 4
+    bulletSpeed: 8,
     bulletDmg: 18,
     isLaser: false,
     laserRange: 0,
@@ -75,7 +73,7 @@ const DEFS = {
     mass: 0.7,
     radius: 16,
     fireRate: 350,
-    bulletSpeed: 16, // increased from 8
+    bulletSpeed: 16,
     bulletDmg: 14,
     isLaser: false,
     laserRange: 0,
@@ -126,7 +124,6 @@ function hypot(dx, dy) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-// ── Asteroid generation ─────────────────────────
 function makeAsteroid(x, y, size) {
   const n = 7 + Math.floor(Math.random() * 5);
   const pts = [];
@@ -200,13 +197,12 @@ function genAsteroids() {
   return list;
 }
 
-// ══════════════════════════════════════════════
 export default class SpaceBattleServer {
   constructor(party) {
     this.party = party;
     this.players = new Map(); // conn.id → {conn, ship, shipIndex, alive}
     this.inputs = new Map(); // conn.id → input
-    this.ships = []; // all active ships in battle
+    this.ships = [];
     this.bullets = [];
     this.asteroids = [];
     this.events = [];
@@ -217,9 +213,7 @@ export default class SpaceBattleServer {
     this.nextShipId = 0;
   }
 
-  // ── Connection lifecycle ──────────────────────
   onConnect(conn) {
-    // Add player to game
     this.players.set(conn.id, {
       conn,
       ship: null,
@@ -227,13 +221,11 @@ export default class SpaceBattleServer {
       alive: false,
     });
 
-    // Send lobby state
     conn.send(JSON.stringify({
       type: 'lobby',
       playersInGame: this.ships.length
     }));
 
-    // If game already running, send asteroids
     if (this.gameStarted && this.asteroids.length > 0) {
       conn.send(JSON.stringify({
         type: 'asteroids',
@@ -268,7 +260,6 @@ export default class SpaceBattleServer {
     if (!player) return;
 
     if (data.type === 'selectShip') {
-      // Spawn player immediately
       this.spawnPlayer(conn.id, data.shipId);
     } else if (data.type === 'input') {
       this.inputs.set(conn.id, data);
@@ -278,7 +269,6 @@ export default class SpaceBattleServer {
   onClose(conn) {
     const player = this.players.get(conn.id);
 
-    // Kill their ship if alive
     if (player && player.shipIndex >= 0 && this.ships[player.shipIndex]) {
       this.ships[player.shipIndex].hp = 0;
     }
@@ -287,12 +277,10 @@ export default class SpaceBattleServer {
     this.inputs.delete(conn.id);
   }
 
-  // ── Spawn player ──────────────────────────────
   spawnPlayer(connId, shipId) {
     const player = this.players.get(connId);
     if (!player) return;
 
-    // Initialize game on first player
     if (!this.gameStarted) {
       this.gameStarted = true;
       this.asteroids = genAsteroids();
@@ -304,7 +292,6 @@ export default class SpaceBattleServer {
       this.party.storage.setAlarm(Date.now() + TICK_MS);
     }
 
-    // Find random spawn position (avoid asteroids)
     let x, y, safe = false;
     for (let attempt = 0; attempt < 20; attempt++) {
       x = 400 + Math.random() * (WW - 800);
@@ -327,7 +314,6 @@ export default class SpaceBattleServer {
     player.shipIndex = shipIndex;
     player.alive = true;
 
-    // Notify player they joined
     player.conn.send(JSON.stringify({
       type: 'gameStart',
       playerIdx: shipIndex,
@@ -352,7 +338,6 @@ export default class SpaceBattleServer {
     console.log(`Player spawned: ${connId} as ship ${shipIndex}`);
   }
 
-  // ── Game tick (called by alarm) ───────────────
   async onAlarm() {
     if (!this.gameStarted) return;
 
@@ -365,7 +350,6 @@ export default class SpaceBattleServer {
       this.lastTimer = now;
     }
 
-    // Update all ships
     for (const [connId, player] of this.players) {
       if (player.shipIndex >= 0 && this.ships[player.shipIndex]) {
         const input = this.inputs.get(connId) || {};
@@ -377,15 +361,13 @@ export default class SpaceBattleServer {
     this.updateBullets(now);
     this.updateAsteroids();
 
-    // Remove dead ships and notify players
     for (let i = this.ships.length - 1; i >= 0; i--) {
       if (this.ships[i].hp <= 0) {
-        // Find player with this ship
         for (const [connId, player] of this.players) {
           if (player.shipIndex === i) {
             player.alive = false;
             player.conn.send(JSON.stringify({ type: 'returnToLobby' }));
-            // Update indices for remaining ships
+            // Removing ship i shifts the indices after it.
             for (const [cid, p] of this.players) {
               if (p.shipIndex > i) p.shipIndex--;
             }
@@ -442,7 +424,6 @@ export default class SpaceBattleServer {
       events: this.events,
     };
 
-    // Send to all alive players
     for (const [connId, player] of this.players) {
       if (player.alive) {
         player.conn.send(JSON.stringify(stateMsg));
@@ -452,7 +433,6 @@ export default class SpaceBattleServer {
     await this.party.storage.setAlarm(Date.now() + TICK_MS);
   }
 
-  // ── Ship physics ──────────────────────────────
   updateShip(ship, inp, now) {
     const d = DEFS[ship.defId];
 
@@ -470,7 +450,6 @@ export default class SpaceBattleServer {
       this.events.push({ type: 'retro', shipId: ship.id, x: ship.x, y: ship.y, angle: ship.angle });
     }
 
-    // damping + clamp speed
     ship.vx *= 0.978;
     ship.vy *= 0.978;
     const spd = hypot(ship.vx, ship.vy);
@@ -481,7 +460,6 @@ export default class SpaceBattleServer {
 
     ship.x += ship.vx;
     ship.y += ship.vy;
-    // wrap world
     if (ship.x < -40) ship.x = WW + 40;
     if (ship.x > WW + 40) ship.x = -40;
     if (ship.y < -40) ship.y = WH + 40;
@@ -510,7 +488,6 @@ export default class SpaceBattleServer {
     ship.energy -= 5;
 
     if (d.isLaser) {
-      // Find closest enemy ship
       let closest = null;
       let minDist = d.laserRange;
       for (const en of this.ships) {
@@ -643,7 +620,6 @@ export default class SpaceBattleServer {
     }
   }
 
-  // ── Ship–ship collision ───────────────────────
   checkAllShipCollisions() {
     for (let i = 0; i < this.ships.length; i++) {
       for (let j = i + 1; j < this.ships.length; j++) {
@@ -688,7 +664,6 @@ export default class SpaceBattleServer {
     }
   }
 
-  // ── Bullet update ─────────────────────────────
   updateBullets() {
     for (let i = this.bullets.length - 1; i >= 0; i--) {
       const b = this.bullets[i];
@@ -708,7 +683,6 @@ export default class SpaceBattleServer {
         continue;
       }
 
-      // vs ships
       let hit = false;
       for (const ship of this.ships) {
         if (ship.id === b.owner || ship.hp <= 0) continue;
@@ -742,7 +716,6 @@ export default class SpaceBattleServer {
       }
       if (hit) continue;
 
-      // vs asteroids
       for (let ai = this.asteroids.length - 1; ai >= 0; ai--) {
         const ast = this.asteroids[ai];
         if (hypot(b.x - ast.x, b.y - ast.y) < ast.size + b.r) {
@@ -801,7 +774,6 @@ export default class SpaceBattleServer {
     }
   }
 
-  // ── Asteroid movement ─────────────────────────
   updateAsteroids() {
     for (const a of this.asteroids) {
       a.x += a.vx;
@@ -853,7 +825,6 @@ export default class SpaceBattleServer {
     }
   }
 
-  // ── Win condition ─────────────────────────────
   checkWin() {
     const [s0, s1] = this.ships;
     if (s0.hp <= 0 && s1.hp <= 0) return 'draw';
@@ -863,7 +834,6 @@ export default class SpaceBattleServer {
     return null;
   }
 
-  // ── Helpers ───────────────────────────────────
   broadcast(data) {
     const msg = JSON.stringify(data);
     this.party.broadcast(msg);

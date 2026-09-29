@@ -2,13 +2,7 @@ import { mount } from '@reely/dommy';
 import type { ReelyNode } from '@reely/dommy';
 import { noop } from '@reely/utils';
 
-/**
- * Shows one page at a time in `parent`. A page renders under its own owner, so showing the next
- * page takes the current one down with everything it holds: bindings, effects, timers.
- *
- * @param {ParentNode} parent - Where the pages are shown, usually `document.body`.
- * @returns {(render: () => ReelyNode) => void} Shows the page `render` builds.
- */
+/** Shows one page at a time in `parent`; each renders under its own owner, so the next takes the last one down. */
 export const createPageView = (parent: ParentNode): ((render: () => ReelyNode) => void) => {
   let disposePage: VoidFunction = noop;
   return (render) => {

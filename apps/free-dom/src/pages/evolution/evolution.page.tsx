@@ -16,10 +16,6 @@ const stepHref = (step: EvolutionStep): string => `/evolution/${step.slug}`;
 const toPagerLink = (step: EvolutionStep | undefined): Nullable<PagerLink> =>
   hasSome(step) ? { href: stepHref(step), title: step.title } : null;
 
-/**
- * A step of reely evolution: the step rail, the live demo with its DOM write counter, and the
- * step's source with the lines new since the previous step of the same demo marked.
- */
 export const EvolutionPage = ({ slug }: { slug?: string }): Node => {
   const index = isNil(slug) ? 0 : evolutionSteps.findIndex((item) => item.slug === slug);
   const step = evolutionSteps[index];
