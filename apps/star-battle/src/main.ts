@@ -1,11 +1,112 @@
 // Star Duel: authoritative PartyKit server.
+
+import { hasProperty, isString } from '@reely/utils';
+import type { Nullable } from '@reely/utils';
+
+import type * as Party from 'partykit/server';
+
+interface ShipDef {
+  readonly speed: number;
+  readonly maxSpeed: number;
+  readonly hp: number;
+  readonly turnSpeed: number;
+  readonly mass: number;
+  readonly radius: number;
+  readonly fireRate: number;
+  readonly bulletSpeed: number;
+  readonly bulletDmg: number;
+  readonly isLaser: boolean;
+  readonly laserRange: number;
+  readonly specialCooldown: number;
+}
+
+interface Point {
+  readonly x: number;
+  readonly y: number;
+}
+
+interface Ship {
+  readonly id: number;
+  readonly defId: ShipKind;
+  x: number;
+  y: number;
+  angle: number;
+  vx: number;
+  vy: number;
+  hp: number;
+  readonly maxHp: number;
+  energy: number;
+  readonly maxEnergy: number;
+  lastFire: number;
+  lastSpecial: number;
+  shieldHp: number;
+  specialActive: boolean;
+  specialTimer: number;
+  alpha: number;
+  hitFlash: number;
+  laserTarget: Nullable<Point>;
+}
+
+interface Asteroid {
+  readonly id: string;
+  x: number;
+  y: number;
+  readonly size: number;
+  vx: number;
+  vy: number;
+  rot: number;
+  readonly rotSpd: number;
+  hp: number;
+  readonly maxHp: number;
+  readonly pts: ReadonlyArray<readonly [number, number]>;
+  readonly craters: ReadonlyArray<{ readonly ox: number; readonly oy: number; readonly r: number }>;
+  readonly tone: string;
+  readonly cracks: ReadonlyArray<readonly number[]>;
+}
+
+interface Bullet {
+  readonly id: number;
+  x: number;
+  y: number;
+  readonly vx: number;
+  readonly vy: number;
+  readonly dmg: number;
+  readonly color: string;
+  readonly owner: number;
+  readonly isMine: boolean;
+  life: number;
+  readonly maxLife: number;
+  readonly r: number;
+}
+
+// what the clients render: sounds, particles and hit numbers
+interface GameEvent {
+  readonly [detail: string]: unknown;
+  readonly type: string;
+}
+
+interface Input {
+  readonly left: boolean;
+  readonly right: boolean;
+  readonly thrust: boolean;
+  readonly reverse: boolean;
+  readonly fire: boolean;
+  readonly special: boolean;
+}
+
+interface Player {
+  readonly conn: Party.Connection;
+  shipIndex: number;
+  alive: boolean;
+}
+
 const TICK_MS = 16; // ~60 fps (faster server updates)
 const GAME_TIME = 120;
 const WW = 4800,
   WH = 4800;
 
 let _bulletId = 0;
-const nextId = () => ++_bulletId;
+const nextId = (): number => ++_bulletId;
 
 // Server-side physics only.
 const DEFS = {
@@ -93,9 +194,35 @@ const DEFS = {
     laserRange: 90,
     specialCooldown: 6000,
   },
-};
+} satisfies Record<string, ShipDef>;
 
-function makeShip(defId, x, y, angle, pi) {
+type ShipKind = keyof typeof DEFS;
+
+const BULLET_COLORS = {
+  scout: '#00ffcc',
+  tank: '#ff8800',
+  sniper: '#cc44ff',
+  bomber: '#ffdd00',
+  ghost: '#44ddff',
+  orb: '#ff2200',
+} satisfies Record<ShipKind, string>;
+
+const isShipKind = (maybeKind: unknown): maybeKind is ShipKind => isString(maybeKind) && Object.hasOwn(DEFS, maybeKind);
+
+const flag = (message: object, name: keyof Input): boolean => hasProperty(name, message) && message[name] === true;
+
+const readInput = (message: object): Input => ({
+  left: flag(message, 'left'),
+  right: flag(message, 'right'),
+  thrust: flag(message, 'thrust'),
+  reverse: flag(message, 'reverse'),
+  fire: flag(message, 'fire'),
+  special: flag(message, 'special'),
+});
+
+const NO_INPUT = readInput({});
+
+function makeShip(defId: ShipKind, x: number, y: number, angle: number, pi: number): Ship {
   const d = DEFS[defId];
   return {
     id: pi,
@@ -120,19 +247,19 @@ function makeShip(defId, x, y, angle, pi) {
   };
 }
 
-function hypot(dx, dy) {
+function hypot(dx: number, dy: number): number {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-function makeAsteroid(x, y, size) {
+function makeAsteroid(x: number, y: number, size: number): Asteroid {
   const n = 7 + Math.floor(Math.random() * 5);
-  const pts = [];
+  const pts: Array<[number, number]> = [];
   for (let i = 0; i < n; i++) {
     const a = ((Math.PI * 2) / n) * i + (Math.random() - 0.5) * 0.5;
     const r = size * (0.65 + Math.random() * 0.35);
     pts.push([Math.cos(a) * r, Math.sin(a) * r]);
   }
-  const craters = [];
+  const craters: Array<{ ox: number; oy: number; r: number }> = [];
   for (let i = 0, nc = 2 + Math.floor(size / 18); i < nc; i++)
     craters.push({
       ox: (Math.random() - 0.5) * size * 0.8,
@@ -141,7 +268,7 @@ function makeAsteroid(x, y, size) {
     });
   const toneArr = ['#8866aa', '#446688', '#776655'];
   const tone = toneArr[Math.random() < 0.25 ? 0 : Math.random() < 0.4 ? 1 : 2];
-  const cracks = [];
+  const cracks: number[][] = [];
   for (let i = 0, nc = 4 + Math.floor(Math.random() * 4); i < nc; i++) {
     const ca = Math.random() * Math.PI * 2,
       cr = size * (0.2 + Math.random() * 0.5);
@@ -174,8 +301,8 @@ function makeAsteroid(x, y, size) {
   };
 }
 
-function genAsteroids() {
-  const list = [];
+function genAsteroids(): Asteroid[] {
+  const list: Asteroid[] = [];
   // clustered
   for (let i = 0; i < 6; i++) {
     const cx = 200 + Math.random() * (WW - 400),
@@ -197,26 +324,24 @@ function genAsteroids() {
   return list;
 }
 
-export default class SpaceBattleServer {
-  constructor(party) {
-    this.party = party;
-    this.players = new Map(); // conn.id → {conn, ship, shipIndex, alive}
-    this.inputs = new Map(); // conn.id → input
-    this.ships = [];
-    this.bullets = [];
-    this.asteroids = [];
-    this.events = [];
-    this.time = GAME_TIME;
-    this.tick = 0;
-    this.lastTimer = 0;
-    this.gameStarted = false;
-    this.nextShipId = 0;
-  }
+export default class SpaceBattleServer implements Party.Server {
+  // by connection id
+  private readonly players = new Map<string, Player>();
+  private readonly inputs = new Map<string, Input>();
+  private ships: Ship[] = [];
+  private bullets: Bullet[] = [];
+  private asteroids: Asteroid[] = [];
+  private events: GameEvent[] = [];
+  private time = GAME_TIME;
+  private tick = 0;
+  private lastTimer = 0;
+  private gameStarted = false;
 
-  onConnect(conn) {
+  constructor(private readonly party: Party.Room) {}
+
+  public onConnect(conn: Party.Connection): void {
     this.players.set(conn.id, {
       conn,
-      ship: null,
       shipIndex: -1,
       alive: false,
     });
@@ -229,44 +354,29 @@ export default class SpaceBattleServer {
     if (this.gameStarted && this.asteroids.length > 0) {
       conn.send(JSON.stringify({
         type: 'asteroids',
-        asteroids: this.asteroids.map((a) => ({
-          id: a.id,
-          x: a.x,
-          y: a.y,
-          size: a.size,
-          vx: a.vx,
-          vy: a.vy,
-          rot: a.rot,
-          rotSpd: a.rotSpd,
-          hp: a.hp,
-          maxHp: a.maxHp,
-          pts: a.pts,
-          craters: a.craters,
-          tone: a.tone,
-          cracks: a.cracks,
-        })),
+        asteroids: this.asteroids,
       }));
     }
   }
 
-  onMessage(msg, conn) {
-    let data;
+  public onMessage(msg: string | ArrayBuffer | ArrayBufferView, conn: Party.Connection): void {
+    let data: unknown;
     try {
-      data = JSON.parse(msg);
+      data = isString(msg) ? JSON.parse(msg) : null;
     } catch {
       return;
     }
     const player = this.players.get(conn.id);
-    if (!player) return;
+    if (!player || !hasProperty('type', data)) return;
 
-    if (data.type === 'selectShip') {
+    if (data.type === 'selectShip' && hasProperty('shipId', data) && isShipKind(data.shipId)) {
       this.spawnPlayer(conn.id, data.shipId);
     } else if (data.type === 'input') {
-      this.inputs.set(conn.id, data);
+      this.inputs.set(conn.id, readInput(data));
     }
   }
 
-  onClose(conn) {
+  public onClose(conn: Party.Connection): void {
     const player = this.players.get(conn.id);
 
     if (player && player.shipIndex >= 0 && this.ships[player.shipIndex]) {
@@ -277,68 +387,7 @@ export default class SpaceBattleServer {
     this.inputs.delete(conn.id);
   }
 
-  spawnPlayer(connId, shipId) {
-    const player = this.players.get(connId);
-    if (!player) return;
-
-    if (!this.gameStarted) {
-      this.gameStarted = true;
-      this.asteroids = genAsteroids();
-      this.bullets = [];
-      this.events = [];
-      this.time = GAME_TIME;
-      this.tick = 0;
-      this.lastTimer = Date.now();
-      this.party.storage.setAlarm(Date.now() + TICK_MS);
-    }
-
-    let x, y, safe = false;
-    for (let attempt = 0; attempt < 20; attempt++) {
-      x = 400 + Math.random() * (WW - 800);
-      y = 400 + Math.random() * (WH - 800);
-      safe = true;
-      for (const ast of this.asteroids) {
-        if (hypot(x - ast.x, y - ast.y) < ast.size + 150) {
-          safe = false;
-          break;
-        }
-      }
-      if (safe) break;
-    }
-
-    const shipIndex = this.ships.length;
-    const newShip = makeShip(shipId, x, y, Math.random() * Math.PI * 2, shipIndex);
-    this.ships.push(newShip);
-
-    player.ship = shipId;
-    player.shipIndex = shipIndex;
-    player.alive = true;
-
-    player.conn.send(JSON.stringify({
-      type: 'gameStart',
-      playerIdx: shipIndex,
-      asteroids: this.asteroids.map((a) => ({
-        id: a.id,
-        x: a.x,
-        y: a.y,
-        size: a.size,
-        vx: a.vx,
-        vy: a.vy,
-        rot: a.rot,
-        rotSpd: a.rotSpd,
-        hp: a.hp,
-        maxHp: a.maxHp,
-        pts: a.pts,
-        craters: a.craters,
-        tone: a.tone,
-        cracks: a.cracks,
-      })),
-    }));
-
-    console.log(`Player spawned: ${connId} as ship ${shipIndex}`);
-  }
-
-  async onAlarm() {
+  public async onAlarm(): Promise<void> {
     if (!this.gameStarted) return;
 
     this.events = [];
@@ -352,23 +401,23 @@ export default class SpaceBattleServer {
 
     for (const [connId, player] of this.players) {
       if (player.shipIndex >= 0 && this.ships[player.shipIndex]) {
-        const input = this.inputs.get(connId) || {};
+        const input = this.inputs.get(connId) ?? NO_INPUT;
         this.updateShip(this.ships[player.shipIndex], input, now);
       }
     }
 
     this.checkAllShipCollisions();
-    this.updateBullets(now);
+    this.updateBullets();
     this.updateAsteroids();
 
     for (let i = this.ships.length - 1; i >= 0; i--) {
       if (this.ships[i].hp <= 0) {
-        for (const [connId, player] of this.players) {
+        for (const player of this.players.values()) {
           if (player.shipIndex === i) {
             player.alive = false;
             player.conn.send(JSON.stringify({ type: 'returnToLobby' }));
             // Removing ship i shifts the indices after it.
-            for (const [cid, p] of this.players) {
+            for (const p of this.players.values()) {
               if (p.shipIndex > i) p.shipIndex--;
             }
             break;
@@ -424,7 +473,7 @@ export default class SpaceBattleServer {
       events: this.events,
     };
 
-    for (const [connId, player] of this.players) {
+    for (const player of this.players.values()) {
       if (player.alive) {
         player.conn.send(JSON.stringify(stateMsg));
       }
@@ -433,7 +482,53 @@ export default class SpaceBattleServer {
     await this.party.storage.setAlarm(Date.now() + TICK_MS);
   }
 
-  updateShip(ship, inp, now) {
+  private spawnPlayer(connId: string, shipId: ShipKind): void {
+    const player = this.players.get(connId);
+    if (!player) return;
+
+    if (!this.gameStarted) {
+      this.gameStarted = true;
+      this.asteroids = genAsteroids();
+      this.bullets = [];
+      this.events = [];
+      this.time = GAME_TIME;
+      this.tick = 0;
+      this.lastTimer = Date.now();
+      this.party.storage.setAlarm(Date.now() + TICK_MS);
+    }
+
+    let x = 0;
+    let y = 0;
+    for (let attempt = 0; attempt < 20; attempt++) {
+      x = 400 + Math.random() * (WW - 800);
+      y = 400 + Math.random() * (WH - 800);
+      let safe = true;
+      for (const ast of this.asteroids) {
+        if (hypot(x - ast.x, y - ast.y) < ast.size + 150) {
+          safe = false;
+          break;
+        }
+      }
+      if (safe) break;
+    }
+
+    const shipIndex = this.ships.length;
+    const newShip = makeShip(shipId, x, y, Math.random() * Math.PI * 2, shipIndex);
+    this.ships.push(newShip);
+
+    player.shipIndex = shipIndex;
+    player.alive = true;
+
+    player.conn.send(JSON.stringify({
+      type: 'gameStart',
+      playerIdx: shipIndex,
+      asteroids: this.asteroids,
+    }));
+
+    console.log(`Player spawned: ${connId} as ship ${shipIndex}`);
+  }
+
+  private updateShip(ship: Ship, inp: Input, now: number): void {
     const d = DEFS[ship.defId];
 
     if (inp.left) ship.angle -= d.turnSpeed;
@@ -481,14 +576,14 @@ export default class SpaceBattleServer {
     ship.laserTarget = null;
   }
 
-  fireWeapon(ship, d, now) {
+  private fireWeapon(ship: Ship, d: ShipDef, now: number): void {
     if (now - ship.lastFire < d.fireRate) return;
     if (ship.energy < 5) return;
     ship.lastFire = now;
     ship.energy -= 5;
 
     if (d.isLaser) {
-      let closest = null;
+      let closest: Nullable<Ship> = null;
       let minDist = d.laserRange;
       for (const en of this.ships) {
         if (en.id === ship.id || en.hp <= 0) continue;
@@ -518,9 +613,7 @@ export default class SpaceBattleServer {
     }
 
     this.events.push({ type: 'fire', shipId: ship.id });
-    const color = ['#00ffcc', '#ff8800', '#cc44ff', '#ffdd00', '#44ddff', '#ff2200'][
-      ['scout', 'tank', 'sniper', 'bomber', 'ghost', 'orb'].indexOf(ship.defId)
-    ];
+    const color = BULLET_COLORS[ship.defId];
     this.bullets.push({
       id: nextId(),
       x: ship.x + Math.cos(ship.angle) * 24,
@@ -539,7 +632,7 @@ export default class SpaceBattleServer {
     ship.vy -= Math.sin(ship.angle) * 0.22;
   }
 
-  activateSpecial(ship, d, now) {
+  private activateSpecial(ship: Ship, d: ShipDef, now: number): void {
     if (now - ship.lastSpecial < d.specialCooldown) return;
     if (ship.energy < 30) return;
     ship.lastSpecial = now;
@@ -620,7 +713,7 @@ export default class SpaceBattleServer {
     }
   }
 
-  checkAllShipCollisions() {
+  private checkAllShipCollisions(): void {
     for (let i = 0; i < this.ships.length; i++) {
       for (let j = i + 1; j < this.ships.length; j++) {
         this.checkShipCollision(this.ships[i], this.ships[j]);
@@ -628,7 +721,7 @@ export default class SpaceBattleServer {
     }
   }
 
-  checkShipCollision(a, b) {
+  private checkShipCollision(a: Ship, b: Ship): void {
     if (a.hp <= 0 || b.hp <= 0) return;
     const dx = b.x - a.x,
       dy = b.y - a.y,
@@ -664,7 +757,7 @@ export default class SpaceBattleServer {
     }
   }
 
-  updateBullets() {
+  private updateBullets(): void {
     for (let i = this.bullets.length - 1; i >= 0; i--) {
       const b = this.bullets[i];
       if (!b.isMine) {
@@ -723,7 +816,7 @@ export default class SpaceBattleServer {
           this.events.push({ type: 'asteroidHit', astId: ast.id, x: b.x, y: b.y });
           if (ast.hp <= 0) {
             this.events.push({ type: 'asteroidBoom', x: ast.x, y: ast.y, size: ast.size });
-            this._splitAsteroid(ai, b.vx, b.vy);
+            this.splitAsteroid(ai, b.vx, b.vy);
           }
           this.bullets.splice(i, 1);
           hit = true;
@@ -733,10 +826,10 @@ export default class SpaceBattleServer {
     }
   }
 
-  _splitAsteroid(idx, dvx, dvy) {
+  private splitAsteroid(idx: number, dvx: number, dvy: number): void {
     const ast = this.asteroids[idx];
     const children = ast.size > 40 ? 3 : ast.size > 22 ? 2 : 0;
-    const newKids = [];
+    const newKids: Asteroid[] = [];
     for (let k = 0; k < children; k++) {
       const angle = ((Math.PI * 2) / children) * k + Math.random() * 0.8;
       const child = makeAsteroid(
@@ -754,27 +847,12 @@ export default class SpaceBattleServer {
       // tell clients about new child asteroid (with full geometry)
       this.events.push({
         type: 'asteroidSpawn',
-        asteroid: {
-          id: c.id,
-          x: c.x,
-          y: c.y,
-          size: c.size,
-          vx: c.vx,
-          vy: c.vy,
-          rot: c.rot,
-          rotSpd: c.rotSpd,
-          hp: c.hp,
-          maxHp: c.maxHp,
-          pts: c.pts,
-          craters: c.craters,
-          tone: c.tone,
-          cracks: c.cracks,
-        },
+        asteroid: c,
       });
     }
   }
 
-  updateAsteroids() {
+  private updateAsteroids(): void {
     for (const a of this.asteroids) {
       a.x += a.vx;
       a.y += a.vy;
@@ -825,17 +903,4 @@ export default class SpaceBattleServer {
     }
   }
 
-  checkWin() {
-    const [s0, s1] = this.ships;
-    if (s0.hp <= 0 && s1.hp <= 0) return 'draw';
-    if (s0.hp <= 0) return 1;
-    if (s1.hp <= 0) return 0;
-    if (this.time <= 0) return s0.hp > s1.hp ? 0 : s1.hp > s0.hp ? 1 : 'draw';
-    return null;
-  }
-
-  broadcast(data) {
-    const msg = JSON.stringify(data);
-    this.party.broadcast(msg);
-  }
 }

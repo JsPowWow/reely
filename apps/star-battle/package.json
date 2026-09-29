@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "private": false,
   "scripts": {
+    "predev": "nx build @reely/utils",
     "dev": "partykit dev",
+    "predeploy": "nx build @reely/utils",
     "deploy": "partykit deploy"
   },
   "devDependencies": {

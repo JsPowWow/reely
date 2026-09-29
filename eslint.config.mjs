@@ -53,6 +53,10 @@ export default [
               sourceTag: 'scope:free-dom',
               onlyDependOnLibsWithTags: ['scope:shared', 'scope:dommy', 'scope:async', 'scope:colors', 'scope:strings'],
             },
+            {
+              sourceTag: 'scope:star-battle',
+              onlyDependOnLibsWithTags: ['scope:shared'],
+            },
           ],
         },
       ],
