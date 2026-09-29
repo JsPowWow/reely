@@ -1,4 +1,4 @@
-import { hasSome, isSomeFunction, toErrorWithMessage } from '@reely/utils';
+import { isSomeFunction, toErrorString, toErrorWithMessage } from '@reely/utils';
 
 import { onCleanup } from './reactive/owner';
 import { bindValue } from './utils/element.bindings';
@@ -20,10 +20,11 @@ export interface AwaitProps<T> {
   /** Renders the branch shown while the promise is pending; nothing by default. */
   fallback?: () => ReelyNode;
   /**
-   * Renders the branch shown when the promise rejects, with the reason as an `Error`. Without
-   * it the slot is cleared and the rejection goes on unhandled, so the error is never lost.
+   * Renders the branch shown when the promise rejects, with the reason as an `Error`. Required,
+   * so a failure always has a view; a JavaScript caller that leaves it out gets the error as
+   * text (`TypeError: …`).
    */
-  catch?: (error: Error) => ReelyNode;
+  catch: (error: Error) => ReelyNode;
 }
 
 /**
@@ -54,12 +55,9 @@ export const Await = <T>({ promise, children, fallback, catch: renderError }: Aw
         if (turn !== latest) {
           return;
         }
-        if (hasSome(renderError)) {
-          slot.show(() => renderError(toErrorWithMessage(reason)));
-          return;
-        }
-        slot.show();
-        throw reason;
+        slot.show(() =>
+          isSomeFunction(renderError) ? renderError(toErrorWithMessage(reason)) : toErrorString(reason)
+        );
       }
     );
   };
@@ -68,15 +66,8 @@ export const Await = <T>({ promise, children, fallback, catch: renderError }: Aw
     latest += 1;
   });
   if (isSomeFunction(promise)) {
-    // a getter that throws before it returns a promise fails like a rejected one; the reason is
-    // kept as thrown (not `Either.tryCatch`, which makes it an `Error`) for the unhandled path
-    bindValue((): PromiseLike<T> => {
-      try {
-        return promise();
-      } catch (reason) {
-        return Promise.reject(reason);
-      }
-    }, wait);
+    // a getter that throws before it returns a promise fails like a rejected one
+    bindValue(() => Promise.try(promise), wait);
   } else {
     wait(promise);
   }

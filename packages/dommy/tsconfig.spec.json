@@ -11,7 +11,7 @@
       "@reely/dommy/jsx-dev-runtime": ["./src/lib/jsx-runtime.ts"]
     },
     "module": "esnext",
-    "lib": ["es2024", "dom"],
+    "lib": ["es2024", "esnext.promise", "dom"],
     "forceConsistentCasingInFileNames": true,
     "ignoreDeprecations": "6.0",
     "rootDir": "."

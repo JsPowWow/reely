@@ -46,7 +46,7 @@ describe('Await', () => {
     const final = deferred<string>();
     const panel = document.createElement('section');
     mount(panel, () => (
-      <Await promise={final.promise} fallback={() => <p>Loading the final</p>}>
+      <Await catch={(error) => error.message} promise={final.promise} fallback={() => <p>Loading the final</p>}>
         {(winner) => <p>Winner: {winner}</p>}
       </Await>
     ));
@@ -61,7 +61,7 @@ describe('Await', () => {
 
   it('renders nothing while pending without a fallback', async () => {
     const panel = document.createElement('section');
-    mount(panel, () => <Await promise={Promise.resolve(3)}>{(laps) => <p>{laps} laps</p>}</Await>);
+    mount(panel, () => <Await catch={(error) => error.message} promise={Promise.resolve(3)}>{(laps) => <p>{laps} laps</p>}</Await>);
     const pending = panel.childNodes.length;
 
     await settle();
@@ -120,7 +120,7 @@ describe('Await', () => {
 
     const unhandled = await collectUnhandled(async () => {
       mount(panel, () => (
-        <Await promise={Promise.resolve('Car 7')}>
+        <Await catch={(error) => error.message} promise={Promise.resolve('Car 7')}>
           {() => {
             throw failure;
           }}
@@ -133,21 +133,15 @@ describe('Await', () => {
     expect(panel.textContent).toBe('');
   });
 
-  it('clears the fallback and leaves the rejection unhandled when there is no catch branch', async () => {
+  it('shows the error as text when a caller leaves out the required catch branch', async () => {
     const panel = document.createElement('section');
-    const failure = new Error('The final did not load');
+    const props = { promise: Promise.reject(new RangeError('No lap 9')), children: () => 'Results' };
 
-    const unhandled = await collectUnhandled(async () => {
-      mount(panel, () => (
-        <Await promise={Promise.reject(failure)} fallback={() => <p>Loading</p>}>
-          {() => <p>Results</p>}
-        </Await>
-      ));
-      await settle();
-    });
+    // @ts-expect-error `catch` is required; a JavaScript caller can still leave it out
+    mount(panel, () => Await(props));
+    await settle();
 
-    expect(panel.textContent).toBe('');
-    expect(unhandled).toEqual([failure]);
+    expect(panel.textContent).toBe('RangeError: No lap 9');
   });
 
   it('waits again when the promise getter reads a changed signal, and drops the result it replaced', async () => {
@@ -156,7 +150,7 @@ describe('Await', () => {
     const load = vi.fn((n: number) => loads.get(n)?.promise ?? Promise.reject(new Error('no lap')));
     const panel = document.createElement('section');
     mount(panel, () => (
-      <Await promise={() => load(lap.value)} fallback={() => <p>Loading lap {String(lap.value)}</p>}>
+      <Await catch={(error) => error.message} promise={() => load(lap.value)} fallback={() => <p>Loading lap {String(lap.value)}</p>}>
         {(leader) => <p>Leader: {leader}</p>}
       </Await>
     ));
@@ -173,19 +167,20 @@ describe('Await', () => {
     expect(panel.textContent).toBe('Leader: Car 3');
   });
 
-  it('ignores a rejection of a replaced promise, even without a catch branch', async () => {
+  it('ignores a rejection of a promise it replaced', async () => {
     const first = deferred<string>();
     const promise = signal<Promise<string>>(first.promise);
     const panel = document.createElement('section');
+    mount(panel, () => (
+      <Await promise={promise} catch={(error) => <p>{error.message}</p>}>
+        {(leader) => <p>{leader}</p>}
+      </Await>
+    ));
 
-    const unhandled = await collectUnhandled(async () => {
-      mount(panel, () => <Await promise={promise}>{(leader) => <p>{leader}</p>}</Await>);
-      promise.value = Promise.resolve('Car 3');
-      first.reject(new Error('stale'));
-      await settle();
-    });
+    promise.value = Promise.resolve('Car 3');
+    first.reject(new Error('stale'));
+    await settle();
 
-    expect(unhandled).toEqual([]);
     expect(panel.textContent).toBe('Car 3');
   });
 
@@ -194,7 +189,7 @@ describe('Await', () => {
     const load = vi.fn(() => Promise.resolve('Car 7'));
     const panel = document.createElement('section');
     mount(panel, () => (
-      <Await promise={load}>
+      <Await catch={(error) => error.message} promise={load}>
         {(leader) => (
           <p>
             {leader} leads by {() => gap.value.toFixed(1)} s
@@ -218,7 +213,7 @@ describe('Await', () => {
     const tick = signal(0);
     const panel = document.createElement('section');
     const dispose = mount(panel, () => (
-      <Await promise={() => (lap.value, final.promise)} fallback={() => <p>{tick}</p>}>
+      <Await catch={(error) => error.message} promise={() => (lap.value, final.promise)} fallback={() => <p>{tick}</p>}>
         {(winner) => <p>{winner}</p>}
       </Await>
     ));
@@ -238,7 +233,7 @@ describe('Await', () => {
     const dots = signal('.');
     const panel = document.createElement('section');
     mount(panel, () => (
-      <Await promise={Promise.resolve('Car 7')} fallback={() => <p>Loading{dots}</p>}>
+      <Await catch={(error) => error.message} promise={Promise.resolve('Car 7')} fallback={() => <p>Loading{dots}</p>}>
         {(winner) => <p>{winner}</p>}
       </Await>
     ));
@@ -255,7 +250,7 @@ describe('Await', () => {
     const lap = signal(1);
     const load = vi.fn(() => (stop.value, deferred<string>().promise));
     mount(document.createElement('div'), () => (
-      <Await promise={load} fallback={() => <p>In the pits on lap {String(lap.value)}</p>}>
+      <Await catch={(error) => error.message} promise={load} fallback={() => <p>In the pits on lap {String(lap.value)}</p>}>
         {(time) => <p>{time}</p>}
       </Await>
     ));
@@ -279,7 +274,7 @@ describe('Await', () => {
         {(car) => (
           <li>
             Car {car}:{' '}
-            <Await promise={times.get(car())?.promise ?? Promise.resolve(0)} fallback={() => 'timing'}>
+            <Await catch={(error) => error.message} promise={times.get(car())?.promise ?? Promise.resolve(0)} fallback={() => 'timing'}>
               {(seconds) => `${seconds} s`}
             </Await>
           </li>
@@ -297,7 +292,7 @@ describe('Await', () => {
   it('types the value the children receive from the promise', async () => {
     const panel = document.createElement('section');
     mount(panel, () => (
-      <Await promise={Promise.resolve({ laps: 5 })}>
+      <Await catch={(error) => error.message} promise={Promise.resolve({ laps: 5 })}>
         {(race) => {
           expectTypeOf(race).toEqualTypeOf<{ laps: number }>();
           return race.laps;
@@ -308,7 +303,10 @@ describe('Await', () => {
     await settle();
 
     expect(panel.textContent).toBe('5');
-    expectTypeOf<{ promise: Promise<string>; children: (laps: number) => number }>().not.toMatchTypeOf<
+    expectTypeOf<{ promise: Promise<string>; children: (laps: number) => number; catch: () => null }>().not.toMatchTypeOf<
+      AwaitProps<number>
+    >();
+    expectTypeOf<{ promise: Promise<number>; children: (laps: number) => number }>().not.toMatchTypeOf<
       AwaitProps<number>
     >();
   });

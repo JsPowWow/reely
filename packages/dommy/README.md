@@ -197,7 +197,7 @@ reviewer.value = 'Linus'; // a new, empty textarea
 
 ## Async
 
-`Await` renders `fallback` while a promise is pending, then `children` with its value, or `catch` with the reason as an `Error`. Like `Show`, each branch is a function, built when it is shown and released when it is hidden.
+`Await` renders `fallback` while a promise is pending, then `children` with its value, or `catch` with the reason as an `Error`. `catch` is required, so a failure always has a view (JavaScript that leaves it out shows the error as text). Like `Show`, each branch is a function, built when it is shown and released when it is hidden.
 
 ```tsx
 import { Await } from '@reely/dommy';
@@ -220,7 +220,7 @@ const result = (
 );
 ```
 
-`promise` can also be a getter: it is tracked, so a change of a signal it reads loads again. Only the latest promise renders; the result of one it replaced is dropped, and so is everything that settles after the view is disposed.
+`promise` can also be a getter, and that makes a resource: the getter is tracked, so a change of a signal it reads loads again. Only the latest promise renders; the one it replaced is dropped, its result and its rejection alike, and so is everything that settles after the view is disposed.
 
 ```tsx
 import { Await, signal } from '@reely/dommy';
@@ -230,7 +230,11 @@ const loadLap = (lap: number): Promise<string[]> => fetch(`/laps/${lap}.json`).t
 const lap = signal(1);
 
 const standings = (
-  <Await promise={() => loadLap(lap.value)} fallback={() => <p>Loading lap {lap}…</p>}>
+  <Await
+    promise={() => loadLap(lap.value)}
+    fallback={() => <p>Loading lap {lap}…</p>}
+    catch={(error) => <p>Lap {lap} did not load: {error.message}</p>}
+  >
     {(cars) => (
       <ol>
         {cars.map((car) => (
@@ -244,7 +248,7 @@ const standings = (
 lap.value = 2; // the fallback again, then lap 2; a late answer for lap 1 is dropped
 ```
 
-`promise={loadFinal}` starts the load when the view renders. A getter that throws counts as a rejection. Without `catch`, a rejection clears the fallback and stays unhandled, so the browser reports it; a replaced promise is dropped whole, its rejection too. To retry, read a signal in the getter and change it. To wait for several promises under one fallback, give `Await` their `Promise.all`.
+`promise={loadFinal}` starts the load when the view renders. A getter that throws counts as a rejection (`Await` calls it through `Promise.try`, in every browser since 2025). To retry, read a signal in the getter and change it. To wait for several promises under one fallback, give `Await` their `Promise.all`.
 
 ## Mount and clean up
 
