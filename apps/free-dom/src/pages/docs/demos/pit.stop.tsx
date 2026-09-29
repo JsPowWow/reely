@@ -30,15 +30,15 @@ export const PitWall = (): Node => {
 
   return (
     <div className={css.row}>
-      <Show when={() => stop.value > 0} fallback={() => <p className={css.racing}>On track</p>}>
+      <Show when={() => stop.value > 0} fallback={() => <p className={css.pending}>On track</p>}>
         {() => (
           <Await
             promise={() => callCrew(stop.value)}
-            fallback={() => <p className={css.racing}>In the pits…</p>}
+            fallback={() => <p className={css.pending}>In the pits…</p>}
             catch={(error) => <p className={css.failed}>{error.message}</p>}
           >
             {(result) => (
-              <p className={css.winner}>
+              <p className={css.plate}>
                 Stop {result.stop}: {result.seconds.toFixed(1)} s
               </p>
             )}

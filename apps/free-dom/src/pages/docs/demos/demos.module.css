@@ -27,8 +27,8 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* The chequered moment: the winner's plate in signal yellow. */
-.winner {
+/* A posted result on its signal-yellow plate: the winner, a stop time. */
+.plate {
   margin: 0;
   padding: 0.6rem 0.9rem;
   border-radius: 4px;
@@ -39,7 +39,8 @@
   line-height: 1.1;
 }
 
-.racing {
+/* Not settled yet: a dashed outline in slate. */
+.pending {
   margin: 0;
   padding: 0.6rem 0.9rem;
   border: 1px dashed var(--line);
@@ -51,11 +52,11 @@
   line-height: 1.1;
 }
 
-/* A failed call: flag red, the colour of a stop that went wrong. */
+/* A failed call, in heavy graphite on white: flag red stays for nodes added or removed. */
 .failed {
   margin: 0;
   padding: 0.6rem 0.9rem;
-  border: 2px solid var(--flag);
+  border: 2px solid var(--graphite);
   border-radius: 4px;
   background: var(--panel);
   font-weight: 700;

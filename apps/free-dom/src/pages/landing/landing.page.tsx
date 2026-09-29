@@ -1,5 +1,6 @@
 import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
+import { measured } from '../../site/measurements';
 import { SiteHeader } from '../../site/site.header';
 import { Counter } from '../docs/demos/first.counter';
 import { trackLap } from './lap.progress';
@@ -38,7 +39,7 @@ const finishId = 'finish';
 /** The sector bar: every sector, then the finish, each with the split it posts once driven. */
 const segments = [
   ...lapSectors.map((sector, index) => ({ id: sector.id, number: `S${index + 1}`, name: sector.name, mark: sector.mark })),
-  { id: finishId, number: 'F', name: 'Finish', mark: '6.5 kB' },
+  { id: finishId, number: 'F', name: 'Finish', mark: measured.wholePackage },
 ];
 
 export const LandingPage = (): Node => {
@@ -107,19 +108,19 @@ export const LandingPage = (): Node => {
               <tbody>
                 <tr>
                   <th scope='row'>An app that uses only signals ships</th>
-                  <td>1.3 kB</td>
+                  <td>{measured.signalsOnly}</td>
                 </tr>
                 <tr>
                   <th scope='row'>A JSX app with For, Show and mount ships</th>
-                  <td>4.7 kB</td>
+                  <td>{measured.jsxApp}</td>
                 </tr>
                 <tr>
                   <th scope='row'>The whole package, gzipped</th>
-                  <td>6.5 kB</td>
+                  <td>{measured.wholePackage}</td>
                 </tr>
                 <tr>
                   <th scope='row'>A lap of a 500-row board, median in headless Chrome</th>
-                  <td>7.7 ms</td>
+                  <td>{measured.lapMedian}</td>
                 </tr>
               </tbody>
             </table>

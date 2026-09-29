@@ -1,4 +1,5 @@
 import { SourceView } from '../../demo/source.view';
+import { measured } from '../../site/measurements';
 import { Board as KeyedBoard } from '../evolution/steps/step12.keyed-list';
 import keyedListSource from '../evolution/steps/step12.keyed-list.tsx?highlight';
 import { Board as LiveBoard } from '../evolution/steps/step13.five-hundred';
@@ -388,17 +389,17 @@ export const docTopics: readonly DocTopic[] = [
           <tbody>
             <tr>
               <th scope='row'>Signals only</th>
-              <td>1.3 kB</td>
+              <td>{measured.signalsOnly}</td>
             </tr>
             <tr>
               <th scope='row'>
                 JSX with <code>For</code>, <code>Show</code> and <code>mount</code>
               </th>
-              <td>4.7 kB</td>
+              <td>{measured.jsxApp}</td>
             </tr>
             <tr>
               <th scope='row'>The whole package</th>
-              <td>6.5 kB</td>
+              <td>{measured.wholePackage}</td>
             </tr>
           </tbody>
         </table>
@@ -408,7 +409,7 @@ export const docTopics: readonly DocTopic[] = [
         </p>
         <h2>Speed</h2>
         <p>
-          In headless Chrome, a lap of the 500-row board takes a median of 7.7 ms, 8.7 ms at the 95th percentile. The
+          In headless Chrome, a lap of the 500-row board takes a median of {measured.lapMedian}, {measured.lapP95} at the 95th percentile. The
           demo above measures the same in your browser.
         </p>
       </>

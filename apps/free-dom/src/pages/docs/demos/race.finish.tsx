@@ -9,8 +9,8 @@ export const RaceFinish = (): Node => {
 
   return (
     <div className={css.row}>
-      <Show when={winner} fallback={() => <p className={css.racing}>Racing, lap {lap}</p>}>
-        {() => <p className={css.winner}>Winner: {winner}</p>}
+      <Show when={winner} fallback={() => <p className={css.pending}>Racing, lap {lap}</p>}>
+        {() => <p className={css.plate}>Winner: {winner}</p>}
       </Show>
       <button onClick={() => (lap.value += 1)} disabled={() => winner.value !== null}>
         Next lap
