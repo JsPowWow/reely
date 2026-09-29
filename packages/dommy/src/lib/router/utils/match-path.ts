@@ -1,4 +1,5 @@
-import { hasSome, isInstanceOf, isNil } from '@reely/utils';
+import { hasSome } from '@reely/basics';
+import { isInstanceOf, isNil } from '@reely/utils';
 
 import type { MatchingRoute, RouteMatchingResult, RoutePath } from './types';
 

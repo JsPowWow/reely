@@ -39,7 +39,7 @@ export const LandingPage = (): Node => {
             </h1>
             <p className={css.pitch}>
               @reely/dommy builds real DOM from tag factories and JSX, and binds each signal to the one node it changes.
-              No virtual DOM, no re-render, no dependencies.
+              No virtual DOM, no re-render, no third-party dependencies.
             </p>
             <div className={css.actions}>
               <a className={css.primary} href='/docs'>

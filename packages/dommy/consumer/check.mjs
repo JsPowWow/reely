@@ -20,13 +20,17 @@ const work = mkdtempSync(join(tmpdir(), 'dommy-consumer-'));
 const run = (command, args) => execFileSync(command, args, { cwd: work, encoding: 'utf8', stdio: 'pipe' });
 
 try {
-  const tarball = execFileSync('npm', ['pack', '--silent', '--pack-destination', work], {
-    cwd: packageDir,
-    encoding: 'utf8',
-  })
-    .trim()
-    .split('\n')
-    .at(-1);
+  const pack = (dir) =>
+    execFileSync('npm', ['pack', '--silent', '--pack-destination', work], { cwd: dir, encoding: 'utf8' })
+      .trim()
+      .split('\n')
+      .at(-1);
+  const tarball = pack(packageDir);
+  // the published @reely packages dommy depends on; none of them depends on another yet
+  const { dependencies = {} } = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8'));
+  const dependencyTarballs = Object.keys(dependencies)
+    .filter((name) => name.startsWith('@reely/'))
+    .map((name) => `./${pack(resolve(packageDir, '..', name.slice('@reely/'.length)))}`);
   writeFileSync(join(work, 'package.json'), JSON.stringify({ name: 'consumer', private: true, type: 'module' }));
   cpSync(join(here, 'src'), join(work, 'src'), { recursive: true });
   cpSync(join(here, 'tsconfig.json'), join(work, 'tsconfig.json'));
@@ -34,8 +38,16 @@ try {
   for (const [index, [, code]] of [...readme.matchAll(/```tsx?\n([\s\S]*?)```/g)].entries()) {
     writeFileSync(join(work, 'src', `readme-${index}.tsx`), `${code}\nexport {};\n`);
   }
-  // the package has no dependencies, so the install never reaches a registry
-  run('npm', ['install', '--no-audit', '--no-fund', '--registry', 'https://registry.npmjs.org', `./${tarball}`]);
+  // its @reely dependencies are packed too, so the install never reaches a registry
+  run('npm', [
+    'install',
+    '--no-audit',
+    '--no-fund',
+    '--registry',
+    'https://registry.npmjs.org',
+    `./${tarball}`,
+    ...dependencyTarballs,
+  ]);
 
   for (const jsx of ['react-jsx', 'react-jsxdev']) {
     run(process.execPath, [tsc, '-p', work, '--jsx', jsx]);
@@ -77,7 +89,10 @@ try {
     assert.equal(parent.innerHTML, '1<button>1</button>');
   }
   // tree shaking: an app that uses only signals ships no element factories
-  writeFileSync(join(work, 'signals-only.ts'), "import { effect, signal } from '@reely/dommy';\neffect(() => signal(0).value);\n");
+  writeFileSync(
+    join(work, 'signals-only.ts'),
+    "import { effect, signal } from '@reely/dommy';\neffect(() => signal(0).value);\n"
+  );
   const { outputFiles } = await build({
     absWorkingDir: work,
     entryPoints: ['signals-only.ts'],

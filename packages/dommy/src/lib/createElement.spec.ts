@@ -99,4 +99,13 @@ describe('createElement', () => {
       expect(element.attributes).toHaveLength(0);
     });
   });
+
+  it('passes props given as a class instance to a component', () => {
+    class CardProps {
+      public id = 'card';
+    }
+    const Card = (props: CardProps): Node => createElement('div', { id: props.id });
+
+    expect(createElement(Card, new CardProps())).toHaveProperty('outerHTML', '<div id="card"></div>');
+  });
 });

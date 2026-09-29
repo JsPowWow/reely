@@ -1,5 +1,6 @@
+import { isSomeFunction } from '@reely/basics';
 import type { PipeableFn } from '@reely/utils';
-import { hasProperty, isInstanceOf, isPlainObject, isSomeFunction, isValidRecordKey } from '@reely/utils';
+import { hasProperty, isInstanceOf, isKeyValueObject, isValidRecordKey } from '@reely/utils';
 
 import { hasAriaAttribute, setAriaAttributes } from './attributes/element.aria.attributes';
 import { isLiveProperty } from './attributes/element.live.properties';
@@ -41,7 +42,7 @@ export const assignElementRef =
 export const assignProperties =
   <Element extends DommyElement>(maybeProps: unknown): PipeableFn<Element> =>
   (element: Element) => {
-    if (!isPlainObject(maybeProps)) {
+    if (!isKeyValueObject(maybeProps)) {
       return element;
     }
 
@@ -79,7 +80,7 @@ export const assignProperties =
 export const assignLiveProperties =
   <Element extends DommyElement>(maybeProps: unknown): PipeableFn<Element> =>
   (element: Element) => {
-    if (isPlainObject(maybeProps)) {
+    if (isKeyValueObject(maybeProps)) {
       for (const [property, value] of Object.entries(maybeProps)) {
         if (isLiveProperty(property)) {
           applyValue(value, (current) => assignProperty(element, property, current));

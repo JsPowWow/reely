@@ -1,5 +1,6 @@
+import { isSomeFunction } from '@reely/basics';
 import type { Nil } from '@reely/utils';
-import { isInstanceOf, isNil, isPrimitiveValue, isSomeFunction } from '@reely/utils';
+import { isInstanceOf, isNil, isPrimitiveValue } from '@reely/utils';
 
 import type { SingleReelyNode } from '../types/dommy.types';
 

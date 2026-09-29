@@ -1,4 +1,4 @@
-import { hasSome } from '@reely/utils';
+import { hasSome } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
 
 import { onCleanup } from '../reactive/owner';

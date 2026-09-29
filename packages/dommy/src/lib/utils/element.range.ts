@@ -1,4 +1,4 @@
-import { hasSome } from '@reely/utils';
+import { hasSome } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
 
 // A flow renders only between its anchors, so a range that holds a flow holds its current content too.

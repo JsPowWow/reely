@@ -1,4 +1,4 @@
-import { hasSome } from '@reely/utils';
+import { hasSome } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
 
 /** What a rendered view must release when it goes away: subscriptions, effects and nested owners. */

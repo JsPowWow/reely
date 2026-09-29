@@ -1,6 +1,7 @@
 // Adapted from act by artalar (https://github.com/artalar/act), MIT licence.
+import { hasSome, isSomeFunction } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
-import { hasProperty, hasSome, isSomeFunction } from '@reely/utils';
+import { hasProperty } from '@reely/utils';
 
 import type { Reelx, RlxDerivedState, RlxState } from './reelx.types';
 

@@ -81,5 +81,8 @@
   "devDependencies": {
     "@reely/logger": "*",
     "@reely/utils": "*"
+  },
+  "dependencies": {
+    "@reely/basics": "*"
   }
 }

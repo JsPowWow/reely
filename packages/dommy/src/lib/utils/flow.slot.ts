@@ -1,4 +1,5 @@
-import { hasSome, noop } from '@reely/utils';
+import { hasSome } from '@reely/basics';
+import { noop } from '@reely/utils';
 
 import { toNodes } from './element.children';
 import { createAnchors, insertBefore, rangeOf, removeNodes } from './element.range';

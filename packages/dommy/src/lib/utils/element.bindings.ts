@@ -1,4 +1,5 @@
-import { isInstanceOf, isSomeFunction } from '@reely/utils';
+import { isSomeFunction } from '@reely/basics';
+import { isInstanceOf } from '@reely/utils';
 
 import { getDommyLogger } from '../config';
 import { isFalsyElement } from './element.utils';

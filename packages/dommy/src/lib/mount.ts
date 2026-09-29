@@ -1,4 +1,4 @@
-import { hasSome } from '@reely/utils';
+import { hasSome } from '@reely/basics';
 
 import { withOwner } from './reactive/owner';
 import { toNodes } from './utils/element.children';

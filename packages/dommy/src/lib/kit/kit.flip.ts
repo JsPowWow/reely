@@ -1,4 +1,4 @@
-import { isSomeFunction } from '@reely/utils';
+import { isSomeFunction } from '@reely/basics';
 
 const reducedMotion = (): boolean =>
   isSomeFunction(window.matchMedia) && window.matchMedia('(prefers-reduced-motion: reduce)').matches;

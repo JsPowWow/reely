@@ -1,4 +1,5 @@
-import { hasProperty, hasSome, isNil } from '@reely/utils';
+import { hasSome } from '@reely/basics';
+import { hasProperty, isNil } from '@reely/utils';
 
 import { applyValue } from '../element.bindings';
 import { removeAttribute, setAttribute } from './element.attributes';

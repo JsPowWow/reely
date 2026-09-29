@@ -1,4 +1,4 @@
-import { isSomeFunction } from '@reely/utils';
+import { isSomeFunction } from '@reely/basics';
 
 import { listen } from './kit.listen';
 import { computed, signal } from '../reactive/preact-like/preact-like.signal';

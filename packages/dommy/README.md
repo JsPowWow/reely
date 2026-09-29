@@ -23,7 +23,7 @@ Each click changes the text of one text node inside `<output>`; nothing else in 
 npm i @reely/dommy@next
 ```
 
-The package has no dependencies. It ships ES modules with TypeScript types.
+It has no third-party dependencies: its one dependency is `@reely/basics`, small helpers from the same repo. It ships ES modules with TypeScript types.
 
 ### JSX setup
 

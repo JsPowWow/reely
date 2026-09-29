@@ -1,5 +1,6 @@
+import { hasSome, isSomeFunction } from '@reely/basics';
 import type { WithRequiredNonNullable } from '@reely/utils';
-import { hasProperty, hasSome, isNonEmpty, isSomeFunction, toNonNullableItems } from '@reely/utils';
+import { hasProperty, isNonEmpty, toNonNullableItems } from '@reely/utils';
 
 import type { DommyElement } from '../types/dommy.types';
 import type {

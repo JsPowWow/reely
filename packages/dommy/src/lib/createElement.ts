@@ -1,5 +1,6 @@
+import { isSomeFunction } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
-import { isPlainObject, isSomeFunction, pipe } from '@reely/utils';
+import { isKeyValueObject, pipe } from '@reely/utils';
 
 import { appendChildren, toElementChildren, toNode } from './utils/element.children';
 import { assignElementRef, assignLiveProperties, assignProperties } from './utils/element.properties';
@@ -37,7 +38,7 @@ const buildSvgElement = <Tag extends SvgElementTag>(
   );
 
 const toComponentProps = (maybeProps: unknown, maybeChildren: readonly unknown[]): Record<string, unknown> => {
-  const { key: _ignoredKey, ...props } = isPlainObject(maybeProps) ? maybeProps : {};
+  const { key: _ignoredKey, ...props } = isKeyValueObject(maybeProps) ? maybeProps : {};
   if (maybeChildren.length === 0) {
     return props;
   }
@@ -53,7 +54,9 @@ export const renderElement = (
   if (isSomeFunction(type)) {
     return toNode(type(toComponentProps(maybeProps, maybeChildren)));
   }
-  return isSvgTag(type) ? buildSvgElement(type, maybeProps, maybeChildren) : buildElement(type, maybeProps, maybeChildren);
+  return isSvgTag(type)
+    ? buildSvgElement(type, maybeProps, maybeChildren)
+    : buildElement(type, maybeProps, maybeChildren);
 };
 
 /**

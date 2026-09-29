@@ -85,7 +85,7 @@ export const docTopics: readonly DocTopic[] = [
         <h2>Install</h2>
         <Code caption='Terminal' source={plain('npm i @reely/dommy@next')} />
         <p>
-          The package has no dependencies and ships ES modules with TypeScript types. It is a pre-release: the{' '}
+          The package has no third-party dependencies and ships ES modules with TypeScript types. It is a pre-release: the{' '}
           <code>next</code> tag installs the API these docs describe.
         </p>
         <h2>Set up JSX</h2>
@@ -521,7 +521,7 @@ export const docTopics: readonly DocTopic[] = [
           </tbody>
         </table>
         <p>
-          Measured on the packed npm tarball, bundled with esbuild. There are no runtime dependencies, and the package is
+          Measured on the packed npm tarball, bundled with esbuild. There are no third-party runtime dependencies, and the package is
           tree-shakeable: what an app does not import, it does not ship.
         </p>
         <h2>Speed</h2>
