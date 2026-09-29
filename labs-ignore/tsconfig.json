@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
     "types": [
@@ -19,13 +19,13 @@
     "ignoreDeprecations": "6.0",
     "paths": {
       "@reely/dommy": [
-        "../../packages/dommy/src/index.ts"
+        "../packages/dommy/src/index.ts"
       ],
       "@reely/dommy/jsx-runtime": [
-        "../../packages/dommy/src/lib/jsx-runtime.ts"
+        "../packages/dommy/src/lib/jsx-runtime.ts"
       ],
       "@reely/dommy/jsx-dev-runtime": [
-        "../../packages/dommy/src/lib/jsx-runtime.ts"
+        "../packages/dommy/src/lib/jsx-runtime.ts"
       ]
     },
     "composite": false,
@@ -35,7 +35,7 @@
     "emitDeclarationOnly": false
   },
   "include": [
-    "*.ts",
-    "*.tsx"
+    "*/**/*.ts",
+    "*/**/*.tsx"
   ]
 }

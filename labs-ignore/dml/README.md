@@ -2,8 +2,7 @@
 
 A prototype, not shipped: can reely markup take `for`, `if`, `let` and `switch` the way
 [van_dml](https://github.com/vanjs-org/van/tree/main/addons/van_dml) does with `begin`/`end`,
-without changing dommy's core? Run: `npx vitest run --config labs-ignore/dml/vitest.config.mts`;
-types: `npx tsc -p labs-ignore/dml/tsconfig.json`.
+without changing dommy's core? Run and type-check it with the other labs (see `../README.md`).
 
 ## The three variants
 

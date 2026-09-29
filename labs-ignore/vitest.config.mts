@@ -2,8 +2,8 @@ import { resolve } from 'node:path';
 
 import { defineConfig } from 'vitest/config';
 
-// the prototype runs against dommy's source, the way the package specs do
-const dommy = resolve(import.meta.dirname, '../../packages/dommy/src');
+// the labs run against dommy's source, the way the package specs do
+const dommy = resolve(import.meta.dirname, '../packages/dommy/src');
 
 export default defineConfig({
   root: import.meta.dirname,
@@ -15,5 +15,5 @@ export default defineConfig({
       '@reely/dommy': `${dommy}/index.ts`,
     },
   },
-  test: { name: 'labs-dml', globals: true, environment: 'jsdom', include: ['*.spec.tsx'], watch: false },
+  test: { name: 'labs', globals: true, environment: 'jsdom', include: ['*/**/*.spec.{ts,tsx}'], watch: false },
 });

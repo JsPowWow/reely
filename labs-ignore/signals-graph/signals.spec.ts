@@ -1,4 +1,3 @@
-import { state, derive } from './_internals';
 import * as signals from './signals';
 import { batch, computed, effect, signal, untracked, watch } from './signals';
 
@@ -70,28 +69,6 @@ describe('Signals tests', () => {
     expect(tasks()).toStrictEqual([{ title: 'Changed' }, { title: 'New' }]);
   });
 
-  it('batch & mutate + effect() tests', () => {
-    const user = state<{ id: number; name: string }>({ id: 1, name: 'Alice' });
-    const multiplier = state(2);
-    const userName = derive(() => user.val.name.toUpperCase());
-
-    const effectFn = vi.fn(() => {
-      console.log('EFFECT', userName.val, multiplier.val);
-    });
-
-    const e = derive(effectFn);
-
-    // user.val = ((u) => (u.name = 'Bob'));
-    user.val = { id: 22, name: 'Bob' };
-    multiplier.val = 10;
-
-    console.log('RESULT', e.val, userName.val, multiplier.val);
-    //
-    // expect(effectFn).toHaveBeenCalledTimes(2);
-    // expect(userName()).toBe('BOB');
-    // expect(multiplier()).toBe(10);
-  });
-
   it('batch & mutate + effect( with untracked) tests', () => {
     const user = signal<{ id: number; name: string }>({ id: 1, name: 'Alice' });
     const multiplier = signal(2);
@@ -99,8 +76,8 @@ describe('Signals tests', () => {
     const effectFn = vi.fn(() => {
       const name = userName();
 
-      // Мы читаем multiplier, но НЕ подписываемся на него
-      // Эффект сработает при смене имени, но не при смене multiplier
+      // reads multiplier without subscribing to it
+      // the effect runs when the name changes, not the multiplier
       const untrackedMultiplier = untracked(() => multiplier());
 
       console.log(`User: ${name}, Multiplier is currently: ${untrackedMultiplier}`);
@@ -114,8 +91,8 @@ describe('Signals tests', () => {
       user.mutate((u) => (u.name = 'Bob'));
       multiplier.set(10);
     });
-    // Эффект сработает только 1 раз в конце
-    // Вывод: User: BOB, Multiplier is currently: 10
+    // the effect runs once, at the end
+    // output: User: BOB, Multiplier is currently: 10
     expect(effectFn).toHaveBeenCalledTimes(2);
     expect(userName()).toBe('BOB');
     expect(multiplier()).toBe(10);

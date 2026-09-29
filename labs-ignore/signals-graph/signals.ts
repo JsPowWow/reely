@@ -23,7 +23,7 @@ export interface CreateSignalOptions<T> {
   equal?: (a: T, b: T) => boolean;
 }
 
-// Интерфейс для callback-функции очистки внутри эффекта
+// The cleanup callback an effect can register
 export type EffectCleanupFn = () => void;
 export type EffectFn = (onCleanup: (fn: EffectCleanupFn) => void) => void;
 
@@ -33,16 +33,16 @@ export type EffectFn = (onCleanup: (fn: EffectCleanupFn) => void) => void;
  * --------------------------------------------------------------------------
  */
 
-// Узел, который производит значения (Signal, Computed)
+// A node that produces values (Signal, Computed)
 interface Producer {
-  id: symbol; // Для отладки и уникальности в Set
+  id: symbol; // for debugging and identity in a Set
   consumers: Set<Consumer>;
 }
 
-// Узел, который потребляет значения (Computed, Effect)
+// A node that consumes values (Computed, Effect)
 interface Consumer extends Producer {
   producers: Set<Producer>;
-  notify(): void; // "Эй, твои данные протухли!"
+  notify(): void; // "your data went stale"
 }
 
 /**
@@ -87,7 +87,7 @@ class SignalNode<T> implements Producer {
 
   constructor(public value: T, private equal: (a: T, b: T) => boolean) {}
 
-  // Специальный метод для мутаций (массивы, объекты)
+  // Mutates in place (arrays, objects) and notifies
   public mutate(fn: (val: T) => void): void {
     fn(this.value);
     this.propagate();
@@ -108,7 +108,7 @@ class SignalNode<T> implements Producer {
   }
 
   private propagate(): void {
-    // Копируем, чтобы избежать проблем при изменении графа во время уведомления
+    // a copy: the graph may change while it is notified
     const targets = [...this.consumers];
     for (const consumer of targets) {
       if (consumer === activeConsumer) {
@@ -145,15 +145,15 @@ class ComputedNode<T> implements Consumer {
 
   private value!: T;
   private dirty = true;
-  private computing = false; // Защита от циклов
+  private computing = false; // guards against cycles
 
   constructor(private computation: () => T, private equal: (a: T, b: T) => boolean) {}
 
   public notify(): void {
-    // Если уже грязный, нет смысла уведомлять снова
+    // already dirty: nothing new to tell
     if (!this.dirty) {
       this.dirty = true;
-      // Рекурсивно уведомляем тех, кто зависит от нас
+      // notify what depends on this, recursively
       for (const consumer of this.consumers) {
         if (consumer === activeConsumer) {
           continue;
@@ -164,23 +164,23 @@ class ComputedNode<T> implements Consumer {
   }
 
   public get(): T {
-    // 1. Проверка на цикл (A -> B -> A)
+    // 1. a cycle check (A -> B -> A)
     if (this.computing) {
       throw new Error('Circular dependency detected in computed signal');
     }
 
-    // 2. Если нас читают внутри другого эффекта/computed — подписываем его
+    // 2. read inside another effect or computed: subscribe it
     if (activeConsumer) {
       subscribe(this, activeConsumer);
     }
 
-    // 3. Ленивое вычисление
+    // 3. compute lazily
     if (this.dirty) {
       const prevConsumer = activeConsumer;
       setActiveConsumer(this);
       this.computing = true;
 
-      // Очищаем старые зависимости перед новым прогоном
+      // drop the old dependencies before the new run
       unsubscribeAll(this);
 
       try {
@@ -213,10 +213,10 @@ export function computed<T>(computation: () => T, options: CreateSignalOptions<T
 
 class EffectNode implements Consumer {
   public id = Symbol('Effect');
-  public consumers = new Set<Consumer>(); // Пусто, эффекты — это листья графа
+  public consumers = new Set<Consumer>(); // empty: effects are the leaves of the graph
   public producers = new Set<Producer>();
 
-  // Хранилище для функции очистки, которую может вернуть пользователь
+  // the cleanup the user registered
   private cleanupFn?: EffectCleanupFn;
 
   constructor(private fn: EffectFn) {}
@@ -233,7 +233,7 @@ class EffectNode implements Consumer {
   }
 
   public execute = (): void => {
-    // 1. Запускаем cleanup от предыдущего цикла (если был)
+    // 1. run the cleanup of the previous run, if any
     if (this.cleanupFn) {
       try {
         this.cleanupFn();
@@ -243,14 +243,14 @@ class EffectNode implements Consumer {
       this.cleanupFn = undefined;
     }
 
-    // 2. Отписываемся от зависимостей (Graph Cleanup)
+    // 2. unsubscribe from the dependencies
     unsubscribeAll(this);
 
-    // 3. Устанавливаем контекст
+    // 3. set the context
     const prevConsumer = activeConsumer;
     setActiveConsumer(this);
 
-    // 4. Запускаем функцию пользователя
+    // 4. run the user's function
     try {
       this.fn((onCleanup) => {
         this.cleanupFn = onCleanup;
@@ -272,7 +272,7 @@ class EffectNode implements Consumer {
 
 export function effect(fn: EffectFn): EffectRef {
   const node = new EffectNode(fn);
-  node.execute(); // Первый запуск
+  node.execute(); // the first run
   return { destroy: () => node.destroy() };
 }
 
@@ -288,7 +288,7 @@ export function batch<T>(fn: () => T): T {
     return fn();
   } finally {
     batchDepth--;
-    // Запускаем очередь только когда вышли из самого внешнего batch
+    // run the queue only when the outermost batch ends
     if (batchDepth === 0) {
       flushBatchQueue();
     }
@@ -296,11 +296,11 @@ export function batch<T>(fn: () => T): T {
 }
 
 function flushBatchQueue(): void {
-  // Копируем очередь для безопасности (если эффекты породят новые эффекты)
+  // a copy of the queue: effects may queue new effects
   const queue = [...batchQueue];
   batchQueue.clear();
 
-  // Сортировка здесь не нужна, так как Computed ленивые и всегда актуальны
+  // no sorting: computeds are lazy and always current
   queue.forEach((node) => node.execute());
 }
 
@@ -326,25 +326,24 @@ export interface WatchOptions<T> {
 
 class WatchNode<T> implements Consumer {
   public id = Symbol('Watch');
-  public consumers = new Set<Consumer>(); // Watch — это конечный потребитель
+  public consumers = new Set<Consumer>(); // a watch is a leaf consumer
   public producers = new Set<Producer>();
 
   private value: T;
   private cleanupFn?: EffectCleanupFn;
-  private dirty = false;
 
   constructor(
     private source: () => T,
     private callback: (newValue: T, oldValue: T, onCleanup: (fn: EffectCleanupFn) => void) => void,
     private equal: (a: T, b: T) => boolean
   ) {
-    // 1. Первый запуск — ТОЛЬКО сбор зависимостей и получение начального значения
-    // Callback НЕ вызывается (ленивость)
+    // 1. the first run only collects the dependencies and the initial value;
+    // the callback does not run (lazy)
     this.value = this.runSource();
   }
 
   public notify(): void {
-    // Если мы внутри батча — добавляем в очередь
+    // inside a batch: queue it
     if (batchDepth > 0) {
       batchQueue.add(this);
     } else {
@@ -353,16 +352,16 @@ class WatchNode<T> implements Consumer {
   }
 
   public execute(): void {
-    // 1. Снова запускаем Source, чтобы проверить, изменилось ли значение
-    // и обновить зависимости (если source ветвится)
+    // 1. run the source again to see whether the value changed
+    // and to update the dependencies (the source may branch)
     const newValue = this.runSource();
 
-    // 2. Если значение изменилось — запускаем эффект (Callback)
+    // 2. the value changed: run the callback
     if (!this.equal(this.value, newValue)) {
       const oldValue = this.value;
       this.value = newValue;
 
-      // Очистка предыдущего прогона callback-а
+      // clean up after the previous callback run
       if (this.cleanupFn) {
         try {
           this.cleanupFn();
@@ -372,9 +371,9 @@ class WatchNode<T> implements Consumer {
         this.cleanupFn = undefined;
       }
 
-      // Запуск Callback
-      // Мы используем untracked, чтобы чтение сигналов внутри callback
-      // НЕ создавало новых зависимостей (мы зависим только от source)
+      // run the callback
+      // untracked, so the signals the callback reads
+      // add no dependencies: the watch depends on its source only
       untracked(() => {
         try {
           this.callback(newValue, oldValue, (fn) => (this.cleanupFn = fn));
@@ -391,7 +390,7 @@ class WatchNode<T> implements Consumer {
   }
 
   private runSource(): T {
-    // Стандартная логика Consumer-а для сбора зависимостей
+    // the usual consumer logic that collects dependencies
     unsubscribeAll(this);
 
     const prevConsumer = activeConsumer;
