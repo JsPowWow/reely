@@ -82,14 +82,10 @@ export const LandingPage = (): Node => {
                   <th scope='row'>The whole package</th>
                   <td>{measured.wholePackage}</td>
                 </tr>
-                <tr>
-                  <th scope='row'>Re-sorting a 500-row list, median in headless Chrome</th>
-                  <td>{measured.lapMedian}</td>
-                </tr>
               </tbody>
             </table>
             <p className={css.numbersNote}>
-              Bundled with esbuild. Time the 500 rows in your own browser on{' '}
+              Bundled with esbuild. Time a 500-row board in your own browser on{' '}
               <a href='/docs/performance'>Size and speed</a>.
             </p>
             <div className={css.actions}>

@@ -425,8 +425,8 @@ export const docTopics: readonly DocTopic[] = [
         </p>
         <h2>Speed</h2>
         <p>
-          In headless Chrome, a lap of the 500-row board takes a median of {measured.lapMedian}, {measured.lapP95} at the 95th percentile. The
-          demo above measures the same in your browser.
+          The demo above times every lap in your browser, from the write to the finished layout. Its numbers are the
+          ones that count: they come from your machine, not from ours.
         </p>
       </>
     ),

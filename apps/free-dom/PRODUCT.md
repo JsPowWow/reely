@@ -44,7 +44,7 @@ No virtual DOM and no re-render: tag factories and JSX return real DOM nodes, a 
 ## Evidence on Hand
 
 - Sizes, gzip, measured on the packed tarball with esbuild: an app that uses only signals ships 1.3 kB of dommy; a typical JSX app with `For`, `Show` and `mount` 4.7 kB; the whole package 6.6 kB. No runtime dependencies.
-- Speed: a 500-row keyed race board re-sorts in a median of 7.7 ms per lap (95th percentile 8.7 ms) in headless Chrome, measured from the write to the finished layout; the performance page times it live in the visitor's own browser.
+- Speed: not quoted as a number (a headless-browser figure says nothing about the reader's machine); the performance page times a 500-row keyed board live in the visitor's own browser.
 - The live demos and their DOM-write counts: `apps/free-dom/src/pages/`.
 - The library source and its tests: `packages/dommy`; first real consumer: JsPowWow/ai-race.
 - There are no testimonials, user counts, stars or adopters beyond ai-race; do not invent them.
