@@ -1,0 +1,20 @@
+[
+  {
+    "name": "a sync machine alone",
+    "code": "import { createStateMachine } from '@reely/state-machine'; createStateMachine({ initial: 'a', states: { a: {} } }).send('x');",
+    "absent": ["AsyncQueue", "createAsyncStateMachine", "matchAction", "logTransition"],
+    "once": ["createStateMachine", "SyncQueue", "EventEmitter", "forEachSettled"]
+  },
+  {
+    "name": "an async machine alone",
+    "code": "import { createAsyncStateMachine } from '@reely/state-machine'; void createAsyncStateMachine({ initial: 'a', states: { a: {} } }).send('x');",
+    "absent": ["SyncQueue", "createStateMachine", "matchAction"],
+    "once": ["createAsyncStateMachine", "AsyncQueue", "EventEmitter"]
+  },
+  {
+    "name": "a machine with the emitter and queue of an app",
+    "code": "import { createStateMachine } from '@reely/state-machine'; import { EventEmitter } from '@reely/emitter'; import { SyncQueue } from '@reely/queue'; console.log(createStateMachine, EventEmitter, SyncQueue);",
+    "absent": [],
+    "once": ["EventEmitter", "SyncQueue", "forEachSettled"]
+  }
+]

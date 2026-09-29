@@ -3,8 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
+    "outDir": "out-tsc/lib",
+    "tsBuildInfoFile": "out-tsc/lib/tsconfig.lib.tsbuildinfo",
     "emitDeclarationOnly": false,
     "forceConsistentCasingInFileNames": true,
     "types": ["node", "vite/client", "vitest/globals", "vitest/importMeta", "vitest"],
@@ -24,10 +24,10 @@
       "path": "../emitter/tsconfig.lib.json"
     },
     {
-      "path": "../utils/tsconfig.lib.json"
+      "path": "../basics/tsconfig.lib.json"
     },
     {
-      "path": "../simple-store/tsconfig.lib.json"
+      "path": "../utils/tsconfig.lib.json"
     }
   ],
   "exclude": [

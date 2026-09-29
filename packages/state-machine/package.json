@@ -1,7 +1,10 @@
 {
   "name": "@reely/state-machine",
   "version": "0.0.0",
+  "description": "A finite state machine with a config that reads like XState's: sync by default, async on request, one transition at a time.",
+  "license": "MIT",
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -26,15 +29,42 @@
   "nx": {
     "tags": [
       "scope:state-machine"
-    ]
+    ],
+    "projectType": "library",
+    "sourceRoot": "packages/state-machine/src",
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "vite build",
+          "cwd": "packages/state-machine"
+        },
+        "dependsOn": [
+          "^build"
+        ],
+        "outputs": [
+          "{projectRoot}/dist"
+        ]
+      },
+      "consumer": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "node ../../scripts/consumer-check.mjs",
+          "cwd": "packages/state-machine"
+        },
+        "dependsOn": [
+          "build",
+          "^build"
+        ]
+      }
+    }
   },
   "dependencies": {
-    "tslib": "^2.3.0",
-    "@reely/utils": "*",
+    "@reely/basics": "*",
     "@reely/emitter": "*",
     "@reely/queue": "*"
   },
   "devDependencies": {
-    "@reely/simple-store": "*"
+    "@reely/utils": "*"
   }
 }
