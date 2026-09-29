@@ -1,7 +1,6 @@
-import type { EventsMap } from '@reely/emitter';
 import { hasProperty, isPromiseLike, noop } from '@reely/utils';
 
-import type { StateMachineChange, StateMachineMode, StateMachineState } from './types';
+import type { StateMachineChange, StateMachineMode, StateMachineTypes } from './types';
 
 /** What a pattern can match: a change's event type and target. */
 export interface MatchableChange {
@@ -109,9 +108,6 @@ const effectOf = <Change extends MatchableChange>(
  * Describes the matching first and takes the change later (the `flow` form): an action for the config, whose rules
  * run in order, a promise awaited before the next.
  */
-export const runActionEffect = <
-  State extends StateMachineState,
-  Events extends EventsMap,
-  Context = undefined,
-  Mode extends StateMachineMode = 'sync'
->(): ActionEffect<StateMachineChange<State, Events, Context, Mode>> => effectOf([]);
+export const runActionEffect = <M extends StateMachineTypes, Mode extends StateMachineMode = 'sync'>(): ActionEffect<
+  StateMachineChange<M, Mode>
+> => effectOf([]);

@@ -20,7 +20,12 @@ interface FinalEvents {
   selectStage: number; // carries a stage number
 }
 
-const final = createStateMachine<Phase, FinalEvents>({
+interface Final {
+  state: Phase;
+  events: FinalEvents;
+}
+
+const final = createStateMachine<Final>({
   initial: 'ready',
   on: { selectStage: 'ready' }, // any-state: taken from every state that has no `selectStage` of its own
   states: {
@@ -37,6 +42,8 @@ final.send('countdownDone'); // …and not allowed where the event carries none
 final.can('play'); // is there a transition for `play` from here? never runs a selector
 final.state; // 'ready'
 ```
+
+One type describes a machine: its `state`, its `events`, and its `context` if it has one. The machine's types take it: `StateMachineConfig<Final>`, `StateMachineAction<Final>`, `StateMachineChange<Final>`; for the async machine, add `'async'`: `StateMachineConfig<Final, 'async'>`. A machine needs it: given to the factory, or through a config typed as `StateMachineConfig<Final>`, as in `createStateMachine(config)`.
 
 The machine starts in `initial` without running its `entry`: creating it has no effects. `send` never throws. It answers with what happened:
 
@@ -70,13 +77,16 @@ If an action throws before the state changes, the machine stays where it was; if
 ## Context and logger
 
 ```ts
-const race = createStateMachine<Phase, RaceEvents, RaceStore>(
-  { initial: 'ready', context: store, states },
-  { logger: console }
-);
+interface Race {
+  state: Phase;
+  events: RaceEvents;
+  context: RaceStore; // `context?: RaceStore` makes it optional in the config
+}
+
+const race = createStateMachine<Race>({ initial: 'ready', context: store, states }, { logger: console });
 ```
 
-`context` is any value the machine hands to actions and selectors; a machine without one leaves it out. The machine writes failures to `logger.error`, and the log actions below write to it too.
+`context` is any value the machine hands to actions and selectors; a machine without one leaves it out of its type and its config. The machine writes failures to `logger.error`, and the log actions below write to it too.
 
 ## Sending from an action
 
@@ -91,8 +101,15 @@ counting: { entry: ({ machine }) => machine.send('countdownDone') } // answers {
 ```ts
 import { createAsyncStateMachine } from '@reely/state-machine';
 
-const draft = createAsyncStateMachine<'editing' | 'saving' | 'saved', DraftEvents>({
+interface Draft {
+  state: 'editing' | 'saving' | 'saved';
+  events: { save: undefined; saved: undefined };
+  context: { valid(): Promise<boolean>; upload(): Promise<void> };
+}
+
+const draft = createAsyncStateMachine<Draft>({
   initial: 'editing',
+  context: form,
   states: {
     editing: { on: { save: async ({ context }) => ((await context.valid()) ? 'saving' : undefined) } },
     saving: { entry: async ({ context }) => context.upload(), on: { saved: 'saved' } },
@@ -128,7 +145,7 @@ final.on('stateChanged', (change) =>
     .when({ to: 'paused' }, dimTrack)
 );
 
-const onEnter = runActionEffect<Phase, FinalEvents>()
+const onEnter = runActionEffect<Final>() // `runActionEffect<Draft, 'async'>()` for the async machine
   .when({ type: 'play', to: 'counting' }, startCountdown)
   .when({ to: 'ready' }, showSummary);
 

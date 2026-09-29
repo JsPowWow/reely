@@ -8,12 +8,17 @@ interface DraftEvents {
   edit: string;
 }
 
+interface DraftMachine {
+  state: Draft;
+  events: DraftEvents;
+}
+
 const tick = (): Promise<void> => new Promise((resolve) => setTimeout(resolve));
 
 describe('createAsyncStateMachine', () => {
   it('awaits the selector and every action in order, and resolves `send` with the result', async () => {
     const steps: string[] = [];
-    const machine = createAsyncStateMachine<Draft, DraftEvents>({
+    const machine = createAsyncStateMachine<DraftMachine>({
       initial: 'editing',
       states: {
         editing: {
@@ -42,7 +47,7 @@ describe('createAsyncStateMachine', () => {
   });
 
   it('runs one transition at a time: the next sees the state the one before left', async () => {
-    const machine = createAsyncStateMachine<Draft, DraftEvents>({
+    const machine = createAsyncStateMachine<DraftMachine>({
       initial: 'editing',
       states: {
         editing: {
@@ -68,7 +73,7 @@ describe('createAsyncStateMachine', () => {
 
   it('never waits for itself: an action awaiting a `send` gets `queued`, and the transition runs next', async () => {
     const answers: unknown[] = [];
-    const machine = createAsyncStateMachine<Draft, DraftEvents>({
+    const machine = createAsyncStateMachine<DraftMachine>({
       initial: 'editing',
       states: {
         editing: { on: { save: 'saving' } },
@@ -96,7 +101,7 @@ describe('createAsyncStateMachine', () => {
 
   it('fails a transition whose selector rejects, keeping the state', async () => {
     const broken = new Error('offline');
-    const machine = createAsyncStateMachine<Draft, DraftEvents>({
+    const machine = createAsyncStateMachine<DraftMachine>({
       initial: 'editing',
       states: { editing: { on: { save: () => Promise.reject(broken) } }, saving: {}, saved: {} },
     });
@@ -105,7 +110,7 @@ describe('createAsyncStateMachine', () => {
   });
 
   it('answers `can` at once', () => {
-    const machine = createAsyncStateMachine<Draft, DraftEvents>({
+    const machine = createAsyncStateMachine<DraftMachine>({
       initial: 'editing',
       states: { editing: { on: { save: 'saving' } }, saving: {}, saved: {} },
     });
@@ -117,7 +122,7 @@ describe('createAsyncStateMachine', () => {
 describe('createStateMachine given a promise', () => {
   it('fails the transition instead of running on before the promise settles', () => {
     const entered = vi.fn();
-    const machine = createStateMachine<Draft, DraftEvents>({
+    const machine = createStateMachine<DraftMachine>({
       initial: 'editing',
       states: {
         editing: { on: { save: 'saving' }, exit: async () => tick() },

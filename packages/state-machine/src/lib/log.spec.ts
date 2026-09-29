@@ -10,6 +10,11 @@ interface RaceEvents {
   stop: undefined;
 }
 
+interface Race {
+  state: Phase;
+  events: RaceEvents;
+}
+
 type Write = Mock<(...data: unknown[]) => void>;
 
 const logger = (): Record<'log' | 'info' | 'warn' | 'error', Write> => ({
@@ -22,7 +27,7 @@ const logger = (): Record<'log' | 'info' | 'warn' | 'error', Write> => ({
 describe('log actions', () => {
   it('log where they are put, the step, states and event, with data or context when asked', () => {
     const out = logger();
-    const machine = createStateMachine<Phase, RaceEvents, { track: string }>(
+    const machine = createStateMachine<Race & { context: { track: string } }>(
       {
         initial: 'ready',
         context: { track: 'Monza' },
@@ -52,8 +57,8 @@ describe('log actions', () => {
       states: { ready: { on: { start: 'running' }, exit: quiet }, running: {} },
     } as const;
 
-    createStateMachine<Phase, RaceEvents>(config, { logger: out }).send('start', { lane: 1 });
-    createStateMachine<Phase, RaceEvents>(config).send('start', { lane: 1 });
+    createStateMachine<Race>(config, { logger: out }).send('start', { lane: 1 });
+    createStateMachine<Race>(config).send('start', { lane: 1 });
 
     expect(out.info).toHaveBeenCalledExactlyOnceWith('Leave "ready" → "running" by "start"');
     expect(out.log).not.toHaveBeenCalled();
@@ -63,7 +68,7 @@ describe('log actions', () => {
     const out = logger();
     const cyclic: { self?: unknown } = {};
     cyclic.self = cyclic;
-    const machine = createStateMachine<Phase, RaceEvents, { self?: unknown }>(
+    const machine = createStateMachine<Race & { context: { self?: unknown } }>(
       {
         initial: 'ready',
         context: cyclic,

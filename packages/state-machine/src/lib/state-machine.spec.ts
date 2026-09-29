@@ -1,6 +1,6 @@
 import { createAsyncStateMachine, createStateMachine } from './state-machine';
 
-import type { StateMachineConfig, StateMachineMode } from './types';
+import type { IStateMachine, StateMachineConfig, StateMachineMode, StateMachineTypes } from './types';
 
 type Phase = 'ready' | 'counting' | 'running' | 'paused';
 
@@ -11,7 +11,12 @@ interface FinalEvents {
   selectStage: number;
 }
 
-const finalOf = <Mode extends StateMachineMode>(): StateMachineConfig<Phase, FinalEvents, undefined, Mode> => ({
+interface Final {
+  state: Phase;
+  events: FinalEvents;
+}
+
+const finalOf = <Mode extends StateMachineMode>(): StateMachineConfig<Final, Mode> => ({
   initial: 'ready',
   on: { selectStage: 'ready' },
   states: {
@@ -41,7 +46,7 @@ describe('createStateMachine', () => {
   it('starts in the initial state without running its `entry`', () => {
     const entered = vi.fn();
 
-    const machine = createStateMachine<Phase, FinalEvents>({
+    const machine = createStateMachine<Final>({
       ...final,
       states: { ...final.states, ready: { on: { play: 'counting' }, entry: entered } },
     });
@@ -110,12 +115,16 @@ describe('createStateMachine', () => {
       lock: string;
       knock: undefined;
     }
+    interface DoorMachine {
+      state: Door;
+      events: DoorEvents;
+    }
 
     it("runs exit, the transition's actions, the state change, entry, then `stateChanged`", () => {
       const steps: string[] = [];
       const note = (name: string) => (change: { step: string; machine: { state: Door } }) =>
         steps.push(`${name}:${change.step}:${change.machine.state}`);
-      const machine = createStateMachine<Door, DoorEvents>({
+      const machine = createStateMachine<DoorMachine>({
         initial: 'closed',
         states: {
           closed: { on: { open: { target: 'open', actions: [note('first'), note('second')] } }, exit: note('exit') },
@@ -138,7 +147,7 @@ describe('createStateMachine', () => {
 
     it('runs no exit and no entry on a transition to the state it leaves', () => {
       const steps: string[] = [];
-      const machine = createStateMachine<Door, DoorEvents>({
+      const machine = createStateMachine<DoorMachine>({
         initial: 'closed',
         states: {
           closed: {
@@ -159,7 +168,7 @@ describe('createStateMachine', () => {
 
     it('hands actions the event with its data, typed by the event', () => {
       const keys: string[] = [];
-      const machine = createStateMachine<Door, DoorEvents>({
+      const machine = createStateMachine<DoorMachine>({
         initial: 'closed',
         states: {
           closed: {
@@ -191,7 +200,7 @@ describe('createStateMachine', () => {
     });
 
     it('lets a target selector pick the state, or refuse with `undefined`', () => {
-      const machine = createStateMachine<Door, DoorEvents>({
+      const machine = createStateMachine<DoorMachine>({
         initial: 'closed',
         states: {
           closed: {
@@ -207,7 +216,7 @@ describe('createStateMachine', () => {
     });
 
     it('fails when a selector picks a state the machine does not have', () => {
-      const machine = createStateMachine<Door, DoorEvents>({
+      const machine = createStateMachine<DoorMachine>({
         initial: 'closed',
         states: { closed: { on: { knock: () => 'cellar' as Door } }, open: {}, locked: {} },
       });
@@ -225,7 +234,7 @@ describe('a `send` from an action or a listener', () => {
   it('runs after the current transition and before the outer `send` returns, answering `queued`', () => {
     const steps: string[] = [];
     let inner: unknown;
-    const machine = createStateMachine<Phase, FinalEvents>({
+    const machine = createStateMachine<Final>({
       ...final,
       states: {
         ...final.states,
@@ -250,7 +259,7 @@ describe('a `send` from an action or a listener', () => {
 
   it('answers `queued` the same when the action reaches the machine through its own variable', () => {
     let inner: unknown;
-    const machine = createStateMachine<Phase, FinalEvents>({
+    const machine = createStateMachine<Final>({
       ...final,
       states: {
         ...final.states,
@@ -275,8 +284,12 @@ describe('a throwing action or listener', () => {
   interface LightEvents {
     toggle: undefined;
   }
+  interface LightMachine {
+    state: Light;
+    events: LightEvents;
+  }
   const broken = new Error('broken bulb');
-  const light = (states: StateMachineConfig<Light, LightEvents>['states']): StateMachineConfig<Light, LightEvents> => ({
+  const light = (states: StateMachineConfig<LightMachine>['states']): StateMachineConfig<LightMachine> => ({
     initial: 'off',
     states,
   });
@@ -370,8 +383,13 @@ describe('a throwing action or listener', () => {
   });
 });
 
+interface Extended extends StateMachineTypes {
+  state: 'idle';
+  events: object;
+}
+
 // never run: the compiler checks these calls
-export function misuses(machine: ReturnType<typeof createStateMachine<Phase, FinalEvents>>): void {
+export function misuses(machine: IStateMachine<Final>): void {
   // @ts-expect-error `selectStage` carries a stage number
   machine.send('selectStage');
   // @ts-expect-error `play` carries nothing
@@ -379,12 +397,31 @@ export function misuses(machine: ReturnType<typeof createStateMachine<Phase, Fin
   // @ts-expect-error no such event
   machine.send('jump');
   // @ts-expect-error no such state
-  createStateMachine<Phase, FinalEvents>({ initial: 'cellar', states: final.states });
+  createStateMachine<Final>({ initial: 'cellar', states: final.states });
+  const idle = { idle: {} };
+  // @ts-expect-error the types declare a context the config leaves out
+  createStateMachine<{ state: 'idle'; events: object; context: number }>({ initial: 'idle', states: idle });
+  createStateMachine<{ state: 'idle'; events: object; context?: number }>({ initial: 'idle', states: idle });
+  const count: number = createStateMachine<{ state: 'idle'; events: object; context: number }>({
+    initial: 'idle',
+    context: 0,
+    states: idle,
+  }).context;
+  const maybe: number | undefined = createStateMachine<{ state: 'idle'; events: object; context?: number }>({
+    initial: 'idle',
+    states: idle,
+  }).context;
+  const none: undefined = machine.context;
+  const extended: undefined = createStateMachine<Extended>({ initial: 'idle', states: idle }).context;
+  const inferred: Phase = createStateMachine(final).state;
+  void [count, maybe, none, extended, inferred];
+  // @ts-expect-error a config typed nowhere: the machine needs its types
+  createStateMachine({ initial: 'cellar', states: idle });
 }
 
 describe('a config that is not what its types say', () => {
   it('fails a transition whose actions hold something other than functions', () => {
-    const machine = createStateMachine<Phase, FinalEvents>({
+    const machine = createStateMachine<Final>({
       ...final,
       states: { ...final.states, ready: { on: { play: { target: 'counting', actions: ['typo'] as never } } } },
     });
@@ -406,7 +443,7 @@ describe('a config that is not what its types say', () => {
   it('logs the error of a promise an action returned to a sync machine', async () => {
     const broken = new Error('late');
     const logger = { log: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() };
-    const machine = createStateMachine<Phase, FinalEvents>(
+    const machine = createStateMachine<Final>(
       {
         ...final,
         states: { ...final.states, ready: { on: { play: 'counting' }, exit: () => Promise.reject(broken) } },

@@ -9,6 +9,11 @@ interface FinalEvents {
   selectStage: number;
 }
 
+interface Final {
+  state: Phase;
+  events: FinalEvents;
+}
+
 const lines: string[] = [];
 const logger = {
   log: (line: unknown) => void lines.push(String(line)),
@@ -17,7 +22,7 @@ const logger = {
   error: () => undefined,
 };
 
-const config: StateMachineConfig<Phase, FinalEvents> = {
+const config: StateMachineConfig<Final> = {
   initial: 'ready',
   on: { selectStage: { target: 'ready', actions: logAction } },
   states: {
@@ -33,10 +38,10 @@ final.on('stateChanged', (change) =>
   matchAction(change).when({ type: 'selectStage' }, ({ event }) => stages.push(event.data))
 );
 
-const played: StateMachineResult<Phase, FinalEvents> = final.send('play');
+const played: StateMachineResult<Final> = final.send('play');
 const selected = final.send('selectStage', 3);
 
-const draft = createAsyncStateMachine<'editing' | 'saved', { save: undefined }>({
+const draft = createAsyncStateMachine<{ state: 'editing' | 'saved'; events: { save: undefined } }>({
   initial: 'editing',
   states: { editing: { on: { save: async () => 'saved' } }, saved: {} },
 });

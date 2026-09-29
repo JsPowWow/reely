@@ -12,9 +12,12 @@ interface RaceEvents {
   resume: undefined;
 }
 
-const race = (actions: {
-  entry?: (change: StateMachineChange<Phase, RaceEvents>) => void;
-}): StateMachineConfig<Phase, RaceEvents> => ({
+interface Race {
+  state: Phase;
+  events: RaceEvents;
+}
+
+const race = (actions: { entry?: (change: StateMachineChange<Race>) => void }): StateMachineConfig<Race> => ({
   initial: 'ready',
   states: {
     ready: { on: { start: 'running' } },
@@ -54,7 +57,7 @@ describe('matchAction', () => {
 describe('matchAction in an async machine', () => {
   it('runs its functions in order, the next after a promise settles, and hands the wait out as `done`', async () => {
     const seen: string[] = [];
-    const machine = createAsyncStateMachine<Phase, RaceEvents>({
+    const machine = createAsyncStateMachine<Race>({
       initial: 'ready',
       states: {
         ready: { on: { start: 'running' } },
@@ -79,7 +82,7 @@ describe('matchAction in an async machine', () => {
 
   it('lets the machine catch what a function rejects with', async () => {
     const broken = new Error('offline');
-    const machine = createAsyncStateMachine<Phase, RaceEvents>({
+    const machine = createAsyncStateMachine<Race>({
       initial: 'ready',
       states: {
         ready: { on: { start: 'running' } },
@@ -95,7 +98,7 @@ describe('matchAction in an async machine', () => {
 describe('runActionEffect', () => {
   it('describes the matching first and takes the change later, as an action', () => {
     const seen: string[] = [];
-    const onEntry = runActionEffect<Phase, RaceEvents>()
+    const onEntry = runActionEffect<Race>()
       .when({ type: 'start' }, ({ event }) => seen.push(`lane ${event.data}`))
       .when({ to: 'paused' }, ({ to }) => seen.push(to));
     const machine = createStateMachine(race({ entry: onEntry }));
@@ -108,7 +111,7 @@ describe('runActionEffect', () => {
 
   it('keeps each step of the description its own: adding a rule never changes an effect made before', () => {
     const seen: string[] = [];
-    const onStart = runActionEffect<Phase, RaceEvents>().when({ type: 'start' }, () => seen.push('start'));
+    const onStart = runActionEffect<Race>().when({ type: 'start' }, () => seen.push('start'));
     const onBoth = onStart.when({ to: 'paused' }, () => seen.push('paused'));
     const machine = createStateMachine(race({ entry: onStart }));
 
@@ -121,12 +124,12 @@ describe('runActionEffect', () => {
 
   it('waits for an async function before the next one, in an async machine', async () => {
     const seen: string[] = [];
-    const machine = createAsyncStateMachine<Phase, RaceEvents>({
+    const machine = createAsyncStateMachine<Race>({
       initial: 'ready',
       states: {
         ready: { on: { start: 'running' } },
         running: {
-          entry: runActionEffect<Phase, RaceEvents, undefined, 'async'>()
+          entry: runActionEffect<Race, 'async'>()
             .when({ type: 'start' }, async () => {
               await new Promise((resolve) => setTimeout(resolve));
               seen.push('first');
@@ -146,7 +149,7 @@ describe('runActionEffect', () => {
 describe('sequence', () => {
   it('joins log actions and effects in a config, as the README shows', () => {
     const seen: string[] = [];
-    const onEntry = runActionEffect<Phase, RaceEvents>().when({ to: 'running' }, () => seen.push('running'));
+    const onEntry = runActionEffect<Race>().when({ to: 'running' }, () => seen.push('running'));
     const machine = createStateMachine(race({ entry: sequence(logAction, onEntry) }), {
       logger: { log: (line) => seen.push(String(line)), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
     });

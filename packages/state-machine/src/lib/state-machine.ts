@@ -1,5 +1,5 @@
 import { forEachSettled, hasSome, isSomeFunction, reportUncaught } from '@reely/basics';
-import type { EventArguments, EventsMap, EventType } from '@reely/emitter';
+import type { EventArguments, EventType } from '@reely/emitter';
 import { EventEmitter } from '@reely/emitter';
 import { AsyncQueue, SyncQueue } from '@reely/queue';
 import type { Bivariant } from '@reely/utils';
@@ -11,36 +11,36 @@ import type {
   StateMachineAnswer,
   StateMachineChange,
   StateMachineConfig,
+  StateMachineContext,
   StateMachineEvent,
   StateMachineEvents,
   StateMachineLogger,
   StateMachineMode,
   StateMachineOptions,
   StateMachineResult,
-  StateMachineState,
   StateMachineStep,
   StateMachineTransition,
+  StateMachineTypes,
 } from './types';
 
-type Steps<
-  State extends StateMachineState,
-  Events extends EventsMap,
-  Context,
-  Mode extends StateMachineMode
-> = Generator<unknown, StateMachineResult<State, Events, Context, Mode>, unknown>;
+type Steps<M extends StateMachineTypes, Mode extends StateMachineMode> = Generator<
+  unknown,
+  StateMachineResult<M, Mode>,
+  unknown
+>;
 
 /** Runs the steps of one transition; `nested` when sent from inside a transition, which then answers `queued`. */
-type Schedule<State extends StateMachineState, Events extends EventsMap, Context, Mode extends StateMachineMode> = (
-  steps: () => Steps<State, Events, Context, Mode>,
+type Schedule<M extends StateMachineTypes, Mode extends StateMachineMode> = (
+  steps: () => Steps<M, Mode>,
   nested: boolean,
-  state: State
-) => StateMachineAnswer<State, Events, Context, Mode>;
+  state: M['state']
+) => StateMachineAnswer<M, Mode>;
 
 // `send`'s types tie the data to the type; the tuple of optional data only hides that from the compiler
-const eventOf = <Events extends EventsMap, Type extends EventType<Events>>(
+const eventOf = <M extends StateMachineTypes, Type extends EventType<M['events']>>(
   type: Type,
-  data: Events[Type]
-): StateMachineEvent<Events, Type> => ({ type, data });
+  data: M['events'][Type]
+): StateMachineEvent<M, Type> => ({ type, data });
 
 // own keys only: an event named `toString` finds no transition
 const own = <Table extends object, Key extends keyof Table>(
@@ -48,47 +48,47 @@ const own = <Table extends object, Key extends keyof Table>(
   key: Key
 ): Table[Key] | undefined => (hasSome(table) && Object.hasOwn(table, key) ? table[key] : undefined);
 
-class Core<State extends StateMachineState, Events extends EventsMap, Context, Mode extends StateMachineMode> {
-  public state: State;
-  public readonly context: Context;
-  public readonly emitter = new EventEmitter<StateMachineEvents<State, Events, Context, Mode>>();
+class Core<M extends StateMachineTypes, Mode extends StateMachineMode> {
+  public state: M['state'];
+  public readonly context: StateMachineContext<M>;
+  public readonly emitter = new EventEmitter<StateMachineEvents<M, Mode>>();
   /** The face actions get: its `send` answers `queued` while a transition runs. */
-  public readonly forActions: IStateMachine<State, Events, Context, Mode> = new Machine(this, true);
+  public readonly forActions: IStateMachine<M, Mode> = new Machine(this, true);
   private transitioning = false;
   // while the machine calls an action, a selector or a listener, up to its first `await`, a `send` comes from inside
   private calling = false;
 
   public constructor(
-    private readonly config: StateMachineConfig<State, Events, Context, Mode>,
+    private readonly config: StateMachineConfig<M, Mode>,
     public readonly logger: StateMachineLogger | undefined,
-    private readonly schedule: Schedule<State, Events, Context, Mode>
+    private readonly schedule: Schedule<M, Mode>
   ) {
     if (!this.isState(config.initial)) {
       throw new TypeError(`The initial state "${String(config.initial)}" is not among the states`);
     }
     this.state = config.initial;
-    // the config may leave `context` out only where `Context` takes `undefined`
-    const read: Bivariant<(config: { readonly context?: Context }) => Context> = (withContext: {
-      readonly context: Context;
+    // the config may leave `context` out only where the context takes `undefined`
+    const read: Bivariant<(config: { readonly context?: unknown }) => StateMachineContext<M>> = (withContext: {
+      readonly context: StateMachineContext<M>;
     }) => withContext.context;
     this.context = read(config);
   }
 
-  public can(type: EventType<Events>): boolean {
+  public can(type: EventType<M['events']>): boolean {
     return hasSome(this.transitionOf(type));
   }
 
-  public send<Type extends EventType<Events>>(
+  public send<Type extends EventType<M['events']>>(
     type: Type,
-    data: EventArguments<Events[Type]>,
+    data: EventArguments<M['events'][Type]>,
     nested: boolean
-  ): StateMachineAnswer<State, Events, Context, Mode> {
-    const toEvent: Bivariant<(type: Type, data: Events[Type] | undefined) => StateMachineEvent<Events, Type>> = eventOf;
+  ): StateMachineAnswer<M, Mode> {
+    const toEvent: Bivariant<(type: Type, data: M['events'][Type] | undefined) => StateMachineEvent<M, Type>> = eventOf;
     const event = toEvent(type, data[0]);
     return this.schedule(() => this.steps(event), (nested && this.transitioning) || this.calling, this.state);
   }
 
-  private *steps(event: StateMachineEvent<Events>): Steps<State, Events, Context, Mode> {
+  private *steps(event: StateMachineEvent<M>): Steps<M, Mode> {
     const from = this.state;
     const transition = this.transitionOf(event.type);
     if (!hasSome(transition)) {
@@ -107,7 +107,7 @@ class Core<State extends StateMachineState, Events extends EventsMap, Context, M
       if (!this.isState(target)) {
         throw new Error(`No state "${String(target)}" to go to from "${String(from)}" by "${event.type}"`);
       }
-      const change = (step: StateMachineStep): StateMachineChange<State, Events, Context, Mode> =>
+      const change = (step: StateMachineStep): StateMachineChange<M, Mode> =>
         Object.freeze({ step, from, to: target, event, context: this.context, machine: this.forActions });
       if (target !== from) {
         yield* this.run(this.config.states[from].exit, change('exit'));
@@ -147,8 +147,8 @@ class Core<State extends StateMachineState, Events extends EventsMap, Context, M
   }
 
   private *run(
-    actions: StateMachineActions<State, Events, Context, Mode> | undefined,
-    change: StateMachineChange<State, Events, Context, Mode>
+    actions: StateMachineActions<M, Mode> | undefined,
+    change: StateMachineChange<M, Mode>
   ): Generator<unknown> {
     for (const action of [actions ?? []].flat()) {
       yield this.call(action, change);
@@ -164,32 +164,30 @@ class Core<State extends StateMachineState, Events extends EventsMap, Context, M
     }
   }
 
-  private isState(value: unknown): value is State {
+  private isState(value: unknown): value is M['state'] {
     return isValidRecordKey(value) && Object.hasOwn(this.config.states, value);
   }
 
-  private transitionOf(type: EventType<Events>): StateMachineTransition<State, Events, Context, Mode> | undefined {
+  private transitionOf(type: EventType<M['events']>): StateMachineTransition<M, Mode> | undefined {
     return own(this.config.states[this.state].on, type) ?? own(this.config.on, type);
   }
 }
 
 /** A face of the machine: the one the factories return, or the one actions get (`nested`). */
-class Machine<State extends StateMachineState, Events extends EventsMap, Context, Mode extends StateMachineMode>
-  implements IStateMachine<State, Events, Context, Mode>
-{
-  public readonly on: IStateMachine<State, Events, Context, Mode>['on'];
-  public readonly off: IStateMachine<State, Events, Context, Mode>['off'];
+class Machine<M extends StateMachineTypes, Mode extends StateMachineMode> implements IStateMachine<M, Mode> {
+  public readonly on: IStateMachine<M, Mode>['on'];
+  public readonly off: IStateMachine<M, Mode>['off'];
 
-  public constructor(private readonly core: Core<State, Events, Context, Mode>, private readonly nested: boolean) {
+  public constructor(private readonly core: Core<M, Mode>, private readonly nested: boolean) {
     this.on = core.emitter.on;
     this.off = core.emitter.off;
   }
 
-  public get state(): State {
+  public get state(): M['state'] {
     return this.core.state;
   }
 
-  public get context(): Context {
+  public get context(): StateMachineContext<M> {
     return this.core.context;
   }
 
@@ -197,12 +195,12 @@ class Machine<State extends StateMachineState, Events extends EventsMap, Context
     return this.core.logger;
   }
 
-  public readonly can = (type: EventType<Events>): boolean => this.core.can(type);
+  public readonly can = (type: EventType<M['events']>): boolean => this.core.can(type);
 
-  public readonly send = <Type extends EventType<Events>>(
+  public readonly send = <Type extends EventType<M['events']>>(
     type: Type,
-    ...data: EventArguments<Events[Type]>
-  ): StateMachineAnswer<State, Events, Context, Mode> => this.core.send(type, data, this.nested);
+    ...data: EventArguments<M['events'][Type]>
+  ): StateMachineAnswer<M, Mode> => this.core.send(type, data, this.nested);
 }
 
 function runSync<R>(steps: Generator<unknown, R, unknown>, report: (error: unknown) => void): R {
@@ -239,17 +237,17 @@ async function runAsync<R>(steps: Generator<unknown, R, unknown>): Promise<R> {
  * A machine whose transitions run inside `send`, one after another (ADR 0001).
  * @throws {TypeError} When `initial` is not among the states.
  */
-export function createStateMachine<State extends StateMachineState, Events extends EventsMap, Context = undefined>(
-  config: StateMachineConfig<State, Events, Context>,
+export function createStateMachine<M extends StateMachineTypes = never>(
+  config: StateMachineConfig<M>,
   { logger }: StateMachineOptions = {}
-): IStateMachine<State, Events, Context> {
-  const queue = new SyncQueue<StateMachineResult<State, Events, Context>>();
+): IStateMachine<M> {
+  const queue = new SyncQueue<StateMachineResult<M>>();
   // a promise the sync machine refused may still reject: its error is not lost
   const report = (error: unknown): void =>
     hasSome(logger)
       ? logger.error('A sync machine left a promise behind, and it rejected', error)
       : reportUncaught(error);
-  const core = new Core<State, Events, Context, 'sync'>(config, logger, (steps, _nested, state) => {
+  const core = new Core<M, 'sync'>(config, logger, (steps, _nested, state) => {
     const run = queue.add(() => runSync(steps(), report));
     return run.status === 'done' ? run.result : { status: 'queued', state };
   });
@@ -261,12 +259,12 @@ export function createStateMachine<State extends StateMachineState, Events exten
  * transition has run. Inside an action, send through `change.machine`: it answers `queued` at once.
  * @throws {TypeError} When `initial` is not among the states.
  */
-export function createAsyncStateMachine<State extends StateMachineState, Events extends EventsMap, Context = undefined>(
-  config: StateMachineConfig<State, Events, Context, 'async'>,
+export function createAsyncStateMachine<M extends StateMachineTypes = never>(
+  config: StateMachineConfig<M, 'async'>,
   { logger }: StateMachineOptions = {}
-): IStateMachine<State, Events, Context, 'async'> {
-  const queue = new AsyncQueue<StateMachineResult<State, Events, Context, 'async'>>();
-  const core = new Core<State, Events, Context, 'async'>(config, logger, (steps, nested, state) => {
+): IStateMachine<M, 'async'> {
+  const queue = new AsyncQueue<StateMachineResult<M, 'async'>>();
+  const core = new Core<M, 'async'>(config, logger, (steps, nested, state) => {
     const result = queue.add(() => runAsync(steps()));
     return nested ? Promise.resolve({ status: 'queued', state }) : result;
   });
