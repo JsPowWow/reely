@@ -36,7 +36,7 @@ export interface AwaitProps<T> {
  * @param {AwaitProps<T>} props - The promise and the three branches.
  * @returns {DocumentFragment} The shown branch between the two anchors it keeps its place by.
  */
-export const Await = <T,>({ promise, children, fallback, catch: renderError }: AwaitProps<T>): DocumentFragment => {
+export const Await = <T>({ promise, children, fallback, catch: renderError }: AwaitProps<T>): DocumentFragment => {
   const slot = createFlowSlot('Await');
   // each wait takes a turn; a settled promise renders only while its turn is still the latest
   let latest = 0;

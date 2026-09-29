@@ -48,7 +48,7 @@ describe('createElement: events', () => {
     expect(onClick).toHaveBeenCalledOnce();
     expect(onKeyDown).toHaveBeenCalledOnce();
     expect(onPointerMove).toHaveBeenCalledOnce();
-    expect(createElement('div', { onDblClick: () => undefined, onTransitionEnd: () => undefined })).toBeInstanceOf(HTMLDivElement);
+    expect(createElement('div', { onDblClick: () => undefined, onTransitionEnd: () => undefined, onTouchStart: () => undefined })).toBeInstanceOf(HTMLDivElement);
     // @ts-expect-error only the first word capitalised is neither the DOM name nor the camelCase one
     expect(createElement('input', { onKeydown: () => undefined })).toBeInstanceOf(HTMLInputElement);
   });

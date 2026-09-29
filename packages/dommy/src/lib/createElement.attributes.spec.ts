@@ -52,6 +52,25 @@ describe('createElement: properties and attributes', () => {
     expect(select.value).toBe('b');
   });
 
+  it('sets token-list props, `DOMTokenList`s in the DOM, from a string', () => {
+    const frame = createElement('iframe', { sandbox: 'allow-scripts allow-forms' });
+    const icon = createElement('link', { rel: 'icon', sizes: '32x32' });
+
+    expect(frame.getAttribute('sandbox')).toBe('allow-scripts allow-forms');
+    expect(icon.getAttribute('sizes')).toBe('32x32');
+  });
+
+  it('keeps every selected option of a `select multiple`, which takes `multiple` before its options', () => {
+    const select = createElement(
+      'select',
+      { multiple: true },
+      createElement('option', { value: 'a', selected: true }, 'A'),
+      createElement('option', { value: 'b', selected: true }, 'B')
+    );
+
+    expect(Array.from(select.selectedOptions, (option) => option.value)).toEqual(['a', 'b']);
+  });
+
   describe('live state', () => {
     it('sets `value` as a property', () => {
       const textarea = createElement('textarea', { value: 'draft' });

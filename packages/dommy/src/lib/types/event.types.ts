@@ -7,7 +7,7 @@ export type DOMElementEvent<Evt extends DOMElementEventType, Elt extends DommyEl
 
 /**
  * Handler props of an element: the DOM name `onkeydown` and its camelCase form `onKeyDown`,
- * a capital letter for every word, as React writes it (`dblclick` is `onDblClick`).
+ * a capital letter for every word: `onPointerMove` as in React, though `dblclick` is `onDblClick`.
  */
 export type DOMElementEvents<T extends DommyElement> = {
   [K in HandlerName as K | CamelCaseHandlerName<K>]?: DOMElementEventHandlerProp<HandlerEvent<K>, T>;
@@ -19,12 +19,19 @@ type HandlerName = Extract<keyof GlobalEventHandlers, `on${string}`>;
 type HandlerEvent<K extends HandlerName> =
   NonNullable<GlobalEventHandlers[K]> extends (event: infer Evt) => unknown ? Extract<Evt, Event> : never;
 
+type KnownEventType = HandlerName extends `on${infer EventType}` ? EventType : never;
+
+/** Checks a word table: every key an event type of the DOM, every value that type in words. */
+type EventWordTable<
+  T extends { [K in keyof T]: K extends KnownEventType ? (Lowercase<T[K] & string> extends K ? string : never) : never },
+> = T;
+
 type CamelCaseHandlerName<K> = K extends `on${infer EventType}`
   ? `on${EventType extends keyof EventTypeWords ? EventTypeWords[EventType] : Capitalize<EventType>}`
   : never;
 
 /** The words of the DOM event types that have more than one; the others take a capital letter. */
-interface EventTypeWords {
+type EventTypeWords = EventWordTable<{
   animationcancel: 'AnimationCancel';
   animationend: 'AnimationEnd';
   animationiteration: 'AnimationIteration';
@@ -78,12 +85,16 @@ interface EventTypeWords {
   selectstart: 'SelectStart';
   slotchange: 'SlotChange';
   timeupdate: 'TimeUpdate';
+  touchcancel: 'TouchCancel';
+  touchend: 'TouchEnd';
+  touchmove: 'TouchMove';
+  touchstart: 'TouchStart';
   transitioncancel: 'TransitionCancel';
   transitionend: 'TransitionEnd';
   transitionrun: 'TransitionRun';
   transitionstart: 'TransitionStart';
   volumechange: 'VolumeChange';
-}
+}>;
 
 export type DOMElementEventHandler<Evt extends DOMElementEventType, Elt extends DommyElement> = (
   event: DOMElementEvent<Evt, Elt>

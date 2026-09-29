@@ -48,6 +48,7 @@ export type DOMElementStyles = {
 
 type ExcludedDOMProps =
   | 'classList'
+  | 'relList'
   | 'style'
   | 'dataset'
   | 'attributes'
@@ -61,7 +62,8 @@ type ExcludedDOMProps =
 
 /**
  * Props the DOM types as the element they point at (`input.list`, `button.form`), while the
- * attribute takes that element's id, as the ID-reference `aria` props do.
+ * attribute takes that element's id, as the ID-reference `aria` props do. Token-list props
+ * (`sandbox`, `sizes`), `DOMTokenList`s in the DOM, take their attribute's string the same way.
  */
 type ElementIdReference = 'list' | 'form';
 
@@ -72,7 +74,11 @@ type SafeAttributes<T> = {
     ? never
     : Extract<T[K], AnyFunction> extends never
     ? K
-    : never]: K extends ElementIdReference ? MaybeReactive<string> : MaybeReactive<T[K]>;
+    : never]: K extends ElementIdReference
+    ? MaybeReactive<string>
+    : T[K] extends DOMTokenList
+    ? MaybeReactive<string>
+    : MaybeReactive<T[K]>;
 } & DataAttributes;
 
 type DataAttributes = {

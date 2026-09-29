@@ -2,6 +2,7 @@ import type { PipeableFn } from '@reely/utils';
 import { hasProperty, isInstanceOf, isPlainObject, isSomeFunction, isValidRecordKey } from '@reely/utils';
 
 import { hasAriaAttribute, setAriaAttributes } from './attributes/element.aria.attributes';
+import { isLiveProperty } from './attributes/element.live.properties';
 import { hasStylesAttribute, setStyleAttributes } from './attributes/element.style.attributes';
 import { addEventListenerHandler, isEventListenerHandler, toEventType } from './element.addListeners';
 import { applyValue } from './element.bindings';
@@ -44,8 +45,9 @@ export const assignElementRef =
   };
 
 /**
- * Applies props to the element: styles, ARIA, event listeners, attributes and live properties;
- * a signal or a getter keeps its prop updated.
+ * Applies props to the element: styles, ARIA, event listeners and attributes; a signal or a
+ * getter keeps its prop updated. Live state (`value`, `checked`…) waits for
+ * `assignLiveProperties`, after the children.
  *
  * @template Element - The type of the element.
  * @param {unknown} maybeProps - Props of the element; checked at runtime, since JSX passes them untyped.
@@ -72,7 +74,8 @@ export const assignProperties =
 
     for (const [property, value] of Object.entries(restProps)) {
       switch (true) {
-        case isElementFactoryOptionProp(property): {
+        case isElementFactoryOptionProp(property):
+        case isLiveProperty(property): {
           break;
         }
         case isEventListenerHandler(property, value): {
@@ -80,6 +83,27 @@ export const assignProperties =
           break;
         }
         default: {
+          applyValue(value, (current) => assignProperty(element, property, current));
+        }
+      }
+    }
+    return element;
+  };
+
+/**
+ * Applies the live state props (`value`, `checked`, `selected`…) once the children are in:
+ * a `select` value then finds the option it names, and `multiple`, an attribute, is already set.
+ *
+ * @template Element - The type of the element.
+ * @param {unknown} maybeProps - Props of the element; checked at runtime, since JSX passes them untyped.
+ * @returns {PipeableFn<Element>} A step that returns the same element.
+ */
+export const assignLiveProperties =
+  <Element extends DommyElement>(maybeProps: unknown): PipeableFn<Element> =>
+  (element: Element) => {
+    if (isPlainObject(maybeProps)) {
+      for (const [property, value] of Object.entries(maybeProps)) {
+        if (isLiveProperty(property)) {
           applyValue(value, (current) => assignProperty(element, property, current));
         }
       }

@@ -7,7 +7,7 @@ import type { ReactiveValue, ReelyNode } from './types/dommy.types';
 export interface KeyedProps<T> {
   /** The value: a signal or a getter; each change of it builds the branch anew. */
   value: ReactiveValue<T>;
-  /** Builds the branch for a value. */
+  /** Builds the branch for a value; `null` and `undefined` come too, so return `null` for none. */
   children: (value: T) => ReelyNode;
 }
 
@@ -21,7 +21,7 @@ export interface KeyedProps<T> {
  * @param {KeyedProps<T>} props - The value and the branch.
  * @returns {DocumentFragment} The branch between the two anchors it keeps its place by.
  */
-export const Keyed = <T,>({ value, children }: KeyedProps<T>): DocumentFragment => {
+export const Keyed = <T>({ value, children }: KeyedProps<T>): DocumentFragment => {
   const slot = createFlowSlot('Keyed');
   bindValue(value, (current) => slot.show(() => children(current)));
   return slot.fragment;

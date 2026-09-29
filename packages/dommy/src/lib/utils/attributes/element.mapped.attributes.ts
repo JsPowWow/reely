@@ -23,9 +23,6 @@ const mappedAttributes = [
   ['bgColor', 'bgcolor'],
 
   ['httpEquiv', 'http-equiv'],
-
-  ['viewBox', 'viewBox'],
-  ['preserveAspectRatio', 'preserveAspectRatio'],
 ] as const;
 
 const mappedAttributeNamesMap: Map<string, string> = new Map<string, string>(mappedAttributes);

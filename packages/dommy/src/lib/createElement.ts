@@ -2,7 +2,7 @@ import type { Nullable } from '@reely/utils';
 import { isPlainObject, isSomeFunction, pipe } from '@reely/utils';
 
 import { appendChildren, toElementChildren, toNode } from './utils/element.children';
-import { assignElementRef, assignProperties } from './utils/element.properties';
+import { assignElementRef, assignLiveProperties, assignProperties } from './utils/element.properties';
 import { isSvgTag, SVG_NAMESPACE } from './utils/element.svg';
 
 import type { DOMElement, DOMElementFactoryProps, HtmlElementTag, ReelyNode } from './types/dommy.types';
@@ -10,8 +10,9 @@ import type { Component } from './types/jsx.types';
 import type { SvgElement, SvgElementProps, SvgElementTag } from './types/svg.types';
 
 /**
- * Builds an element from untyped props and children, checking them at runtime. Children go in
- * before props, so a `select` value finds the option it names.
+ * Builds an element from untyped props and children, checking them at runtime. Attributes go
+ * before the children and live state after them, so a `select` is `multiple` before its options
+ * arrive and its `value` finds the option it names.
  */
 const buildElement = <Tag extends HtmlElementTag>(
   tag: Tag,
@@ -21,8 +22,9 @@ const buildElement = <Tag extends HtmlElementTag>(
   pipe(
     document.createElement(tag),
     assignElementRef<DOMElement<Tag>>(maybeProps),
+    assignProperties<DOMElement<Tag>>(maybeProps),
     appendChildren<DOMElement<Tag>>(toElementChildren(maybeProps, maybeChildren)),
-    assignProperties<DOMElement<Tag>>(maybeProps)
+    assignLiveProperties<DOMElement<Tag>>(maybeProps)
   );
 
 /** Builds an SVG element: the same steps in the SVG namespace. */
@@ -34,8 +36,8 @@ const buildSvgElement = <Tag extends SvgElementTag>(
   pipe(
     document.createElementNS(SVG_NAMESPACE, tag),
     assignElementRef<SvgElement<Tag>>(maybeProps),
-    appendChildren<SvgElement<Tag>>(toElementChildren(maybeProps, maybeChildren)),
-    assignProperties<SvgElement<Tag>>(maybeProps)
+    assignProperties<SvgElement<Tag>>(maybeProps),
+    appendChildren<SvgElement<Tag>>(toElementChildren(maybeProps, maybeChildren))
   );
 
 /**

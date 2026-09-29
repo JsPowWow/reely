@@ -15,14 +15,27 @@ describe('Keyed', () => {
     expect(panel.textContent).toBe('Review by Linus');
   });
 
-  it('keeps the branch while the value stays the same', () => {
-    const file = signal('lap.ts');
+  it('keeps the branch while the value stays the same, whatever its getter reads', () => {
+    const files = signal([{ name: 'lap.ts', lines: 40 }]);
     const renders = vi.fn((name: string) => <p>{name}</p>);
-    mount(document.createElement('div'), () => <Keyed value={file}>{renders}</Keyed>);
+    const panel = document.createElement('div');
+    mount(panel, () => <Keyed value={() => files.value[0]?.name ?? ''}>{renders}</Keyed>);
+    const card = panel.querySelector('p');
 
-    file.value = 'lap.ts';
+    files.value = [{ name: 'lap.ts', lines: 41 }];
 
     expect(renders).toHaveBeenCalledOnce();
+    expect(panel.querySelector('p')).toBe(card);
+  });
+
+  it('passes `null` to the children like any value, so they decide what no value shows', () => {
+    const reviewer = signal<string | null>('Ada');
+    const panel = document.createElement('section');
+    mount(panel, () => <Keyed value={reviewer}>{(name) => name && <p>Review by {name}</p>}</Keyed>);
+
+    reviewer.value = null;
+
+    expect(panel.querySelectorAll('p')).toHaveLength(0);
   });
 
   it('follows a getter, and releases the bindings of the branch it replaces', () => {

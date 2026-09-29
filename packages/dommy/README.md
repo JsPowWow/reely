@@ -57,7 +57,7 @@ const same = (
 );
 ```
 
-- Props are DOM property names: `className`, `htmlFor`, `tabIndex`, and lowercase where the DOM has them so: `autocomplete`, `autofocus`. `value`, `checked` and other live state are set as properties, after the children, so `<select value="b">` selects its option `b`.
+- Props are DOM property names: `className`, `htmlFor`, `tabIndex`, and lowercase where the DOM has them so: `autocomplete`, `autofocus`. `value`, `checked` and other live state are set as properties, after the children, so `<select value="b">` selects its option `b`; attributes go before them.
 - `list` and `form`, which the DOM types as elements, take an id: `<input list="cars" />`.
 - `styles={{ marginTop: '1rem', '--accent': 'red' }}` sets inline styles, custom properties included.
 - `aria={{ role: 'status', ariaLabel: 'Score' }}` sets `role` and `aria-*` attributes.
