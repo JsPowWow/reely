@@ -1,5 +1,6 @@
 // Small helpers over signals and the owner, as their own entry: `@reely/dommy/kit`.
 export { flip } from './lib/kit/kit.flip';
+export { later } from './lib/kit/kit.later';
 export { listen, type EventMapOf } from './lib/kit/kit.listen';
 export { machine, type Machine, type MachineEvent, type MachineState } from './lib/kit/kit.machine';
 export { media } from './lib/kit/kit.media';

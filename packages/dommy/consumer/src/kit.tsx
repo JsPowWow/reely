@@ -1,5 +1,5 @@
 import { effect } from '@reely/dommy';
-import { flip, listen, machine, media, persisted, size, throttled } from '@reely/dommy/kit';
+import { flip, later, listen, machine, media, persisted, size, throttled } from '@reely/dommy/kit';
 
 // the kit as a consumer types it
 export const start = (board: HTMLElement): void => {
@@ -12,5 +12,7 @@ export const start = (board: HTMLElement): void => {
   effect(() => {
     board.dataset['layout'] = phone.value ? 'phone' : `${tab.value}:${gap.value}`;
   });
+  const cancel = later(0, () => board.focus());
+  listen(board, 'pointerdown', cancel);
   flip(board, () => board.append(...Array.from(board.children).reverse()));
 };
