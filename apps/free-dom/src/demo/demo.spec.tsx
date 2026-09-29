@@ -21,6 +21,22 @@ describe('demo', () => {
       Reflect.deleteProperty(Element.prototype, 'animate');
     });
 
+    it('counts a node removed and added back in one change as moved, not as a node write', async () => {
+      const list = document.createElement('ul');
+      list.append(document.createElement('li'), document.createElement('li'));
+      const meter = MutationMeter({ children: list });
+      await flushMutations();
+
+      list.prepend(list.lastChild ?? list);
+      list.append(document.createElement('li'));
+      await flushMutations();
+      const [, text, attributes, moved, nodes] = Array.from(meter.querySelectorAll('figcaption dd'), (count) =>
+        Number(count.firstChild?.textContent)
+      );
+
+      expect([text, attributes, moved, nodes]).toEqual([0, 0, 1, 1]);
+    });
+
     it('flashes the rows a lap moved, not the list that holds them', async () => {
       const animate = vi.fn();
       Element.prototype.animate = animate;

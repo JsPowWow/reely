@@ -22,28 +22,28 @@ export interface LandingExample {
 
 export const landingExamples: readonly LandingExample[] = [
   {
-    id: 'elements',
-    title: 'The element itself',
-    claim:
-      'A tag factory returns a real HTMLButtonElement, typed as one, so the DOM API is right there: shake.animate() needs no ref and no wrapper. The animation runs on the element, and the board under it counts no writes.',
-    file: 'real.element.ts',
-    Demo: ShakeButton,
-    source: elementSource,
-  },
-  {
     id: 'signals',
     title: 'One keystroke, two text edits',
     claim:
-      'Type your name. The greeting and the count are the two text nodes bound to the signal, so each keystroke edits those two and nothing else: no re-render, no diff.',
+      'Type in the field. The greeting and the letter count are the two text nodes bound to the name, so each keystroke edits those two, and the board counts nothing else.',
     file: 'live.preview.tsx',
     Demo: LivePreview,
     source: previewSource,
   },
   {
+    id: 'elements',
+    title: 'The element itself',
+    claim:
+      'A tag factory returns the real HTMLButtonElement, typed as one, so shake.animate() needs no ref, and the animation writes nothing to the DOM.',
+    file: 'real.element.ts',
+    Demo: ShakeButton,
+    source: elementSource,
+  },
+  {
     id: 'lists',
     title: 'Rows move, they are not rebuilt',
     claim:
-      'Type a note in any row, then reverse the list. For keeps one row per key and moves its nodes, so your note, and the input it lives in, move with the row.',
+      'Type a note in any row, then reverse the list: the board counts moved nodes and no new ones, and your note moves with its row.',
     file: 'keyed.notes.tsx',
     Demo: KeyedNotes,
     source: notesSource,
@@ -52,7 +52,7 @@ export const landingExamples: readonly LandingExample[] = [
     id: 'async',
     title: 'Only the latest answer',
     claim:
-      'Type e, ef, eff quickly. The server here answers shorter queries later, the way a slow network would; Await shows the answer for the latest query and drops the late ones.',
+      'Type eff quickly. This server answers shorter queries later, as a slow network would; Await shows the answer to the latest query and drops the late ones, counted under the results.',
     file: 'api.search.tsx',
     Demo: ApiSearch,
     source: searchSource,

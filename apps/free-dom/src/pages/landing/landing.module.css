@@ -177,6 +177,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+.timesCaption {
+  padding-bottom: 0.5rem;
+  color: var(--code-text);
+  font-size: 0.9375rem;
+  text-align: left;
+}
+
 .times th,
 .times td {
   padding: 0.85rem 0;

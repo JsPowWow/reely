@@ -68,7 +68,7 @@ export const LandingPage = (): Node => {
               Size and speed
             </h2>
             <table className={css.times}>
-              <caption className='visually-hidden'>Size, minified and gzipped, and speed</caption>
+              <caption className={css.timesCaption}>Sizes minified and gzipped, measured on the npm tarball</caption>
               <tbody>
                 <tr>
                   <th scope='row'>An app that uses only signals ships</th>
@@ -79,7 +79,7 @@ export const LandingPage = (): Node => {
                   <td>{measured.jsxApp}</td>
                 </tr>
                 <tr>
-                  <th scope='row'>The whole package, gzipped</th>
+                  <th scope='row'>The whole package</th>
                   <td>{measured.wholePackage}</td>
                 </tr>
                 <tr>
@@ -89,7 +89,7 @@ export const LandingPage = (): Node => {
               </tbody>
             </table>
             <p className={css.numbersNote}>
-              Measured on the npm tarball, bundled with esbuild. Time the 500 rows in your own browser on{' '}
+              Bundled with esbuild. Time the 500 rows in your own browser on{' '}
               <a href='/docs/performance'>Size and speed</a>.
             </p>
             <div className={css.actions}>

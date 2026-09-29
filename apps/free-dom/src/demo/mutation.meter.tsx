@@ -4,18 +4,14 @@ import { exhaustiveGuard, isInstanceOf, isNil, isSomeFunction } from '@reely/uti
 
 import css from './demo.module.css';
 
-type WriteKind = 'text' | 'attribute' | 'node';
+type WriteKind = 'text' | 'attribute' | 'move' | 'node';
 
-interface DomWrite {
-  kind: WriteKind;
-  count: number;
-}
-
-const writeKinds: readonly WriteKind[] = ['text', 'attribute', 'node'];
+const writeKinds: readonly WriteKind[] = ['text', 'attribute', 'move', 'node'];
 
 const writeLabels = {
   text: 'Text edits',
   attribute: 'Attribute edits',
+  move: 'Nodes moved',
   node: 'Nodes added or removed',
 } as const satisfies Record<WriteKind, string>;
 
@@ -23,26 +19,53 @@ const writeLabels = {
 const writeNouns = {
   text: ['text edit', 'text edits'],
   attribute: ['attribute edit', 'attribute edits'],
+  move: ['node moved', 'nodes moved'],
   node: ['node added or removed', 'nodes added or removed'],
 } as const satisfies Record<WriteKind, readonly [string, string]>;
 
 const countSignals = (): Record<WriteKind, Signal<number>> => ({
   text: signal(0),
   attribute: signal(0),
+  move: signal(0),
   node: signal(0),
 });
 
-const toDomWrite = (record: MutationRecord): DomWrite => {
-  switch (record.type) {
-    case 'characterData':
-      return { kind: 'text', count: 1 };
-    case 'attributes':
-      return { kind: 'attribute', count: 1 };
-    case 'childList':
-      return { kind: 'node', count: record.addedNodes.length + record.removedNodes.length };
-    default:
-      return exhaustiveGuard(record.type);
+/** The nodes one change removed, and those it inserted; a node in both was moved. */
+interface ChildListChange {
+  removed: Set<Node>;
+  added: Set<Node>;
+}
+
+const toChildListChange = (records: readonly MutationRecord[]): ChildListChange => {
+  const change: ChildListChange = { removed: new Set(), added: new Set() };
+  for (const record of records) {
+    record.removedNodes.forEach((node) => change.removed.add(node));
+    record.addedNodes.forEach((node) => change.added.add(node));
   }
+  return change;
+};
+
+/** Counts one change by kind: a node removed and inserted again within it is one move. */
+const countWrites = (records: readonly MutationRecord[]): Record<WriteKind, number> => {
+  const counts = { text: 0, attribute: 0, move: 0, node: 0 } satisfies Record<WriteKind, number>;
+  for (const record of records) {
+    switch (record.type) {
+      case 'characterData':
+        counts.text += 1;
+        break;
+      case 'attributes':
+        counts.attribute += 1;
+        break;
+      case 'childList':
+        break;
+      default:
+        exhaustiveGuard(record.type);
+    }
+  }
+  const { removed, added } = toChildListChange(records);
+  counts.move = [...added].filter((node) => removed.has(node)).length;
+  counts.node = added.size + removed.size - 2 * counts.move;
+  return counts;
 };
 
 /** Counts the elements and non-blank text nodes inside `root`, without `root` itself. */
@@ -90,9 +113,9 @@ const touchedBy = (record: MutationRecord): Node[] =>
  * Outlines the elements a mutation touched (a text node's element for text), in the page's
  * `--signal-ink` or `--flag` color; with reduced motion the outline shows and hides without fading.
  */
-const flash = (record: MutationRecord): void => {
-  const token = toDomWrite(record).kind === 'node' ? '--flag' : '--signal-ink';
+const flash = (record: MutationRecord, moved: ReadonlySet<Node>): void => {
   for (const node of touchedBy(record)) {
+    const token = record.type === 'childList' && !moved.has(node) ? '--flag' : '--signal-ink';
     const element = isInstanceOf(Element, node) ? node : node.parentElement;
     if (isNil(element) || !isSomeFunction(element.animate)) {
       continue;
@@ -108,6 +131,13 @@ const flash = (record: MutationRecord): void => {
     );
   }
 };
+
+const readoutClass = {
+  text: css.readoutEdit,
+  attribute: css.readoutEdit,
+  move: css.readoutMove,
+  node: css.readoutNode,
+} satisfies Record<WriteKind, string | undefined>;
 
 interface MutationMeterProps {
   children?: ReelyNode;
@@ -126,10 +156,7 @@ export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => 
   const stage = div({ className: css.stage }, children);
 
   const observer = new MutationObserver((records) => {
-    const delta = { text: 0, attribute: 0, node: 0 } satisfies Record<WriteKind, number>;
-    for (const { kind, count } of records.map(toDomWrite)) {
-      delta[kind] += count;
-    }
+    const delta = countWrites(records);
     batch(() => {
       for (const kind of writeKinds) {
         totals[kind].value += delta[kind];
@@ -141,7 +168,9 @@ export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => 
       );
     });
     if (records.length <= flashLimit) {
-      records.forEach(flash);
+      const { removed, added } = toChildListChange(records);
+      const moved = new Set([...added].filter((node) => removed.has(node)));
+      records.forEach((record) => flash(record, moved));
     }
   });
   observer.observe(stage, { subtree: true, childList: true, attributes: true, characterData: true });
@@ -149,7 +178,7 @@ export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => 
 
   const readout = (kind: WriteKind): HTMLElement =>
     div(
-      { className: kind === 'node' ? css.readoutNode : css.readoutEdit },
+      { className: readoutClass[kind] },
       dt(null, writeLabels[kind]),
       dd(
         null,

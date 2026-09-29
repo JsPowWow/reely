@@ -15,7 +15,7 @@ Memorable moment: an example the visitor can break with their own hands (type, r
 
 ## Direction contract
 
-THESIS: Show, then tell, in plain words: what reely is, four live examples a JS developer recognises (the element itself, a keystroke that edits two text nodes, rows that move with what you typed in them, a search that shows only the latest answer), then the measured size and speed and the docs. It refuses metaphor: every heading says what the example proves.
+THESIS: Show, then tell, in plain words: what reely is, four live examples a JS developer recognises (a keystroke that edits two text nodes, the element itself, rows that move with what you typed in them, a search that shows only the latest answer), then the measured size and speed and the docs. It refuses metaphor: every heading says what the example proves.
 
 OWN-WORLD: Asphalt #e9edf1 ground, graphite #1f2933 opening band and numbers band, signal yellow #f5c518 for the primary action, the one "current" plate in a demo and figures on graphite, flag red #d64545 only for node writes. Big Shoulders Display for headings and figures in tabular numerals; Atkinson Hyperlegible for prose; JetBrains Mono only for code. White demo panels with the write board under each demo, the module that renders it beside.
 
@@ -23,6 +23,6 @@ STORY: The visitor learns in one line what reely is (real DOM, one write per cha
 
 FIRST VIEWPORT: A graphite band under the site header. Left, at 5.5rem display: "Real DOM. One write per change." Under it one sentence on how, the signal-yellow "Open the docs" button beside the `npm i @reely/dommy@next` line, and "This page, its examples and their write counters are built with reely". Right: the live counter with its write board, on a white panel.
 
-FORM: A plain sequence: opening band, four example sections (heading that states the claim, one explaining paragraph, demo with its board beside its source, the demo sticky while the source scrolls), a graphite numbers band that closes the page. No sticky progress bar, no numbered sections, no decorative edges. Motion only where a demo answers the visitor (the shake), reduced to an opacity pulse under reduced motion.
+FORM: Code-led, no concept roll (the earlier lap-sectors roll, seed 5281967b, was retired). A plain sequence: opening band, four example sections (heading that states the claim, one explaining paragraph, demo with its board beside its source, the demo sticky while the source scrolls), a graphite numbers band that closes the page. No sticky progress bar, no numbered sections, no decorative edges. Motion only where a demo answers the visitor (the shake), reduced to an opacity pulse under reduced motion.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

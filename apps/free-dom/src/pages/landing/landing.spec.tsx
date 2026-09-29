@@ -21,7 +21,7 @@ const section = (host: Element, id: string): Element => {
   return found;
 };
 
-/** The write board under a demo: text edits, attribute edits, nodes added or removed. */
+/** The write board under a demo: text edits, attribute edits, nodes moved, nodes added or removed. */
 const writes = (example: Element): number[] =>
   Array.from(example.querySelectorAll('figcaption dd'), (count) => Number(count.firstChild?.textContent)).slice(1);
 
@@ -65,7 +65,7 @@ describe('LandingPage', () => {
 
     expect(shake).toBeInstanceOf(HTMLButtonElement);
     expect(animate).toHaveBeenCalledOnce();
-    expect(writes(elements)).toEqual([0, 0, 0]);
+    expect(writes(elements)).toEqual([0, 0, 0, 0]);
   });
 
   it('edits two text nodes per keystroke, as the signals example claims', async () => {
@@ -76,21 +76,38 @@ describe('LandingPage', () => {
     await flushMutations();
 
     expect(signals.querySelector('figure p')?.textContent).toBe('Hello, Grace!');
-    expect(signals.textContent).toContain('5 characters');
-    expect(writes(signals)).toEqual([2, 0, 0]);
+    expect(signals.textContent).toContain('5 letters');
+    expect(writes(signals)).toEqual([2, 0, 0, 0]);
   });
 
-  it('moves a row with the note typed into it when the list is reversed', () => {
+  it('moves a row with the note typed into it, and counts moves, no new nodes', async () => {
     const lists = section(host, 'lists');
     const firstNote = lists.querySelector('input');
     typeInto(firstNote, 'check the typos');
+    await flushMutations();
 
     clickButton(lists, 'Reverse');
+    await flushMutations();
     const notes = Array.from(lists.querySelectorAll('input'));
+    const [text, attributes, moved, nodes] = writes(lists);
 
     expect(notes.at(-1)).toBe(firstNote);
     expect(notes.at(-1)?.value).toBe('check the typos');
     expect(lists.querySelector('li')?.textContent).toContain('Release');
+    expect([text, attributes, nodes]).toEqual([0, 0, 0]);
+    expect(moved).toBeGreaterThan(0);
+  });
+
+  it('greets a stranger and counts one letter in the singular', () => {
+    const signals = section(host, 'signals');
+
+    typeInto(signals.querySelector('input'), '');
+    const empty = signals.querySelector('figure p')?.textContent;
+    typeInto(signals.querySelector('input'), 'A');
+
+    expect(empty).toBe('Hello, stranger!');
+    expect(signals.textContent).toContain('1 letter');
+    expect(signals.textContent).not.toContain('1 letters');
   });
 
   describe('the async example', () => {
@@ -106,21 +123,24 @@ describe('LandingPage', () => {
       vi.useRealTimers();
     });
 
-    it('shows only the answer for the latest query, though the earlier ones answer later', async () => {
+    it('shows only the answer to the latest query, and counts the late answers it dropped', async () => {
       const search = section(host, 'async');
       const input = search.querySelector('input');
+      const idle = search.textContent;
 
       typeInto(input, 'e');
       typeInto(input, 'ef');
       typeInto(input, 'eff');
       await vi.advanceTimersByTimeAsync(answerDelay('eff'));
       const first = Array.from(search.querySelectorAll('li'), (item) => item.textContent);
-      await vi.advanceTimersByTimeAsync(answerDelay(''));
+      await vi.advanceTimersByTimeAsync(answerDelay('e'));
 
+      expect(idle).toContain('Type to search 11 names');
       expect(answerDelay('e')).toBeGreaterThan(answerDelay('eff'));
       expect(first).toEqual(['effect']);
+      expect(search.textContent).toContain('Answer to “eff”');
       expect(Array.from(search.querySelectorAll('li'), (item) => item.textContent)).toEqual(['effect']);
-      expect(search.textContent).toContain('Answers received: 4.');
+      expect(search.textContent).toContain('Late answers dropped: 2');
     });
   });
 });

@@ -5,7 +5,7 @@ import { MutationMeter } from '../../demo/mutation.meter';
 import { EvolutionPage } from './evolution.page';
 import { evolutionSteps } from './evolution.steps';
 
-// the first-render node count, then text edits, attribute edits, nodes added or removed
+// the first-render node count, then text edits, attribute edits, nodes moved, nodes added or removed
 const readWrites = (meter: Element): string[] =>
   Array.from(meter.querySelectorAll('figcaption dd')).map((count) => count.textContent ?? '');
 
@@ -30,7 +30,7 @@ describe('evolution', () => {
     const meter = renderStep('factories');
     await flushMutations();
 
-    expect(readWrites(meter)).toEqual(['24', '0', '0', '0']);
+    expect(readWrites(meter)).toEqual(['24', '0', '0', '0', '0']);
     expect(readAnnouncement(meter)).toBe('');
   });
 
@@ -45,7 +45,7 @@ describe('evolution', () => {
   });
 
   // Every counter step, after +1, +1, −1 clicked in turn: the first-render node count, then text
-  // edits, attribute edits and nodes added or removed, each with the last click's delta.
+  // edits, attribute edits, nodes moved and nodes added or removed, each with the last click's delta.
   describe('counter steps', () => {
     const clickInTurn = async (meter: Element, labels: readonly string[]): Promise<void> => {
       for (const label of labels) {
@@ -55,13 +55,13 @@ describe('evolution', () => {
     };
 
     it.each([
-      ['signal', ['7', '0', '0', '6+2']],
-      ['bind-by-hand', ['7', '0', '0', '6+2']],
-      ['bind', ['7', '3+1', '0', '0']],
-      ['derived', ['7', '3+1', '3+1', '0']],
-      ['getter', ['7', '3+1', '4+1', '0']],
-      ['two-signals', ['9', '9+3', '4+1', '0']],
-      ['batch', ['9', '6+2', '4+1', '0']],
+      ['signal', ['7', '0', '0', '0', '6+2']],
+      ['bind-by-hand', ['7', '0', '0', '0', '6+2']],
+      ['bind', ['7', '3+1', '0', '0', '0']],
+      ['derived', ['7', '3+1', '3+1', '0', '0']],
+      ['getter', ['7', '3+1', '4+1', '0', '0']],
+      ['two-signals', ['9', '9+3', '4+1', '0', '0']],
+      ['batch', ['9', '6+2', '4+1', '0', '0']],
     ])('step "%s" makes the writes it shows', async (slug, expected) => {
       const meter = renderStep(slug);
 
@@ -101,7 +101,7 @@ describe('evolution', () => {
       }
 
       expect(meter.querySelector('output')?.textContent).toBe('1');
-      expect(readWrites(meter)).toEqual(['7', '0', '0', '6+2']);
+      expect(readWrites(meter)).toEqual(['7', '0', '0', '0', '6+2']);
     });
 
     it('announces what the last click changed', async () => {
@@ -128,7 +128,8 @@ describe('evolution', () => {
   describe('board steps', () => {
     const rowsOf = (root: Element): HTMLLIElement[] => Array.from(root.querySelectorAll('li'));
     const distanceOf = (row: Element): number => Number.parseFloat(row.querySelector('data')?.value ?? 'NaN');
-    const readNodeWrites = (meter: Element): number => Number.parseInt(readWrites(meter)[3] ?? '', 10);
+    const readMoves = (meter: Element): number => Number.parseInt(readWrites(meter)[3] ?? '', 10);
+    const readNodeWrites = (meter: Element): number => Number.parseInt(readWrites(meter)[4] ?? '', 10);
 
     it('step "keyed-list" keeps every row and moves fewer rows than a rebuild would', async () => {
       const meter = renderStep('keyed-list');
@@ -142,9 +143,10 @@ describe('evolution', () => {
       expect(new Set(after)).toEqual(new Set(before));
       expect(after.map(distanceOf)).toEqual(after.map(distanceOf).toSorted((x, y) => y - x));
       expect(after.map((row) => row.querySelector('b')?.textContent)).toEqual(['1', '2', '3', '4', '5', '6', '7', '8']);
-      expect(readNodeWrites(meter)).toBeGreaterThan(0);
-      // a rebuild removes and adds every row: 16 node writes
-      expect(readNodeWrites(meter)).toBeLessThan(16);
+      // rows move; a rebuild would remove and add every row, 16 node writes
+      expect(readMoves(meter)).toBeGreaterThan(0);
+      expect(readMoves(meter)).toBeLessThan(8);
+      expect(readNodeWrites(meter)).toBe(0);
     });
 
     describe('step "five-hundred"', () => {

@@ -14,9 +14,17 @@ const tasks: readonly Task[] = [
   { id: 4, title: 'Release' },
 ];
 
-// `For` keeps one row per key and moves it when the order changes: what you typed moves with it.
+// `For` keeps one row per key and moves it when the order
+// changes, so what you typed moves with its row.
 export const KeyedNotes = (): Node => {
   const rows = signal(tasks);
+  const reverse = (): void => {
+    rows.value = rows.value.toReversed();
+  };
+  const firstToLast = (): void => {
+    const [first, ...rest] = rows.value;
+    rows.value = first ? [...rest, first] : rest;
+  };
 
   return (
     <div className={css.stack}>
@@ -25,16 +33,17 @@ export const KeyedNotes = (): Node => {
           {(task) => (
             <li className={css.item}>
               <span className={css.title}>{() => task().title}</span>
-              <input placeholder='Your note' aria={{ ariaLabel: () => `Note on ${task().title}` }} />
+              <input
+                placeholder='Your note'
+                aria={{ ariaLabel: () => `Note on ${task().title}` }}
+              />
             </li>
           )}
         </For>
       </ol>
       <div className={css.row}>
-        <button onClick={() => (rows.value = rows.value.toReversed())}>Reverse</button>
-        <button onClick={() => (rows.value = [...rows.value.slice(1), ...rows.value.slice(0, 1)])}>
-          First to last
-        </button>
+        <button onClick={reverse}>Reverse</button>
+        <button onClick={firstToLast}>First to last</button>
       </div>
     </div>
   );

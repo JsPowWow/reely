@@ -65,6 +65,7 @@
 
 .readoutBuilt,
 .readoutEdit,
+.readoutMove,
 .readoutNode {
   display: flex;
   flex-direction: column;
@@ -75,7 +76,13 @@
   color: var(--slate);
 }
 
+/* what the first render built heads the board; the four kinds of write follow in pairs */
+.readoutBuilt {
+  grid-column: 1 / -1;
+}
+
 .readoutEdit dt::before,
+.readoutMove dt::before,
 .readoutNode dt::before {
   content: '';
   display: inline-block;
@@ -84,6 +91,12 @@
   margin-right: 0.4em;
   border-radius: 50%;
   background: var(--signal-ink);
+}
+
+/* a moved node is no new node: a hollow pip in graphite */
+.readoutMove dt::before {
+  border: 2px solid var(--graphite);
+  background: transparent;
 }
 
 .readoutNode dt::before {
@@ -98,6 +111,10 @@
 
 .readoutEdit .delta {
   color: var(--signal-ink);
+}
+
+.readoutMove .delta {
+  color: var(--graphite);
 }
 
 .readoutNode .delta {
