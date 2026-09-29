@@ -13,13 +13,13 @@ A task added while another runs waits for it, and runs before the outer `add` re
 ```ts
 import { SyncQueue } from '@reely/queue';
 
-const queue = new SyncQueue();
+const edits = new SyncQueue();
 
-queue.add(() => {
-  queue.add(() => console.log('second')); // { status: 'queued' }: runs once the first is done
-  console.log('first');
-  return 'lap';
-}); // { status: 'done', result: 'lap' }, after both have run
+edits.add(() => {
+  edits.add(() => autosave(doc)); // { status: 'queued' }: runs once the rename is done
+  doc.title = 'Q3 budget review';
+  return doc.title;
+}); // { status: 'done', result: 'Q3 budget review' }, after both have run, so autosave sees the new title
 ```
 
 `add` throws the error of its own task. A queued task has no caller left to throw to, so its error is reported as uncaught (see `reportUncaught` in `@reely/basics`), and the tasks after it still run.
