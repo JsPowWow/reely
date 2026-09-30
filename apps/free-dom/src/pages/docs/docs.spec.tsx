@@ -1,5 +1,7 @@
 import { mount } from '@reely/dommy';
 
+import { textsLoaded } from '../../i18n/localized';
+import { chooseLocale } from '../../i18n/locale';
 import { clickButton } from '../../testing/dom.testing';
 import { DeliveryTracker } from './demos/delivery.tracker';
 import { ExchangeRate, quoteDelay } from './demos/exchange.rate';
@@ -66,6 +68,28 @@ describe('docs', () => {
       expect(last.querySelector('footer a[href="/evolution"]')).not.toBeNull();
     });
 
+    it('speaks Russian once it is chosen, and keeps the demo as the reader left it', async () => {
+      const host = document.createElement('div');
+      const dispose = mount(host, () => <DocsPage slug='conditions' />);
+      clickButton(host, 'Next stop');
+      const branch = host.querySelector('figure p');
+
+      chooseLocale('ru');
+      await textsLoaded();
+
+      expect(host.querySelector('h1')?.textContent).toBe('Условный показ');
+      expect(host.querySelector('article h2')?.textContent).toBe('Пропсы');
+      expect(host.querySelector('nav h2')?.textContent).toBe('Начало');
+      expect(host.querySelector('a[rel="prev"]')?.textContent).toBe('Назад: Списки с ключами');
+      expect(document.title).toBe('Условный показ | документация reely');
+      expect(host.querySelector('figure p')).toBe(branch);
+      expect(branch?.textContent).toBe('Out for delivery, 4 stops away');
+
+      chooseLocale('en');
+      expect(host.querySelector('h1')?.textContent).toBe('Conditions');
+      dispose();
+    });
+
     it('explains an unknown topic and links to the first one instead of rendering a demo', () => {
       const page = renderPage('nope');
 
@@ -100,7 +124,9 @@ describe('docs', () => {
       }
 
       expect(demo.querySelector('p')?.textContent).toBe('Out for delivery, 2 stops away');
-      expect(Array.from(demo.querySelectorAll('button')).find((item) => item.textContent === 'Next stop')?.disabled).toBe(true);
+      expect(
+        Array.from(demo.querySelectorAll('button')).find((item) => item.textContent === 'Next stop')?.disabled
+      ).toBe(true);
     });
 
     it('swaps the branch when the parcel is delivered, and back for another', () => {
