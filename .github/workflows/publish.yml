@@ -1,14 +1,15 @@
 name: Publish
 
 # `nx release version` commits the new versions on main and tags each project `release/<name>/<version>`;
-# pushing those commits to main publishes every package tagged in the push. Push the commits and their
-# tags together (`git push --atomic origin main --follow-tags`) and straight to main: a rebased or
-# squashed copy of a release commit leaves its tags behind. A failed run is safe to re-run: a version
-# already on npm is skipped.
+# a push to main then publishes every package whose version on main is tagged and not yet on npm. So a
+# failed or skipped release goes out with the next push or a manual run, and a published one never twice.
+# Push release commits and their tags together (`git push --atomic origin main --follow-tags`) and
+# straight to main: a rebased or squashed copy of a release commit leaves its tags behind.
 on:
   push:
     branches: [main]
     paths: ['packages/*/package.json']
+  workflow_dispatch:
 
 jobs:
   released:
@@ -24,24 +25,24 @@ jobs:
         with:
           fetch-depth: 0
 
-      # the tags on the pushed commits; a pre-release version (`0.1.0-next.3`) goes to `next`, any other to `latest`
-      - name: Read release tags
+      # a pre-release version (`0.1.0-next.3`) goes to the `next` dist-tag, any other to `latest`
+      - name: Read unpublished release tags
         id: tags
         run: |
           latest=()
           next=()
-          for tag in $(git tag --list 'release/@reely/*' --merged "$AFTER" --no-merged "$BEFORE"); do
-            release="${tag#release/}"
-            if [[ "${release##*/}" == *-* ]]; then next+=("${release%/*}"); else latest+=("${release%/*}"); fi
+          for manifest in packages/*/package.json; do
+            read -r name version private < <(node -p "const m = require('./$manifest'); [m.name, m.version, !!m.private].join(' ')")
+            [[ "$private" == true ]] && continue
+            git rev-parse -q --verify "refs/tags/release/$name/$version" >/dev/null || continue
+            [[ -n "$(npm view "$name@$version" version --registry https://registry.npmjs.org 2>/dev/null)" ]] && continue
+            if [[ "$version" == *-* ]]; then next+=("$name"); else latest+=("$name"); fi
           done
           all=("${latest[@]}" "${next[@]}")
           echo "latest=$(IFS=,; echo "${latest[*]}")" >> "$GITHUB_OUTPUT"
           echo "next=$(IFS=,; echo "${next[*]}")" >> "$GITHUB_OUTPUT"
           echo "all=$(IFS=,; echo "${all[*]}")" >> "$GITHUB_OUTPUT"
-          echo "released: ${all[*]:-none}"
-        env:
-          BEFORE: ${{ github.event.before }}
-          AFTER: ${{ github.sha }}
+          echo "to publish: ${all[*]:-none}"
 
   publish:
     name: Publish
