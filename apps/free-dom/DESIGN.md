@@ -256,7 +256,7 @@ Plain and firm: a filled or outlined plate with bold text, no icon.
 - **Focus:** the global 3px graphite ring, 2px offset.
 
 ### Install Line
-The `npm i @reely/dommy@next` command: mono at 0.9375rem, asphalt on graphite, a 1px slate border at 4px, selectable in one click.
+The `npm i @reely/dommy` command: mono at 0.9375rem, asphalt on graphite, a 1px slate border at 4px, selectable in one click.
 
 ### Navigation
 - **Header:** a graphite strip with the display wordmark at 1.75rem and bold code-text links; hover lightens to asphalt over a slate 3px underline, the current part of the site gets a signal underline.

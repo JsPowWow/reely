@@ -32,7 +32,7 @@ No virtual DOM and no re-render: tag factories and JSX return real DOM nodes, a 
 - All copy is in English for now; code and comments are English too. English and Russian are planned, on reely's own signals.
 - The whole site uses only `@reely/*` packages at runtime: no other UI framework or runtime dependency.
 - The repo principle applies to the site as well: minimal, yet mature.
-- `@reely/dommy` is published as a pre-release: `npm i @reely/dommy@next` installs the current API; `latest` is still an old 0.0.x.
+- `@reely/dommy` is published on npm with plain versions: `npm i @reely/dommy` installs the current API.
 
 ## Brand Commitments
 
