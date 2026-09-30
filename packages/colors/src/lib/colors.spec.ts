@@ -98,10 +98,21 @@ describe('colors', () => {
       expect(parseColor('rgb(37 99 235 / 50%)')).toEqual({ r: 37, g: 99, b: 235 });
     });
 
+    it('reads around spaces, and rounds a fractional channel', () => {
+      expect(parseColor(' #fff ')).toEqual({ r: 255, g: 255, b: 255 });
+      expect(parseColor('rgb(12.4 99.6 235)')).toEqual({ r: 12, g: 100, b: 235 });
+    });
+
     it('throws for what it cannot read', () => {
       expect(() => parseColor('red')).toThrow('Invalid color: red');
+      expect(() => parseColor('abc')).toThrow('Invalid color');
       expect(() => parseColor('rgb(300, 0, 0)')).toThrow('Invalid color');
       expect(() => parseColor('rgb(1, 2)')).toThrow('Invalid color');
+      expect(() => parseColor('rgb(1,,2,3)')).toThrow('Invalid color');
+      expect(() => parseColor('rgb(1, 2 3)')).toThrow('Invalid color');
+      expect(() => parseColor('rgb(1, 2, 3, junk)')).toThrow('Invalid color');
+      expect(() => parseColor('rgb(0x10, 1e2, 3)')).toThrow('Invalid color');
+      expect(() => parseColor(42 as unknown as string)).toThrow('Invalid color: 42');
     });
   });
 
@@ -126,6 +137,7 @@ describe('colors', () => {
     it('draws from the given source of randomness, so a seeded one repeats', () => {
       expect(randomHex(() => 0)).toBe('#000000');
       expect(randomHex(() => 0.999)).toBe('#ffffff');
+      expect(randomHex(() => 1)).toBe('#ffffff');
       expect(randomHex()).toMatch(/^#[0-9a-f]{6}$/);
     });
   });

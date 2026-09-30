@@ -1,3 +1,5 @@
+import { isString } from '@reely/basics';
+
 export interface RgbColor {
     r: number;
     g: number;
@@ -41,7 +43,7 @@ export function rgbToHex(
     g = Number.NaN,
     b = Number.NaN
 ): string {
-    const channels = typeof rOrRgb === 'object' ? [rOrRgb.r, rOrRgb.g, rOrRgb.b] : [rOrRgb, g, b];
+    const channels = rOrRgb instanceof Object ? [rOrRgb.r, rOrRgb.g, rOrRgb.b] : [rOrRgb, g, b];
 
     if (!channels.every(isChannel)) {
         throw new Error('Each RGB channel must be a number from 0 to 255');
@@ -50,23 +52,45 @@ export function rgbToHex(
     return `#${channels.map((n) => Math.round(n).toString(16).padStart(2, '0')).join('')}`;
 }
 
+const cssHex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
 const rgbFunction = /^rgba?\(([^)]*)\)$/i;
+const channelToken = /^\d+(\.\d+)?$/;
+const alphaToken = /^(\d+(\.\d+)?|\.\d+)%?$/;
 
-/** Reads `#rgb`, `#rrggbb`, and `rgb()`/`rgba()` with commas or spaces, as a computed style gives them; alpha is dropped. Throws on anything else. */
+// the arguments of `rgb(r, g, b[, a])` or `rgb(r g b[ / a])`, or nothing when the syntax is off
+const rgbArguments = (inside: string): string[] | undefined => {
+    if (inside.includes(',')) {
+        const parts = inside.split(',').map((part) => part.trim());
+        return parts.length === 3 || parts.length === 4 ? parts : undefined;
+    }
+    const [channels = '', alpha, ...rest] = inside.split('/');
+    const parts = channels.trim().split(/\s+/);
+    if (rest.length > 0 || parts.length !== 3) {
+        return undefined;
+    }
+    return alpha === undefined ? parts : [...parts, alpha.trim()];
+};
+
+/**
+ * Reads `#rgb`, `#rrggbb`, and `rgb()`/`rgba()` in either syntax (commas, or spaces with `/ alpha`), as
+ * `getComputedStyle` gives a colour set in hex, `rgb()` or by name. The alpha is dropped and a fractional
+ * channel rounded; anything else, a name or `oklch()` included, throws.
+ */
 export function parseColor(css: string): RgbColor {
-    if (hexPattern.test(css)) {
-        return hexToRgb(css);
+    const text = isString(css) ? css.trim() : '';
+    if (cssHex.test(text)) {
+        return hexToRgb(text);
     }
 
-    // r, g and b, then an optional alpha, split by commas, spaces or the `/` before the alpha
-    const parts = rgbFunction.exec(css.trim())?.[1].split(/[\s,/]+/).filter(Boolean) ?? [];
-    const [r, g, b] = parts.slice(0, 3).map(Number);
+    const [r = '', g = '', b = '', alpha] = rgbArguments(rgbFunction.exec(text)?.[1] ?? '') ?? [];
+    const readable = [r, g, b].every((token) => channelToken.test(token)) && (alpha === undefined || alphaToken.test(alpha));
+    const rgb = { r: Math.round(Number(r)), g: Math.round(Number(g)), b: Math.round(Number(b)) };
 
-    if ((parts.length !== 3 && parts.length !== 4) || ![r, g, b].every(isChannel)) {
-        throw new Error(`Invalid color: ${css}`);
+    if (!readable || ![rgb.r, rgb.g, rgb.b].every(isChannel)) {
+        throw new Error(`Invalid color: ${String(css)}`);
     }
 
-    return { r, g, b };
+    return rgb;
 }
 
 /** The colour `weight` of the way from `from` to `to` (0 gives `from`, 1 gives `to`), as `#rrggbb`; either colour as `parseColor` reads it. */
@@ -177,7 +201,7 @@ export function getContrastRatio(color1: string, color2: string): number {
 
 /** A random `#rrggbb`; pass a seeded `random` (values in [0, 1)) for a colour that repeats. */
 export function randomHex(random: () => number = Math.random): string {
-    const channel = (): number => Math.floor(random() * 256);
+    const channel = (): number => Math.min(255, Math.floor(random() * 256));
     return rgbToHex(channel(), channel(), channel());
 }
 
