@@ -22,8 +22,8 @@
     ]
   },
   {
-    "name": "both queues and a store",
-    "code": "import { AsyncQueue, SyncQueue } from '@reely/queue'; import { PrimitiveStore } from '@reely/simple-store'; new SyncQueue().add(() => 1); void new AsyncQueue().add(() => 1); new PrimitiveStore(0).value = 1;",
+    "name": "both queues and the app's own emitter",
+    "code": "import { EventEmitter } from '@reely/emitter'; import { AsyncQueue, SyncQueue } from '@reely/queue'; new SyncQueue().add(() => 1); void new AsyncQueue().add(() => 1); new EventEmitter().emit('saved');",
     "once": [
       "AsyncQueue",
       "SyncQueue",
