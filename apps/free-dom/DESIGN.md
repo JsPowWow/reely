@@ -202,6 +202,8 @@ A cool graphite-and-asphalt neutral scale with two race signals: a yellow for st
 
 **Character:** a condensed, heavy timing-tower face for headings and numbers against a highly legible humanist sans for explanation; mono appears only where the reader is looking at code that runs.
 
+**In Russian** (`:root:lang(ru)`), where neither face has Cyrillic: Fira Sans Extra Condensed 800 takes the display role and Golos Text 400/700 the body; mono stays. The site switches as a whole, demos included, so a page never mixes two body faces.
+
 ### Hierarchy
 - **Display** (800, clamp(3.25rem, 6.6vw, 5.5rem), 0.92): the landing thesis, max 11ch, balanced. The figures band title runs clamp(3rem, 7vw, 5rem) at 0.95.
 - **Headline** (800, clamp(2.5rem, 5vw, 4rem), 1): landing example headings, which state the claim the example proves, balanced.
