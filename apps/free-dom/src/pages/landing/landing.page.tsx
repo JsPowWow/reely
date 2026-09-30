@@ -1,3 +1,6 @@
+import { effect } from '@reely/dommy';
+
+import { Localized } from '../../i18n/localized.view';
 import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
 import { measured } from '../../site/measurements';
@@ -5,6 +8,7 @@ import { SiteHeader } from '../../site/site.header';
 import { LikeButton } from '../docs/demos/like.button';
 import { landingExamples } from './landing.examples';
 import css from './landing.module.css';
+import { landingText } from './landing.text';
 
 import type { LandingExample } from './landing.examples';
 
@@ -12,9 +16,9 @@ const Example = ({ example }: { example: LandingExample }): Node => (
   <section id={example.id} className={css.example} aria={{ ariaLabelledby: `${example.id}-title` }}>
     <header className={css.exampleHeading}>
       <h2 id={`${example.id}-title`} className={css.exampleTitle}>
-        {example.title}
+        {() => landingText().examples[example.id].title}
       </h2>
-      <p className={css.claim}>{example.claim}</p>
+      <p className={css.claim}>{() => landingText().examples[example.id].claim}</p>
     </header>
     <div className={css.panels}>
       <MutationMeter>
@@ -26,7 +30,9 @@ const Example = ({ example }: { example: LandingExample }): Node => (
 );
 
 export const LandingPage = (): Node => {
-  document.title = 'reely: real DOM, one write per change';
+  effect(() => {
+    document.title = landingText().documentTitle;
+  });
 
   return (
     <>
@@ -35,19 +41,16 @@ export const LandingPage = (): Node => {
         <section className={css.start} aria={{ ariaLabelledby: 'start-title' }}>
           <div className={css.startCopy}>
             <h1 id='start-title' className={css.title}>
-              Real DOM. One write per change.
+              {() => landingText().title}
             </h1>
-            <p className={css.pitch}>
-              @reely/dommy builds real DOM from tag factories and JSX, and binds each signal to the one node it changes.
-              No virtual DOM, no re-render, no third-party dependencies.
-            </p>
+            <p className={css.pitch}>{() => landingText().pitch}</p>
             <div className={css.actions}>
               <a className={css.primary} href='/docs'>
-                Open the docs
+                {() => landingText().openDocs}
               </a>
-              <code className={css.install}>npm i @reely/dommy@next</code>
+              <code className={css.install}>npm i @reely/dommy</code>
             </div>
-            <p className={css.builtWith}>This page, its examples and their write counters are built with reely.</p>
+            <p className={css.builtWith}>{() => landingText().builtWith}</p>
           </div>
           <div className={css.startDemo}>
             <MutationMeter>
@@ -61,38 +64,37 @@ export const LandingPage = (): Node => {
         <section id='numbers' className={css.numbers} aria={{ ariaLabelledby: 'numbers-title' }}>
           <div className={css.numbersInner}>
             <h2 id='numbers-title' className={css.numbersTitle}>
-              Size and speed
+              {() => landingText().numbers.title}
             </h2>
             <table className={css.times}>
-              <caption className={css.timesCaption}>Sizes minified and gzipped, measured on the npm tarball</caption>
+              <caption className={css.timesCaption}>{() => landingText().numbers.caption}</caption>
               <tbody>
                 <tr>
-                  <th scope='row'>An app that uses only signals ships</th>
+                  <th scope='row'>{() => landingText().numbers.signalsOnly}</th>
                   <td>{measured.signalsOnly}</td>
                 </tr>
                 <tr>
-                  <th scope='row'>A JSX app with For, Show and mount ships</th>
+                  <th scope='row'>{() => landingText().numbers.jsxApp}</th>
                   <td>{measured.jsxApp}</td>
                 </tr>
                 <tr>
-                  <th scope='row'>The whole package</th>
+                  <th scope='row'>{() => landingText().numbers.wholePackage}</th>
                   <td>{measured.wholePackage}</td>
                 </tr>
               </tbody>
             </table>
             <p className={css.numbersNote}>
-              Bundled with esbuild. Time a 500-row board in your own browser on{' '}
-              <a href='/docs/performance'>Size and speed</a>.
+              <Localized view={() => landingText().numbers.Note} />
             </p>
             <div className={css.actions}>
               <a className={css.primary} href='/docs'>
-                Open the docs
+                {() => landingText().openDocs}
               </a>
               <a className={css.secondary} href='/evolution'>
-                See it built step by step
+                {() => landingText().numbers.stepByStep}
               </a>
               <a className={css.secondary} href='https://github.com/JsPowWow/reely'>
-                Source on GitHub
+                {() => landingText().numbers.github}
               </a>
             </div>
           </div>

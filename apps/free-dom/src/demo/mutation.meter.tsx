@@ -3,25 +3,12 @@ import { batch, dd, div, dl, dt, figcaption, figure, onCleanup, p, signal, span 
 import { exhaustiveGuard, isInstanceOf, isNil, isSomeFunction } from '@reely/utils';
 
 import css from './demo.module.css';
+import { demoText } from './demo.text';
 
-type WriteKind = 'text' | 'attribute' | 'move' | 'node';
+/** The kinds of DOM writes the meter counts. */
+export type WriteKind = 'text' | 'attribute' | 'move' | 'node';
 
 const writeKinds: readonly WriteKind[] = ['text', 'attribute', 'move', 'node'];
-
-const writeLabels = {
-  text: 'Text edits',
-  attribute: 'Attribute edits',
-  move: 'Nodes moved',
-  node: 'Nodes added or removed',
-} as const satisfies Record<WriteKind, string>;
-
-/** How the announcement names one write of a kind, and several. */
-const writeNouns = {
-  text: ['text edit', 'text edits'],
-  attribute: ['attribute edit', 'attribute edits'],
-  move: ['node moved', 'nodes moved'],
-  node: ['node added or removed', 'nodes added or removed'],
-} as const satisfies Record<WriteKind, readonly [string, string]>;
 
 const countSignals = (): Record<WriteKind, Signal<number>> => ({
   text: signal(0),
@@ -84,12 +71,9 @@ const countNodes = (root: Node): number => {
 
 /** The running total keeps the text different on every change, so a live region announces repeated clicks too. */
 const describeChange = (delta: Readonly<Record<WriteKind, number>>, total: number): string => {
-  const parts = writeKinds
-    .filter((kind) => delta[kind] > 0)
-    .map((kind) => `${delta[kind]} ${writeNouns[kind][delta[kind] === 1 ? 0 : 1]}`);
-  return parts.length === 0
-    ? ''
-    : `Last change: ${parts.join(', ')}. ${total} ${total === 1 ? 'write' : 'writes'} since the first render.`;
+  const { count, change } = demoText().meter;
+  const writes = writeKinds.filter((kind) => delta[kind] > 0).map((kind) => count[kind](delta[kind]));
+  return writes.length === 0 ? '' : change(writes, total);
 };
 
 /** More records than this in one change are shown by the counts alone: flashing them all would cost the frame. */
@@ -164,7 +148,7 @@ export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => 
   const readout = (kind: WriteKind): HTMLElement =>
     div(
       { className: readoutClass[kind] },
-      dt(null, writeLabels[kind]),
+      dt(null, () => demoText().meter.labels[kind]),
       dd(
         null,
         totals[kind],
@@ -181,7 +165,11 @@ export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => 
       { className: css.readouts },
       dl(
         { className: css.board },
-        div({ className: css.readoutBuilt }, dt(null, 'Built at first render'), dd(null, countNodes(stage))),
+        div(
+          { className: css.readoutBuilt },
+          dt(null, () => demoText().meter.built),
+          dd(null, countNodes(stage))
+        ),
         writeKinds.map(readout)
       ),
       p({ className: 'visually-hidden', aria: { ariaLive: 'polite' } }, announcement)

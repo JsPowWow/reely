@@ -14,7 +14,7 @@ import type { EvolutionStep } from './evolution.steps';
 const stepHref = (step: EvolutionStep): string => `/evolution/${step.slug}`;
 
 const toPagerLink = (step: EvolutionStep | undefined): Nullable<PagerLink> =>
-  hasSome(step) ? { href: stepHref(step), title: step.title } : null;
+  hasSome(step) ? { href: stepHref(step), title: () => step.title } : null;
 
 export const EvolutionPage = ({ slug }: { slug?: string }): Node => {
   const index = isNil(slug) ? 0 : evolutionSteps.findIndex((item) => item.slug === slug);
@@ -85,7 +85,9 @@ export const EvolutionPage = ({ slug }: { slug?: string }): Node => {
                 </MutationMeter>
                 <SourceView
                   source={step.source}
-                  caption={hasSome(trackPrevious) ? `Highlighted: new since step ${trackIndex + 1}` : 'A new demo starts here'}
+                  caption={
+                    hasSome(trackPrevious) ? `Highlighted: new since step ${trackIndex + 1}` : 'A new demo starts here'
+                  }
                   previous={trackPrevious?.source}
                 />
               </section>,

@@ -1,5 +1,7 @@
 import { mount } from '@reely/dommy';
 
+import { textsLoaded } from '../../i18n/localized';
+import { locale } from '../../i18n/locale';
 import { clickButton, flushMutations } from '../../testing/dom.testing';
 import { answerDelay } from './examples/api.search';
 import { landingExamples } from './landing.examples';
@@ -34,13 +36,32 @@ describe('LandingPage', () => {
     dispose = mount(host, () => <LandingPage />);
   });
 
-  afterEach(() => dispose());
+  afterEach(() => {
+    dispose();
+    locale.value = 'en';
+  });
 
   it('says what reely is and leads into the docs', () => {
     expect(host.querySelector('h1')?.textContent).toBe('Real DOM. One write per change.');
     expect(host.querySelector('main a[href="/docs"]')?.textContent).toBe('Open the docs');
-    expect(host.querySelector('main code')?.textContent).toBe('npm i @reely/dommy@next');
+    expect(host.querySelector('main code')?.textContent).toBe('npm i @reely/dommy');
     expect(host.textContent).toContain('This page, its examples and their write counters are built with reely.');
+  });
+
+  it('speaks Russian once it is chosen, with every demo left as it was', async () => {
+    const keyed = section(host, 'lists').querySelector('ol');
+
+    locale.value = 'ru';
+    await textsLoaded();
+
+    expect(host.querySelector('h1')?.textContent).toBe('Настоящий DOM. Одна запись на изменение.');
+    expect(host.querySelector('main a[href="/docs"]')?.textContent).toBe('Открыть документацию');
+    expect(section(host, 'lists').querySelector('h2')?.textContent).toBe('Строки переезжают, а не собираются заново');
+    expect(section(host, 'numbers').querySelector('a[href="/docs/performance"]')?.textContent).toBe(
+      'Размер и скорость'
+    );
+    expect(section(host, 'lists').querySelector('ol')).toBe(keyed);
+    expect(document.title).toBe('reely: настоящий DOM, одна запись на изменение');
   });
 
   it('shows every example live beside its source, then the size and speed', () => {

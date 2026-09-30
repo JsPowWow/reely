@@ -3,10 +3,12 @@ import { createAsyncRouter } from '@reely/dommy/router';
 import { scopedLogger } from '@reely/logger';
 import { isInstanceOf, isSomeFunction } from '@reely/utils';
 
+import { textsLoaded } from './i18n/localized';
 import { navigateInPage } from './routing/page.navigation';
 import { createPageView } from './routing/page.view';
 import { followPagerKey } from './routing/pager.keys';
 import { routes } from './routing/routes';
+import { siteText } from './site/site.text';
 
 defineDommyConfig({
   debug: import.meta.env.DEV,
@@ -30,7 +32,13 @@ const renderPage = async (pathname: string): Promise<boolean> => {
   } catch (error: unknown) {
     // every URL has a route, so this is a bug: say so instead of leaving a blank page
     scopedLogger('free-dom').error(error);
-    showPage(() => p(null, 'This page failed to load. ', a({ href: '/docs' }, 'Open the docs'), '.'));
+    showPage(() =>
+      p(
+        null,
+        () => `${siteText().failed.text} `,
+        a({ href: '/docs' }, () => siteText().failed.openDocs)
+      )
+    );
   }
   return true;
 };
@@ -49,4 +57,5 @@ document.addEventListener('keydown', followPagerKey);
 navigateInPage((pathname) => {
   void renderPage(pathname).then((drawn) => drawn && enterPage());
 });
-void renderPage(location.pathname);
+// a reader who chose Russian last time sees it from the first render, not after a flash of English
+void textsLoaded().then(() => renderPage(location.pathname));

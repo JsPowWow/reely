@@ -15,7 +15,7 @@ import type { DocTopic } from './docs.topics';
 const topicHref = (topic: DocTopic): string => `/docs/${topic.slug}`;
 
 const toPagerLink = (topic: DocTopic | undefined): Nullable<PagerLink> =>
-  hasSome(topic) ? { href: topicHref(topic), title: topic.title } : null;
+  hasSome(topic) ? { href: topicHref(topic), title: () => topic.title } : null;
 
 export const DocsPage = ({ slug }: { slug?: string }): Node => {
   const index = isNil(slug) ? 0 : docTopics.findIndex((item) => item.slug === slug);

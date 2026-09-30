@@ -1,29 +1,54 @@
+import { locale } from '../i18n/locale';
 import css from './site.module.css';
+import { siteText } from './site.text';
+
+import type { Locale } from '../i18n/locale';
+import type { SiteText } from './site.text';
 
 /** The parts of the site; the header marks the one the page belongs to. */
 export type SiteSection = 'home' | 'docs' | 'evolution' | 'labs';
 
 const sections = [
-  { section: 'docs', href: '/docs', label: 'Docs' },
-  { section: 'evolution', href: '/evolution', label: 'Evolution' },
-  { section: 'labs', href: '/labs', label: 'Labs' },
-] as const satisfies readonly { section: SiteSection; href: string; label: string }[];
+  { section: 'docs', href: '/docs' },
+  { section: 'evolution', href: '/evolution' },
+  { section: 'labs', href: '/labs' },
+] as const satisfies readonly { section: keyof SiteText['nav'] & SiteSection; href: string }[];
 
-/** The bar on top of every page, with the part of the site the page belongs to marked. */
+/** Each language named in itself, so a reader finds theirs whichever is shown. */
+const languages = [
+  { code: 'en', name: 'English' },
+  { code: 'ru', name: 'Русский' },
+] as const satisfies readonly { code: Locale; name: string }[];
+
+/** The bar on top of every page: the part of the site the page belongs to, and the language it is shown in. */
 export const SiteHeader = ({ current }: { current?: SiteSection }): Node => (
   <header className={css.header}>
     <a className={css.wordmark} href='/' aria={current === 'home' ? { ariaCurrent: 'page' } : {}}>
       reely
     </a>
-    <nav className={css.nav} aria={{ ariaLabel: 'Site' }}>
-      {sections.map(({ section, href, label }) => (
+    <nav className={css.nav} aria={{ ariaLabel: () => siteText().nav.label }}>
+      {sections.map(({ section, href }) => (
         <a className={css.link} href={href} aria={section === current ? { ariaCurrent: 'true' } : {}}>
-          {label}
+          {() => siteText().nav[section]}
         </a>
       ))}
       <a className={css.link} href='https://github.com/JsPowWow/reely'>
         GitHub
       </a>
     </nav>
+    <div className={css.languages} role='group' aria={{ ariaLabel: () => siteText().language.label }}>
+      {languages.map(({ code, name }) => (
+        <button
+          type='button'
+          className={css.language}
+          lang={code}
+          title={name}
+          aria={{ ariaPressed: () => String(locale.value === code) }}
+          onClick={() => (locale.value = code)}
+        >
+          {code.toUpperCase()}
+        </button>
+      ))}
+    </div>
   </header>
 );

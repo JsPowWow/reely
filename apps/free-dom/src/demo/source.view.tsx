@@ -3,6 +3,7 @@ import { code, div, ins, p, pre, span } from '@reely/dommy';
 import { isNil } from '@reely/utils';
 
 import css from './demo.module.css';
+import { demoText } from './demo.text';
 
 import type { SourceLines, SourceToken } from '../highlight/source.types';
 
@@ -54,8 +55,8 @@ const markBlankLines = (lines: readonly string[], inserted: readonly boolean[]):
 
 interface SourceViewProps {
   source: SourceLines;
-  /** Says what the listing shows, and what is marked in it. */
-  caption: string;
+  /** Says what the listing shows, and what is marked in it: text, or a getter of it that follows the language. */
+  caption: string | (() => string);
   /** The source this one grows from: lines it lacks are marked; nothing is marked without it. */
   previous?: Nullable<SourceLines>;
 }
@@ -80,7 +81,7 @@ export const SourceView = ({ source, caption, previous }: SourceViewProps): HTML
     { className: css.sourcePanel },
     p(
       { className: css.sourceCaption },
-      span({ id: titleId, className: 'visually-hidden' }, 'Source'),
+      span({ id: titleId, className: 'visually-hidden' }, () => demoText().source.title),
       span({ id: captionId }, caption)
     ),
     pre(

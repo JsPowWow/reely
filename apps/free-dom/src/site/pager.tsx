@@ -3,11 +3,12 @@ import { hasSome } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
 import guide from './guide.module.css';
+import { siteText } from './site.text';
 
-/** A neighbouring page: where it is and what it is called. */
+/** A neighbouring page: where it is and what it is called, in the language shown. */
 export interface PagerLink {
   href: string;
-  title: string;
+  title: () => string;
 }
 
 interface PagerProps {
@@ -22,12 +23,12 @@ export const Pager = ({ previous, next, children }: PagerProps): Node => (
   <footer className={guide.pager}>
     {hasSome(previous) && (
       <a href={previous.href} rel='prev' aria={{ ariaKeyShortcuts: 'ArrowLeft' }}>
-        Previous: {previous.title}
+        {() => `${siteText().pager.previous}: ${previous.title()}`}
       </a>
     )}
     {hasSome(next) ? (
       <a className={guide.next} href={next.href} rel='next' aria={{ ariaKeyShortcuts: 'ArrowRight' }}>
-        Next: {next.title}
+        {() => `${siteText().pager.next}: ${next.title()}`}
       </a>
     ) : (
       children
