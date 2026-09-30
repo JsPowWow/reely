@@ -6,7 +6,12 @@ import css from './tickets.module.css';
 // attribute, it rewrites only that attribute.
 export const Tickets = (): HTMLElement => {
   const tickets = signal(0);
-  const plan = computed(() => (tickets.value === 0 ? 'empty' : tickets.value === 1 ? 'single' : 'group'));
+  const plan = computed(() => {
+    if (tickets.value === 0) {
+      return 'empty';
+    }
+    return tickets.value === 1 ? 'single' : 'group';
+  });
 
   return div(
     { className: css.tickets },

@@ -7,7 +7,12 @@ import css from './tickets.module.css';
 export const Tickets = (): HTMLElement => {
   const tickets = signal(0);
   const seatsLeft = signal(40);
-  const plan = computed(() => (tickets.value === 0 ? 'empty' : tickets.value === 1 ? 'single' : 'group'));
+  const plan = computed(() => {
+    if (tickets.value === 0) {
+      return 'empty';
+    }
+    return tickets.value === 1 ? 'single' : 'group';
+  });
   const summary = computed(() => `Tickets in your cart: ${tickets.value}, seats left: ${seatsLeft.value}`);
 
   const press = (step: number): void => {
