@@ -16,6 +16,8 @@ const renderPage = (slug?: string): Element => {
 };
 
 describe('docs', () => {
+  afterEach(() => chooseLocale('en'));
+
   it('has a unique slug for every topic', () => {
     const slugs = docTopics.map((topic) => topic.slug);
 
@@ -87,6 +89,24 @@ describe('docs', () => {
 
       chooseLocale('en');
       expect(host.querySelector('h1')?.textContent).toBe('Conditions');
+      dispose();
+    });
+
+    it('keeps the advanced demos as the reader left them when the language changes', async () => {
+      const host = document.createElement('div');
+      const dispose = mount(host, () => <DocsPage slug='advanced' />);
+      clickButton(host, 'Switch view');
+      const built = host.querySelector('[data-built]');
+
+      chooseLocale('ru');
+      await textsLoaded();
+
+      expect(host.querySelector('article h2')?.textContent).toBe('Условные привязки');
+      expect(host.querySelector('[data-built]')).toBe(built);
+      expect(built?.textContent).toBe('2');
+
+      chooseLocale('en');
+      expect(host.querySelector('[data-built]')).toBe(built);
       dispose();
     });
 

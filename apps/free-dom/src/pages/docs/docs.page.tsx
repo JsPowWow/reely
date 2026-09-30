@@ -1,4 +1,4 @@
-import { effect } from '@reely/dommy';
+import { Keyed, effect } from '@reely/dommy';
 import { hasSome, isNil } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
@@ -11,11 +11,12 @@ import { SiteHeader } from '../../site/site.header';
 import { siteText } from '../../site/site.text';
 import guide from '../../site/guide.module.css';
 import css from './docs.module.css';
+import { advancedExamples } from './docs.examples';
 import { docsText } from './docs.text';
 import { docGroups, docTopics } from './docs.topics';
 
 import type { PagerLink } from '../../site/pager';
-import type { DocTopic } from './docs.topics';
+import type { DocSlug, DocTopic } from './docs.topics';
 
 const topicHref = (topic: DocTopic): string => `/docs/${topic.slug}`;
 
@@ -23,6 +24,14 @@ const titleOf = (topic: DocTopic): string => docsText().topics[topic.slug].title
 
 const toPagerLink = (topic: DocTopic | undefined): Nullable<PagerLink> =>
   hasSome(topic) ? { href: topicHref(topic), title: () => titleOf(topic) } : null;
+
+const TopicDetails = ({ slug }: { slug: DocSlug }): Node => {
+  if (slug !== 'advanced') {
+    return <Localized view={() => docsText().topics[slug].Details} />;
+  }
+  const examples = advancedExamples();
+  return <Keyed value={() => docsText().topics.advanced.Details}>{(Details) => <Details {...examples} />}</Keyed>;
+};
 
 export const DocsPage = ({ slug }: { slug?: string }): Node => {
   const index = isNil(slug) ? 0 : docTopics.findIndex((item) => item.slug === slug);
@@ -93,7 +102,7 @@ export const DocsPage = ({ slug }: { slug?: string }): Node => {
                 <SourceView source={topic.source} caption={() => docsText().sourceCaption} />
               </section>,
               <article className={css.details}>
-                <Localized view={() => docsText().topics[topic.slug].Details} />
+                <TopicDetails slug={topic.slug} />
               </article>,
               <Pager previous={toPagerLink(previous)} next={toPagerLink(next)}>
                 <a className={guide.next} href='/evolution'>

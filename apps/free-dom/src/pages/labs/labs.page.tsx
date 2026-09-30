@@ -1,10 +1,10 @@
-import { effect } from '@reely/dommy';
+import { Keyed, effect } from '@reely/dommy';
 
-import { Localized } from '../../i18n/localized.view';
 import { SiteHeader } from '../../site/site.header';
 import guide from '../../site/guide.module.css';
 import docs from '../docs/docs.module.css';
 import css from './labs.module.css';
+import { labExamples } from './labs.examples';
 import { labsText } from './labs.text';
 
 import type { LabId } from './labs.text';
@@ -12,6 +12,7 @@ import type { LabId } from './labs.text';
 const labs: readonly LabId[] = ['dml', 'signals-graph'];
 
 export const LabsPage = (): Node => {
+  const examples = labExamples();
   effect(() => {
     document.title = labsText().documentTitle;
   });
@@ -30,7 +31,7 @@ export const LabsPage = (): Node => {
               {() => labsText().labs[lab].title}
             </h2>
             <div className={docs.details}>
-              <Localized view={() => labsText().labs[lab].Body} />
+              <Keyed value={() => labsText().labs[lab].Body}>{(Body) => <Body {...examples} />}</Keyed>
             </div>
           </section>
         ))}

@@ -23,6 +23,8 @@ const texts = (root: ParentNode, selector: string): (string | null)[] =>
   Array.from(root.querySelectorAll(selector), (node) => node.textContent);
 
 describe('labs', () => {
+  afterEach(() => chooseLocale('en'));
+
   it('shows each lab with its question, live demos and verdict', () => {
     const page = render(() => <LabsPage />);
 
@@ -32,8 +34,10 @@ describe('labs', () => {
     expect(page.querySelector('header a[href="/labs"]')?.getAttribute('aria-current')).toBe('true');
   });
 
-  it('speaks Russian once it is chosen', async () => {
+  it('speaks Russian once it is chosen, and keeps the demos as the reader left them', async () => {
     const page = render(() => <LabsPage />);
+    click(page, 'count + 1');
+    const log = page.querySelector('ol');
 
     chooseLocale('ru');
     await textsLoaded();
@@ -42,6 +46,8 @@ describe('labs', () => {
     expect(texts(page, 'main h2')).toEqual(['Операторы внутри разметки', 'Граф сигналов по образцу Angular']);
     expect(texts(page, 'main h3')).toEqual(['Вердикт', 'Вердикт']);
     expect(page.querySelectorAll('figure')).toHaveLength(3);
+    expect(page.querySelector('ol')).toBe(log);
+    expect(texts(log ?? page, 'li')).toEqual(['1 / 2', '2 / 4']);
     chooseLocale('en');
   });
 

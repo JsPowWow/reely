@@ -1,14 +1,7 @@
-import { SourceView } from '../../demo/source.view';
 import { localized } from '../../i18n/localized';
-import { Live } from '../docs/docs.live';
-import diamondSpecSource from '../../../../../labs-ignore/signals-graph/diamond.spec.ts?highlight';
-import { DiamondLog } from './demos/diamond.log';
-import diamondLogSource from './demos/diamond.log.tsx?highlight';
-import { MarkupList } from './demos/markup.list';
-import markupListSource from './demos/markup.list.tsx?highlight';
-import { SharedParent } from './demos/shared.parent';
-import sharedParentSource from './demos/shared.parent.tsx?highlight';
 import { labSource } from './labs.source';
+
+import type { LabExamples } from './labs.examples';
 
 /** The labs, in the order the page shows them. */
 export type LabId = 'dml' | 'signals-graph';
@@ -20,7 +13,7 @@ const en = {
   labs: {
     dml: {
       title: 'Statements inside markup',
-      Body: (): Node => (
+      Body: ({ markupList, sharedParent }: LabExamples): Node => (
         <>
           <p>
             Can markup take <code>for</code>, <code>if</code> and <code>switch</code> the way van_dml does with{' '}
@@ -39,12 +32,12 @@ const en = {
             </li>
           </ul>
           <p>The generator needs one line of helper, keeps no state, and runs once, like a component:</p>
-          <Live Demo={MarkupList} caption='markup.list.tsx' source={markupListSource} />
+          {markupList}
           <p>
             The other two share one current parent for the whole module. Two builds that wait in the middle put their
             second items into whichever parent is current by then:
           </p>
-          <Live Demo={SharedParent} caption='shared.parent.tsx' source={sharedParentSource} />
+          {sharedParent}
           <h3>Verdict</h3>
           <p>
             The generator is the one worth keeping: statements in markup, balanced by syntax, no shared state, no core
@@ -56,7 +49,7 @@ const en = {
     },
     'signals-graph': {
       title: 'A signal graph in the shape of Angular’s',
-      Body: (): Node => (
+      Body: ({ diamondSpec, diamondLog }: LabExamples): Node => (
         <>
           <p>
             A <code>signal</code> pushes “dirty” to its consumers, a <code>computed</code> recomputes when read, an{' '}
@@ -68,9 +61,9 @@ const en = {
             In the lab, a write of 2 runs the effect before <code>double</code> is marked dirty: it logs 2 / 2, a pair
             that never existed, then keeps running itself until something stops it. The spec pins both:
           </p>
-          <SourceView source={diamondSpecSource} caption='labs-ignore/signals-graph/diamond.spec.ts' />
+          {diamondSpec}
           <p>The same diamond in dommy logs one current pair per change:</p>
-          <Live Demo={DiamondLog} caption='diamond.log.tsx' source={diamondLogSource} />
+          {diamondLog}
           <h3>Verdict</h3>
           <p>
             Kept as a record. A push graph has to mark every dirty node before it runs any effect; running effects
@@ -80,7 +73,7 @@ const en = {
         </>
       ),
     },
-  } satisfies Record<LabId, { title: string; Body: () => Node }>,
+  } satisfies Record<LabId, { title: string; Body: (examples: LabExamples) => Node }>,
 };
 
 /** The words of the labs page: its lead, and each lab's question, findings and verdict. */
