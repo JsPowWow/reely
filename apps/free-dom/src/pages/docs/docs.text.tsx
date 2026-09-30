@@ -341,7 +341,7 @@ const en = {
     },
     advanced: {
       title: 'Advanced topics',
-      lead: 'The pitfalls VanJS lists in its own advanced topics, each answered in reely with a live demo. First, conditional bindings: a binding depends on what its last run read, so the delivery cost below runs for the courier fees or for the pickup fees, never for all four.',
+      lead: 'The questions that come up once the basics work, each answered with a live demo. First, conditional bindings: a binding depends on what its last run read, so the delivery cost below runs for the courier fees or for the pickup fees, never for all four.',
       Details: ({
         flavours,
         salePrice,
@@ -356,8 +356,7 @@ const en = {
             Change the locker fee while the delivery is by courier: the run count stays. Switch to pickup, and the
             courier fees stop counting instead. The same holds for a <code>computed</code> and an <code>effect</code>.
             Every answer on this page is also checked by the specs of @reely/dommy (
-            <code>advanced.topics.spec.tsx</code>), and the headings follow{' '}
-            <a href='https://vanjs.org/advanced'>vanjs.org/advanced</a>.
+            <code>advanced.topics.spec.tsx</code>).
           </p>
           <h2>DOM attributes vs. properties</h2>
           <p>
@@ -369,10 +368,10 @@ const en = {
           {flavours}
           <h2>Why can’t a signal hold a DOM node?</h2>
           <p>
-            A bound child is text. In VanJS a state holding one node, bound in two places, can be in one place only, so
-            the first one disappears. In reely a signal of nodes does not type-check as a child, and from JavaScript it
-            renders as text and the dommy logger reports it. To switch nodes, use <code>Show</code> or{' '}
-            <code>Keyed</code>: each place builds its own node.
+            A bound child is text. A node can stand in one place only, so one node bound in two places would leave the
+            first one empty. A signal of nodes does not type-check as a child, and from JavaScript it renders as text
+            and the dommy logger reports it. To switch nodes, use <code>Show</code> or <code>Keyed</code>: each place
+            builds its own node.
           </p>
           {salePrice}
           <h2>Signal granularity</h2>
@@ -384,14 +383,14 @@ const en = {
           <Code caption='granularity.ts' source={granularitySource} />
           <h2>The scope of DOM updates</h2>
           <p>
-            VanJS advises a derived state so that typing does not rebuild the whole paragraph. Here there is nothing to
-            remember: a function child renders text, and <code>Show</code> keeps its branch while the truthiness of{' '}
+            Typing into a field does not rebuild the paragraph that shows it, and there is nothing to arrange for that:
+            a function child renders text, and <code>Show</code> keeps its branch while the truthiness of{' '}
             <code>when</code> stays. Type a coupon code and count one text edit per key; clear it and count the nodes.
           </p>
           {couponHint}
           <h2>Advanced state derivation</h2>
           <p>
-            One effect can write several signals from one source. The timed derivations VanJS builds by hand come from{' '}
+            One effect can write several signals from one source. The timed derivations come ready from{' '}
             <code>@reely/dommy/kit</code>: <code>persisted</code> keeps a signal in storage, <code>throttled</code>{' '}
             passes at most one change per interval, and <code>later</code> delays a write and is cancelled by the next
             change.
@@ -399,19 +398,18 @@ const en = {
           <Code caption='derivation.ts' source={derivationSource} />
           <h2>Self-referencing in effects</h2>
           <p>
-            The effect below reads <code>plays</code> and then writes it. As in VanJS 1.3, a signal an effect reads and
-            then writes stops being its dependency, so its own write does not run it again and Reset sets the count to 0
-            for good. It still runs for <code>playing</code>, which it only reads. The price: an effect cannot clamp a
-            signal it writes; a <code>computed</code> can. Two effects that write what the other reads would run
-            forever; after 100 waves of writes the flush throws a cycle error instead.
+            The effect below reads <code>plays</code> and then writes it. A signal an effect reads and then writes stops
+            being its dependency, so its own write does not run it again and Reset sets the count to 0 for good. It
+            still runs for <code>playing</code>, which it only reads. The price: an effect cannot clamp a signal it
+            writes; a <code>computed</code> can. Two effects that write what the other reads would run forever; after
+            100 waves of writes the flush throws a cycle error instead.
           </p>
           {playCounter}
           <h2>Releasing bindings</h2>
           <p>
-            VanJS collects the bindings of disconnected nodes as garbage, so a view built across an <code>await</code>{' '}
-            can lose them. reely has no such collection: bindings are released by their owner. A branch that goes
-            releases the signal, the computed and the subscriptions made in it. Switch the view as often as you like;
-            one stays alive.
+            Bindings are released by their owner, not collected as garbage when their nodes leave the document, so a
+            view built across an <code>await</code> keeps them. A branch that goes releases the signal, the computed and
+            the subscriptions made in it. Switch the view as often as you like; one stays alive.
           </p>
           {addressView}
           <p>

@@ -42,7 +42,7 @@ describe('docs', () => {
       expect(page.querySelector('article h2')?.textContent).toBe('The props');
     });
 
-    it('answers the advanced topics with a live demo each, under the headings of VanJS', () => {
+    it('answers the advanced topics with a live demo each', () => {
       const page = renderPage('advanced');
       const headings = Array.from(page.querySelectorAll('article h2'), (heading) => heading.textContent);
 

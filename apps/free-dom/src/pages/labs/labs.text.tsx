@@ -16,8 +16,8 @@ const en = {
       Body: ({ markupList, sharedParent }: LabExamples): Node => (
         <>
           <p>
-            Can markup take <code>for</code>, <code>if</code> and <code>switch</code> the way van_dml does with{' '}
-            <code>begin</code>/<code>end</code>, without a change to dommy’s core? The lab tried three shapes:
+            Can markup take <code>for</code>, <code>if</code> and <code>switch</code> with <code>begin</code>/
+            <code>end</code>, without a change to dommy’s core? The lab tried three shapes:
           </p>
           <ul>
             <li>
@@ -28,7 +28,7 @@ const en = {
               <code>using within(parent)</code>: a current parent that the block closes, even when it throws.
             </li>
             <li>
-              <code>begin</code>/<code>end</code> by hand, as in van_dml: nothing checks the balance.
+              <code>begin</code>/<code>end</code> by hand: nothing checks the balance.
             </li>
           </ul>
           <p>The generator needs one line of helper, keeps no state, and runs once, like a component:</p>

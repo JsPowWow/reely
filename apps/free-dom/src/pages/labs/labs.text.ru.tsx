@@ -12,8 +12,8 @@ export const ru: LabsText = {
       Body: ({ markupList, sharedParent }) => (
         <>
           <p>
-            Может ли разметка принимать <code>for</code>, <code>if</code> и <code>switch</code> так, как это делает
-            van_dml с <code>begin</code>/<code>end</code>, без изменений в ядре dommy? Эксперимент опробовал три формы:
+            Может ли разметка принимать <code>for</code>, <code>if</code> и <code>switch</code> через <code>begin</code>
+            /<code>end</code>, без изменений в ядре dommy? Эксперимент опробовал три формы:
           </p>
           <ul>
             <li>
@@ -25,7 +25,7 @@ export const ru: LabsText = {
               исключение.
             </li>
             <li>
-              <code>begin</code>/<code>end</code> вручную, как в van_dml: баланс никто не проверяет.
+              <code>begin</code>/<code>end</code> вручную: баланс никто не проверяет.
             </li>
           </ul>
           <p>

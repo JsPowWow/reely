@@ -2,7 +2,7 @@ import { ul } from '@reely/dommy';
 
 import css from '../../docs/demos/demos.module.css';
 
-// van_dml's `begin`/`end`, trimmed: one current parent for the whole module.
+// `begin`/`end`, trimmed: one current parent for the whole module.
 const parents: HTMLElement[] = [];
 const begin = (parent: HTMLElement): void => {
   parents.push(parent);
