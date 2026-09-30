@@ -1,5 +1,6 @@
 // A package as a consumer gets it: packed with its @reely dependencies, installed in a clean
-// project, `consumer/*.ts` compiled (strict, no DOM lib) and run, then tree shaking checked:
+// project, `consumer/*.ts` compiled (strict, no DOM lib unless `consumer/tsconfig.json` asks for one)
+// and run, then tree shaking checked:
 // a bare import ships nothing, and `consumer/shake.json` names are declared `once` or are `absent`.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -32,6 +33,11 @@ const withLocalDependencies = (dir, seen = new Set()) => {
 
 try {
   const shakeFile = join(packageDir, 'consumer', 'shake.json');
+  // a package whose types name a platform global (`AbortSignal`) states the lib its consumer has
+  const tsconfigFile = join(packageDir, 'consumer', 'tsconfig.json');
+  const { compilerOptions: ownOptions = {} } = existsSync(tsconfigFile)
+    ? JSON.parse(readFileSync(tsconfigFile, 'utf8'))
+    : {};
   const shakeCases = existsSync(shakeFile) ? JSON.parse(readFileSync(shakeFile, 'utf8')) : [];
   // the other @reely packages a case bundles together with this one
   const bundledTogether = shakeCases.flatMap(({ code }) =>
@@ -57,6 +63,7 @@ try {
         types: [],
         outDir: 'out',
         rootDir: 'src',
+        ...ownOptions,
       },
       include: ['src'],
     })

@@ -8,7 +8,7 @@ npm i @reely/async
 
 ## retry
 
-`retry(task, options?)` calls `task(attempt)` until it resolves, waiting `delay` ms before the first retry and `factor` times longer before each next one, up to `maxDelay`. After `retries` retries it throws what the last attempt threw.
+`retry(task, options?)` calls `task(attempt, signal)` until it resolves, waiting `delay` ms before the first retry and `factor` times longer before each next one, up to `maxDelay`. After `retries` retries it throws what the last attempt threw.
 
 ```ts
 import { retry } from '@reely/async';
@@ -36,6 +36,26 @@ const rates = await retry(
 | `maxDelay`    | 30000   | the longest wait                                        |
 | `shouldRetry` | always  | `(error, attempt) => boolean`; `false` rethrows at once |
 | `onRetry`     | nothing | `(error, attempt, nextDelay)`, called before each wait  |
+| `timeout`     | none    | ms an attempt may run; then it fails with `TimeoutError` |
+| `signal`      | none    | an `AbortSignal` that stops the attempts and the waits  |
+
+## Cancel and time out
+
+Each attempt gets a signal: pass it to `fetch`, and the request is cancelled when the attempt times out or your `signal` aborts. A timed-out attempt fails with a `TimeoutError` and is retried like any failure; an aborted `signal` rejects `retry` at once with its reason, even in the middle of a wait.
+
+```ts
+let checking: AbortController | undefined;
+
+const checkLogin = async (login: string): Promise<boolean> => {
+  checking?.abort(); // a newer login makes the older check pointless
+  checking = new AbortController();
+  const response = await retry((_attempt, signal) => fetch(`https://api.github.com/users/${login}`, { signal }), {
+    timeout: 5000,
+    signal: checking.signal,
+  });
+  return response.ok;
+};
+```
 
 `shouldRetry` and `onRetry` get an `Error`: a task that throws something else, a string say, has it wrapped for them, and `retry` still rethrows the original value.
 
@@ -53,4 +73,4 @@ await saveDraft(draft);
 const [avatar, banner] = await retryAll([() => upload(avatarFile), () => upload(bannerFile)]); // each task retried on its own
 ```
 
-`retryRace` resolves with the first task to succeed after its retries; `retryAllSettled` never rejects and returns every result, as `Promise.allSettled`.
+`retryRace` resolves with the first task to succeed after its retries, and rejects with an `AggregateError` only once every task has failed; `retryAllSettled` never rejects and returns every result, as `Promise.allSettled`.
