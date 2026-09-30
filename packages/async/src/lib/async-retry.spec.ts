@@ -400,4 +400,66 @@ describe('async-retry', () => {
       expect(error.message).toBe('The attempt took too long');
     });
   });
+
+  describe('without `AbortSignal.any` (Safari before 17.4)', () => {
+    const any = AbortSignal.any;
+
+    beforeEach(() => {
+      Object.defineProperty(AbortSignal, 'any', { value: undefined, configurable: true });
+    });
+
+    afterEach(() => {
+      Object.defineProperty(AbortSignal, 'any', { value: any, configurable: true });
+    });
+
+    it('still aborts the task with the given signal, and times an attempt out', async () => {
+      const controller = new AbortController();
+      const seen: AbortSignal[] = [];
+      const hang = (_attempt: number, signal: AbortSignal): Promise<never> => {
+        seen.push(signal);
+        return new Promise<never>(() => undefined);
+      };
+
+      const timedOut = retry(hang, { timeout: 100, retries: 0, signal: new AbortController().signal });
+      const timedOutSettled = expect(timedOut).rejects.toBeInstanceOf(TimeoutError);
+      await vi.advanceTimersByTimeAsync(100);
+      await timedOutSettled;
+
+      const stopped = retry(hang, { signal: controller.signal });
+      const stoppedSettled = expect(stopped).rejects.toBe('left the page');
+      controller.abort('left the page');
+      await stoppedSettled;
+
+      expect(seen.map((signal) => signal.aborted)).toStrictEqual([true, true]);
+    });
+
+    it('lets go of the given signal once the task settles', async () => {
+      const controller = new AbortController();
+      const added = vi.spyOn(controller.signal, 'addEventListener');
+      const removed = vi.spyOn(controller.signal, 'removeEventListener');
+
+      await expect(retry(() => Promise.resolve('done'), { signal: controller.signal })).resolves.toBe('done');
+
+      expect(added).toHaveBeenCalled();
+      expect(removed).toHaveBeenCalledTimes(added.mock.calls.length);
+    });
+
+    it('stops the rest of a race once one wins, and rejects a group whose signal has aborted', async () => {
+      const seen: AbortSignal[] = [];
+      const winner = retryRace(
+        [
+          () => Promise.resolve('fast'),
+          (_attempt, signal) => {
+            seen.push(signal);
+            return new Promise<never>(() => undefined);
+          },
+        ],
+        { signal: new AbortController().signal }
+      );
+
+      await expect(winner).resolves.toBe('fast');
+      expect(seen[0]?.aborted).toBe(true);
+      await expect(retryAll([() => Promise.resolve(1)], { signal: AbortSignal.abort('gone') })).rejects.toBe('gone');
+    });
+  });
 });

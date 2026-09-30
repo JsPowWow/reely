@@ -1,4 +1,4 @@
-import { toErrorWithMessage } from '@reely/basics';
+import { isSomeFunction, toErrorWithMessage } from '@reely/basics';
 
 export interface RetryOptions {
   /** Maximum number of retries (default: 3) */
@@ -32,6 +32,29 @@ export class TimeoutError extends Error {
 /** A task `retry` calls: the attempt number from 0, and a signal to pass on, to `fetch` say. */
 export type RetryTask<T> = (attempt: number, signal: AbortSignal) => Promise<T>;
 
+interface Followed {
+  signal: AbortSignal;
+  release: () => void;
+}
+
+// `own`'s signal, which `outer` aborts too: `AbortSignal.any` where the platform has it, and before it
+// (Safari 17.4, older iPads) a listener on `outer` that aborts `own`, removed by `release`.
+const follow = (own: AbortController, outer: AbortSignal | undefined): Followed => {
+  if (!outer) {
+    return { signal: own.signal, release: () => undefined };
+  }
+  if (isSomeFunction(AbortSignal.any)) {
+    return { signal: AbortSignal.any([outer, own.signal]), release: () => undefined };
+  }
+  const abort = (): void => own.abort(outer.reason);
+  if (outer.aborted) {
+    abort();
+  } else {
+    outer.addEventListener('abort', abort, { once: true });
+  }
+  return { signal: own.signal, release: () => outer.removeEventListener('abort', abort) };
+};
+
 // Rejects with the signal's reason once it aborts, at once if it has; the listener goes when `settled` does.
 const abortOf = (signal: AbortSignal, settled: Promise<unknown>): Promise<never> =>
   new Promise((_, reject) => {
@@ -63,12 +86,13 @@ const runAttempt = async <T>(task: RetryTask<T>, attempt: number, { timeout, sig
     timeout === undefined
       ? undefined
       : setTimeout(() => timeLimit.abort(new TimeoutError(`The attempt took longer than ${timeout} ms`)), timeout);
-  const attemptSignal = signal ? AbortSignal.any([signal, timeLimit.signal]) : timeLimit.signal;
-  const running = Promise.resolve().then(() => task(attempt, attemptSignal));
+  const followed = follow(timeLimit, signal);
+  const running = Promise.resolve().then(() => task(attempt, followed.signal));
   try {
-    return await Promise.race([running, abortOf(attemptSignal, running)]);
+    return await Promise.race([running, abortOf(followed.signal, running)]);
   } finally {
     clearTimeout(timer);
+    followed.release();
   }
 };
 
@@ -114,11 +138,12 @@ const together = async <T, R>(
   settle: (runs: Array<Promise<T>>) => Promise<R>
 ): Promise<R> => {
   const group = new AbortController();
-  const signal = options.signal ? AbortSignal.any([options.signal, group.signal]) : group.signal;
+  const followed = follow(group, options.signal);
   try {
-    return await settle(fns.map((fn) => retry(fn, { ...options, signal })));
+    return await settle(fns.map((fn) => retry(fn, { ...options, signal: followed.signal })));
   } finally {
     group.abort(new Error('Another task settled the group'));
+    followed.release();
   }
 };
 

@@ -75,4 +75,4 @@ const [avatar, banner] = await retryAll([() => upload(avatarFile), () => upload(
 
 `retryRace` resolves with the first task to succeed after its retries and stops the rest, and rejects with an `AggregateError` only once every task has failed; `retryAllSettled` never rejects and returns every result, as `Promise.allSettled`.
 
-The signals need `AbortSignal.any`: Node 20.3+, and every current browser (Safari 17.4+, Firefox 124+).
+The signals use `AbortSignal.any` where the platform has it (Node 20.3+, Safari 17.4+, Firefox 124+) and join the signals themselves where it does not, so the package runs from Safari 15.4 (iPadOS 15.4) on.
