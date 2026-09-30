@@ -17,7 +17,7 @@ export const NotFoundPage = ({ pathname }: { pathname: string }): Node => {
           <h1 className={guide.title}>{() => siteText().notFound.title(pathname)}</h1>
           <p className={guide.lead}>{() => siteText().notFound.lead}</p>
           <a className={guide.start} href='/docs'>
-            {() => siteText().notFound.openDocs}
+            {() => siteText().openDocs}
           </a>
         </header>
       </main>

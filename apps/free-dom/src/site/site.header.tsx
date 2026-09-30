@@ -1,4 +1,4 @@
-import { locale } from '../i18n/locale';
+import { chooseLocale, locale } from '../i18n/locale';
 import css from './site.module.css';
 import { siteText } from './site.text';
 
@@ -42,9 +42,8 @@ export const SiteHeader = ({ current }: { current?: SiteSection }): Node => (
           type='button'
           className={css.language}
           lang={code}
-          title={name}
-          aria={{ ariaPressed: () => String(locale.value === code) }}
-          onClick={() => (locale.value = code)}
+          aria={{ ariaLabel: `${code.toUpperCase()}, ${name}`, ariaPressed: () => String(locale.value === code) }}
+          onClick={() => chooseLocale(code)}
         >
           {code.toUpperCase()}
         </button>

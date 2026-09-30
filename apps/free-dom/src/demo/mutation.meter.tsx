@@ -5,8 +5,7 @@ import { exhaustiveGuard, isInstanceOf, isNil, isSomeFunction } from '@reely/uti
 import css from './demo.module.css';
 import { demoText } from './demo.text';
 
-/** The kinds of DOM writes the meter counts. */
-export type WriteKind = 'text' | 'attribute' | 'move' | 'node';
+import type { WriteKind } from './demo.types';
 
 const writeKinds: readonly WriteKind[] = ['text', 'attribute', 'move', 'node'];
 
@@ -122,7 +121,8 @@ export const MutationMeter = ({ children }: MutationMeterProps): HTMLElement => 
   const deltas = countSignals();
   const announcement = signal('');
 
-  const stage = div({ className: css.stage }, children);
+  // a demo keeps its English labels in any language of the site, so a screen reader reads it in English
+  const stage = div({ className: css.stage, lang: 'en' }, children);
 
   const observer = new MutationObserver((records) => {
     const delta = countWrites(records);

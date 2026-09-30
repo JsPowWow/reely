@@ -4,13 +4,13 @@ const en = {
   nav: { label: 'Site', docs: 'Docs', evolution: 'Evolution', labs: 'Labs' },
   language: { label: 'Language' },
   pager: { previous: 'Previous', next: 'Next' },
+  openDocs: 'Open the docs',
   notFound: {
     documentTitle: 'Not found | reely',
     title: (pathname: string): string => `There is no page at ${pathname}`,
     lead: 'The docs answer one question per page; reely evolution builds it all step by step.',
-    openDocs: 'Open the docs',
   },
-  failed: { text: 'This page failed to load.', openDocs: 'Open the docs' },
+  failed: 'This page failed to load.',
 };
 
 /** The words of the parts every page shares: the header, the pager, the page that is not there. */

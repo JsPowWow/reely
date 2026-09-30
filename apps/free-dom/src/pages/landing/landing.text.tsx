@@ -7,7 +7,6 @@ const en = {
   title: 'Real DOM. One write per change.',
   pitch:
     '@reely/dommy builds real DOM from tag factories and JSX, and binds each signal to the one node it changes. No virtual DOM, no re-render, no third-party dependencies.',
-  openDocs: 'Open the docs',
   builtWith: 'This page, its examples and their write counters are built with reely.',
   examples: {
     signals: {

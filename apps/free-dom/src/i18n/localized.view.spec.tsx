@@ -1,12 +1,12 @@
 import { mount, signal } from '@reely/dommy';
 
 import { textsLoaded, localized } from './localized';
-import { locale } from './locale';
+import { chooseLocale } from './locale';
 import { Localized } from './localized.view';
 
 describe('Localized', () => {
   afterEach(() => {
-    locale.value = 'en';
+    chooseLocale('en');
   });
 
   it('renders the markup of a text and renders it again, in place, when the language changes', async () => {
@@ -34,7 +34,7 @@ describe('Localized', () => {
 
     expect(host.querySelector('section')?.textContent).toBe('BeforeRead the docsAfter');
 
-    locale.value = 'ru';
+    chooseLocale('ru');
     await textsLoaded();
 
     expect(host.querySelector('section')?.textContent).toBe('BeforeЧитайте документациюAfter');
@@ -58,7 +58,7 @@ describe('Localized', () => {
     const output = host.querySelector('output');
     likes.value = 3;
 
-    locale.value = 'ru';
+    chooseLocale('ru');
     await textsLoaded();
 
     expect(host.querySelector('output')).toBe(output);

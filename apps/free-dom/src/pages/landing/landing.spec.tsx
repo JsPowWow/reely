@@ -1,7 +1,7 @@
 import { mount } from '@reely/dommy';
 
 import { textsLoaded } from '../../i18n/localized';
-import { locale } from '../../i18n/locale';
+import { chooseLocale } from '../../i18n/locale';
 import { clickButton, flushMutations } from '../../testing/dom.testing';
 import { answerDelay } from './examples/api.search';
 import { landingExamples } from './landing.examples';
@@ -38,7 +38,7 @@ describe('LandingPage', () => {
 
   afterEach(() => {
     dispose();
-    locale.value = 'en';
+    chooseLocale('en');
   });
 
   it('says what reely is and leads into the docs', () => {
@@ -51,7 +51,7 @@ describe('LandingPage', () => {
   it('speaks Russian once it is chosen, with every demo left as it was', async () => {
     const keyed = section(host, 'lists').querySelector('ol');
 
-    locale.value = 'ru';
+    chooseLocale('ru');
     await textsLoaded();
 
     expect(host.querySelector('h1')?.textContent).toBe('Настоящий DOM. Одна запись на изменение.');

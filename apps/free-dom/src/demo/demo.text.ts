@@ -1,7 +1,7 @@
 import { localized } from '../i18n/localized';
 import { pluralOf } from '../i18n/plural';
 
-import type { WriteKind } from './mutation.meter';
+import type { WriteKind } from './demo.types';
 
 const plural = pluralOf('en');
 

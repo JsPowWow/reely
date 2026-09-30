@@ -4,6 +4,7 @@ import { Localized } from '../../i18n/localized.view';
 import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
 import { measured } from '../../site/measurements';
+import { siteText } from '../../site/site.text';
 import { SiteHeader } from '../../site/site.header';
 import { LikeButton } from '../docs/demos/like.button';
 import { landingExamples } from './landing.examples';
@@ -46,7 +47,7 @@ export const LandingPage = (): Node => {
             <p className={css.pitch}>{() => landingText().pitch}</p>
             <div className={css.actions}>
               <a className={css.primary} href='/docs'>
-                {() => landingText().openDocs}
+                {() => siteText().openDocs}
               </a>
               <code className={css.install}>npm i @reely/dommy</code>
             </div>
@@ -88,7 +89,7 @@ export const LandingPage = (): Node => {
             </p>
             <div className={css.actions}>
               <a className={css.primary} href='/docs'>
-                {() => landingText().openDocs}
+                {() => siteText().openDocs}
               </a>
               <a className={css.secondary} href='/evolution'>
                 {() => landingText().numbers.stepByStep}

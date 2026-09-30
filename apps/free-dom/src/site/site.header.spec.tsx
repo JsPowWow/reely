@@ -1,7 +1,7 @@
 import { mount } from '@reely/dommy';
 
 import { textsLoaded } from '../i18n/localized';
-import { locale } from '../i18n/locale';
+import { chooseLocale } from '../i18n/locale';
 import { MutationMeter } from '../demo/mutation.meter';
 import { LikeButton } from '../pages/docs/demos/like.button';
 import { clickButton, flushMutations } from '../testing/dom.testing';
@@ -12,7 +12,7 @@ const navLabels = (root: Element): string[] =>
 
 describe('SiteHeader', () => {
   afterEach(() => {
-    locale.value = 'en';
+    chooseLocale('en');
   });
 
   it('switches the site to Russian and back in place, and keeps the choice', async () => {
@@ -47,7 +47,7 @@ describe('SiteHeader', () => {
     clickButton(host, 'Like');
     await flushMutations();
 
-    locale.value = 'ru';
+    chooseLocale('ru');
     await textsLoaded();
     await flushMutations();
 

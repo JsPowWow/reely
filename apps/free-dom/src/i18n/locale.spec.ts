@@ -40,11 +40,20 @@ describe('locale', () => {
   });
 
   it('keeps a new choice for the next visit and marks the document with it', async () => {
-    const { locale } = await loadLocale();
+    const { chooseLocale, locale } = await loadLocale();
 
-    locale.value = 'ru';
+    chooseLocale('ru');
 
+    expect(locale.value).toBe('ru');
     expect(localStorage.getItem(key)).toBe(JSON.stringify('ru'));
     expect(document.documentElement.lang).toBe('ru');
+  });
+
+  it('follows the browser from visit to visit until the reader chooses', async () => {
+    vi.spyOn(navigator, 'language', 'get').mockReturnValue('ru-RU');
+    await loadLocale();
+    vi.spyOn(navigator, 'language', 'get').mockReturnValue('en-US');
+
+    expect((await loadLocale()).locale.value).toBe('en');
   });
 });

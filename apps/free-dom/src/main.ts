@@ -35,8 +35,10 @@ const renderPage = async (pathname: string): Promise<boolean> => {
     showPage(() =>
       p(
         null,
-        () => `${siteText().failed.text} `,
-        a({ href: '/docs' }, () => siteText().failed.openDocs)
+        () => siteText().failed,
+        ' ',
+        a({ href: '/docs' }, () => siteText().openDocs),
+        '.'
       )
     );
   }

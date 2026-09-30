@@ -2,16 +2,16 @@ import type * as LocaleModule from './locale';
 import type * as LocalizedModule from './localized';
 
 interface Modules {
-  locale: (typeof LocaleModule)['locale'];
+  chooseLocale: (typeof LocaleModule)['chooseLocale'];
   localized: (typeof LocalizedModule)['localized'];
   textsLoaded: (typeof LocalizedModule)['textsLoaded'];
 }
 
 const loadModules = async (): Promise<Modules> => {
   vi.resetModules();
-  const { locale } = await import('./locale');
+  const { chooseLocale } = await import('./locale');
   const { localized, textsLoaded } = await import('./localized');
-  return { locale, localized, textsLoaded };
+  return { chooseLocale, localized, textsLoaded };
 };
 
 describe('localized', () => {
@@ -21,26 +21,26 @@ describe('localized', () => {
   });
 
   it('gives the English text until Russian is chosen, then the Russian one once it is loaded', async () => {
-    const { locale, localized, textsLoaded } = await loadModules();
+    const { chooseLocale, localized, textsLoaded } = await loadModules();
     const greeting = localized('Hello', async () => 'Привет');
 
     expect(greeting()).toBe('Hello');
-    locale.value = 'ru';
+    chooseLocale('ru');
     expect(greeting()).toBe('Hello');
     await textsLoaded();
     expect(greeting()).toBe('Привет');
-    locale.value = 'en';
+    chooseLocale('en');
     expect(greeting()).toBe('Hello');
   });
 
   it('loads a Russian text once, however often the language changes', async () => {
-    const { locale, localized, textsLoaded } = await loadModules();
+    const { chooseLocale, localized, textsLoaded } = await loadModules();
     const loadRussian = vi.fn(async () => 'Привет');
     localized('Hello', loadRussian);
 
-    locale.value = 'ru';
-    locale.value = 'en';
-    locale.value = 'ru';
+    chooseLocale('ru');
+    chooseLocale('en');
+    chooseLocale('ru');
     await textsLoaded();
 
     expect(loadRussian).toHaveBeenCalledOnce();
@@ -57,17 +57,17 @@ describe('localized', () => {
   });
 
   it('stays in English when the Russian text fails to load, and tries again on the next choice', async () => {
-    const { locale, localized, textsLoaded } = await loadModules();
+    const { chooseLocale, localized, textsLoaded } = await loadModules();
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const loadRussian = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue('Привет');
     const greeting = localized('Hello', loadRussian);
 
-    locale.value = 'ru';
+    chooseLocale('ru');
     await textsLoaded();
     expect(greeting()).toBe('Hello');
 
-    locale.value = 'en';
-    locale.value = 'ru';
+    chooseLocale('en');
+    chooseLocale('ru');
     await textsLoaded();
     expect(greeting()).toBe('Привет');
   });
