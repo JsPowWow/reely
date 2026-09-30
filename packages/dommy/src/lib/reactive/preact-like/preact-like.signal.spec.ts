@@ -1507,7 +1507,7 @@ describe('computed', () => {
       expect(spy).not.toHaveBeenCalled();
     });
 
-    it('should only subscribe to signals listened to', () => {
+    it('should stop updating a computed once nothing listens to it', () => {
       // Here both "B" and "C" are active in the beginning, but
       // "B" becomes inactive later. At that point it should
       // not receive any updates anymore.

@@ -67,9 +67,13 @@ describe('the signal contract', () => {
   it('keeps working after it stops a cycle of effects', () => {
     const ping = signal(0);
     const pong = signal(0);
-    const stopPing = effect(() => void (ping.value = pong.value + 1));
+    const stopPing = effect(() => {
+      ping.value = pong.value + 1;
+    });
 
-    expect(() => effect(() => void (pong.value = ping.value + 1))).toThrow(/cycle/);
+    expect(() => effect(() => {
+      pong.value = ping.value + 1;
+    })).toThrow(/cycle/);
     stopPing();
 
     const lap = signal(0);
@@ -83,9 +87,13 @@ describe('the signal contract', () => {
     const ping = signal(0);
     const pong = signal(0);
     const other = signal(0);
-    const spy = vi.fn(() => void (ping.value = pong.value + other.value + 1));
+    const spy = vi.fn(() => {
+      ping.value = pong.value + other.value + 1;
+    });
     effect(spy);
-    expect(() => effect(() => void (pong.value = ping.value + 1))).toThrow(/cycle/);
+    expect(() => effect(() => {
+      pong.value = ping.value + 1;
+    })).toThrow(/cycle/);
     const runs = spy.mock.calls.length;
 
     other.value = 99;
@@ -112,7 +120,9 @@ describe('the signal contract', () => {
   it('never runs again an effect whose creation threw', () => {
     const s = signal(0);
     const t = signal(0);
-    effect(() => void (t.value = s.value + 1));
+    effect(() => {
+      t.value = s.value + 1;
+    });
     const broken = vi.fn(() => {
       t.value;
       s.value = 1;
@@ -286,8 +296,12 @@ describe('the signal contract', () => {
   it('leaves nothing subscribed when an effect is created into a cycle', () => {
     const ping = signal(0);
     const pong = signal(0);
-    const stop = effect(() => void (ping.value = pong.value + 1));
-    expect(() => effect(() => void (pong.value = ping.value + 1))).toThrow(/cycle/);
+    const stop = effect(() => {
+      ping.value = pong.value + 1;
+    });
+    expect(() => effect(() => {
+      pong.value = ping.value + 1;
+    })).toThrow(/cycle/);
 
     stop();
 

@@ -23,8 +23,6 @@ interface Link {
 // the value, or what the computation threw
 type Outcome<T> = { readonly threw: false; readonly value: T } | { readonly threw: true; readonly value: unknown };
 
-type Scheduler = (flush: VoidFunction) => void;
-
 const MAX_FLUSH_WAVES = 100;
 
 // grows with every write: an unlinked computed hears no writes, but one checked at this epoch is current
@@ -35,7 +33,6 @@ let running: Nullable<Computation<unknown>> = null;
 let batchDepth = 0;
 let queue: Effect[] = [];
 let flushing = false;
-let schedule: Scheduler = (flush) => flush();
 
 const setTracker = (observer: Nullable<Computation<unknown>>): Nullable<Computation<unknown>> => {
   const outer = tracker;
@@ -82,7 +79,7 @@ class Signal<T> implements Source {
       observer.mark(this);
     }
     if (idle && queue.length > 0 && batchDepth === 0 && !flushing) {
-      schedule(flushSync);
+      flushSync();
     }
   }
 }
@@ -115,7 +112,8 @@ abstract class Computation<T> {
     // A run does not depend on a signal it writes, read directly or through a computed: its own
     // write coming back makes it deaf to that signal until it reads it again or runs again.
     if (this === running) {
-      (this.deafTo ??= new Set()).add(written);
+      this.deafTo ??= new Set();
+      this.deafTo.add(written);
     } else if (!this.deafTo?.has(written)) {
       this.onMarked(written);
     }
@@ -171,7 +169,8 @@ abstract class Computation<T> {
     if (!hasSome(current) || current.threw !== next.threw || !Object.is(current.value, next.value)) {
       this.version++;
     }
-    return (this.outcome = next);
+    this.outcome = next;
+    return next;
   }
 
   protected detach(): void {
@@ -285,14 +284,16 @@ class Effect extends Computation<void> {
 }
 
 /** Runs the queued effects now; what they write joins as the next wave. Every effect runs, the first error is rethrown. */
-export const flushSync = (): void => {
+const flushSync = (): void => {
   if (flushing) {
     return;
   }
   flushing = true;
   let failure: Nullable<{ readonly error: unknown }> = null;
   try {
-    for (let wave = 1; queue.length > 0; wave++) {
+    let wave = 0;
+    while (queue.length > 0) {
+      wave++;
       if (wave > MAX_FLUSH_WAVES) {
         const dropped = queue;
         queue = [];
@@ -318,17 +319,6 @@ export const flushSync = (): void => {
   if (hasSome(failure)) {
     throw failure.error;
   }
-};
-
-/**
- * Replaces how a write outside `batch` gets its effects run: `next` is called with `flushSync` once
- * the first effect is queued. By default it runs them at once; `batch` always flushes when it ends.
- * Returns the scheduler it replaced.
- */
-export const setScheduler = (next: Scheduler): Scheduler => {
-  const previous = schedule;
-  schedule = next;
-  return previous;
 };
 
 // the node behind each reader, for writes and for `reelxDebug`

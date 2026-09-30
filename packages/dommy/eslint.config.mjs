@@ -33,4 +33,22 @@ export default [
     // a consumer's code, checked by `consumer/check.mjs` with a consumer's tsconfig
     ignores: ['**/out-tsc', 'consumer/src'],
   },
+  {
+    // a dev script that runs the developer's own `npm`
+    files: ['consumer/check.mjs'],
+    rules: {
+      'sonarjs/no-os-command-from-path': 'off',
+    },
+  },
+  {
+    // the experimental router is reported, not failed, until it is finished (JsPowWow/reely#4)
+    files: ['src/lib/router/**'],
+    rules: {
+      'sonarjs/prefer-specific-assertions': 'warn',
+      'sonarjs/no-skipped-tests': 'warn',
+      'sonarjs/async-test-assertions': 'warn',
+      'sonarjs/concise-regex': 'warn',
+      'sonarjs/super-linear-regex': 'warn',
+    },
+  },
 ];

@@ -20,7 +20,7 @@ Each keystroke changes the text of one text node inside `<output>`; nothing else
 ## Install
 
 ```sh
-npm i @reely/dommy@next
+npm i @reely/dommy
 ```
 
 It has no third-party dependencies: its one dependency is `@reely/basics`, small helpers from the same repo. It ships ES modules with TypeScript types.

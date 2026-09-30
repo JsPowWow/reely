@@ -1,7 +1,7 @@
 // The core's own contract, beside the public one: tests that need its internal hooks.
 import { noop } from '@reely/utils';
 
-import { flushSync, reelxDebug, setScheduler } from './reelx.core';
+import { reelxDebug } from './reelx.core';
 import { batch, computed, effect, signal } from '../preact-like/preact-like.signal';
 
 describe('the signal core', () => {
@@ -89,55 +89,5 @@ describe('the signal core', () => {
     b.set(123);
 
     expect(reelxDebug(a).subscriberCount()).toBe(0);
-  });
-
-  describe('a replaced scheduler', () => {
-    const later = (flush: VoidFunction): void => void setTimeout(flush);
-    let restore: VoidFunction = noop;
-    beforeEach(() => {
-      const previous = setScheduler(later);
-      restore = (): void => void setScheduler(previous);
-    });
-    afterEach(() => restore());
-
-    it('decides when the effects of a write run; `flushSync` runs them at once', async () => {
-      const a = signal(0);
-      const seen: number[] = [];
-      effect(() => void seen.push(a()));
-
-      a.set(1);
-      a.set(2);
-      expect(seen).toStrictEqual([0]);
-      await new Promise((resolve) => setTimeout(resolve));
-      expect(seen).toStrictEqual([0, 2]);
-
-      a.set(3);
-      flushSync();
-      expect(seen).toStrictEqual([0, 2, 3]);
-    });
-
-    it('is asked once for a write, not again for what its effects write while they run', () => {
-      const asked = vi.fn((flush: VoidFunction) => flush());
-      setScheduler(asked);
-      const a = signal(0);
-      const b = signal(0);
-      effect(() => void b.set(a() + 1));
-      effect(() => void b());
-      asked.mockClear();
-
-      a.set(1);
-
-      expect(asked).toHaveBeenCalledOnce();
-    });
-
-    it('leaves `batch` to run its effects when it ends', () => {
-      const a = signal(0);
-      const seen: number[] = [];
-      effect(() => void seen.push(a()));
-
-      batch(() => a.set(1));
-
-      expect(seen).toStrictEqual([0, 1]);
-    });
   });
 });
