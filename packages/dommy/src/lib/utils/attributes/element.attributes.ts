@@ -1,5 +1,5 @@
-import { hasSome } from '@reely/basics';
-import { isBoolean, isNil, isNumber, isString } from '@reely/utils';
+import { hasSome, isString } from '@reely/basics';
+import { isBoolean, isNil, isNumber } from '@reely/utils';
 
 import { isEventHandlerName } from '../element.addListeners';
 

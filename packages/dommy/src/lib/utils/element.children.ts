@@ -1,5 +1,6 @@
+import { isString } from '@reely/basics';
 import type { PipeableFn } from '@reely/utils';
-import { hasProperty, isInstanceOf, isNonEmpty, isString } from '@reely/utils';
+import { hasProperty, isInstanceOf, isNonEmpty } from '@reely/utils';
 
 import { toChildNode } from './element.bindings';
 import { toValidChildDOMElement } from './element.utils';

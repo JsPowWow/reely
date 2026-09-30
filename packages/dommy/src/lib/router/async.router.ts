@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { hasSome, isSomeFunction } from '@reely/basics';
+import { hasSome, isSomeFunction, isString } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
-import { Either, hasProperty, isNil, isString } from '@reely/utils';
+import { Either, hasProperty, isNil } from '@reely/utils';
 
 import { getMatchingRoutes, RouteNotFoundError } from './utils/match-path';
 import { parseConfig } from './utils/route-config';
