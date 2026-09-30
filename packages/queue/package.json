@@ -1,6 +1,6 @@
 {
   "name": "@reely/queue",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Task queues: a sync one that runs tasks to completion, and an async one with a concurrency limit.",
   "license": "MIT",
   "type": "module",

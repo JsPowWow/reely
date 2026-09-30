@@ -1,6 +1,6 @@
 {
   "name": "@reely/emitter",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A typed publish-subscribe channel: events by name, listeners that unsubscribe, errors that do not stop the others.",
   "license": "MIT",
   "type": "module",
