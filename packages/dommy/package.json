@@ -83,6 +83,6 @@
     "@reely/utils": "*"
   },
   "dependencies": {
-    "@reely/basics": "*"
+    "@reely/basics": "^0.1.0"
   }
 }
