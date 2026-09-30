@@ -93,29 +93,40 @@ export function parseColor(css: string): RgbColor {
     return rgb;
 }
 
-/** The colour `weight` of the way from `from` to `to` (0 gives `from`, 1 gives `to`), as `#rrggbb`; either colour as `parseColor` reads it. */
+// What every function that takes a colour reads: a hex, with or without `#`, or what `parseColor` reads.
+const readColor = (color: string): RgbColor => (isValidHex(color) ? hexToRgb(color) : parseColor(color));
+
+/** The colour `weight` of the way from `from` to `to` (0 gives `from`, 1 gives `to`), as `#rrggbb`; either colour a hex or as `parseColor` reads it. */
 export function mix(from: string, to: string, weight = 0.5): string {
     if (!(weight >= 0 && weight <= 1)) {
         throw new Error('The weight must be from 0 to 1');
     }
 
-    const a = parseColor(from);
-    const b = parseColor(to);
+    const a = readColor(from);
+    const b = readColor(to);
     const blend = (x: number, y: number): number => x + (y - x) * weight;
 
     return rgbToHex(blend(a.r, b.r), blend(a.g, b.g), blend(a.b, b.b));
 }
 
-/** Moves each channel toward 0 by `percent` (0–100). */
-export function darken(color: string, percent: number): string {
-    if (!isValidHex(color)) {
-        throw new Error('Invalid hex color');
+/** The colour with `alpha` (0–1) as `rgb(r g b / alpha)`, for a canvas stroke or shadow; the colour a hex or as `parseColor` reads it. */
+export function withAlpha(color: string, alpha: number): string {
+    if (!(alpha >= 0 && alpha <= 1)) {
+        throw new Error('The alpha must be from 0 to 1');
     }
+
+    const { r, g, b } = readColor(color);
+
+    return `rgb(${r} ${g} ${b} / ${alpha})`;
+}
+
+/** Moves each channel toward 0 by `percent` (0–100); the colour a hex or as `parseColor` reads it. */
+export function darken(color: string, percent: number): string {
     if (percent < 0 || percent > 100) {
         throw new Error('Percent must be between 0 and 100');
     }
 
-    const rgb = hexToRgb(color);
+    const rgb = readColor(color);
     const factor = 1 - (percent / 100);
 
     return rgbToHex(
@@ -125,16 +136,13 @@ export function darken(color: string, percent: number): string {
     );
 }
 
-/** Moves each channel toward 255 by `percent` (0–100). */
+/** Moves each channel toward 255 by `percent` (0–100); the colour a hex or as `parseColor` reads it. */
 export function lighten(color: string, percent: number): string {
-    if (!isValidHex(color)) {
-        throw new Error('Invalid hex color');
-    }
     if (percent < 0 || percent > 100) {
         throw new Error('Percent must be between 0 and 100');
     }
 
-    const rgb = hexToRgb(color);
+    const rgb = readColor(color);
     const factor = percent / 100;
 
     return rgbToHex(
@@ -173,7 +181,7 @@ export function isValidRgb(
     return isValid(r) && isValid(g) && isValid(b);
 }
 
-/** The WCAG contrast ratio, from 1 to 21. */
+/** The WCAG contrast ratio, from 1 to 21; both colours hex or as `parseColor` reads them. */
 export function getContrastRatio(color1: string, color2: string): number {
     const getLuminance = (rgb: RgbColor): number => {
         const toLinear = (val: number): number => {
@@ -190,8 +198,8 @@ export function getContrastRatio(color1: string, color2: string): number {
         return 0.2126 * r + 0.7152 * g + 0.0722 * b;
     };
 
-    const lum1 = getLuminance(hexToRgb(color1));
-    const lum2 = getLuminance(hexToRgb(color2));
+    const lum1 = getLuminance(readColor(color1));
+    const lum2 = getLuminance(readColor(color2));
 
     const lighter = Math.max(lum1, lum2);
     const darker = Math.min(lum1, lum2);

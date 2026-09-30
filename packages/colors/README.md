@@ -34,15 +34,17 @@ isValidHex(userInput); // before converting what a colour picker or a URL gave y
 ## Mixing, and colours from CSS
 
 ```ts
-import { mix, parseColor, randomHex } from '@reely/colors';
+import { getContrastRatio, mix, parseColor, randomHex, withAlpha } from '@reely/colors';
 
-// a palette read from CSS comes back as `rgb(r g b)`, not hex
+// a palette read from CSS comes back as `rgb(r g b)`, not hex; every function takes either
 const cold = getComputedStyle(board).getPropertyValue('--cold'); // 'rgb(37 99 235)'
 const heat = mix(cold, '#d64545', 0.3); // 30% of the way from cold to hot, as '#rrggbb'
+board.style.color = getContrastRatio('#000000', heat) > getContrastRatio('#ffffff', heat) ? 'black' : 'white';
+canvas.getContext('2d')!.shadowColor = withAlpha(heat, 0.4); // 'rgb(r g b / 0.4)' for a canvas glow
 
 mix('#2563eb', '#facc15'); // halfway by default
 parseColor('rgba(37, 99, 235, 0.5)'); // { r: 37, g: 99, b: 235 }: alpha is dropped
 randomHex(seeded); // any `() => number` in [0, 1): a seeded one gives the same colour every run
 ```
 
-`rgbToHex` rounds each channel, so the fractions a mix produces are fine. An invalid hex or colour, an RGB channel outside 0–255, or a weight outside 0–1 throws an `Error`.
+`rgbToHex` rounds each channel, so the fractions a mix produces are fine. An invalid hex or colour, an RGB channel outside 0–255, or a weight or alpha outside 0–1 throws an `Error`.

@@ -8,6 +8,7 @@ import {
   isValidHex,
   isValidRgb,
   getContrastRatio,
+  withAlpha,
   mix,
   parseColor,
   randomHex,
@@ -133,6 +134,29 @@ describe('colors', () => {
     });
   });
 
+  describe('a colour from CSS', () => {
+    it('is read the same way, hex with or without `#` or `rgb()`, by every function that takes a colour', () => {
+      const brand = 'rgb(37 99 235)';
+
+      expect(darken(brand, 10)).toBe(darken('#2563eb', 10));
+      expect(lighten('rgba(37, 99, 235, 0.5)', 10)).toBe(lighten('#2563eb', 10));
+      expect(getContrastRatio('rgb(255 255 255)', brand)).toBe(getContrastRatio('#ffffff', '#2563eb'));
+      expect(darken('2563eb', 10)).toBe(darken('#2563eb', 10));
+      expect(mix('000', 'fff')).toBe('#808080');
+      expect(() => darken('red', 10)).toThrow('Invalid color: red');
+      expect(() => getContrastRatio('#ffffff', 'oklch(0.5 0.1 250)')).toThrow('Invalid color');
+    });
+  });
+
+  describe('withAlpha', () => {
+    it('gives the colour with an alpha as `rgb(r g b / a)`, for a canvas stroke or shadow', () => {
+      expect(withAlpha('#2563eb', 0.4)).toBe('rgb(37 99 235 / 0.4)');
+      expect(withAlpha('rgb(37 99 235 / 0.9)', 0)).toBe('rgb(37 99 235 / 0)');
+      expect(() => withAlpha('#2563eb', 1.5)).toThrow('The alpha must be from 0 to 1');
+      expect(() => withAlpha('#2563eb', Number.NaN)).toThrow('The alpha must be from 0 to 1');
+    });
+  });
+
   describe('randomHex', () => {
     it('draws from the given source of randomness, so a seeded one repeats', () => {
       expect(randomHex(() => 0)).toBe('#000000');
@@ -173,8 +197,8 @@ describe('colors', () => {
       );
     });
 
-    it('should throw error for invalid hex', () => {
-      expect(() => darken('invalid', 50)).toThrow('Invalid hex color');
+    it('should throw error for an invalid colour', () => {
+      expect(() => darken('invalid', 50)).toThrow('Invalid color: invalid');
     });
   });
 
@@ -209,8 +233,8 @@ describe('colors', () => {
       );
     });
 
-    it('should throw error for invalid hex', () => {
-      expect(() => lighten('invalid', 50)).toThrow('Invalid hex color');
+    it('should throw error for an invalid colour', () => {
+      expect(() => lighten('invalid', 50)).toThrow('Invalid color: invalid');
     });
   });
 

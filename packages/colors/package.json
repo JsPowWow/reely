@@ -1,7 +1,7 @@
 {
   "name": "@reely/colors",
   "version": "0.0.6",
-  "description": "Convert, lighten and darken hex colours, and check the contrast between two.",
+  "description": "Convert, mix, lighten and darken colours (hex or CSS rgb()), give them an alpha, and check the contrast between two.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
