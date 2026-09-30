@@ -212,6 +212,20 @@ const status = (
 );
 ```
 
+`children` gets `when` back as a getter narrowed to its truthy value, so the branch reads it without `?.`; it follows `when` while the branch is shown.
+
+```tsx
+import { Show, signal } from '@reely/dommy';
+
+interface Try {
+  attempt: { text: string };
+}
+
+const waiting = signal<Try | null>(null);
+
+const card = <Show when={waiting}>{(current) => <p>Take: {() => current().attempt.text}</p>}</Show>;
+```
+
 `Show` keeps its branch while the truthiness stays. `Keyed` builds the branch anew, with new state, whenever the value changes: the notes on another contact, the card of another file.
 
 ```tsx

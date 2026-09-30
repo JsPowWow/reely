@@ -3,7 +3,7 @@ import { computed, onCleanup } from '@reely/signals';
 import { isInstanceOf } from '@reely/utils';
 
 import { getDommyLogger } from '../config';
-import { isFalsyElement } from './element.utils';
+import { isSkippedChild } from './element.utils';
 
 import type { ReactiveReelyNode, ReactiveValue, SingleReelyNode } from '../types/dommy.types';
 
@@ -24,7 +24,7 @@ const toTextData = (value: unknown): string => {
   if (isInstanceOf(Node, value)) {
     getDommyLogger()?.warn('A bound child renders text, not a node; switch nodes with `Show` or `Keyed`:', value);
   }
-  return isFalsyElement(value) ? '' : String(value);
+  return isSkippedChild(value) ? '' : String(value);
 };
 
 export const toBoundTextNode = (read: ReactiveReelyNode): Text => {

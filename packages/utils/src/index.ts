@@ -38,6 +38,7 @@ export { isString } from '@reely/basics';
 export { default as isNumber } from './lib/objects/isNumber';
 export { isBigInt } from './lib/objects/isBigInt';
 export { isBoolean } from './lib/objects/isBoolean';
+export { isTruthy } from './lib/objects/isTruthy';
 export { isPrimitiveValue } from './lib/objects/isPrimitiveValue';
 export { default as isSymbol } from './lib/objects/isSymbol';
 export { default as isError } from './lib/objects/isError';
