@@ -1,7 +1,7 @@
-import { bindValue } from './utils/element.bindings';
-import { createFlowSlot } from './utils/flow.slot';
+import { createFlowSlot } from './flow.slot';
+import { bindValue } from '../utils/element.bindings';
 
-import type { ReactiveValue, ReelyNode } from './types/dommy.types';
+import type { ReactiveValue, ReelyNode } from '../types/dommy.types';
 
 export interface KeyedProps<T> {
   value: ReactiveValue<T>;

@@ -1,8 +1,8 @@
 import { subscriberCount } from '@reely/signals/testing';
 
-import { Await, For, mount, signal } from '../index';
+import { Await, For, mount, signal } from '../../index';
 
-import type { AwaitProps } from '../index';
+import type { AwaitProps } from '../../index';
 
 interface Deferred<T> {
   promise: Promise<T>;

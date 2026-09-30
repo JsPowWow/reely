@@ -1,6 +1,6 @@
 import { subscriberCount } from '@reely/signals/testing';
 
-import { effect, For, mount, onCleanup, Show, signal } from '../index';
+import { effect, For, mount, onCleanup, Show, signal } from '../../index';
 
 describe('onCleanup', () => {
   it('runs when the mounted view is disposed, not before', () => {

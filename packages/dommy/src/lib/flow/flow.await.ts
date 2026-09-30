@@ -2,10 +2,10 @@ import { isSomeFunction, toErrorWithMessage } from '@reely/basics';
 import { onCleanup } from '@reely/signals';
 import { toErrorString } from '@reely/utils';
 
-import { bindValue } from './utils/element.bindings';
-import { createFlowSlot } from './utils/flow.slot';
+import { createFlowSlot } from './flow.slot';
+import { bindValue } from '../utils/element.bindings';
 
-import type { ReactiveValue, ReelyNode } from './types/dommy.types';
+import type { ReactiveValue, ReelyNode } from '../types/dommy.types';
 
 export interface AwaitProps<T> {
   /**

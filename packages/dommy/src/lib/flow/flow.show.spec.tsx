@@ -1,6 +1,6 @@
 import { subscriberCount } from '@reely/signals/testing';
 
-import { effect, mount, Show, signal } from '../index';
+import { effect, mount, Show, signal } from '../../index';
 
 describe('Show', () => {
   it('gives the children the truthy value of `when`, kept current while the branch is shown', () => {

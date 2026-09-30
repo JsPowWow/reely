@@ -1,4 +1,4 @@
-import { For, mount, Show, signal } from '../index';
+import { For, mount, Show, signal } from '../../index';
 
 /** The rendered markup without the anchors flows keep their place by. */
 const markupOf = (host: Element): string => host.innerHTML.replace(/<!--[^>]*-->/g, '');

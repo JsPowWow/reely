@@ -1,4 +1,4 @@
-import { For, mount, signal } from '../index';
+import { For, mount, signal } from '../../index';
 
 interface Racer {
   id: string;

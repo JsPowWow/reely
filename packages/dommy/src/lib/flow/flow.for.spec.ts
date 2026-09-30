@@ -1,8 +1,8 @@
 import { subscriberCount } from '@reely/signals/testing';
 
-import { button, dd, div, dt, For, li, mount, signal, ul } from '../index';
+import { button, dd, div, dt, For, li, mount, signal, ul } from '../../index';
 
-import type { Signal } from '../index';
+import type { Signal } from '../../index';
 
 interface Racer {
   id: string;

@@ -1,6 +1,6 @@
 import { subscriberCount } from '@reely/signals/testing';
 
-import { Keyed, mount, signal } from '../index';
+import { Keyed, mount, signal } from '../../index';
 
 describe('Keyed', () => {
   it('builds the branch for the value, and anew when the value changes', () => {

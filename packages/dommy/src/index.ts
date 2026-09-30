@@ -1,10 +1,10 @@
 export { defineDommyConfig } from './lib/config';
 export { createElement } from './lib/createElement';
 export { mount } from './lib/mount';
-export { For, type ForProps } from './lib/flow.for';
-export { Show, type ShowProps } from './lib/flow.show';
-export { Await, type AwaitProps } from './lib/flow.await';
-export { Keyed, type KeyedProps } from './lib/flow.keyed';
+export { For, type ForProps } from './lib/flow/flow.for';
+export { Show, type ShowProps } from './lib/flow/flow.show';
+export { Await, type AwaitProps } from './lib/flow/flow.await';
+export { Keyed, type KeyedProps } from './lib/flow/flow.keyed';
 
 export * from './lib/types/dommy.types';
 export * from './lib/types/event.types';

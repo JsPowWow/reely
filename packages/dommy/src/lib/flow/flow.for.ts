@@ -2,11 +2,11 @@ import { effect, getOwner, signal, untracked, withOwner } from '@reely/signals';
 import type { Signal } from '@reely/signals';
 import { isInstanceOf, isNil } from '@reely/utils';
 
-import { getDommyLogger } from './config';
-import { toNodes } from './utils/element.children';
-import { createAnchors, insertBefore, rangeOf, removeNodes } from './utils/element.range';
+import { getDommyLogger } from '../config';
+import { toNodes } from '../utils/element.children';
+import { createAnchors, insertBefore, rangeOf, removeNodes } from '../utils/element.range';
 
-import type { ReactiveValue, ReelyNode } from './types/dommy.types';
+import type { ReactiveValue, ReelyNode } from '../types/dommy.types';
 
 export interface ForProps<T> {
   each: ReactiveValue<readonly T[]>;
