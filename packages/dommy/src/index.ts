@@ -5,9 +5,6 @@ export { For, type ForProps } from './lib/flow.for';
 export { Show, type ShowProps } from './lib/flow.show';
 export { Await, type AwaitProps } from './lib/flow.await';
 export { Keyed, type KeyedProps } from './lib/flow.keyed';
-export { createObjectReference } from '@reely/utils';
-export { addListener, addListeners } from './lib/utils/element.addListeners';
-export { appendTo, appendChildren, replaceChildrenOf } from './lib/utils/element.children';
 
 export * from './lib/types/dommy.types';
 export * from './lib/types/event.types';
@@ -16,8 +13,6 @@ export type { JSX } from './lib/types/jsx.types';
 export * from './lib/tags.predefined';
 export * from './lib/tags.svg';
 export type * from './lib/types/svg.types';
-export { setAttribute, removeAttribute, isSafeAttributeEntry } from './lib/utils/attributes/element.attributes';
-export { setStyleAttributes, hasStylesAttribute } from './lib/utils/attributes/element.style.attributes';
 
 export {
   type Signal,

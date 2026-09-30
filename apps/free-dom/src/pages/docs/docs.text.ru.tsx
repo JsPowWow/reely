@@ -84,12 +84,13 @@ export const ru: DocsText = {
             </li>
             <li>
               <code>onClick</code> и любой другой проп <code>on*</code> принимает функцию; событие и{' '}
-              <code>event.currentTarget</code> типизированы по элементу. Строка никогда не становится
-              инлайн-обработчиком.
+              <code>event.currentTarget</code> типизированы по элементу. Для опций слушателя передайте{' '}
+              <code>{'{ handleEvent, once, capture, passive, signal }'}</code>, а для нескольких слушателей —
+              массив. Строка никогда не становится инлайн-обработчиком.
             </li>
             <li>
-              <code>elementRef</code> получает элемент с типом его тега: объект из <code>createObjectReference()</code>{' '}
-              или функцию.
+              <code>elementRef</code> — функция, которая получает элемент с типом его тега, как только он
+              создан.
             </li>
           </ul>
           <h2>Текст остаётся текстом</h2>

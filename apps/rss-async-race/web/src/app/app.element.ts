@@ -1,6 +1,5 @@
 import './app.element.css';
-import { addListener, addListeners, appendTo, createElement, div, h1, input, span } from '@reely/dommy';
-import { pipe } from '@reely/utils';
+import { createElement, div, h1, input, span } from '@reely/dommy';
 
 import { HeaderComponent } from './components/Header.component';
 
@@ -25,23 +24,20 @@ export class AppElement extends HTMLElement {
             },
             h1(
               {
-                onClick: addListeners(
-                  [
-                    // TODO AR just via func, no array wrapped
-                    (e): void => {
-                      console.log('~ via handleEvents1(no capture): ', e.type, e.eventPhase, e.currentTarget);
-                    },
-                  ],
+                onClick: [
+                  (e): void => {
+                    console.log('~ via handleEvents1(no capture): ', e.type, e.eventPhase, e.currentTarget);
+                  },
                   (e): void => {
                     console.log('~ via handleEvents2(no capture): ', e.type, e.eventPhase, e.currentTarget);
                   },
-                  [
-                    (e): void => {
+                  {
+                    handleEvent: (e): void => {
                       console.log('~ via handleEvents3(CAPTURE): ', e.type, e.eventPhase, e.currentTarget);
                     },
-                    { capture: true },
-                  ]
-                ),
+                    capture: true,
+                  },
+                ],
               },
               span(
                 {
@@ -51,9 +47,11 @@ export class AppElement extends HTMLElement {
                     },
                     signal: this.testSignal.signal,
                   },
-                  onMouseLeave: addListener((e) => {
-                    console.log('via handleEvent: ', e.type, e.eventPhase, e.currentTarget);
-                  }),
+                  onMouseLeave: {
+                    handleEvent: (e) => {
+                      console.log('via handleEvent: ', e.type, e.eventPhase, e.currentTarget);
+                    },
+                  },
                 },
                 'Hi Hi Hi'
               )
@@ -88,7 +86,7 @@ export class AppElement extends HTMLElement {
   public connectedCallback(): void {
     this.append(this.container);
 
-    pipe(createElement('async-race-header'), appendTo(this.container));
+    this.container.append(createElement('async-race-header'));
   }
 }
 

@@ -57,10 +57,4 @@ export { hasPropertyRecord } from './lib/objects/hasPropertyRecord';
 export { default as objectsKeysMap } from './lib/objects/objectsKeysMap';
 export { default as toRemovedProperty } from './lib/objects/toRemovedProperty';
 export { getPropertyDescriptor } from './lib/objects/getPropertyDescriptor';
-export {
-  createObjectReference,
-  type ObjectReference,
-  type ReferenceCallback,
-  type Ref,
-} from './lib/objects/createObjectReference';
 export { setPrototype } from './lib/objects/setPrototype';

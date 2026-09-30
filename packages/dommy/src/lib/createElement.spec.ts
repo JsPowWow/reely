@@ -1,6 +1,6 @@
 import { noop } from '@reely/utils';
 
-import { createElement, createObjectReference } from '../index';
+import { createElement } from '../index';
 
 describe('createElement', () => {
   it('creates an element with the given tag', () => {
@@ -83,14 +83,6 @@ describe('createElement', () => {
       });
 
       expect(tags).toEqual(['OUTPUT']);
-    });
-
-    it('sets `current` of an object ref', () => {
-      const ref = createObjectReference<HTMLDivElement>();
-
-      const element = createElement('div', { elementRef: ref });
-
-      expect(ref.current).toBe(element);
     });
 
     it('does not render `elementRef` as an attribute', () => {

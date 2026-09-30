@@ -5,8 +5,8 @@ import { hasProperty, isInstanceOf, isKeyValueObject, isValidRecordKey } from '@
 import { hasAriaAttribute, setAriaAttributes } from './attributes/element.aria.attributes';
 import { isLiveProperty } from './attributes/element.live.properties';
 import { hasStylesAttribute, setStyleAttributes } from './attributes/element.style.attributes';
-import { addEventListenerHandler, isEventListenerHandler, toEventType } from './element.addListeners';
 import { applyValue } from './element.bindings';
+import { addEventListenerHandler, isEventListenerHandler, toEventType } from './element.listeners';
 import { assignProperty } from './element.property';
 
 import type { DOMElementFactoryOptionsProps, HtmlElementTag, DommyElement } from '../types/dommy.types';
@@ -33,8 +33,6 @@ export const assignElementRef =
         // the props are unknown here; their types at `createElement` promise an `ElementRef`
         const ref: Bivariant<(element: Element) => void> = elementRef;
         ref(element);
-      } else if (hasProperty('current', elementRef)) {
-        elementRef.current = element;
       }
     }
     return element;

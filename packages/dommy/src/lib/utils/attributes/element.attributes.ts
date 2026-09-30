@@ -1,7 +1,7 @@
 import { hasSome, isString } from '@reely/basics';
 import { isBoolean, isNil, isNumber } from '@reely/utils';
 
-import { isEventHandlerName } from '../element.addListeners';
+import { isEventHandlerName } from '../element.listeners';
 
 import type { DommyElement } from '../../types/dommy.types';
 

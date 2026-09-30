@@ -15,22 +15,6 @@ export const appendChildren =
     return parent;
   };
 
-/** Appends a child, arrays nested as JSX produces them; `null`, `undefined` and `false` render nothing. */
-export const appendTo =
-  <Element extends DommyElement>(parent: Element): ((child: ReelyNode) => Element) =>
-  (child) => {
-    parent.append(...toChildNodes([child]));
-    return parent;
-  };
-
-/** Replaces all children of `parent`; takes the same children as `appendTo`. */
-export const replaceChildrenOf =
-  <Element extends DommyElement>(parent: Element): ((...children: ReelyNode[]) => Element) =>
-  (...children) => {
-    parent.replaceChildren(...toChildNodes(children));
-    return parent;
-  };
-
 export const toChildNodes = (maybeChildren: readonly unknown[]): (Node | string)[] =>
   toValidChildDOMElement(maybeChildren).map(toChildNode);
 

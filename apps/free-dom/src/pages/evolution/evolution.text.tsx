@@ -55,7 +55,7 @@ const en = {
     },
     'bind-by-hand': {
       title: 'Bind by hand',
-      lead: 'A function in elementRef is called once with the element it created. Subscribing that element to the signal is a binding by hand: the effect now lives with the output it writes. Setting textContent still swaps the text node, as the board shows; next, dommy keeps one text node and edits it.',
+      lead: 'Now the elementRef function does more than hand the element over. Subscribing that element to the signal is a binding by hand: the effect now lives with the output it writes. Setting textContent still swaps the text node, as the board shows; next, dommy keeps one text node and edits it.',
     },
     bind: {
       title: 'Bind the signal',

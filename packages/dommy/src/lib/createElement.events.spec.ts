@@ -1,6 +1,6 @@
 import type { ILogger } from '@reely/logger';
 
-import { addListener, addListeners, createElement, defineDommyConfig } from '../index';
+import { createElement, defineDommyConfig } from '../index';
 
 import type { DOMElementFactoryProps } from '../index';
 
@@ -23,10 +23,12 @@ describe('createElement: events', () => {
         expectTypeOf(event.currentTarget).toEqualTypeOf<HTMLButtonElement>();
         seen.push(`${event.type} ${event.currentTarget.tagName}`);
       },
-      onkeydown: addListener((event) => {
-        expectTypeOf(event.key).toEqualTypeOf<string>();
-        seen.push(event.key);
-      }),
+      onkeydown: {
+        handleEvent: (event) => {
+          expectTypeOf(event.key).toEqualTypeOf<string>();
+          seen.push(event.key);
+        },
+      },
     });
 
     button.click();
@@ -104,9 +106,9 @@ describe('createElement: events', () => {
     expect(second).toHaveBeenCalledOnce();
   });
 
-  it('passes listener options of `addListener`', () => {
+  it('passes the options of a `{ handleEvent, ...options }` descriptor', () => {
     const handler = vi.fn();
-    const button = createElement('button', { onclick: addListener(handler, { once: true }) });
+    const button = createElement('button', { onclick: { handleEvent: handler, once: true } });
 
     button.click();
     button.click();
@@ -114,10 +116,10 @@ describe('createElement: events', () => {
     expect(handler).toHaveBeenCalledOnce();
   });
 
-  it('combines handlers with and without options in `addListeners`', () => {
+  it('combines handlers with and without options in an array', () => {
     const always = vi.fn();
     const once = vi.fn();
-    const button = createElement('button', { onclick: addListeners(always, [once, { once: true }]) });
+    const button = createElement('button', { onclick: [always, { handleEvent: once, once: true }] });
 
     button.click();
     button.click();
@@ -133,7 +135,7 @@ describe('createElement: events', () => {
     const input = createElement('input', {
       eventsAbortSignal: controller.signal,
       onclick: plain,
-      onfocus: addListener(described),
+      onfocus: { handleEvent: described },
     });
 
     controller.abort();
@@ -149,7 +151,7 @@ describe('createElement: events', () => {
     const own = vi.fn();
     const other = vi.fn();
     const button = createElement('button', {
-      onclick: addListeners([own, { signal: controller.signal }], other),
+      onclick: [{ handleEvent: own, signal: controller.signal }, other],
     });
 
     controller.abort();

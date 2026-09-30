@@ -99,11 +99,13 @@ const en = {
             </li>
             <li>
               <code>onClick</code> and every other <code>on*</code> prop takes a function; the event and{' '}
-              <code>event.currentTarget</code> are typed by the element. A string is never set as an inline handler.
+              <code>event.currentTarget</code> are typed by the element. For listener options, pass{' '}
+              <code>{'{ handleEvent, once, capture, passive, signal }'}</code>, and an array for several listeners.
+              A string is never set as an inline handler.
             </li>
             <li>
-              <code>elementRef</code> gets the element, typed by its tag: an object from{' '}
-              <code>createObjectReference()</code>, or a function.
+              <code>elementRef</code> is a function that gets the element, typed by its tag, once it is
+              created.
             </li>
           </ul>
           <h2>Text stays text</h2>

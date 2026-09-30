@@ -3,13 +3,8 @@ import type { Bivariant, Nullable } from '@reely/utils';
 import { hasProperty, isBoolean, isInstanceOf, isNil, isNonEmpty, toNonNullableItems } from '@reely/utils';
 
 import type { DommyElement } from '../types/dommy.types';
-import type {
-  DOMElementEventHandler,
-  DOMElementEventHandlerDescriptor,
-  DOMElementEventType,
-} from '../types/event.types';
 
-// what `addListener` builds, checked field by field: props reach dommy untyped
+// a listener descriptor `{ handleEvent, ...options }`, checked field by field: props reach dommy untyped
 type ListenerDescriptor = {
   handleEvent: Bivariant<EventListener>;
   signal?: Nullable<AbortSignal>;
@@ -33,7 +28,7 @@ function isListenerDescriptor(maybeDescriptor: unknown): maybeDescriptor is List
   );
 }
 
-/** Whether `maybeListener` in an `on*` prop is a handler, a descriptor from `addListener`, or a list of them. */
+/** Whether `maybeListener` in an `on*` prop is a handler, a `{ handleEvent, ...options }` descriptor, or a list of them. */
 export function isEventListenerHandler(maybeEventType: string, maybeListener: unknown): boolean {
   if (Array.isArray(maybeListener)) {
     return maybeListener.every((listener) => isEventListenerHandler(maybeEventType, listener));
@@ -44,34 +39,6 @@ export function isEventListenerHandler(maybeEventType: string, maybeListener: un
 export const isEventHandlerName = (property: string): property is `on${string}` => property.startsWith('on');
 
 export const toEventType = (handlerProperty: string): string => handlerProperty.slice(2).toLowerCase();
-
-export function addListener<Evt extends DOMElementEventType, Elt extends DommyElement>(
-  handleEvent: DOMElementEventHandler<Evt, Elt>,
-  options?: AddEventListenerOptions
-): DOMElementEventHandlerDescriptor<Evt, Elt>[] {
-  return [{ handleEvent, ...options }];
-}
-
-export function addListeners<Evt extends DOMElementEventType, Elt extends DommyElement>(
-  ...args: (
-    | [DOMElementEventHandler<Evt, Elt>, AddEventListenerOptions]
-    | [DOMElementEventHandler<Evt, Elt>]
-    | DOMElementEventHandler<Evt, Elt>
-  )[]
-): DOMElementEventHandlerDescriptor<Evt, Elt>[] {
-  return toNonNullableItems(
-    args.map((entry) => {
-      if (Array.isArray(entry)) {
-        const [handleEvent, options] = entry;
-        return { handleEvent, ...options };
-      }
-      if (isSomeFunction(entry)) {
-        return { handleEvent: entry };
-      }
-      return null;
-    })
-  );
-}
 
 export function addEventListenerHandler(
   element: DommyElement,
