@@ -5,7 +5,7 @@ paths:
 ---
 # @reely/dommy
 
-Goal of the current work — JsPowWow/reely#1: signals bound to the DOM (point updates, no virtual DOM), owner/`dispose`, keyed `For` and `Show`, automatic JSX runtime, working npm package. First real consumer — JsPowWow/ai-race (a race scoreboard with split-flap letters: frequent point updates, row reordering).
+Signals bound to the DOM (point updates, no virtual DOM), owner/`dispose`, flow components, automatic JSX runtime; released on npm (0.1.0, JsPowWow/reely#1). First real consumer — JsPowWow/ai-race (a race scoreboard with split-flap letters: frequent point updates, row reordering); its needs drive what comes next.
 
 ## Minimal, yet mature (the repo principle in `CLAUDE.md`, applied to dommy)
 - The public surface stays small: tag factories, `createElement`, JSX runtime, signals (`signal`/`computed`/`effect`/`batch`), `For`/`Show`/`Keyed`/`Await`, owner/`dispose`. A new export earns its place by serving ai-race; otherwise it composes from these.
