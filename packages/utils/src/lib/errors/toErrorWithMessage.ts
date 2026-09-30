@@ -1,6 +1,7 @@
+import { isString } from '@reely/basics';
+
 import { hasStringMessage } from './hasStringMessage';
 import isError from '../objects/isError';
-import isString from '../objects/isString';
 
 export default function toErrorWithMessage(maybeError: unknown): Error {
   if (isError(maybeError)) return maybeError;

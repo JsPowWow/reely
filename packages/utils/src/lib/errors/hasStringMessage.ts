@@ -1,6 +1,7 @@
+import { isString } from '@reely/basics';
+
 import { hasProperty } from '../objects/hasProperty';
 import { isKeyValueObject } from '../objects/isKeyValueObject';
-import isString from '../objects/isString';
 
 export type WithMessage<T> = {
   message: T;

@@ -1,6 +1,7 @@
+import { isString } from '@reely/basics';
+
 import isNil from './isNil';
 import isNumber from './isNumber';
-import isString from './isString';
 
 type ObjectsKeyMap = {
   getKeyOf: (source: object) => string;

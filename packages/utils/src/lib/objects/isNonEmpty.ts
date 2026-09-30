@@ -1,6 +1,4 @@
-import { hasSome } from '@reely/basics';
-
-import isString from '../objects/isString';
+import { hasSome, isString } from '@reely/basics';
 
 import type { Nullable } from '../types/core.types';
 

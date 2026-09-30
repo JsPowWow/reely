@@ -2,7 +2,6 @@ export * from './lib/types/core.types';
 export * from './lib/types/function.types';
 export * from './lib/types/utility.types';
 
-export * from './lib/utils';
 
 export { default as toErrorWithMessage } from './lib/errors/toErrorWithMessage';
 export { default as toErrorString } from './lib/errors/toErrorString';
@@ -36,7 +35,7 @@ export { hasSome } from '@reely/basics';
 export { toNonNullableItems } from './lib/objects/toNonNullableItems';
 export { default as isInstanceOf } from './lib/objects/isInstanceOf';
 export { isSomeFunction } from '@reely/basics';
-export { default as isString } from './lib/objects/isString';
+export { isString } from '@reely/basics';
 export { default as isNumber } from './lib/objects/isNumber';
 export { isBigInt } from './lib/objects/isBigInt';
 export { isBoolean } from './lib/objects/isBoolean';
