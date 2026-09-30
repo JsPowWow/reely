@@ -5,7 +5,7 @@ import { pipe } from '@reely/utils';
 import { HeaderComponent } from './components/Header.component';
 
 export class AppElement extends HTMLElement {
-  public static observedAttributes = [];
+  public static readonly observedAttributes = [];
   private testSignal = new AbortController();
   private container = div({
     className: 'myWrapper',

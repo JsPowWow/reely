@@ -8,7 +8,7 @@ export interface CardElement extends HTMLElement {
 
 export class HeaderComponent extends HTMLElement {
   public static readonly tagName = 'async-race-header';
-  public static observedAttributes = ['color', 'size'];
+  public static readonly observedAttributes = ['color', 'size'];
 
   #variant: Variant = 'tile';
 
