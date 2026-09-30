@@ -12,7 +12,8 @@
     "access": "public"
   },
   "repository": {
-    "url": "https://github.com/JsPowWow/reely"
+    "type": "git",
+    "url": "git+https://github.com/JsPowWow/reely.git"
   },
   "exports": {
     "./package.json": "./package.json",
