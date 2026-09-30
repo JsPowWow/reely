@@ -1,5 +1,7 @@
 import { mount } from '@reely/dommy';
 
+import { textsLoaded } from '../../i18n/localized';
+import { chooseLocale } from '../../i18n/locale';
 import { clickButton, flushMutations } from '../../testing/dom.testing';
 import { MutationMeter } from '../../demo/mutation.meter';
 import { EvolutionPage } from './evolution.page';
@@ -168,12 +170,15 @@ describe('evolution', () => {
       const findButton = (root: Element, label: string): HTMLButtonElement | undefined =>
         Array.from(root.querySelectorAll('button')).find((item) => item.textContent === label);
       const findField = (root: Element, label: string): HTMLInputElement | undefined =>
-        Array.from(root.querySelectorAll('label')).find((item) => item.textContent?.includes(label))?.querySelector('input') ??
-        undefined;
+        Array.from(root.querySelectorAll('label'))
+          .find((item) => item.textContent?.includes(label))
+          ?.querySelector('input') ?? undefined;
       const updateOf = (root: Element): string =>
-        Array.from(root.querySelectorAll('p')).find((item) => item.textContent?.startsWith('Update '))?.textContent ?? '';
+        Array.from(root.querySelectorAll('p')).find((item) => item.textContent?.startsWith('Update '))?.textContent ??
+        '';
       const readoutOf = (root: Element, label: string): string =>
-        Array.from(root.querySelectorAll('dt')).find((item) => item.textContent === label)?.nextElementSibling?.textContent ?? '';
+        Array.from(root.querySelectorAll('dt')).find((item) => item.textContent === label)?.nextElementSibling
+          ?.textContent ?? '';
 
       it('ranks five hundred stocks, moving the rows it keeps', async () => {
         const meter = renderStep('five-hundred');
@@ -266,7 +271,7 @@ describe('evolution', () => {
     it('shows the first step by default and marks it as current', () => {
       const page = renderPage();
 
-      expect(page.querySelector('h1')?.textContent).toBe(`Step 1. ${evolutionSteps[0]?.title}`);
+      expect(page.querySelector('h1')?.textContent).toBe('Step 1. Markup with tag factories');
       expect(page.querySelector('nav a[href="/evolution/factories"]')?.getAttribute('aria-current')).toBe('step');
     });
 
@@ -292,6 +297,26 @@ describe('evolution', () => {
       renderPage('jsx');
 
       expect(document.title).toBe('Step 2. The same markup in JSX | reely evolution');
+    });
+
+    it('speaks Russian once it is chosen, and keeps the demo as the reader left it', async () => {
+      const host = document.createElement('div');
+      const dispose = mount(host, () => <EvolutionPage slug='bind' />);
+      clickButton(host, '+1');
+      const output = host.querySelector('output');
+
+      chooseLocale('ru');
+      await textsLoaded();
+
+      expect(host.querySelector('h1')?.textContent).toBe('Шаг 7. Привязка сигнала');
+      expect(sourceName(host)).toBe('Исходный код. Подсвечено: новое с шага 6');
+      expect(host.querySelector('a[rel="next"]')?.textContent).toBe('Дальше: Производные значения');
+      expect(document.title).toBe('Шаг 7. Привязка сигнала | эволюция reely');
+      expect(host.querySelector('output')).toBe(output);
+      expect(output?.textContent).toBe('1');
+
+      chooseLocale('en');
+      dispose();
     });
 
     it('explains an unknown step and links to the first one instead of rendering a demo', () => {

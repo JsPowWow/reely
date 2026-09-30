@@ -1,20 +1,27 @@
+import { effect } from '@reely/dommy';
 import { hasSome, isNil } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
+import { Localized } from '../../i18n/localized.view';
+import { demoText } from '../../demo/demo.text';
 import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
 import { Pager } from '../../site/pager';
 import { SiteHeader } from '../../site/site.header';
+import { siteText } from '../../site/site.text';
 import css from '../../site/guide.module.css';
 import { evolutionSteps } from './evolution.steps';
+import { evolutionText } from './evolution.text';
 
 import type { PagerLink } from '../../site/pager';
 import type { EvolutionStep } from './evolution.steps';
 
 const stepHref = (step: EvolutionStep): string => `/evolution/${step.slug}`;
 
+const titleOf = (step: EvolutionStep): string => evolutionText().steps[step.slug].title;
+
 const toPagerLink = (step: EvolutionStep | undefined): Nullable<PagerLink> =>
-  hasSome(step) ? { href: stepHref(step), title: () => step.title } : null;
+  hasSome(step) ? { href: stepHref(step), title: () => titleOf(step) } : null;
 
 export const EvolutionPage = ({ slug }: { slug?: string }): Node => {
   const index = isNil(slug) ? 0 : evolutionSteps.findIndex((item) => item.slug === slug);
@@ -28,15 +35,19 @@ export const EvolutionPage = ({ slug }: { slug?: string }): Node => {
   const trackPrevious = evolutionSteps[trackIndex];
   const first = evolutionSteps[0];
 
-  document.title = isNil(step) ? 'Not found | reely' : `Step ${index + 1}. ${step.title} | reely evolution`;
+  effect(() => {
+    document.title = isNil(step)
+      ? siteText().notFound.documentTitle
+      : `${evolutionText().step(index + 1)} ${titleOf(step)} | ${evolutionText().documentTitle}`;
+  });
 
   return (
     <>
       <SiteHeader current='evolution' />
       <div className={css.guide}>
-        <nav className={css.rail} aria={{ ariaLabel: 'Evolution steps' }}>
+        <nav className={css.rail} aria={{ ariaLabel: () => evolutionText().railLabel }}>
           <a className={css.home} href='/evolution'>
-            reely evolution
+            {() => evolutionText().home}
           </a>
           <ol className={css.steps}>
             {evolutionSteps.map((item, itemIndex) => (
@@ -47,23 +58,23 @@ export const EvolutionPage = ({ slug }: { slug?: string }): Node => {
                   aria={itemIndex === index ? { ariaCurrent: 'step' } : {}}
                 >
                   <span className={css.stepNumber}>{itemIndex + 1}</span>
-                  <span className={css.stepTitle}>{item.title}</span>
+                  <span className={css.stepTitle}>{() => titleOf(item)}</span>
                 </a>
               </li>
             ))}
           </ol>
           <p className={css.keys}>
-            Use <kbd>←</kbd> and <kbd>→</kbd> to move between steps.
+            <Localized view={() => evolutionText().Keys} />
           </p>
         </nav>
         <main className={css.main}>
           {isNil(step) ? (
             <header className={css.missing}>
-              <h1 className={css.title}>There is no step “{slug}”</h1>
-              <p className={css.lead}>Pick a step from the list, or start from the beginning.</p>
+              <h1 className={css.title}>{() => evolutionText().missing.title(String(slug))}</h1>
+              <p className={css.lead}>{() => evolutionText().missing.lead}</p>
               {hasSome(first) && (
                 <a className={css.start} href={stepHref(first)}>
-                  Start with step 1
+                  {() => evolutionText().missing.start}
                 </a>
               )}
             </header>
@@ -74,31 +85,32 @@ export const EvolutionPage = ({ slug }: { slug?: string }): Node => {
                   {index + 1}
                 </span>
                 <h1 className={css.title}>
-                  <span className='visually-hidden'>Step {index + 1}. </span>
-                  {step.title}
+                  <span className='visually-hidden'>{() => `${evolutionText().step(index + 1)} `}</span>
+                  {() => titleOf(step)}
                 </h1>
-                <p className={css.lead}>{step.lead}</p>
+                <p className={css.lead}>{() => evolutionText().steps[step.slug].lead}</p>
               </header>,
-              <section className={css.panels} aria={{ ariaLabel: 'Demo and source' }}>
+              <section className={css.panels} aria={{ ariaLabel: () => demoText().panelsLabel }}>
                 <MutationMeter>
                   <step.Demo />
                 </MutationMeter>
                 <SourceView
                   source={step.source}
-                  caption={
-                    hasSome(trackPrevious) ? `Highlighted: new since step ${trackIndex + 1}` : 'A new demo starts here'
+                  caption={() =>
+                    hasSome(trackPrevious)
+                      ? evolutionText().caption.changed(trackIndex + 1)
+                      : evolutionText().caption.fresh
                   }
                   previous={trackPrevious?.source}
                 />
               </section>,
               <Pager previous={toPagerLink(previous)} next={toPagerLink(next)}>
                 <section className={css.ending} aria={{ ariaLabelledby: 'ending-title' }}>
-                  <h2 id='ending-title'>Where to go from here</h2>
+                  <h2 id='ending-title'>{() => evolutionText().ending.title}</h2>
                   <p>
-                    Every step ran on @reely/dommy, published as a pre-release: install it with{' '}
-                    <code>npm i @reely/dommy@next</code>, and look up each part in the docs.
+                    <Localized view={() => evolutionText().ending.Text} />
                   </p>
-                  <a href='/docs'>Read the docs</a>
+                  <a href='/docs'>{() => evolutionText().ending.docs}</a>
                 </section>
               </Pager>,
             ]

@@ -47,4 +47,5 @@ export const ru: DemoText = {
       })} в DOM.`,
   },
   source: { title: 'Исходный код' },
+  panelsLabel: 'Демо и исходный код',
 };

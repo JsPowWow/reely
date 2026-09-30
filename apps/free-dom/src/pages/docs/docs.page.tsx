@@ -3,6 +3,7 @@ import { hasSome, isNil } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
 import { Localized } from '../../i18n/localized.view';
+import { demoText } from '../../demo/demo.text';
 import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
 import { Pager } from '../../site/pager';
@@ -85,7 +86,7 @@ export const DocsPage = ({ slug }: { slug?: string }): Node => {
                 <h1 className={guide.title}>{() => titleOf(topic)}</h1>
                 <p className={guide.lead}>{() => docsText().topics[topic.slug].lead}</p>
               </header>,
-              <section className={guide.panels} aria={{ ariaLabel: () => docsText().panelsLabel }}>
+              <section className={guide.panels} aria={{ ariaLabel: () => demoText().panelsLabel }}>
                 <MutationMeter>
                   <topic.Demo />
                 </MutationMeter>

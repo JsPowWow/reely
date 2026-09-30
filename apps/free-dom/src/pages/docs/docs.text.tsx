@@ -52,7 +52,6 @@ const en = {
     lead: 'Pick a topic from the list, or start from the beginning.',
     start: 'Getting started',
   },
-  panelsLabel: 'Demo and source',
   sourceCaption: 'The module that renders this demo',
   onward: 'See it built step by step: reely evolution',
   topics: {

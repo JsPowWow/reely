@@ -1,5 +1,7 @@
 import { mount } from '@reely/dommy';
 
+import { textsLoaded } from '../../i18n/localized';
+import { chooseLocale } from '../../i18n/locale';
 import { DiamondLog } from './demos/diamond.log';
 import { MarkupList } from './demos/markup.list';
 import { SharedParent } from './demos/shared.parent';
@@ -28,6 +30,19 @@ describe('labs', () => {
     expect(texts(page, 'main h2')).toEqual(['Statements inside markup', 'A signal graph in the shape of Angular’s']);
     expect(page.querySelectorAll('figure')).toHaveLength(3);
     expect(page.querySelector('header a[href="/labs"]')?.getAttribute('aria-current')).toBe('true');
+  });
+
+  it('speaks Russian once it is chosen', async () => {
+    const page = render(() => <LabsPage />);
+
+    chooseLocale('ru');
+    await textsLoaded();
+
+    expect(document.title).toBe('Лаборатория | reely');
+    expect(texts(page, 'main h2')).toEqual(['Операторы внутри разметки', 'Граф сигналов по образцу Angular']);
+    expect(texts(page, 'main h3')).toEqual(['Вердикт', 'Вердикт']);
+    expect(page.querySelectorAll('figure')).toHaveLength(3);
+    chooseLocale('en');
   });
 
   it('builds children with a loop and a condition inside JSX', () => {

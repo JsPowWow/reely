@@ -30,6 +30,8 @@ const en = {
       })} since the first render.`,
   },
   source: { title: 'Source' },
+  /** Names the section that holds a page's demo and its source. */
+  panelsLabel: 'Demo and source',
 };
 
 /** The words around a demo: its write counter and its source listing. */
