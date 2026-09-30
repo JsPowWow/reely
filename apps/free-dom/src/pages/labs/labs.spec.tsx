@@ -48,7 +48,6 @@ describe('labs', () => {
     expect(page.querySelectorAll('figure')).toHaveLength(3);
     expect(page.querySelector('ol')).toBe(log);
     expect(texts(log ?? page, 'li')).toEqual(['1 / 2', '2 / 4']);
-    chooseLocale('en');
   });
 
   it('builds children with a loop and a condition inside JSX', () => {

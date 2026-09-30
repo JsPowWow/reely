@@ -22,7 +22,6 @@ export interface AdvancedExamples {
   slideCaption: Node;
 }
 
-// Built by the page, not by the text: a language switch rebuilds the words around them and keeps their state.
 export const advancedExamples = (): AdvancedExamples => ({
   flavours: <Live Demo={Flavours} caption='flavours.tsx' source={flavoursSource} />,
   salePrice: <Live Demo={SalePrice} caption='sale.price.tsx' source={salePriceSource} />,

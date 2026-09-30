@@ -1,5 +1,6 @@
-import { Keyed, effect } from '@reely/dommy';
+import { effect } from '@reely/dommy';
 
+import { Localized } from '../../i18n/localized.view';
 import { SiteHeader } from '../../site/site.header';
 import guide from '../../site/guide.module.css';
 import docs from '../docs/docs.module.css';
@@ -31,7 +32,7 @@ export const LabsPage = (): Node => {
               {() => labsText().labs[lab].title}
             </h2>
             <div className={docs.details}>
-              <Keyed value={() => labsText().labs[lab].Body}>{(Body) => <Body {...examples} />}</Keyed>
+              <Localized view={() => labsText().labs[lab].Body} props={examples} />
             </div>
           </section>
         ))}

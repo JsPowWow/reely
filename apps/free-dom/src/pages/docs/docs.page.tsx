@@ -1,4 +1,4 @@
-import { Keyed, effect } from '@reely/dommy';
+import { effect } from '@reely/dommy';
 import { hasSome, isNil } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
@@ -11,7 +11,7 @@ import { SiteHeader } from '../../site/site.header';
 import { siteText } from '../../site/site.text';
 import guide from '../../site/guide.module.css';
 import css from './docs.module.css';
-import { advancedExamples } from './docs.examples';
+import { advancedExamples } from './advanced.examples';
 import { docsText } from './docs.text';
 import { docGroups, docTopics } from './docs.topics';
 
@@ -30,7 +30,7 @@ const TopicDetails = ({ slug }: { slug: DocSlug }): Node => {
     return <Localized view={() => docsText().topics[slug].Details} />;
   }
   const examples = advancedExamples();
-  return <Keyed value={() => docsText().topics.advanced.Details}>{(Details) => <Details {...examples} />}</Keyed>;
+  return <Localized view={() => docsText().topics.advanced.Details} props={examples} />;
 };
 
 export const DocsPage = ({ slug }: { slug?: string }): Node => {

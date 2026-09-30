@@ -23,7 +23,7 @@ export const ru: EvolutionText = {
     title: 'Куда дальше',
     Text: () => (
       <>
-        Каждый шаг работал на @reely/dommy: установите его командой <code>npm i @reely/dommy</code> а подробности о
+        Каждый шаг работал на @reely/dommy: установите его командой <code>npm i @reely/dommy</code>, а подробности о
         каждой части — в документации.
       </>
     ),

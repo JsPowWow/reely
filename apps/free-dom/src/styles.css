@@ -16,7 +16,7 @@
 }
 
 /* Neither face above has Cyrillic: in Russian the same roles go to a condensed heavy signage face and a
-   legibility-first sans that do. Their files load only for Cyrillic text. */
+   legibility-first sans that do. Their files load only when the page is Russian. */
 :root:lang(ru) {
   --display: 'Fira Sans Extra Condensed', 'Arial Narrow', sans-serif;
   --body: 'Golos Text', system-ui, sans-serif;

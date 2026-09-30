@@ -16,7 +16,6 @@ export interface LabExamples {
   diamondLog: Node;
 }
 
-// Built by the page, not by the text: a language switch rebuilds the words around them and keeps their state.
 export const labExamples = (): LabExamples => ({
   markupList: <Live Demo={MarkupList} caption='markup.list.tsx' source={markupListSource} />,
   sharedParent: <Live Demo={SharedParent} caption='shared.parent.tsx' source={sharedParentSource} />,

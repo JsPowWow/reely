@@ -164,7 +164,7 @@ Motion only answers the reader: the write board outlines the nodes a change touc
 **Key Characteristics:**
 - Asphalt ground, white demo panels, graphite bands and code panes; flat, bordered with 1px hairlines.
 - Signal yellow marks state (current page, leader, posted result, primary action), never fills a surface for decoration.
-- Big Shoulders Display at weight 800 for headings and every posted number; Atkinson Hyperlegible for prose; JetBrains Mono only for code.
+- Big Shoulders Display at weight 800 for headings and every posted number; Atkinson Hyperlegible for prose; JetBrains Mono only for code. In Russian, their Cyrillic stand-ins (see Typography).
 - Small, even corners (3 to 6px); plates, not pills.
 - Every live demo ships with its write board; every code pane is the module that runs.
 
@@ -280,7 +280,7 @@ Figures tables (docs sizes, the landing's size and speed band): a visible captio
 
 ### Do:
 - **Do** put the write board under every live demo, and show the module that renders it in a code pane beside it.
-- **Do** set every posted figure in Big Shoulders Display 800 with tabular figures.
+- **Do** set every posted figure in the display face at 800 (Big Shoulders Display; its Russian stand-in) with tabular figures.
 - **Do** mark the current item with a signal plate or underline, and draw focus as a 3px graphite ring on light surfaces and a 3px signal ring on graphite.
 - **Do** separate layers by tone and 1px hairlines (line on light, slate on graphite).
 - **Do** move only in answer to the reader, and under reduced motion drop transitions and fades.

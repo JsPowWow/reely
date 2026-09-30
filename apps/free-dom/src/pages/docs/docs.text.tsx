@@ -8,7 +8,7 @@ import listsSource from './snippets/lists.inbox.tsx?highlight';
 import signalsSource from './snippets/signals.api.ts?highlight';
 import mountSource from './snippets/start.mount.tsx?highlight';
 
-import type { AdvancedExamples } from './docs.examples';
+import type { AdvancedExamples } from './advanced.examples';
 import type { DocGroup, DocSlug } from './docs.topics';
 
 /** The words of one docs page: its question, the answer's lead, and the details after the demo. */
