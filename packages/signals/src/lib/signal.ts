@@ -3,9 +3,9 @@ import { noop, setPrototype } from '@reely/utils';
 import { getOwner, withOwner } from './owner';
 import * as reelx from './reelx.core';
 
-import type { ReactiveValue } from './reelx.core';
+import type { ReactiveValue, SignalOptions } from './reelx.core';
 
-export { batch, untracked, type ReactiveValue } from './reelx.core';
+export { batch, untracked, type ReactiveValue, type SignalOptions } from './reelx.core';
 
 interface Subscribable<T> {
   subscribe(cb: (value: T, prevValue?: T) => void): () => void;
@@ -31,7 +31,8 @@ export interface Computed<T> extends Subscribable<T> {
 }
 
 /** A value that effects and computeds re-read when it is written; a function is held as a value too. */
-export const signal = <T>(init: T): Signal<T> => setPrototype<Signal<T>>(signalProto, reelx.signal(init));
+export const signal = <T>(init: T, options?: SignalOptions<T>): Signal<T> =>
+  setPrototype<Signal<T>>(signalProto, reelx.signal(init, options));
 
 /**
  * A value derived from signals, recomputed only after one of them changes. What `fn` throws is

@@ -30,7 +30,21 @@ total(); // a computed reads the same way
 
 Pick the style you like; the two mix freely. A `ReactiveValue<T>` is anything read that way: a signal, a computed or a getter of them.
 
-Effects run synchronously, and a computed recomputes only when it is read after a change. A write of an equal value (`Object.is`) changes nothing. A signal holds any value, a function included: `set` and `.value =` store it; `update` calls only the function you pass it.
+Effects run synchronously, and a computed recomputes only when it is read after a change. A write of an equal value (`Object.is`, or the `equals` you pass) changes nothing. A signal holds any value, a function included: `set` and `.value =` store it; `update` calls only the function you pass it.
+
+```ts
+import { signal } from '@reely/signals';
+
+const garage = { cars: ['Volvo'] };
+const state = signal(garage, { equals: () => false }); // changed in place: every write notifies
+garage.cars.push('Saab');
+state.value = garage;
+
+const standings = signal({ leader: 'Ada', lap: 3 }, { equals: (previous, next) => previous.leader === next.leader });
+standings.value = { leader: 'Ada', lap: 4 }; // the same leader: nothing is notified, the value stays
+```
+
+`equals` decides whether the signal notifies. What derives from it compares its own result by `Object.is`: a `computed` that returns the same object notifies nothing, so derive the part that changes (`() => state.value.cars.length`).
 
 ## Owners
 

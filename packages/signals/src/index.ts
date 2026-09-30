@@ -2,6 +2,7 @@ export {
   type Computed,
   type ReactiveValue,
   type Signal,
+  type SignalOptions,
   batch,
   computed,
   effect,

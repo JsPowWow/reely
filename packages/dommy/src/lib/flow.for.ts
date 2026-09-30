@@ -1,9 +1,8 @@
-import { getOwner, signal, withOwner } from '@reely/signals';
+import { effect, getOwner, signal, untracked, withOwner } from '@reely/signals';
 import type { Signal } from '@reely/signals';
 import { isInstanceOf, isNil } from '@reely/utils';
 
 import { getDommyLogger } from './config';
-import { bindValue } from './utils/element.bindings';
 import { toNodes } from './utils/element.children';
 import { createAnchors, insertBefore, rangeOf, removeNodes } from './utils/element.range';
 
@@ -125,6 +124,10 @@ export const For = <T,>({ each, by, children }: ForProps<T>): DocumentFragment =
     rows = next;
   };
 
-  bindValue(each, update);
+  // every notification re-reads the list, not only a new array: a list changed in place is diffed too
+  effect(() => {
+    const items = each();
+    untracked(() => update(items));
+  });
   return fragment;
 };

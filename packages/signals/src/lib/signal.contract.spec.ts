@@ -374,4 +374,45 @@ describe('the signal contract', () => {
       expect([spy.mock.calls.length, laps.value]).toStrictEqual([2, 30]);
     });
   });
+
+  describe('`equals`', () => {
+    it('with `() => false`, notifies every write of an object changed in place', () => {
+      const garage = { cars: ['Volvo'] };
+      const state = signal(garage, { equals: () => false });
+      const counts: number[] = [];
+      effect(() => void counts.push(state.value.cars.length));
+
+      garage.cars.push('Saab');
+      state.value = garage;
+
+      expect(counts).toStrictEqual([1, 2]);
+    });
+
+    it('keeps the value and notifies nothing for a write `equals` finds unchanged, `update` included', () => {
+      const first = { leader: 'Ada', lap: 3 };
+      const standings = signal(first, { equals: (previous, next) => previous.leader === next.leader });
+      const leaders: string[] = [];
+      effect(() => void leaders.push(standings.value.leader));
+
+      standings.value = { leader: 'Ada', lap: 4 };
+      standings.update((current) => ({ ...current, lap: 5 }));
+      const kept = standings.peek();
+      standings.set({ leader: 'Grace', lap: 5 });
+
+      expect(kept).toBe(first);
+      expect(leaders).toStrictEqual(['Ada', 'Grace']);
+    });
+
+    it('with `() => false`, calls a subscriber on every write of an object changed in place', () => {
+      const garage = { cars: ['Volvo'] };
+      const state = signal(garage, { equals: () => false });
+      const counts: number[] = [];
+      state.subscribe((value) => counts.push(value.cars.length));
+
+      garage.cars.push('Saab');
+      state.value = garage;
+
+      expect(counts).toStrictEqual([1, 2]);
+    });
+  });
 });

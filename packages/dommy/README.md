@@ -112,7 +112,21 @@ total(); // a computed reads the same way
 
 Pick the style you like; the two mix freely.
 
-Effects run synchronously. A write of an equal value (`Object.is`) changes nothing. A signal holds any value, a function included: `set` and `.value =` store it; `update` calls only the function you pass it.
+Effects run synchronously. A write of an equal value (`Object.is`, or the `equals` you pass) changes nothing. A signal holds any value, a function included: `set` and `.value =` store it; `update` calls only the function you pass it.
+
+```ts
+import { signal } from '@reely/dommy';
+
+const garage = { cars: ['Volvo'] };
+const state = signal(garage, { equals: () => false }); // changed in place: every write notifies
+garage.cars.push('Saab');
+state.value = garage;
+
+const standings = signal({ leader: 'Ada', lap: 3 }, { equals: (previous, next) => previous.leader === next.leader });
+standings.value = { leader: 'Ada', lap: 4 }; // the same leader: nothing is notified, the value stays
+```
+
+`equals` decides whether the signal notifies. What derives from it compares its own result by `Object.is`: a `computed` that returns the same object notifies nothing, so derive the part that changes (`() => state.value.cars.length`). `For` re-reads its list on every notification, so a list changed in place gets its rows added, removed and moved; an item changed in place keeps its row as it was, so give a changed item a new object.
 
 Each run of an effect has its own owner: `onCleanup` inside it runs before the next run and when the effect is disposed, and the effects it created go with it.
 

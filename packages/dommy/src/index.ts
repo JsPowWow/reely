@@ -21,6 +21,7 @@ export { setStyleAttributes, hasStylesAttribute } from './lib/utils/attributes/e
 
 export {
   type Signal,
+  type SignalOptions,
   signal,
   type Computed,
   computed,

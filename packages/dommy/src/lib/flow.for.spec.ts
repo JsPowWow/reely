@@ -27,6 +27,19 @@ const rowsOf = (board: HTMLElement): HTMLLIElement[] => Array.from(board.querySe
 const textsOf = (board: HTMLElement): string[] => rowsOf(board).map((row) => row.textContent ?? '');
 
 describe('For', () => {
+  it('adds, removes and moves rows of a list changed in place, under a signal with `equals: () => false`', () => {
+    const garage = { cars: [racer('a'), racer('b')] };
+    const state = signal(garage, { equals: () => false });
+    const board = ul();
+    mount(board, () => For({ each: () => state.value.cars, by: (car) => car.id, children: (car) => li(car().name) }));
+
+    garage.cars.reverse().push(racer('c'));
+    garage.cars.splice(1, 1);
+    state.value = garage;
+
+    expect(textsOf(board)).toStrictEqual(['B', 'C']);
+  });
+
   it('renders one node per item, in order', () => {
     const { board } = renderBoard(signal([racer('a'), racer('b')]));
 

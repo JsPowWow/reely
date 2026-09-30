@@ -6,6 +6,16 @@ import { isInstanceOf, noop } from '@reely/utils';
 /** A value read reactively: a signal, a computed or any getter of them; an effect or computed that reads it follows it. */
 export type ReactiveValue<T> = () => T;
 
+/** How a signal tells a write that changes nothing from one that notifies. */
+export interface SignalOptions<T> {
+  /**
+   * Whether a write leaves the value unchanged, so nothing is notified; `Object.is` by default.
+   * `() => false` notifies every write, for an object changed in place.
+   */
+  // a method, not a property: its parameters stay bivariant, so a `Signal<T>` is a `Signal<unknown>`
+  equals?(previous: T, next: T): boolean;
+}
+
 interface Source {
   // grows with every change of the value, so an observer can tell whether what it read is still current
   readonly version: number;
@@ -51,7 +61,7 @@ class Signal<T> implements Source {
   public readonly observers = new Set<Computation<unknown>>();
   public readonly refresh = noop;
 
-  constructor(private value: T) {}
+  constructor(private value: T, private readonly options: SignalOptions<T>) {}
 
   public readonly read = (): T => {
     tracker?.onRead(this);
@@ -67,7 +77,7 @@ class Signal<T> implements Source {
   }
 
   public write(value: T): void {
-    if (Object.is(value, this.value)) {
+    if (this.options.equals?.(this.value, value) ?? Object.is(this.value, value)) {
       return;
     }
     this.value = value;
@@ -330,12 +340,13 @@ const toReactiveValue = <T>(node: Signal<T> | Computed<T>): ReactiveValue<T> => 
 };
 
 /** A value that effects and computeds re-read when it is written; a function is held as a value too. */
-export const signal = <T>(initial: T): ReactiveValue<T> => toReactiveValue(new Signal(initial));
+export const signal = <T>(initial: T, options: SignalOptions<T> = {}): ReactiveValue<T> =>
+  toReactiveValue(new Signal(initial, options));
 
 /** A value derived from what `fn` reads, recomputed on read after one of them changes; what `fn` throws is rethrown until then. */
 export const computed = <T>(fn: () => T): ReactiveValue<T> => toReactiveValue(new Computed(fn));
 
-/** Writes `value` to the signal `read` reads (a computed's reader is ignored); an equal value (by `Object.is`) changes nothing. */
+/** Writes `value` to the signal `read` reads (a computed's reader is ignored); a value its `equals` finds unchanged changes nothing. */
 export const write = <T>(read: ReactiveValue<T>, value: T): void => {
   const node = nodes.get(read);
   if (isInstanceOf(Signal, node)) {
@@ -364,18 +375,20 @@ export const effect = (fn: () => void): (() => void) => {
 };
 
 /**
- * Calls `cb` with every new value of `read` (by `Object.is`, starting from `undefined`) and the one
- * before it, now and after each change. Returns `unsubscribe`.
+ * Calls `cb` with the value of `read` and the one before it: now, unless it is `undefined`, then
+ * after every change `read` notifies. Returns `unsubscribe`.
  */
 export const subscribe = <T>(read: ReactiveValue<T>, cb: (value: T, prevValue?: T) => void): (() => void) => {
   let last: T | undefined;
+  let started = false;
   return effect(() => {
     const value = read();
-    if (!Object.is(value, last)) {
-      const previous = last;
-      last = value;
+    const previous = last;
+    last = value;
+    if (started || !Object.is(value, undefined)) {
       untracked(() => cb(value, previous));
     }
+    started = true;
   });
 };
 

@@ -8,6 +8,10 @@ Values that change over time and the code that follows them, released through ow
 A value that is written; whatever read it follows the change. Read and written as `.value` or as `lap()` / `set` / `update`.
 _Avoid_: atom, store, observable
 
+**Equality**:
+What decides that a write changes nothing, so nothing is notified: `Object.is`, or a signal's own `equals`. A computed always uses `Object.is` on its result.
+_Avoid_: comparator, dirty check
+
 **Computed**:
 A value derived from signals, recomputed when read after one of them changed.
 _Avoid_: memo, derived signal, selector
