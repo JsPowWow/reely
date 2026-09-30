@@ -5,7 +5,7 @@ import type { DommyElement, ReelyNode } from '@reely/dommy';
 /**
  * Variant B, `begin`/`end` as a `using` declaration: `using _ = within(ul)` makes `ul` the
  * current parent until the block closes, and `add(...)` appends to it. The block closes the
- * scope, so `end` is never forgotten; the current parent is module state, like van_dml's.
+ * scope, so `end` is never forgotten; the current parent is module state.
  */
 const parents: DommyElement[] = [];
 
@@ -27,7 +27,7 @@ export const add = (...children: ReelyNode[]): void => {
 };
 
 /**
- * Variant C, van_dml's `begin`/`end`: the same stack, closed by hand. Nothing checks the
+ * Variant C, `begin`/`end`: the same stack, closed by hand. Nothing checks the
  * balance: a missing `end` leaves the parent current for everything that follows.
  */
 export const begin = <T extends DommyElement>(parent: T): T => {

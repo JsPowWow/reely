@@ -1,8 +1,7 @@
 # DML: statements inside markup
 
-A prototype, not shipped: can reely markup take `for`, `if`, `let` and `switch` the way
-[van_dml](https://github.com/vanjs-org/van/tree/main/addons/van_dml) does with `begin`/`end`,
-without changing dommy's core? Run and type-check it with the other labs (see `../README.md`).
+A prototype, not shipped: can reely markup take `for`, `if`, `let` and `switch` through
+`begin`/`end`, without changing dommy's core? Run and type-check it with the other labs (see `../README.md`).
 
 ## The three variants
 
@@ -16,7 +15,7 @@ without changing dommy's core? Run and type-check it with the other labs (see `.
 | Types | TS checks the yield type, but marks the whole builder, not the line | TS checks `add`'s arguments | as B |
 | Core change | none: `markup` is one line, `Array.from(build())` | none over `add`; an implicit append would need every factory to read the stack | as B |
 
-The implicit append that makes van_dml short (a bare `h1('x')` lands in the current parent)
+The implicit append that would make `begin`/`end` short (a bare `h1('x')` lands in the current parent)
 is exactly what dommy cannot take: every factory call, including children built as props and
 rows a `For` renders synchronously, would land in whatever parent is current.
 
