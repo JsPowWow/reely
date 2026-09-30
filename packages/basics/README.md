@@ -9,10 +9,11 @@ npm i @reely/basics
 ## Guards
 
 ```ts
-import { hasSome, isPlainObject, isSomeFunction } from '@reely/basics';
+import { hasSome, isPlainObject, isSomeFunction, isString } from '@reely/basics';
 
 if (hasSome(user.avatarUrl)) img.src = user.avatarUrl; // neither `null` nor `undefined`: `string | null` narrows to `string`
 if (isSomeFunction(options.onSave)) options.onSave(draft); // can be called: `boolean | ((draft: Draft) => void)` narrows to the function
+if (isString(saved.query)) search(saved.query); // a string primitive, not a boxed `new String()`: `unknown` narrows to `string`
 if (isPlainObject(saved.theme)) Object.assign(theme, saved.theme); // made by `{}`, `new Object()` or `Object.create(null)`, not an array, a class instance or a built-in: narrows to `Record<PropertyKey, unknown>`
 ```
 
