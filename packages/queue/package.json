@@ -62,6 +62,6 @@
   },
   "dependencies": {
     "@reely/basics": "^0.1.0",
-    "@reely/emitter": "*"
+    "@reely/emitter": "^0.1.0"
   }
 }

@@ -61,9 +61,9 @@
     }
   },
   "dependencies": {
-    "@reely/basics": "^0.1.0",
-    "@reely/emitter": "*",
-    "@reely/queue": "*"
+    "@reely/basics": "^0.1.1",
+    "@reely/emitter": "^0.1.0",
+    "@reely/queue": "^0.1.0"
   },
   "devDependencies": {
     "@reely/utils": "*"
