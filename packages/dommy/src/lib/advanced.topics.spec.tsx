@@ -4,8 +4,7 @@ import { reelxDebug } from './reactive/reelx/reelx.core';
 
 import type { ILogger } from '@reely/logger';
 
-// The pitfalls VanJS lists in its "Advanced Topics" (https://vanjs.org/advanced), checked in
-// reely; README "Advanced topics" explains each one.
+// The questions that come up once the basics work; README "Advanced topics" explains each one.
 
 const render = (view: () => Node): HTMLElement => {
   const host = document.createElement('div');

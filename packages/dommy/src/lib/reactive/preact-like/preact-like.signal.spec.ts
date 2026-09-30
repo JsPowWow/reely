@@ -636,7 +636,7 @@ describe('effect()', () => {
     spy.mockClear();
   });
 
-  it('does not recompute for a dependency it changes itself (preact runs it twice; reely follows VanJS 1.3)', () => {
+  it('does not recompute for a dependency it changes itself (preact runs it twice)', () => {
     const a = signal(0);
     const spy = vi.fn(() => {
       if (a.value === 0) {

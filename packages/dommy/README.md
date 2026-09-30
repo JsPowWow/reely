@@ -374,7 +374,7 @@ A transition to the same state leaves the signal as it is. What the view shows o
 
 ## Advanced topics
 
-The pitfalls [VanJS lists](https://vanjs.org/advanced), and how each one goes in reely. Each answer is checked in `src/lib/advanced.topics.spec.tsx`.
+The questions that come up once the basics work. Each answer is checked in `src/lib/advanced.topics.spec.tsx`.
 
 ### DOM attributes vs. properties
 
@@ -418,7 +418,7 @@ const name = computed(() => profile.value.name); // a new avatar does not reach 
 
 ### The scope of DOM updates
 
-The problem VanJS describes (a binding function that rebuilds a whole `<p>` on every keystroke) has no counterpart here: a function child renders text only, and `Show` keeps its branch while the truthiness of `when` stays, so typing a code rewrites only the text node bound to it:
+Typing into a field does not rebuild the paragraph that shows it: a function child renders text only, and `Show` keeps its branch while the truthiness of `when` stays, so typing a code rewrites only the text node bound to it:
 
 ```tsx
 import { Show, signal } from '@reely/dommy';
@@ -462,11 +462,11 @@ effect(() => {
 });
 ```
 
-A stream of every value (VanJS's `for await` example) is not provided: an effect already sees every change, synchronously.
+A stream of every value (`for await`) is not provided: an effect already sees every change, synchronously.
 
 ### Self-referencing in effects
 
-A signal an effect reads and then writes in the same run stops being its dependency (as in VanJS 1.3): the write does not run the effect again, so an effect can count plays while it watches playback:
+A signal an effect reads and then writes in the same run stops being its dependency: the write does not run the effect again, so an effect can count plays while it watches playback:
 
 ```ts
 import { effect, signal } from '@reely/dommy';
