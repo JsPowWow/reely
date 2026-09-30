@@ -1,4 +1,4 @@
-import { forEachSettled, hasSome, isPlainObject, isSomeFunction, isString } from '@reely/basics';
+import { forEachSettled, hasSome, isPlainObject, isSomeFunction, isString, messageOf } from '@reely/basics';
 
 const closed: string[] = [];
 let failure: unknown;
@@ -23,7 +23,8 @@ if (
   lap !== 1 ||
   !hasSome(lap) ||
   isSomeFunction(lap) ||
-  !isString(query)
+  !isString(query) ||
+  messageOf({ message: 'quota exceeded' }) !== 'quota exceeded'
 ) {
   throw new Error(`unexpected basics: ${JSON.stringify({ closed, lap })}`);
 }

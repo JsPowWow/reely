@@ -1,5 +1,5 @@
-import { isSomeFunction } from '@reely/basics';
-import { toErrorString, toErrorWithMessage } from '@reely/utils';
+import { isSomeFunction, toErrorWithMessage } from '@reely/basics';
+import { toErrorString } from '@reely/utils';
 
 import { onCleanup } from './reactive/owner';
 import { bindValue } from './utils/element.bindings';

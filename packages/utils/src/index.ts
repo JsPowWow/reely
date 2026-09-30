@@ -3,7 +3,7 @@ export * from './lib/types/function.types';
 export * from './lib/types/utility.types';
 
 
-export { default as toErrorWithMessage } from './lib/errors/toErrorWithMessage';
+export { messageOf, toErrorWithMessage } from '@reely/basics';
 export { default as toErrorString } from './lib/errors/toErrorString';
 export { default as exhaustiveGuard } from './lib/errors/exhaustiveGuard';
 export { default as reThrow } from './lib/errors/reThrow';

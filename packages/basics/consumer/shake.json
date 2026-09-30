@@ -2,31 +2,71 @@
   {
     "name": "forEachSettled alone",
     "code": "import { forEachSettled } from '@reely/basics'; forEachSettled([1], () => undefined);",
-    "absent": ["reportUncaught", "isPlainObject", "isSomeFunction", "hasSome", "isString"],
+    "absent": [
+      "reportUncaught",
+      "isPlainObject",
+      "isSomeFunction",
+      "hasSome",
+      "isString",
+      "messageOf",
+      "toErrorWithMessage"
+    ],
     "once": ["forEachSettled"]
   },
   {
     "name": "isSomeFunction alone",
     "code": "import { isSomeFunction } from '@reely/basics'; console.log(isSomeFunction(1));",
-    "absent": ["forEachSettled", "reportUncaught", "isPlainObject", "hasSome", "isString"],
+    "absent": [
+      "forEachSettled",
+      "reportUncaught",
+      "isPlainObject",
+      "hasSome",
+      "isString",
+      "messageOf",
+      "toErrorWithMessage"
+    ],
     "once": ["isSomeFunction"]
   },
   {
     "name": "isPlainObject alone",
     "code": "import { isPlainObject } from '@reely/basics'; console.log(isPlainObject({}));",
-    "absent": ["forEachSettled", "reportUncaught", "isSomeFunction", "hasSome", "isString"],
+    "absent": [
+      "forEachSettled",
+      "reportUncaught",
+      "isSomeFunction",
+      "hasSome",
+      "isString",
+      "messageOf",
+      "toErrorWithMessage"
+    ],
     "once": ["isPlainObject"]
   },
   {
     "name": "hasSome alone",
     "code": "import { hasSome } from '@reely/basics'; console.log(hasSome(1));",
-    "absent": ["forEachSettled", "reportUncaught", "isSomeFunction", "isPlainObject", "isString"],
+    "absent": [
+      "forEachSettled",
+      "reportUncaught",
+      "isSomeFunction",
+      "isPlainObject",
+      "isString",
+      "messageOf",
+      "toErrorWithMessage"
+    ],
     "once": ["hasSome"]
   },
   {
     "name": "isString alone",
     "code": "import { isString } from '@reely/basics'; console.log(isString(1));",
-    "absent": ["forEachSettled", "reportUncaught", "isSomeFunction", "isPlainObject", "hasSome"],
+    "absent": [
+      "forEachSettled",
+      "reportUncaught",
+      "isSomeFunction",
+      "isPlainObject",
+      "hasSome",
+      "messageOf",
+      "toErrorWithMessage"
+    ],
     "once": ["isString"]
   },
   {
@@ -34,5 +74,11 @@
     "code": "import { reportUncaught } from '@reely/basics'; reportUncaught(new Error('lost'));",
     "absent": ["forEachSettled", "isPlainObject"],
     "once": ["reportUncaught"]
+  },
+  {
+    "name": "messageOf alone",
+    "code": "import { messageOf } from '@reely/basics'; console.log(messageOf('offline'));",
+    "absent": ["forEachSettled", "reportUncaught", "isPlainObject", "isSomeFunction"],
+    "once": ["messageOf", "toErrorWithMessage"]
   }
 ]

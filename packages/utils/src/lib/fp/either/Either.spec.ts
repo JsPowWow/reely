@@ -5,7 +5,7 @@ describe('Either tests', () => {
   const eitherNumber = Either.Right<TypeError, number>(2);
   const eitherError = Either.Left<TypeError, number>(new TypeError('Test message'));
 
-  it.skip('inspect available functionality', () => {
+  it('unwraps both sides and taps only a right', () => {
     const r1 = eitherNumber.unwrap(identity, identity);
     expect(r1).toBe(2);
     const r2 = eitherError.unwrap(identity, identity);

@@ -1,4 +1,4 @@
-import toErrorWithMessage from './toErrorWithMessage';
+import { toErrorWithMessage } from '@reely/basics';
 
 /**
  * Describes any thrown value as text, the way an `Error` prints: `TypeError: No timing data`.

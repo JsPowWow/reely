@@ -1,11 +1,14 @@
 import { isString } from './isString';
 
 describe('isString', () => {
+  // eslint-disable-next-line sonarjs/no-primitive-wrappers -- a boxed string is the case under test
+  const boxed = new String('boxed');
+
   test.each`
     value                      | expected
     ${'phrase'}                | ${true}
     ${''}                      | ${true}
-    ${new String('boxed')}     | ${false}
+    ${boxed}                   | ${false}
     ${undefined}               | ${false}
     ${null}                    | ${false}
     ${10}                      | ${false}

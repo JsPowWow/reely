@@ -32,3 +32,15 @@ void navigator.clipboard.writeText(inviteLink).catch(reportUncaught); // nobody 
 ```
 
 `reportUncaught(error)` reports an error nobody can catch as an uncaught one: through the platform `reportError`, or thrown from a microtask where there is none. It reaches `window.onerror` in a browser and `uncaughtException` in Node.
+
+`messageOf(error)` is the message of whatever was thrown, and `toErrorWithMessage(error)` the thrown value as an `Error`: an `Error` as it is; an object's string `message` or a thrown string as the message of a new one; any other value as its JSON.
+
+```ts
+import { messageOf } from '@reely/basics';
+
+try {
+  await saveCar(car);
+} catch (error) {
+  banner.show(`Could not save the car: ${messageOf(error)}`); // an Error, a thrown string, a `{ message }` from an API
+}
+```

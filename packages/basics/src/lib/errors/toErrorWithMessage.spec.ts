@@ -1,4 +1,4 @@
-import toErrorWithMessage from './toErrorWithMessage';
+import { toErrorWithMessage } from './toErrorWithMessage';
 
 describe('toErrorWithMessage', () => {
   it('returns an Error as it is', () => {
@@ -7,8 +7,13 @@ describe('toErrorWithMessage', () => {
     expect(toErrorWithMessage(error)).toBe(error);
   });
 
-  it('makes an Error of an object with a string message', () => {
+  it('makes an Error of an object with a string message, a class instance too', () => {
+    class ApiFailure {
+      public readonly message = 'HTTP 503';
+    }
+
     expect(toErrorWithMessage({ message: 'offline' }).message).toBe('offline');
+    expect(toErrorWithMessage(new ApiFailure()).message).toBe('HTTP 503');
   });
 
   it('takes a thrown string as the message', () => {

@@ -1,5 +1,7 @@
 export { forEachSettled } from './lib/errors/forEachSettled';
+export { messageOf } from './lib/errors/messageOf';
 export { reportUncaught } from './lib/errors/reportUncaught';
+export { toErrorWithMessage } from './lib/errors/toErrorWithMessage';
 export { hasSome } from './lib/objects/hasSome';
 export { isPlainObject } from './lib/objects/isPlainObject';
 export { isSomeFunction } from './lib/objects/isSomeFunction';

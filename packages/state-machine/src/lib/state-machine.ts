@@ -1,9 +1,9 @@
-import { forEachSettled, hasSome, isSomeFunction, reportUncaught } from '@reely/basics';
+import { forEachSettled, hasSome, isSomeFunction, reportUncaught, toErrorWithMessage } from '@reely/basics';
 import type { EventArguments, EventType } from '@reely/emitter';
 import { EventEmitter } from '@reely/emitter';
 import { AsyncQueue, SyncQueue } from '@reely/queue';
 import type { Bivariant } from '@reely/utils';
-import { isPromiseLike, isValidRecordKey, toErrorWithMessage } from '@reely/utils';
+import { isPromiseLike, isValidRecordKey } from '@reely/utils';
 
 import type {
   IStateMachine,
@@ -96,11 +96,10 @@ class Core<M extends StateMachineTypes, Mode extends StateMachineMode> {
     }
     this.transitioning = true;
     try {
-      const { target, actions } = isSomeFunction(transition)
-        ? { target: yield this.call(transition, { from, event, context: this.context, machine: this.forActions }) }
-        : isValidRecordKey(transition)
-        ? { target: transition }
-        : transition;
+      const step = isValidRecordKey(transition) ? { target: transition } : transition;
+      const { target, actions } = isSomeFunction(step)
+        ? { target: yield this.call(step, { from, event, context: this.context, machine: this.forActions }) }
+        : step;
       if (target === undefined) {
         return { status: 'refused', state: from, reason: `The target selector of "${event.type}" chose no state` };
       }

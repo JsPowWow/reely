@@ -1,5 +1,6 @@
+import { toErrorWithMessage } from '@reely/basics';
+
 import reThrow from '../../errors/reThrow';
-import toErrorWithMessage from '../../errors/toErrorWithMessage';
 import identity from '../identity';
 
 type EitherWrapper<Left, Right> = { either: 'left'; value: Left } | { either: 'right'; value: Right };
