@@ -1,27 +1,52 @@
 name: Publish
 
+# `nx release version` commits the new versions on main and tags each project `release/<name>/<version>`;
+# pushing those commits to main publishes every package tagged in the push. Push the commits and their
+# tags together (`git push --atomic origin main --follow-tags`) and straight to main: a rebased or
+# squashed copy of a release commit leaves its tags behind. A failed run is safe to re-run: a version
+# already on npm is skipped.
 on:
-  workflow_dispatch:
-    inputs:
-      dry-run:
-        description: 'Run in dry-run mode (no actual publishing)'
-        required: false
-        default: false
-        type: boolean
-      projects:
-        description: 'Projects to publish, comma separated'
-        required: true
-        default: '@reely/dommy'
-        type: string
-      dist-tag:
-        description: 'npm dist-tag: next for a pre-release, latest for a release'
-        required: true
-        default: 'next'
-        type: string
+  push:
+    branches: [main]
+    paths: ['packages/*/package.json']
 
 jobs:
+  released:
+    name: Find released packages
+    runs-on: ubuntu-latest
+    outputs:
+      all: ${{ steps.tags.outputs.all }}
+      latest: ${{ steps.tags.outputs.latest }}
+      next: ${{ steps.tags.outputs.next }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # the tags on the pushed commits; a pre-release version (`0.1.0-next.3`) goes to `next`, any other to `latest`
+      - name: Read release tags
+        id: tags
+        run: |
+          latest=()
+          next=()
+          for tag in $(git tag --list 'release/@reely/*' --merged "$AFTER" --no-merged "$BEFORE"); do
+            release="${tag#release/}"
+            if [[ "${release##*/}" == *-* ]]; then next+=("${release%/*}"); else latest+=("${release%/*}"); fi
+          done
+          all=("${latest[@]}" "${next[@]}")
+          echo "latest=$(IFS=,; echo "${latest[*]}")" >> "$GITHUB_OUTPUT"
+          echo "next=$(IFS=,; echo "${next[*]}")" >> "$GITHUB_OUTPUT"
+          echo "all=$(IFS=,; echo "${all[*]}")" >> "$GITHUB_OUTPUT"
+          echo "released: ${all[*]:-none}"
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+
   publish:
     name: Publish
+    needs: released
+    if: needs.released.outputs.all != ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -29,8 +54,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Install Node
         uses: actions/setup-node@v4
@@ -45,18 +68,20 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # the tarball ships `dist`, built here; a package with a `consumer` target is installed from
-      # its tarball into a clean project and checked there (types, run, tree shaking) first
+      # the tarball ships `dist`, built here; each package is installed from its tarball into a
+      # clean project and checked there (types, run, tree shaking) first
       - name: Build and check packages
-        run: npx nx run-many -t build consumer --projects "$PROJECTS"
+        run: npx nx run-many -t build consumer --projects "$ALL"
         env:
-          PROJECTS: ${{ inputs.projects }}
+          ALL: ${{ needs.released.outputs.all }}
 
+      # npm trusts this workflow (`npm trust github <package> --file publish.yml`) and adds provenance itself
       - name: Publish packages
-        run: npx nx release publish --projects "$PROJECTS" --tag "$DIST_TAG" ${{ inputs.dry-run == true && '--dry-run --verbose' || '--verbose' }}
+        run: |
+          if [[ -n "$LATEST" ]]; then npx nx release publish --projects "$LATEST" --tag latest --verbose; fi
+          if [[ -n "$NEXT" ]]; then npx nx release publish --projects "$NEXT" --tag next --verbose; fi
         env:
-          PROJECTS: ${{ inputs.projects }}
-          DIST_TAG: ${{ inputs.dist-tag }}
+          LATEST: ${{ needs.released.outputs.latest }}
+          NEXT: ${{ needs.released.outputs.next }}
           NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
-          # npm trusts this workflow (npmjs.com → package settings → Trusted Publisher) and adds provenance itself
           NPM_CONFIG_PROVENANCE: true

@@ -60,10 +60,12 @@
     "version": {
       "preVersionCommand": "npx nx run-many -t build",
       "conventionalCommits": true,
+      "fallbackCurrentVersionResolver": "disk",
+      "updateDependents": "never",
       "git": {
         "commit": true,
         "tag": true,
-        "commitMessage": "chore(source): release versions [no ci]"
+        "commitMessage": "chore(source): release versions"
       }
     },
     "changelog": {
