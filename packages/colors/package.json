@@ -1,6 +1,6 @@
 {
   "name": "@reely/colors",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Convert, lighten and darken hex colours, and check the contrast between two.",
   "license": "MIT",
   "type": "module",
