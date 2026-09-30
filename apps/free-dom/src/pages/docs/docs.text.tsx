@@ -395,7 +395,9 @@ const en = {
             One effect can write several signals from one source. The timed derivations come ready from{' '}
             <code>@reely/dommy-kit</code>: <code>persisted</code> keeps a signal in storage, <code>throttled</code>{' '}
             passes at most one change per interval, and <code>later</code> delays a write and is cancelled by the next
-            change.
+            change, which makes it a debounce. A full quota does not break <code>persisted</code>: it keeps the value in
+            memory and tries the storage again on the next write; the <code>@reely/dommy-kit</code> README has a
+            storage that reports a failed save.
           </p>
           <Code caption='derivation.ts' source={derivationSource} />
           <h2>Self-referencing in effects</h2>

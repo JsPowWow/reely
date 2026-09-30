@@ -47,6 +47,22 @@ describe('persisted', () => {
     expect(tab.value).toBe('garage');
   });
 
+  it('tries the storage again on the next write after it throws', () => {
+    const storage = memoryStorage();
+    const setItem = vi
+      .fn<Storage['setItem']>()
+      .mockImplementationOnce(() => {
+        throw new DOMException('Quota exceeded', 'QuotaExceededError');
+      })
+      .mockImplementation((key, value) => storage.setItem(key, value));
+    const garage = persisted('garage', ['Volvo'], { storage: { getItem: (key) => storage.getItem(key), setItem } });
+
+    garage.value = ['Volvo', 'Saab'];
+
+    expect(setItem).toHaveBeenCalledTimes(2);
+    expect(storage.getItem('garage')).toBe('["Volvo","Saab"]');
+  });
+
   it('follows a write from another tab until its render is disposed', () => {
     let lang: { value: string } | undefined;
     const dispose = mount(document.createElement('div'), () => {

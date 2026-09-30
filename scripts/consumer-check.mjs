@@ -1,10 +1,10 @@
 // A package as a consumer gets it: packed with its @reely dependencies, installed in a clean
 // project, `consumer/*.ts` compiled (strict, no DOM lib unless `consumer/tsconfig.json` asks for one)
-// and run, then tree shaking checked:
+// and run (with `--readme`, the README's `ts` examples compiled too), then tree shaking checked:
 // a bare import ships nothing, and `consumer/shake.json` names are declared `once` or are `absent`.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
@@ -39,12 +39,17 @@ try {
     ? JSON.parse(readFileSync(tsconfigFile, 'utf8'))
     : {};
   const shakeCases = existsSync(shakeFile) ? JSON.parse(readFileSync(shakeFile, 'utf8')) : [];
-  // the other @reely packages a case bundles together with this one
-  const bundledTogether = shakeCases.flatMap(({ code }) =>
+  // with `--readme`, the README's `ts` examples compile against the packed packages too, but are not run
+  const examples = process.argv.includes('--readme')
+    ? [...readFileSync(join(packageDir, 'README.md'), 'utf8').matchAll(/```ts\n([\s\S]*?)```/g)].map(([, code]) => code)
+    : [];
+  assert.ok(!process.argv.includes('--readme') || examples.length > 0, 'the README has no ```ts example');
+  // the other @reely packages a case or an example uses together with this one
+  const usedTogether = [...shakeCases.map(({ code }) => code), ...examples].flatMap((code) =>
     [...code.matchAll(/['"`]@reely\/([\w-]+)['"`]/g)].map(([, dir]) => dir)
   );
   const packageDirs = new Set();
-  for (const dir of [packageDir, ...bundledTogether.map((name) => join(packagesDir, name))]) {
+  for (const dir of [packageDir, ...usedTogether.map((name) => join(packagesDir, name))]) {
     withLocalDependencies(dir, packageDirs);
   }
   const tarballs = [...packageDirs].map(
@@ -70,6 +75,21 @@ try {
   );
   run('npm', ['install', '--no-audit', '--no-fund', '--registry', 'https://registry.npmjs.org', ...tarballs]);
   run(process.execPath, [tsc, '-p', work]);
+  if (examples.length > 0) {
+    mkdirSync(join(work, 'readme'));
+    examples.forEach((code, index) =>
+      writeFileSync(join(work, 'readme', `example-${index}.ts`), `${code}\nexport {};\n`)
+    );
+    writeFileSync(
+      join(work, 'tsconfig.readme.json'),
+      JSON.stringify({
+        extends: './tsconfig.json',
+        compilerOptions: { noEmit: true, rootDir: '.' },
+        include: ['readme'],
+      })
+    );
+    run(process.execPath, [tsc, '-p', join(work, 'tsconfig.readme.json')]);
+  }
   for (const file of readdirSync(join(work, 'out')).filter((name) => name.endsWith('.js'))) {
     run(process.execPath, [join(work, 'out', file)]);
   }

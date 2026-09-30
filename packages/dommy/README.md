@@ -336,7 +336,7 @@ const ring = (
 
 ## Kit
 
-Helpers for the browser, each stopping with the render that created it, live in [`@reely/dommy-kit`](https://www.npmjs.com/package/@reely/dommy-kit): `media` follows a media query, `size` an element's box, `throttled` passes at most one change per interval, `persisted` keeps a signal in storage, `listen` adds a typed listener, `later` delays a call, `flip` animates moved children.
+Helpers for the browser, each stopping with the render that created it, live in [`@reely/dommy-kit`](https://www.npmjs.com/package/@reely/dommy-kit): `media` follows a media query, `size` an element's box, `throttled` passes at most one change per interval, `persisted` keeps a signal in storage, `listen` adds a typed listener, `later` delays a call, `flip` animates moved children. Its README has recipes: a debounce from `later`, and a storage that reports a failed save.
 
 ## State machines
 

@@ -34,3 +34,48 @@ effect(() => console.log(phone.value, theme.value, width.value));
 - `listen(target, type, handler, options)` types the event by target and returns the function that removes it.
 - `later(ms, fn)` runs `fn` once after `ms`, unless the view is disposed or the effect runs again first; it returns its own cancel. `later(0, fn)` runs after the render is in the document.
 - `flip(container, change)` animates the children `change` moved, not those it added; nothing moves under reduced motion.
+
+## Recipes
+
+### Debounce
+
+There is no `debounce`: `later` inside an effect is one. Each run of the effect cancels the timer of the previous run, so only the last write waits out the delay.
+
+```ts
+import { effect, signal } from '@reely/dommy';
+import { later } from '@reely/dommy-kit';
+
+const note = signal(''); // what the driver types about the lap
+const savedNote = signal('');
+
+effect(() => {
+  const text = note.value;
+  later(800, () => (savedNote.value = text)); // saved 800 ms after typing stops
+});
+```
+
+### A storage that reports a failed save
+
+`persisted` keeps working in memory when the storage throws (a full quota, storage blocked in a private window), and tries it again on the next write. To tell the user, pass a storage that notes the failure in a signal and rethrows the error:
+
+```ts
+import { signal } from '@reely/dommy';
+import { persisted } from '@reely/dommy-kit';
+
+const tabOnly = signal(false); // true while saving fails: say "saved in this tab only"
+
+const reportingStorage: Pick<Storage, 'getItem' | 'setItem'> = {
+  getItem: (key) => localStorage.getItem(key),
+  setItem: (key, value) => {
+    try {
+      localStorage.setItem(key, value);
+      tabOnly.value = false;
+    } catch (error) {
+      tabOnly.value = true;
+      throw error;
+    }
+  },
+};
+
+const garage = persisted('garage', [{ car: 'Volvo 240', laps: 0 }], { storage: reportingStorage });
+```

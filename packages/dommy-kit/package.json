@@ -50,7 +50,7 @@
       "consumer": {
         "executor": "nx:run-commands",
         "options": {
-          "command": "node ../../scripts/consumer-check.mjs",
+          "command": "node ../../scripts/consumer-check.mjs --readme",
           "cwd": "packages/dommy-kit"
         },
         "dependsOn": [
