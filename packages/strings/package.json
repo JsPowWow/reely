@@ -9,7 +9,8 @@
     "access": "public"
   },
   "repository": {
-    "url": "https://github.com/JsPowWow/reely"
+    "type": "git",
+    "url": "git+https://github.com/JsPowWow/reely.git"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -37,15 +38,6 @@
       "scope:strings"
     ],
     "targets": {
-      "build-base": {
-        "command": "echo 'Running build-base for strings. This can be replaced with arbitrary commands.'",
-        "cache": true
-      },
-      "build": {
-        "dependsOn": [
-          "build-base"
-        ]
-      },
       "consumer": {
         "executor": "nx:run-commands",
         "options": {
