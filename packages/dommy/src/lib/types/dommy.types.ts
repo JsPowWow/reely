@@ -1,3 +1,4 @@
+import type { ObjectReference } from '@reely/basics';
 import type { ReactiveValue } from '@reely/signals';
 import type { Nullable, PrimitiveValue } from '@reely/utils';
 
@@ -46,8 +47,8 @@ export type DOMElementFactoryProps<Tag extends HtmlElementTag> =
   | StaticReelyNode
   | ReactiveReelyNode;
 
-/** Receives the element once it is created; never called with `null`. */
-export type ElementRef<Elt extends DommyElement> = (element: Elt) => void;
+/** Gets the element once it is created: an object ref has it set as `current`, a function is called with it. */
+export type ElementRef<Elt extends DommyElement> = ObjectReference<Elt> | ((element: Elt) => void);
 
 export type DOMElementFactoryOptionsProps<Tag extends HtmlElementTag> = {
   /** Identity of a list item; never rendered. */

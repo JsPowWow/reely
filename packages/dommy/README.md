@@ -62,7 +62,7 @@ const same = (
 - `styles={{ marginTop: '1rem', '--accent': 'red' }}` sets inline styles, custom properties included.
 - `aria={{ role: 'status', ariaLabel: 'Cart total' }}` sets `role` and `aria-*` attributes.
 - Handler props take a function, named the DOM way (`onkeydown`) or in camelCase with every word capitalised, as in React (`onKeyDown`, `onPointerMove`; `dblclick` is `onDblClick`). The event and `event.currentTarget` are typed by the element. For listener options, pass `{ handleEvent, once, capture, passive, signal }` instead of the function, and an array for several listeners. A string is never rendered as an inline handler.
-- `elementRef` is a function `(element) => void` that gets the element once it is created.
+- `elementRef` gets the element: an object from `createObjectReference()` of `@reely/basics`, or a function `(element) => void`.
 - Text is always inserted as text, so user input cannot become markup.
 
 ## Components

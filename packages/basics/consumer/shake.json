@@ -9,7 +9,8 @@
       "hasSome",
       "isString",
       "messageOf",
-      "toErrorWithMessage"
+      "toErrorWithMessage",
+      "createObjectReference"
     ],
     "once": ["forEachSettled"]
   },
@@ -23,7 +24,8 @@
       "hasSome",
       "isString",
       "messageOf",
-      "toErrorWithMessage"
+      "toErrorWithMessage",
+      "createObjectReference"
     ],
     "once": ["isSomeFunction"]
   },
@@ -37,7 +39,8 @@
       "hasSome",
       "isString",
       "messageOf",
-      "toErrorWithMessage"
+      "toErrorWithMessage",
+      "createObjectReference"
     ],
     "once": ["isPlainObject"]
   },
@@ -51,7 +54,8 @@
       "isPlainObject",
       "isString",
       "messageOf",
-      "toErrorWithMessage"
+      "toErrorWithMessage",
+      "createObjectReference"
     ],
     "once": ["hasSome"]
   },
@@ -65,20 +69,36 @@
       "isPlainObject",
       "hasSome",
       "messageOf",
-      "toErrorWithMessage"
+      "toErrorWithMessage",
+      "createObjectReference"
     ],
     "once": ["isString"]
   },
   {
     "name": "reportUncaught alone",
     "code": "import { reportUncaught } from '@reely/basics'; reportUncaught(new Error('lost'));",
-    "absent": ["forEachSettled", "isPlainObject"],
+    "absent": ["forEachSettled", "isPlainObject", "createObjectReference"],
     "once": ["reportUncaught"]
   },
   {
     "name": "messageOf alone",
     "code": "import { messageOf } from '@reely/basics'; console.log(messageOf('offline'));",
-    "absent": ["forEachSettled", "reportUncaught", "isPlainObject", "isSomeFunction"],
+    "absent": ["forEachSettled", "reportUncaught", "isPlainObject", "isSomeFunction", "createObjectReference"],
     "once": ["messageOf", "toErrorWithMessage"]
+  },
+  {
+    "name": "createObjectReference alone",
+    "code": "import { createObjectReference } from '@reely/basics'; console.log(createObjectReference().current);",
+    "absent": [
+      "forEachSettled",
+      "reportUncaught",
+      "isSomeFunction",
+      "isPlainObject",
+      "hasSome",
+      "isString",
+      "messageOf",
+      "toErrorWithMessage"
+    ],
+    "once": ["createObjectReference"]
   }
 ]

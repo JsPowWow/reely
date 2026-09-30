@@ -33,6 +33,8 @@ export const assignElementRef =
         // the props are unknown here; their types at `createElement` promise an `ElementRef`
         const ref: Bivariant<(element: Element) => void> = elementRef;
         ref(element);
+      } else if (hasProperty('current', elementRef)) {
+        elementRef.current = element;
       }
     }
     return element;

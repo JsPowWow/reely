@@ -44,3 +44,17 @@ try {
   banner.show(`Could not save the car: ${messageOf(error)}`); // an Error, a thrown string, a `{ message }` from an API
 }
 ```
+
+## References
+
+`createObjectReference()` is a box for a value that arrives later: `current` is `null` until something puts a value in, such as a view library handing over an element once it is created. `ReferenceCallback<T>` is the other kind, a function that gets the value (or `null` when it goes away), and `Ref<T>` is either of them or `null`, for an API that takes a ref of any kind.
+
+```ts
+import { createObjectReference } from '@reely/basics';
+
+const search = createObjectReference<HTMLInputElement>();
+// … a view sets `search.current` when it creates the field
+document.addEventListener('keydown', (event) => {
+  if (event.key === '/') search.current?.focus();
+});
+```

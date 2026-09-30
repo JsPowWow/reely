@@ -85,12 +85,12 @@ export const ru: DocsText = {
             <li>
               <code>onClick</code> и любой другой проп <code>on*</code> принимает функцию; событие и{' '}
               <code>event.currentTarget</code> типизированы по элементу. Для опций слушателя передайте{' '}
-              <code>{'{ handleEvent, once, capture, passive, signal }'}</code>, а для нескольких слушателей —
-              массив. Строка никогда не становится инлайн-обработчиком.
+              <code>{'{ handleEvent, once, capture, passive, signal }'}</code>, а для нескольких слушателей — массив.
+              Строка никогда не становится инлайн-обработчиком.
             </li>
             <li>
-              <code>elementRef</code> — функция, которая получает элемент с типом его тега, как только он
-              создан.
+              <code>elementRef</code> получает элемент с типом его тега: объект из <code>createObjectReference()</code>{' '}
+              (<code>@reely/basics</code>) или функцию.
             </li>
           </ul>
           <h2>Текст остаётся текстом</h2>

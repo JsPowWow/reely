@@ -1,4 +1,14 @@
-import { forEachSettled, hasSome, isPlainObject, isSomeFunction, isString, messageOf } from '@reely/basics';
+import {
+  createObjectReference,
+  forEachSettled,
+  hasSome,
+  isPlainObject,
+  isSomeFunction,
+  isString,
+  messageOf,
+} from '@reely/basics';
+
+import type { ObjectReference } from '@reely/basics';
 
 const closed: string[] = [];
 let failure: unknown;
@@ -16,6 +26,9 @@ try {
 const value: unknown = { lap: 1 };
 const lap = isPlainObject(value) ? value['lap'] : undefined;
 const query: unknown = JSON.parse('{"q":"lap"}').q;
+const leader: ObjectReference<string> = createObjectReference();
+const before = leader.current;
+leader.current = 'Ada';
 
 if (
   closed.join() !== 'a,c' ||
@@ -24,7 +37,9 @@ if (
   !hasSome(lap) ||
   isSomeFunction(lap) ||
   !isString(query) ||
-  messageOf({ message: 'quota exceeded' }) !== 'quota exceeded'
+  messageOf({ message: 'quota exceeded' }) !== 'quota exceeded' ||
+  before !== null ||
+  leader.current !== 'Ada'
 ) {
   throw new Error(`unexpected basics: ${JSON.stringify({ closed, lap })}`);
 }
