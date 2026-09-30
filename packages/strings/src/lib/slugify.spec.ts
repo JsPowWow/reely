@@ -52,6 +52,20 @@ describe('slugify', () => {
     expect(slugify('naïve')).toBe('naive');
   });
 
+  it('spells out a Latin letter that has no accent to drop', () => {
+    expect(slugify('Łódź')).toBe('lodz');
+    expect(slugify('Straße')).toBe('strasse');
+    expect(slugify('Ærø Øresund')).toBe('aero-oresund');
+  });
+
+  it('keeps the vowel signs a script writes its words with', () => {
+    expect(slugify('हिन्दी भाषा')).toBe('हिन्दी-भाषा');
+  });
+
+  it('keeps digits, not other number signs', () => {
+    expect(slugify('x² ½ Ⅻ 42')).toBe('x-42');
+  });
+
   it('keeps letters of other scripts whole', () => {
     expect(slugify('Моя Машина №1 — ёлка')).toBe('моя-машина-1-ёлка');
     expect(slugify('Настоящий DOM')).toBe('настоящий-dom');

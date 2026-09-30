@@ -45,6 +45,7 @@ describe('capitalize', () => {
     it('capitalizes words in any script', () => {
       expect(capitalize('призрак мозга')).toBe('Призрак Мозга');
       expect(capitalize('élan vital')).toBe('Élan Vital');
+      expect(capitalize('nai\u0308ve')).toBe('Nai\u0308ve');
     });
 
     it('should handle hyphenated words', () => {
