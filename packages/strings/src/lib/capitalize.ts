@@ -9,7 +9,7 @@ export function capitalize(text: string, allWords = true): string {
   if (!text) return text;
 
   if (allWords) {
-    return text.replace(/\b\w/g, (char) => char.toUpperCase());
+    return text.replace(/(?<![\p{L}\p{N}_])[\p{L}\p{N}_]/gu, (char) => char.toUpperCase());
   }
 
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();

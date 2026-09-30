@@ -45,9 +45,16 @@ describe('slugify', () => {
     expect(slugify('...')).toBe('');
   });
 
-  it('should handle accented characters by removing them', () => {
-    expect(slugify('café')).toBe('caf');
-    expect(slugify('naïve')).toBe('nave');
+  it('keeps a Latin letter and drops only its accent', () => {
+    expect(slugify('Café & Croissants: a Paris guide')).toBe('cafe-croissants-a-paris-guide');
+    expect(slugify('Zürich')).toBe('zurich');
+    expect(slugify('São Paulo')).toBe('sao-paulo');
+    expect(slugify('naïve')).toBe('naive');
+  });
+
+  it('keeps letters of other scripts whole', () => {
+    expect(slugify('Моя Машина №1 — ёлка')).toBe('моя-машина-1-ёлка');
+    expect(slugify('Настоящий DOM')).toBe('настоящий-dom');
   });
 
   it('should handle numbers', () => {

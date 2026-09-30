@@ -15,4 +15,4 @@ capitalize('LONDON', false); // 'London': the first letter, the rest lowercased
 const url = `/blog/${slugify('10 Tips for Remote Work in 2026!')}`; // '/blog/10-tips-for-remote-work-in-2026'
 ```
 
-`slugify` keeps ASCII letters, digits and hyphens: other characters, accented letters included, are dropped, not transliterated. Both throw a `TypeError` for anything but a string.
+`slugify` keeps letters of every script, digits and hyphens: a Latin letter loses its accent (`Café` → `cafe`), Cyrillic and other scripts stay as they are (`Моя машина` → `моя-машина`), anything else is dropped. `capitalize` capitalizes words in any script. Both throw a `TypeError` for anything but a string.

@@ -42,6 +42,11 @@ describe('capitalize', () => {
       expect(capitalize('tHe QuIcK bRoWn FoX')).toBe('THe QuIcK BRoWn FoX');
     });
 
+    it('capitalizes words in any script', () => {
+      expect(capitalize('призрак мозга')).toBe('Призрак Мозга');
+      expect(capitalize('élan vital')).toBe('Élan Vital');
+    });
+
     it('should handle hyphenated words', () => {
       expect(capitalize('mary-jane')).toBe('Mary-Jane');
       expect(capitalize('x-ray')).toBe('X-Ray');
