@@ -1,5 +1,5 @@
-import { localized } from '../../i18n/localized';
 import { labSource } from './labs.source';
+import { localized } from '../../i18n/localized';
 
 import type { LabExamples } from './labs.examples';
 

@@ -1,4 +1,3 @@
-import { measured } from '../../site/measurements';
 import { Code, plain } from './docs.live';
 import derivationSource from './snippets/advanced.derivation.ts?highlight';
 import granularitySource from './snippets/advanced.granularity.ts?highlight';
@@ -6,6 +5,7 @@ import forecastSource from './snippets/async.forecast.tsx?highlight';
 import listsSource from './snippets/lists.inbox.tsx?highlight';
 import signalsSource from './snippets/signals.api.ts?highlight';
 import mountSource from './snippets/start.mount.tsx?highlight';
+import { measured } from '../../site/measurements';
 
 import type { DocsText } from './docs.text';
 

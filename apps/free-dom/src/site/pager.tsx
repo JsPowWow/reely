@@ -2,8 +2,9 @@ import type { ReelyNode } from '@reely/dommy';
 import { hasSome } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
-import guide from './guide.module.css';
 import { siteText } from './site.text';
+
+import guide from './guide.module.css';
 
 /** A neighbouring page: where it is and what it is called, in the language shown. */
 export interface PagerLink {

@@ -1,9 +1,9 @@
 import { isInstanceOf } from '@reely/utils';
 
-import { clickButton, flushMutations } from '../testing/dom.testing';
-import { evolutionSteps } from '../pages/evolution/evolution.steps';
 import { MutationMeter } from './mutation.meter';
 import { SourceView } from './source.view';
+import { evolutionSteps } from '../pages/evolution/evolution.steps';
+import { clickButton, flushMutations } from '../testing/dom.testing';
 
 import type { SourceLines } from '../highlight/source.types';
 

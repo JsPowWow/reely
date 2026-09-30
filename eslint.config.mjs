@@ -26,7 +26,7 @@ export default [
     ignores: ['**/dist', '**/build', '**/out-tsc', '**/labs-ignore', '**/vite.config.*.timestamp*', '**/vitest.config.*.timestamp*'],
   },
   {
-    files: ['**/*.ts', '**/*.js'],
+    files: ['**/*.ts', '**/*.tsx', '**/*.js'],
     rules: {
       '@nx/enforce-module-boundaries': [
         'error',
@@ -137,7 +137,7 @@ export default [
     rules: { 'import/max-dependencies': ['error', { max: 60, ignoreTypeImports: true }] },
   },
   {
-    files: ['**/*spec.js', '**/*spec.ts', '**/*test.js', '**/*test.ts'],
+    files: ['**/*spec.js', '**/*spec.ts', '**/*spec.tsx', '**/*test.js', '**/*test.ts', '**/*test.tsx'],
     // Override or add rules here
     rules: {
       'no-magic-numbers': 'off',

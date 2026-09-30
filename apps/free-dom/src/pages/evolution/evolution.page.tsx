@@ -2,19 +2,19 @@ import { effect } from '@reely/dommy';
 import { hasSome, isNil } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
-import { Localized } from '../../i18n/localized.view';
+import { evolutionSteps } from './evolution.steps';
+import { evolutionText } from './evolution.text';
 import { demoText } from '../../demo/demo.text';
 import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
+import { Localized } from '../../i18n/localized.view';
+import css from '../../site/guide.module.css';
 import { Pager } from '../../site/pager';
 import { SiteHeader } from '../../site/site.header';
 import { siteText } from '../../site/site.text';
-import css from '../../site/guide.module.css';
-import { evolutionSteps } from './evolution.steps';
-import { evolutionText } from './evolution.text';
 
-import type { PagerLink } from '../../site/pager';
 import type { EvolutionStep } from './evolution.steps';
+import type { PagerLink } from '../../site/pager';
 
 const stepHref = (step: EvolutionStep): string => `/evolution/${step.slug}`;
 

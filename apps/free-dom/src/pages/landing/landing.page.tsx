@@ -1,15 +1,16 @@
 import { effect } from '@reely/dommy';
 
-import { Localized } from '../../i18n/localized.view';
+import { landingExamples } from './landing.examples';
+import { landingText } from './landing.text';
 import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
+import { Localized } from '../../i18n/localized.view';
 import { measured } from '../../site/measurements';
-import { siteText } from '../../site/site.text';
 import { SiteHeader } from '../../site/site.header';
+import { siteText } from '../../site/site.text';
 import { LikeButton } from '../docs/demos/like.button';
-import { landingExamples } from './landing.examples';
+
 import css from './landing.module.css';
-import { landingText } from './landing.text';
 
 import type { LandingExample } from './landing.examples';
 

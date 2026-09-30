@@ -1,8 +1,7 @@
+import type { ILogger } from '@reely/logger';
 import { subscriberCount } from '@reely/signals/testing';
 
 import { For, Show, computed, defineDommyConfig, effect, mount, onCleanup, signal } from '../index';
-
-import type { ILogger } from '@reely/logger';
 
 // The questions that come up once the basics work; README "Advanced topics" explains each one.
 

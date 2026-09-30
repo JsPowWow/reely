@@ -2,21 +2,22 @@ import { effect } from '@reely/dommy';
 import { hasSome, isNil } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
-import { Localized } from '../../i18n/localized.view';
-import { demoText } from '../../demo/demo.text';
-import { MutationMeter } from '../../demo/mutation.meter';
-import { SourceView } from '../../demo/source.view';
-import { Pager } from '../../site/pager';
-import { SiteHeader } from '../../site/site.header';
-import { siteText } from '../../site/site.text';
-import guide from '../../site/guide.module.css';
-import css from './docs.module.css';
 import { advancedExamples } from './advanced.examples';
 import { docsText } from './docs.text';
 import { docGroups, docTopics } from './docs.topics';
+import { demoText } from '../../demo/demo.text';
+import { MutationMeter } from '../../demo/mutation.meter';
+import { SourceView } from '../../demo/source.view';
+import { Localized } from '../../i18n/localized.view';
+import guide from '../../site/guide.module.css';
+import { Pager } from '../../site/pager';
+import { SiteHeader } from '../../site/site.header';
+import { siteText } from '../../site/site.text';
 
-import type { PagerLink } from '../../site/pager';
+import css from './docs.module.css';
+
 import type { DocSlug, DocTopic } from './docs.topics';
+import type { PagerLink } from '../../site/pager';
 
 const topicHref = (topic: DocTopic): string => `/docs/${topic.slug}`;
 

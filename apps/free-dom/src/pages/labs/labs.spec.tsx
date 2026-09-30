@@ -1,11 +1,11 @@
 import { mount } from '@reely/dommy';
 
-import { textsLoaded } from '../../i18n/localized';
-import { chooseLocale } from '../../i18n/locale';
 import { DiamondLog } from './demos/diamond.log';
 import { MarkupList } from './demos/markup.list';
 import { SharedParent } from './demos/shared.parent';
 import { LabsPage } from './labs.page';
+import { chooseLocale } from '../../i18n/locale';
+import { textsLoaded } from '../../i18n/localized';
 
 const render = (view: () => Node): HTMLElement => {
   const host = document.createElement('div');

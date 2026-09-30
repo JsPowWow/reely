@@ -1,9 +1,10 @@
-import { chooseLocale, locale } from '../i18n/locale';
-import css from './site.module.css';
 import { siteText } from './site.text';
+import { chooseLocale, locale } from '../i18n/locale';
 
-import type { Locale } from '../i18n/locale';
+import css from './site.module.css';
+
 import type { SiteText } from './site.text';
+import type { Locale } from '../i18n/locale';
 
 /** The parts of the site; the header marks the one the page belongs to. */
 export type SiteSection = 'home' | 'docs' | 'evolution' | 'labs';

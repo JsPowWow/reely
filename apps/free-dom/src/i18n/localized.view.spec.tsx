@@ -1,7 +1,7 @@
 import { mount, signal } from '@reely/dommy';
 
-import { textsLoaded, localized } from './localized';
 import { chooseLocale } from './locale';
+import { textsLoaded, localized } from './localized';
 import { Localized } from './localized.view';
 
 describe('Localized', () => {

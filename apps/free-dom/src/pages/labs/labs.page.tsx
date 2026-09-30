@@ -1,12 +1,13 @@
 import { effect } from '@reely/dommy';
 
-import { Localized } from '../../i18n/localized.view';
-import { SiteHeader } from '../../site/site.header';
-import guide from '../../site/guide.module.css';
-import docs from '../docs/docs.module.css';
-import css from './labs.module.css';
 import { labExamples } from './labs.examples';
 import { labsText } from './labs.text';
+import { Localized } from '../../i18n/localized.view';
+import guide from '../../site/guide.module.css';
+import { SiteHeader } from '../../site/site.header';
+
+import css from './labs.module.css';
+import docs from '../docs/docs.module.css';
 
 import type { LabId } from './labs.text';
 

@@ -1,11 +1,11 @@
 import { mount } from '@reely/dommy';
 
-import { textsLoaded } from '../../i18n/localized';
-import { chooseLocale } from '../../i18n/locale';
-import { clickButton, flushMutations } from '../../testing/dom.testing';
-import { MutationMeter } from '../../demo/mutation.meter';
 import { EvolutionPage } from './evolution.page';
 import { evolutionSteps } from './evolution.steps';
+import { MutationMeter } from '../../demo/mutation.meter';
+import { chooseLocale } from '../../i18n/locale';
+import { textsLoaded } from '../../i18n/localized';
+import { clickButton, flushMutations } from '../../testing/dom.testing';
 
 // the first-render node count, then text edits, attribute edits, nodes moved, nodes added or removed
 const readWrites = (meter: Element): string[] =>

@@ -1,9 +1,10 @@
-import type { Nullable } from '@reely/utils';
 import { code, div, ins, p, pre, span } from '@reely/dommy';
+import type { Nullable } from '@reely/utils';
 import { isNil } from '@reely/utils';
 
-import css from './demo.module.css';
 import { demoText } from './demo.text';
+
+import css from './demo.module.css';
 
 import type { SourceLines, SourceToken } from '../highlight/source.types';
 

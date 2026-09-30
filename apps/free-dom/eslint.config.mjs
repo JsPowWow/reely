@@ -14,9 +14,20 @@ export default [
   },
   {
     // The registries import every demo and its source, two modules per page.
-    files: ['src/pages/evolution/evolution.steps.ts', 'src/pages/docs/docs.topics.tsx'],
+    files: [
+      'src/pages/evolution/evolution.steps.ts',
+      'src/pages/docs/docs.topics.tsx',
+      'src/pages/docs/advanced.examples.tsx',
+    ],
     rules: {
       'import/max-dependencies': 'off',
+    },
+  },
+  {
+    // A page composes the site's header, pager and meter with its own content.
+    files: ['src/**/*.page.tsx'],
+    rules: {
+      'import/max-dependencies': ['error', { max: 15, ignoreTypeImports: true }],
     },
   },
 ];

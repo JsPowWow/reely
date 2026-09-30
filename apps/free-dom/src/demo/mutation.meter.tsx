@@ -2,8 +2,9 @@ import type { ReelyNode, Signal } from '@reely/dommy';
 import { batch, dd, div, dl, dt, figcaption, figure, onCleanup, p, signal, span } from '@reely/dommy';
 import { exhaustiveGuard, isInstanceOf, isNil, isSomeFunction } from '@reely/utils';
 
-import css from './demo.module.css';
 import { demoText } from './demo.text';
+
+import css from './demo.module.css';
 
 import type { WriteKind } from './demo.types';
 

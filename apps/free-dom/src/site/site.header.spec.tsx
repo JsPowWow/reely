@@ -1,11 +1,11 @@
 import { mount } from '@reely/dommy';
 
-import { textsLoaded } from '../i18n/localized';
-import { chooseLocale } from '../i18n/locale';
+import { SiteHeader } from './site.header';
 import { MutationMeter } from '../demo/mutation.meter';
+import { chooseLocale } from '../i18n/locale';
+import { textsLoaded } from '../i18n/localized';
 import { LikeButton } from '../pages/docs/demos/like.button';
 import { clickButton, flushMutations } from '../testing/dom.testing';
-import { SiteHeader } from './site.header';
 
 const navLabels = (root: Element): string[] =>
   Array.from(root.querySelectorAll('nav a'), (link) => link.textContent ?? '');

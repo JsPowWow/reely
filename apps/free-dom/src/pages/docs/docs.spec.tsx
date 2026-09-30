@@ -1,13 +1,13 @@
 import { mount } from '@reely/dommy';
 
-import { textsLoaded } from '../../i18n/localized';
-import { chooseLocale } from '../../i18n/locale';
-import { clickButton } from '../../testing/dom.testing';
 import { DeliveryTracker } from './demos/delivery.tracker';
 import { ExchangeRate, quoteDelay } from './demos/exchange.rate';
 import { StopwatchSlot } from './demos/stopwatch';
 import { DocsPage } from './docs.page';
 import { docTopics } from './docs.topics';
+import { chooseLocale } from '../../i18n/locale';
+import { textsLoaded } from '../../i18n/localized';
+import { clickButton } from '../../testing/dom.testing';
 
 const renderPage = (slug?: string): Element => {
   const host = document.createElement('div');

@@ -1,3 +1,13 @@
+import { DeliveryTracker } from './demos/delivery.tracker';
+import deliveryTrackerSource from './demos/delivery.tracker.tsx?highlight';
+import { ExchangeRate } from './demos/exchange.rate';
+import exchangeRateSource from './demos/exchange.rate.tsx?highlight';
+import { LikeButton } from './demos/like.button';
+import likeButtonSource from './demos/like.button.tsx?highlight';
+import { StopwatchSlot } from './demos/stopwatch';
+import stopwatchSource from './demos/stopwatch.tsx?highlight';
+import { Tickets as BatchTickets } from '../evolution/steps/step11.batch';
+import batchSource from '../evolution/steps/step11.batch.ts?highlight';
 import { Board as KeyedBoard } from '../evolution/steps/step12.keyed-list';
 import keyedListSource from '../evolution/steps/step12.keyed-list.tsx?highlight';
 import { Board as LiveBoard } from '../evolution/steps/step13.five-hundred';
@@ -10,18 +20,8 @@ import { Tickets as DerivedTickets } from '../evolution/steps/step8.derived';
 import derivedSource from '../evolution/steps/step8.derived.ts?highlight';
 import { Tickets as GetterTickets } from '../evolution/steps/step9.getter';
 import getterSource from '../evolution/steps/step9.getter.ts?highlight';
-import { Tickets as BatchTickets } from '../evolution/steps/step11.batch';
-import batchSource from '../evolution/steps/step11.batch.ts?highlight';
 import { DeliveryCost } from './demos/advanced/delivery.cost';
 import deliveryCostSource from './demos/advanced/delivery.cost.tsx?highlight';
-import { DeliveryTracker } from './demos/delivery.tracker';
-import deliveryTrackerSource from './demos/delivery.tracker.tsx?highlight';
-import { ExchangeRate } from './demos/exchange.rate';
-import exchangeRateSource from './demos/exchange.rate.tsx?highlight';
-import { LikeButton } from './demos/like.button';
-import likeButtonSource from './demos/like.button.tsx?highlight';
-import { StopwatchSlot } from './demos/stopwatch';
-import stopwatchSource from './demos/stopwatch.tsx?highlight';
 
 import type { SourceLines } from '../../highlight/source.types';
 

@@ -1,8 +1,9 @@
 import { effect } from '@reely/dommy';
 
 import { SiteHeader } from './site.header';
-import guide from './guide.module.css';
 import { siteText } from './site.text';
+
+import guide from './guide.module.css';
 
 /** A URL the site has no page for: says which, and offers the ways in. */
 export const NotFoundPage = ({ pathname }: { pathname: string }): Node => {

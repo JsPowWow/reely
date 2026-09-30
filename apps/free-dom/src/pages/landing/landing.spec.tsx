@@ -1,11 +1,11 @@
 import { mount } from '@reely/dommy';
 
-import { textsLoaded } from '../../i18n/localized';
-import { chooseLocale } from '../../i18n/locale';
-import { clickButton, flushMutations } from '../../testing/dom.testing';
 import { answerDelay } from './examples/api.search';
 import { landingExamples } from './landing.examples';
 import { LandingPage } from './landing.page';
+import { chooseLocale } from '../../i18n/locale';
+import { textsLoaded } from '../../i18n/localized';
+import { clickButton, flushMutations } from '../../testing/dom.testing';
 
 const typeInto = (input: HTMLInputElement | null | undefined, text: string): void => {
   if (!input) {
