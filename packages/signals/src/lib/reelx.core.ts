@@ -6,14 +6,16 @@ import { isInstanceOf, noop } from '@reely/utils';
 /** A value read reactively: a signal, a computed or any getter of them; an effect or computed that reads it follows it. */
 export type ReactiveValue<T> = () => T;
 
+// a method type: its parameters stay bivariant, so a `Signal<T>` is a `Signal<unknown>`
+type Equality<T> = { bivarianceHack(previous: T, next: T): boolean }['bivarianceHack'];
+
 /** How a signal tells a write that changes nothing from one that notifies. */
 export interface SignalOptions<T> {
   /**
    * Whether a write leaves the value unchanged, so nothing is notified; `Object.is` by default.
-   * `() => false` notifies every write, for an object changed in place.
+   * `false` (or `() => false`) notifies every write, for an object changed in place.
    */
-  // a method, not a property: its parameters stay bivariant, so a `Signal<T>` is a `Signal<unknown>`
-  equals?(previous: T, next: T): boolean;
+  equals?: Equality<T> | false;
 }
 
 interface Source {
@@ -77,7 +79,8 @@ class Signal<T> implements Source {
   }
 
   public write(value: T): void {
-    if (this.options.equals?.(this.value, value) ?? Object.is(this.value, value)) {
+    const { equals = Object.is } = this.options;
+    if (equals !== false && equals(this.value, value)) {
       return;
     }
     this.value = value;

@@ -4,6 +4,8 @@ import { noop } from '@reely/utils';
 import { subscriberCount } from './reelx.core';
 import { batch, computed, effect, signal, untracked } from './signal';
 
+import type { Signal } from './signal';
+
 describe('the signal contract', () => {
   it('runs the effects of a signal in the order they were created', () => {
     const lap = signal(0);
@@ -376,9 +378,12 @@ describe('the signal contract', () => {
   });
 
   describe('`equals`', () => {
-    it('with `() => false`, notifies every write of an object changed in place', () => {
+    it.each([
+      ['false', false],
+      ['() => false', (): boolean => false],
+    ] as const)('with `%s`, notifies every write of an object changed in place', (_name, equals) => {
       const garage = { cars: ['Volvo'] };
-      const state = signal(garage, { equals: () => false });
+      const state = signal(garage, { equals });
       const counts: number[] = [];
       effect(() => void counts.push(state.value.cars.length));
 
@@ -386,6 +391,13 @@ describe('the signal contract', () => {
       state.value = garage;
 
       expect(counts).toStrictEqual([1, 2]);
+    });
+
+    it('keeps a signal with its own `equals` a `Signal<unknown>`', () => {
+      const lap: Signal<unknown> = signal(1, { equals: (previous, next) => previous === next });
+      const leader: Signal<unknown> = signal('Ada', { equals: false });
+
+      expect([lap.peek(), leader.peek()]).toStrictEqual([1, 'Ada']);
     });
 
     it('keeps the value and notifies nothing for a write `equals` finds unchanged, `update` included', () => {
@@ -403,16 +415,20 @@ describe('the signal contract', () => {
       expect(leaders).toStrictEqual(['Ada', 'Grace']);
     });
 
-    it('with `() => false`, calls a subscriber on every write of an object changed in place', () => {
+    it.each([
+      ['false', false],
+      ['() => false', (): boolean => false],
+    ] as const)('with `%s`, calls a subscriber on every write of an object changed in place', (_name, equals) => {
       const garage = { cars: ['Volvo'] };
-      const state = signal(garage, { equals: () => false });
+      const state = signal(garage, { equals });
       const counts: number[] = [];
       state.subscribe((value) => counts.push(value.cars.length));
 
       garage.cars.push('Saab');
-      state.value = garage;
+      state.set(garage);
+      state.update((current) => current);
 
-      expect(counts).toStrictEqual([1, 2]);
+      expect(counts).toStrictEqual([1, 2, 2]);
     });
   });
 });

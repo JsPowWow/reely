@@ -118,7 +118,7 @@ Effects run synchronously. A write of an equal value (`Object.is`, or the `equal
 import { signal } from '@reely/dommy';
 
 const garage = { cars: ['Volvo'] };
-const state = signal(garage, { equals: () => false }); // changed in place: every write notifies
+const state = signal(garage, { equals: false }); // changed in place: every write notifies
 garage.cars.push('Saab');
 state.value = garage;
 

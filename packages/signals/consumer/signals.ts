@@ -27,7 +27,7 @@ dispose();
 lap.set(9);
 
 const garage = { cars: ['Volvo'] };
-const always: SignalOptions<typeof garage> = { equals: () => false };
+const always: SignalOptions<typeof garage> = { equals: false };
 const state = signal(garage, always);
 const counts: number[] = [];
 effect(() => {

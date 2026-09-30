@@ -36,7 +36,7 @@ Effects run synchronously, and a computed recomputes only when it is read after 
 import { signal } from '@reely/signals';
 
 const garage = { cars: ['Volvo'] };
-const state = signal(garage, { equals: () => false }); // changed in place: every write notifies
+const state = signal(garage, { equals: false }); // changed in place: every write notifies
 garage.cars.push('Saab');
 state.value = garage;
 
