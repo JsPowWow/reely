@@ -12,6 +12,15 @@ The repo exists for `@reely/dommy` and the small `@reely/*` helpers it stands on
 - **Mature:** what exists is production-grade — types that work for a consumer, behaviour covered by tests, no leaks, predictable timing, correct and safe DOM, documented public API, tree-shakeable.
 - A capability the real consumer (JsPowWow/ai-race) needs is built fully or not at all. Touching code leaves it smaller and sturdier: improve it along the way, test real behaviour and bugs rather than trivia.
 
+## Principle: clean architecture, low coupling, high cohesion
+
+Every new module, fix and refactor follows these; a fix that has to cross a boundary means the code sits in the wrong place — move the code, keep the rule.
+
+- **Dependencies point inward**, toward the general and stable: `basics`/`utils` ← signals (the reactive core) ← DOM binding ← flow components and JSX ← kit ← apps. An inner layer never imports an outer one; the reactive core knows nothing of the DOM.
+- **The outside world stays at the edge:** DOM, storage, clock, network are reached through thin adapters or taken as parameters, so the logic inside runs and is tested without them.
+- **High cohesion:** a file, folder or package holds what changes together for one reason and is named after it; one that changes for several reasons is split.
+- **Low coupling:** modules meet at a small typed interface — no reaching into another module's internals, no shared mutable state between modules, no cycles.
+
 ## Layout
 
 - `packages/basics` — `@reely/basics`, published (`scope:shared`): production-grade helpers promoted from utils (`forEachSettled`, `reportUncaught`, `hasSome`, `isSomeFunction`, `isPlainObject`).
@@ -39,7 +48,7 @@ Always through Nx (caching, `^build` deps): `npx nx test dommy`, `npx nx lint do
 
 - Conventional Commits with the Nx project as scope, checked by commitlint + husky: `feat(dommy): add \`For\` with keyed reorder`, `fix(utils): …`, `chore(source): …`. Identifiers in backticks. Linear history on `main`, no merge commits.
 - The course (`apps/free-dom`) is built by Netlify itself (site `reely-free-dom`, repo linked through the Netlify GitHub App): `main` → https://reely-free-dom.netlify.app, every PR → a deploy preview. Build settings live in Netlify (package directory `apps/free-dom`, `npx nx build free-dom`, publish `apps/free-dom/dist`); the SPA redirect lives in `apps/free-dom/netlify.toml`.
-- Release — only with the author: on `main`, `npx nx release version --projects <names>` (versions from Conventional Commits, or an explicit one: `npx nx release version 0.2.0-next.0 --projects @reely/dommy` for a pre-release) makes a release commit and tags `release/{projectName}/{version}`; `git push --atomic origin main --follow-tags` then lets `.github/workflows/publish.yml` check and publish, through npm trusted publishing, every package whose version on main is tagged and not yet on npm, a pre-release to dist-tag `next`; after a failed run, fix and push, or run the workflow by hand. A new package is first published by the author, before that push, and trusted with `npm trust github <package> --file publish.yml --repo JsPowWow/reely`. The default npm registry on the author's machine is a corporate one — **publish only to `https://registry.npmjs.org`**.
+- Release — only with the author: on `main`, `npx nx release version --projects <names>` (versions from Conventional Commits, or an explicit one: `npx nx release version 0.2.0 --projects @reely/dommy`; plain versions only, no pre-releases) makes a release commit and tags `release/{projectName}/{version}`; `git push --atomic origin main --follow-tags` then lets `.github/workflows/publish.yml` check and publish, through npm trusted publishing, every package whose version on main is tagged and not yet on npm, to dist-tag `latest`; after a failed run, fix and push, or run the workflow by hand. A new package is first published by the author, before that push, and trusted with `npm trust github <package> --file publish.yml --repo JsPowWow/reely`. The default npm registry on the author's machine is a corporate one — **publish only to `https://registry.npmjs.org`**.
 
 Area rules — `.claude/rules/*.md` (loaded by path).
 

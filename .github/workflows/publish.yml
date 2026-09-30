@@ -17,30 +17,23 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       all: ${{ steps.tags.outputs.all }}
-      latest: ${{ steps.tags.outputs.latest }}
-      next: ${{ steps.tags.outputs.next }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # a pre-release version (`0.1.0-next.3`) goes to the `next` dist-tag, any other to `latest`
       - name: Read unpublished release tags
         id: tags
         run: |
-          latest=()
-          next=()
+          all=()
           for manifest in packages/*/package.json; do
             read -r name version private < <(node -p "const m = require('./$manifest'); [m.name, m.version, !!m.private].join(' ')")
             [[ "$private" == true ]] && continue
             git rev-parse -q --verify "refs/tags/release/$name/$version" >/dev/null || continue
             [[ -n "$(npm view "$name@$version" version --registry https://registry.npmjs.org 2>/dev/null)" ]] && continue
-            if [[ "$version" == *-* ]]; then next+=("$name"); else latest+=("$name"); fi
+            all+=("$name")
           done
-          all=("${latest[@]}" "${next[@]}")
-          echo "latest=$(IFS=,; echo "${latest[*]}")" >> "$GITHUB_OUTPUT"
-          echo "next=$(IFS=,; echo "${next[*]}")" >> "$GITHUB_OUTPUT"
           echo "all=$(IFS=,; echo "${all[*]}")" >> "$GITHUB_OUTPUT"
           echo "to publish: ${all[*]:-none}"
 
@@ -78,11 +71,8 @@ jobs:
 
       # npm trusts this workflow (`npm trust github <package> --file publish.yml`) and adds provenance itself
       - name: Publish packages
-        run: |
-          if [[ -n "$LATEST" ]]; then npx nx release publish --projects "$LATEST" --tag latest --verbose; fi
-          if [[ -n "$NEXT" ]]; then npx nx release publish --projects "$NEXT" --tag next --verbose; fi
+        run: npx nx release publish --projects "$ALL" --tag latest --verbose
         env:
-          LATEST: ${{ needs.released.outputs.latest }}
-          NEXT: ${{ needs.released.outputs.next }}
+          ALL: ${{ needs.released.outputs.all }}
           NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
           NPM_CONFIG_PROVENANCE: true
