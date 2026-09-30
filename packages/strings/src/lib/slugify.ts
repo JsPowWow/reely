@@ -1,7 +1,8 @@
-import { validateType } from '@reely/utils';
+import { isString } from '@reely/basics';
 
+/** A lowercase, hyphen-separated form of `text` for a URL: drops what is not a letter, digit, space, `_` or `-`. */
 export function slugify(text: string): string {
-  if (!validateType(text, 'string')) {
+  if (!isString(text)) {
     throw new TypeError('Input must be a string');
   }
 

@@ -1,0 +1,14 @@
+[
+  {
+    "name": "capitalize alone",
+    "code": "import { capitalize } from '@reely/strings'; console.log(capitalize('ada'));",
+    "absent": ["slugify"],
+    "once": ["capitalize", "isString"]
+  },
+  {
+    "name": "isString shared with @reely/basics",
+    "code": "import { isString } from '@reely/basics'; import { slugify } from '@reely/strings'; console.log(isString(1), slugify('A b'));",
+    "absent": ["capitalize"],
+    "once": ["slugify", "isString"]
+  }
+]

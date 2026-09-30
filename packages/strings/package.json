@@ -24,12 +24,13 @@
     "dist",
     "!**/*.tsbuildinfo"
   ],
+  "sideEffects": false,
   "dependencies": {
+    "@reely/basics": "*",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "vite": "^7.0.0",
-    "@reely/utils": "*"
+    "vite": "^7.0.0"
   },
   "nx": {
     "tags": [
@@ -43,6 +44,17 @@
       "build": {
         "dependsOn": [
           "build-base"
+        ]
+      },
+      "consumer": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "node ../../scripts/consumer-check.mjs",
+          "cwd": "packages/strings"
+        },
+        "dependsOn": [
+          "build",
+          "^build"
         ]
       }
     }

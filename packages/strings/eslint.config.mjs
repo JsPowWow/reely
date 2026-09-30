@@ -18,9 +18,12 @@ export default [
         'error',
         {
           ignoredFiles: ['{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}'],
-          ignoredDependencies: ['@reely/utils'],
         },
       ],
     },
+  },
+  {
+    // checked by scripts/consumer-check.mjs
+    ignores: ['consumer'],
   },
 ];
