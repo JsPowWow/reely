@@ -1,6 +1,8 @@
 {
   "name": "@reely/async",
   "version": "0.0.7",
+  "description": "Retry an async task with exponential backoff, one task or several at once.",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -24,12 +26,26 @@
     "dist",
     "!**/*.tsbuildinfo"
   ],
+  "sideEffects": false,
   "dependencies": {
     "tslib": "^2.3.0"
   },
   "nx": {
     "tags": [
       "scope:async"
-    ]
+    ],
+    "targets": {
+      "consumer": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "node ../../scripts/consumer-check.mjs",
+          "cwd": "packages/async"
+        },
+        "dependsOn": [
+          "build",
+          "^build"
+        ]
+      }
+    }
   }
 }
