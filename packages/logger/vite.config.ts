@@ -1,10 +1,34 @@
 /// <reference types='vitest' />
+import { resolve } from 'path';
+
 import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/packages/logger',
-  plugins: [],
+  plugins: [
+    dts({
+      entryRoot: 'src',
+      tsconfigPath: './tsconfig.lib.json',
+      rollupTypes: true,
+    }),
+  ],
+  build: {
+    lib: {
+      entry: resolve(import.meta.dirname, 'src/index.ts'),
+      fileName: (): string => 'index.js',
+      formats: ['es' as const],
+    },
+    // the app minifies; unminified, stack traces keep names
+    minify: false,
+    outDir: 'dist',
+    rolldownOptions: {
+      // shared with other `@reely` packages, so an app ships it once
+      external: ['@reely/basics'],
+    },
+    sourcemap: true,
+  },
   test: {
     name: '@reely/logger',
     watch: false,

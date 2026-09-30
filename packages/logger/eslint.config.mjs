@@ -20,6 +20,7 @@ export default [
     },
   },
   {
-    ignores: ['**/out-tsc'],
+    // checked by scripts/consumer-check.mjs
+    ignores: ['**/out-tsc', 'consumer'],
   },
 ];
