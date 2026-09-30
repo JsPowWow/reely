@@ -8,6 +8,8 @@ import {
   isValidHex,
   isValidRgb,
   getContrastRatio,
+  mix,
+  parseColor,
   randomHex,
   rgbToHsl,
 } from './colors.js';
@@ -69,14 +71,62 @@ describe('colors', () => {
       expect(rgbToHex(15, 15, 15)).toBe('#0f0f0f');
     });
 
-    it('should throw error for invalid RGB values', () => {
-      expect(() => rgbToHex(256, 0, 0)).toThrow('Invalid RGB values');
-      expect(() => rgbToHex(-1, 0, 0)).toThrow('Invalid RGB values');
-      expect(() => rgbToHex(0, 0, 256)).toThrow('Invalid RGB values');
-      expect(() => rgbToHex(1.5, 0, 0)).toThrow('Invalid RGB values');
-      expect(() => rgbToHex({ r: 256, g: 0, b: 0 })).toThrow(
-        'Invalid RGB values'
-      );
+    it('rounds a fractional channel, as mixing two colours gives', () => {
+      expect(rgbToHex(127.5, 0, 0)).toBe('#800000');
+      expect(rgbToHex({ r: 1.6, g: 0, b: 0 })).toBe('#020000');
+    });
+
+    it('throws for a channel outside 0–255, and says so', () => {
+      const message = 'Each RGB channel must be a number from 0 to 255';
+      expect(() => rgbToHex(256, 0, 0)).toThrow(message);
+      expect(() => rgbToHex(-1, 0, 0)).toThrow(message);
+      expect(() => rgbToHex(0, 0, Number.NaN)).toThrow(message);
+      expect(() => rgbToHex({ r: 256, g: 0, b: 0 })).toThrow(message);
+    });
+  });
+
+  describe('parseColor', () => {
+    it('reads hex and the rgb() a computed style returns', () => {
+      expect(parseColor('#abc')).toEqual({ r: 170, g: 187, b: 204 });
+      expect(parseColor('#2563eb')).toEqual({ r: 37, g: 99, b: 235 });
+      expect(parseColor('rgb(37, 99, 235)')).toEqual({ r: 37, g: 99, b: 235 });
+      expect(parseColor('rgb(37 99 235)')).toEqual({ r: 37, g: 99, b: 235 });
+    });
+
+    it('reads rgba() and drops its alpha', () => {
+      expect(parseColor('rgba(37, 99, 235, 0.5)')).toEqual({ r: 37, g: 99, b: 235 });
+      expect(parseColor('rgb(37 99 235 / 50%)')).toEqual({ r: 37, g: 99, b: 235 });
+    });
+
+    it('throws for what it cannot read', () => {
+      expect(() => parseColor('red')).toThrow('Invalid color: red');
+      expect(() => parseColor('rgb(300, 0, 0)')).toThrow('Invalid color');
+      expect(() => parseColor('rgb(1, 2)')).toThrow('Invalid color');
+    });
+  });
+
+  describe('mix', () => {
+    it('blends two colours halfway by default', () => {
+      expect(mix('#000000', '#ffffff')).toBe('#808080');
+      expect(mix('#ff0000', 'rgb(0 0 255)')).toBe('#800080');
+    });
+
+    it('moves from the first colour to the second as the weight goes from 0 to 1', () => {
+      expect(mix('#ff0000', '#0000ff', 0)).toBe('#ff0000');
+      expect(mix('#ff0000', '#0000ff', 0.25)).toBe('#bf0040');
+      expect(mix('#ff0000', '#0000ff', 1)).toBe('#0000ff');
+    });
+
+    it('throws for a weight outside 0–1', () => {
+      expect(() => mix('#000', '#fff', 1.5)).toThrow('The weight must be from 0 to 1');
+    });
+  });
+
+  describe('randomHex', () => {
+    it('draws from the given source of randomness, so a seeded one repeats', () => {
+      expect(randomHex(() => 0)).toBe('#000000');
+      expect(randomHex(() => 0.999)).toBe('#ffffff');
+      expect(randomHex()).toMatch(/^#[0-9a-f]{6}$/);
     });
   });
 

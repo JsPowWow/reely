@@ -1,6 +1,6 @@
 # @reely/colors
 
-Convert, lighten and darken hex colours, and check the contrast between two.
+Convert, mix, lighten and darken colours, and check the contrast between two.
 
 ```sh
 npm i @reely/colors
@@ -31,4 +31,18 @@ rgbToHsl({ r: 37, g: 99, b: 235 }); // { h, s, l }
 isValidHex(userInput); // before converting what a colour picker or a URL gave you
 ```
 
-An invalid hex or an RGB channel outside 0–255 throws an `Error`.
+## Mixing, and colours from CSS
+
+```ts
+import { mix, parseColor, randomHex } from '@reely/colors';
+
+// a palette read from CSS comes back as `rgb(r g b)`, not hex
+const cold = getComputedStyle(board).getPropertyValue('--cold'); // 'rgb(37 99 235)'
+const heat = mix(cold, '#d64545', 0.3); // 30% of the way from cold to hot, as '#rrggbb'
+
+mix('#2563eb', '#facc15'); // halfway by default
+parseColor('rgba(37, 99, 235, 0.5)'); // { r: 37, g: 99, b: 235 }: alpha is dropped
+randomHex(seeded); // any `() => number` in [0, 1): a seeded one gives the same colour every run
+```
+
+`rgbToHex` rounds each channel, so the fractions a mix produces are fine. An invalid hex or colour, an RGB channel outside 0–255, or a weight outside 0–1 throws an `Error`.

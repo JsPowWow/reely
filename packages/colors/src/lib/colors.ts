@@ -31,34 +31,55 @@ export function hexToRgb(hex: string): RgbColor {
     };
 }
 
-/** Lowercase `#rrggbb`; throws unless each channel is an integer from 0 to 255. */
+const isChannel = (n: number): boolean => Number.isFinite(n) && n >= 0 && n <= 255;
+
+/** Lowercase `#rrggbb`, each channel rounded; throws unless each channel is a number from 0 to 255. */
 export function rgbToHex(r: number, g: number, b: number): string;
 export function rgbToHex(rgb: RgbColor): string;
 export function rgbToHex(
     rOrRgb: number | RgbColor,
-    g?: number,
-    b?: number
+    g = Number.NaN,
+    b = Number.NaN
 ): string {
-    let r: number;
+    const channels = typeof rOrRgb === 'object' ? [rOrRgb.r, rOrRgb.g, rOrRgb.b] : [rOrRgb, g, b];
 
-    if (typeof rOrRgb === 'object') {
-        ({ r, g, b } = rOrRgb);
-    } else {
-        r = rOrRgb;
-        g = g!;
-        b = b!;
+    if (!channels.every(isChannel)) {
+        throw new Error('Each RGB channel must be a number from 0 to 255');
     }
 
-    if (!isValidRgb(r, g, b)) {
-        throw new Error('Invalid RGB values. Must be between 0-255');
+    return `#${channels.map((n) => Math.round(n).toString(16).padStart(2, '0')).join('')}`;
+}
+
+const rgbFunction = /^rgba?\(([^)]*)\)$/i;
+
+/** Reads `#rgb`, `#rrggbb`, and `rgb()`/`rgba()` with commas or spaces, as a computed style gives them; alpha is dropped. Throws on anything else. */
+export function parseColor(css: string): RgbColor {
+    if (hexPattern.test(css)) {
+        return hexToRgb(css);
     }
 
-    const toHex = (n: number): string => {
-        const hex = n.toString(16);
-        return hex.length === 1 ? '0' + hex : hex;
-    };
+    // r, g and b, then an optional alpha, split by commas, spaces or the `/` before the alpha
+    const parts = rgbFunction.exec(css.trim())?.[1].split(/[\s,/]+/).filter(Boolean) ?? [];
+    const [r, g, b] = parts.slice(0, 3).map(Number);
 
-    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    if ((parts.length !== 3 && parts.length !== 4) || ![r, g, b].every(isChannel)) {
+        throw new Error(`Invalid color: ${css}`);
+    }
+
+    return { r, g, b };
+}
+
+/** The colour `weight` of the way from `from` to `to` (0 gives `from`, 1 gives `to`), as `#rrggbb`; either colour as `parseColor` reads it. */
+export function mix(from: string, to: string, weight = 0.5): string {
+    if (!(weight >= 0 && weight <= 1)) {
+        throw new Error('The weight must be from 0 to 1');
+    }
+
+    const a = parseColor(from);
+    const b = parseColor(to);
+    const blend = (x: number, y: number): number => x + (y - x) * weight;
+
+    return rgbToHex(blend(a.r, b.r), blend(a.g, b.g), blend(a.b, b.b));
 }
 
 /** Moves each channel toward 0 by `percent` (0–100). */
@@ -99,9 +120,11 @@ export function lighten(color: string, percent: number): string {
     );
 }
 
+const hexPattern = /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+
 export function isValidHex(color: unknown): color is string {
     if (typeof color !== 'string') return false;
-    return /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
+    return hexPattern.test(color);
 }
 
 /** Whether each channel is an integer from 0 to 255. */
@@ -152,9 +175,10 @@ export function getContrastRatio(color1: string, color2: string): number {
     return (lighter + 0.05) / (darker + 0.05);
 }
 
-export function randomHex(): string {
-    const random = (): number => Math.floor(Math.random() * 256);
-    return rgbToHex(random(), random(), random());
+/** A random `#rrggbb`; pass a seeded `random` (values in [0, 1)) for a colour that repeats. */
+export function randomHex(random: () => number = Math.random): string {
+    const channel = (): number => Math.floor(random() * 256);
+    return rgbToHex(channel(), channel(), channel());
 }
 
 /** Hue in degrees, saturation and lightness in percent, rounded. */
@@ -162,8 +186,8 @@ export function rgbToHsl(r: number, g: number, b: number): HslColor;
 export function rgbToHsl(rgb: RgbColor): HslColor;
 export function rgbToHsl(
     rOrRgb: number | RgbColor,
-    g?: number,
-    b?: number
+    g = Number.NaN,
+    b = Number.NaN
 ): HslColor {
     let r: number;
 
@@ -171,8 +195,6 @@ export function rgbToHsl(
         ({ r, g, b } = rOrRgb);
     } else {
         r = rOrRgb;
-        g = g!;
-        b = b!;
     }
 
     r /= 255;
