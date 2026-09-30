@@ -1,5 +1,6 @@
 import nx from '@nx/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
+import sonarjs from 'eslint-plugin-sonarjs';
 
 export default [
   ...nx.configs['flat/base'],
@@ -8,6 +9,19 @@ export default [
   // https://github.com/import-js/eslint-plugin-import/
   importPlugin.flatConfigs.recommended,
   importPlugin.flatConfigs.typescript,
+  // the rules SonarQube for IDE shows, checked in lint and CI as well
+  sonarjs.configs.recommended,
+  {
+    rules: {
+      // randomness here drives games and colours, never security
+      'sonarjs/pseudo-random': 'off',
+      // `void` marks a deliberate floating promise or a read done for its side effect (a forced layout)
+      'sonarjs/void-use': 'off',
+      // @typescript-eslint/no-unused-vars covers it, and knows the `_ignored` rest-destructuring convention
+      'sonarjs/no-unused-vars': 'off',
+      'sonarjs/todo-tag': 'warn',
+    },
+  },
   {
     ignores: ['**/dist', '**/build', '**/out-tsc', '**/labs-ignore', '**/vite.config.*.timestamp*', '**/vitest.config.*.timestamp*'],
   },
