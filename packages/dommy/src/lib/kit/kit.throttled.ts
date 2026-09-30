@@ -1,10 +1,8 @@
 import { hasSome } from '@reely/basics';
+import { computed, effect, onCleanup, signal, untracked } from '@reely/signals';
+import type { Computed } from '@reely/signals';
 import type { Nullable } from '@reely/utils';
 
-import { onCleanup } from '../reactive/owner';
-import { computed, effect, signal, untracked } from '../reactive/preact-like/preact-like.signal';
-
-import type { Computed } from '../reactive/preact-like/preact-like.signal';
 import type { ReactiveValue } from '../types/dommy.types';
 
 /**

@@ -1,8 +1,8 @@
 // The core's own contract, beside the public one: tests that need its internal hooks.
 import { noop } from '@reely/utils';
 
-import { reelxDebug } from './reelx.core';
-import { batch, computed, effect, signal } from '../preact-like/preact-like.signal';
+import { subscriberCount } from './reelx.core';
+import { batch, computed, effect, signal } from './signal';
 
 describe('the signal core', () => {
   it('reads a derived value after a write', () => {
@@ -77,17 +77,17 @@ describe('the signal core', () => {
       }
     });
 
-    expect(reelxDebug(a).subscriberCount()).toBe(1);
+    expect(subscriberCount(a)).toBe(1);
   });
 
   it('drops a dependency a reader no longer reads', () => {
     const a = signal(0);
     const b = signal(0);
     effect(() => void (b() || a()));
-    expect(reelxDebug(a).subscriberCount()).toBe(1);
+    expect(subscriberCount(a)).toBe(1);
 
     b.set(123);
 
-    expect(reelxDebug(a).subscriberCount()).toBe(0);
+    expect(subscriberCount(a)).toBe(0);
   });
 });

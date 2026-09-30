@@ -26,11 +26,19 @@ try {
       .split('\n')
       .at(-1);
   const tarball = pack(packageDir);
-  // the published @reely packages dommy depends on; none of them depends on another yet
-  const { dependencies = {} } = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8'));
-  const dependencyTarballs = Object.keys(dependencies)
-    .filter((name) => name.startsWith('@reely/'))
-    .map((name) => `./${pack(resolve(packageDir, '..', name.slice('@reely/'.length)))}`);
+  // the published @reely packages dommy depends on, and theirs (signals needs basics)
+  const localDependencies = (dir, seen = new Set()) => {
+    const { dependencies = {} } = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
+    for (const name of Object.keys(dependencies).filter((dependency) => dependency.startsWith('@reely/'))) {
+      const dependencyDir = resolve(packageDir, '..', name.slice('@reely/'.length));
+      if (!seen.has(dependencyDir)) {
+        seen.add(dependencyDir);
+        localDependencies(dependencyDir, seen);
+      }
+    }
+    return seen;
+  };
+  const dependencyTarballs = [...localDependencies(packageDir)].map((dir) => `./${pack(dir)}`);
   writeFileSync(join(work, 'package.json'), JSON.stringify({ name: 'consumer', private: true, type: 'module' }));
   cpSync(join(here, 'src'), join(work, 'src'), { recursive: true });
   cpSync(join(here, 'tsconfig.json'), join(work, 'tsconfig.json'));

@@ -1,12 +1,14 @@
 import { noop, setPrototype } from '@reely/utils';
 
-import { getOwner, withOwner } from '../owner';
-import * as reelx from '../reelx/reelx.core';
+import { getOwner, withOwner } from './owner';
+import * as reelx from './reelx.core';
 
-import type { Reader } from '../reelx/reelx.core';
+import type { ReactiveValue } from './reelx.core';
+
+export { batch, untracked, type ReactiveValue } from './reelx.core';
 
 interface Subscribable<T> {
-  subscribe(cb: (value: T, prevValue?: T) => void): VoidFunction;
+  subscribe(cb: (value: T, prevValue?: T) => void): () => void;
 }
 
 export interface Signal<T> extends Subscribable<T> {
@@ -28,7 +30,7 @@ export interface Computed<T> extends Subscribable<T> {
   peek(): T;
 }
 
-/** A value that bindings, effects and computeds re-read when it is written; a function is held as a value too. */
+/** A value that effects and computeds re-read when it is written; a function is held as a value too. */
 export const signal = <T>(init: T): Signal<T> => setPrototype<Signal<T>>(signalProto, reelx.signal(init));
 
 /**
@@ -37,23 +39,17 @@ export const signal = <T>(init: T): Signal<T> => setPrototype<Signal<T>>(signalP
  */
 export const computed = <T>(fn: () => T): Computed<T> => setPrototype<Computed<T>>(computedProto, reelx.computed(fn));
 
-/** Groups writes: effects and bindings run once, when the outermost `batch` ends. */
-export const batch = <T>(fn: () => T): T => reelx.batch(fn);
-
-/** Runs `fn` without subscribing the running effect or computed to the signals it reads. */
-export const untracked = <T>(fn: () => T): T => reelx.untracked(fn);
-
 /**
  * Runs `fn` now and after every change of what it reads; what a run registers is released before
  * the next one. Returns `dispose`, also reachable as `this.dispose()` inside `fn`.
  */
-export const effect = (fn: VoidFunction): VoidFunction => {
+export const effect = (fn: () => void): (() => void) => {
   const parent = getOwner();
-  let disposeRun: VoidFunction = noop;
+  let disposeRun: () => void = noop;
   let running = false;
   let disposed = false;
-  let unsubscribe: VoidFunction = noop;
-  let body: VoidFunction = noop;
+  let unsubscribe: () => void = noop;
+  let body: () => void = noop;
 
   // cleanups read and write signals like any code outside the effect: untracked, in one batch
   const releaseRun = (): void => {
@@ -121,14 +117,14 @@ export const effect = (fn: VoidFunction): VoidFunction => {
   return dispose;
 };
 
-const computedProto: ThisType<Reader<unknown>> = {
+const computedProto: ThisType<ReactiveValue<unknown>> = {
   get value(): unknown {
     return this();
   },
   peek(): unknown {
     return reelx.untracked(this);
   },
-  subscribe(cb: (value: unknown, prevValue?: unknown) => void): VoidFunction {
+  subscribe(cb: (value: unknown, prevValue?: unknown) => void): () => void {
     return reelx.subscribe(this, cb);
   },
   toString(): string {
@@ -142,7 +138,9 @@ const computedProto: ThisType<Reader<unknown>> = {
   },
 };
 
-const signalMembers: ThisType<Reader<unknown>> = {
+// `__proto__` in a literal, not a call, so importing the module runs no code
+const signalProto: ThisType<ReactiveValue<unknown>> = {
+  __proto__: computedProto,
   get value(): unknown {
     return this();
   },
@@ -156,5 +154,3 @@ const signalMembers: ThisType<Reader<unknown>> = {
     reelx.write(this, fn(reelx.untracked(this)));
   },
 };
-
-const signalProto = setPrototype(computedProto, signalMembers);

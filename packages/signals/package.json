@@ -1,7 +1,7 @@
 {
-  "name": "@reely/dommy",
+  "name": "@reely/signals",
   "version": "0.1.0",
-  "description": "DOM elements from tag factories and JSX, bound to signals: no virtual DOM, one DOM node updated per change.",
+  "description": "Signals, computed values and effects: a push-pull graph with owners that release what a piece of work subscribed. No DOM.",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -22,25 +22,10 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./jsx-runtime": {
-      "types": "./dist/jsx-runtime.d.ts",
-      "import": "./dist/jsx-runtime.js",
-      "default": "./dist/jsx-runtime.js"
-    },
-    "./jsx-dev-runtime": {
-      "types": "./dist/jsx-runtime.d.ts",
-      "import": "./dist/jsx-runtime.js",
-      "default": "./dist/jsx-runtime.js"
-    },
-    "./router": {
-      "types": "./dist/router.d.ts",
-      "import": "./dist/router.js",
-      "default": "./dist/router.js"
-    },
-    "./kit": {
-      "types": "./dist/kit.d.ts",
-      "import": "./dist/kit.js",
-      "default": "./dist/kit.js"
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "import": "./dist/testing.js",
+      "default": "./dist/testing.js"
     }
   },
   "files": [
@@ -49,16 +34,16 @@
   ],
   "nx": {
     "tags": [
-      "scope:dommy"
+      "scope:shared"
     ],
     "projectType": "library",
-    "sourceRoot": "packages/dommy/src",
+    "sourceRoot": "packages/signals/src",
     "targets": {
       "build": {
         "executor": "nx:run-commands",
         "options": {
           "command": "vite build",
-          "cwd": "packages/dommy"
+          "cwd": "packages/signals"
         },
         "dependsOn": [
           "^build"
@@ -70,21 +55,20 @@
       "consumer": {
         "executor": "nx:run-commands",
         "options": {
-          "command": "node consumer/check.mjs",
-          "cwd": "packages/dommy"
+          "command": "node ../../scripts/consumer-check.mjs",
+          "cwd": "packages/signals"
         },
         "dependsOn": [
-          "build"
+          "build",
+          "^build"
         ]
       }
     }
   },
   "devDependencies": {
-    "@reely/logger": "*",
     "@reely/utils": "*"
   },
   "dependencies": {
-    "@reely/basics": "^0.1.0",
-    "@reely/signals": "^0.1.0"
+    "@reely/basics": "^0.1.0"
   }
 }

@@ -1,8 +1,8 @@
 // What reely's signals guarantee beyond the tests ported from Preact: the contract any core under them keeps.
 import { noop } from '@reely/utils';
 
-import { batch, computed, effect, signal, untracked } from './preact-like.signal';
-import { reelxDebug } from '../reelx/reelx.core';
+import { subscriberCount } from './reelx.core';
+import { batch, computed, effect, signal, untracked } from './signal';
 
 describe('the signal contract', () => {
   it('runs the effects of a signal in the order they were created', () => {
@@ -71,9 +71,11 @@ describe('the signal contract', () => {
       ping.value = pong.value + 1;
     });
 
-    expect(() => effect(() => {
-      pong.value = ping.value + 1;
-    })).toThrow(/cycle/);
+    expect(() =>
+      effect(() => {
+        pong.value = ping.value + 1;
+      })
+    ).toThrow(/cycle/);
     stopPing();
 
     const lap = signal(0);
@@ -91,9 +93,11 @@ describe('the signal contract', () => {
       ping.value = pong.value + other.value + 1;
     });
     effect(spy);
-    expect(() => effect(() => {
-      pong.value = ping.value + 1;
-    })).toThrow(/cycle/);
+    expect(() =>
+      effect(() => {
+        pong.value = ping.value + 1;
+      })
+    ).toThrow(/cycle/);
     const runs = spy.mock.calls.length;
 
     other.value = 99;
@@ -183,11 +187,7 @@ describe('the signal contract', () => {
 
     stop();
 
-    expect([
-      reelxDebug(lap).subscriberCount(),
-      reelxDebug(double).subscriberCount(),
-      reelxDebug(label).subscriberCount(),
-    ]).toStrictEqual([0, 0, 0]);
+    expect([subscriberCount(lap), subscriberCount(double), subscriberCount(label)]).toStrictEqual([0, 0, 0]);
   });
 
   it('releases a signal read through a computed that a subscriber and an effect share, once both are gone', () => {
@@ -201,7 +201,7 @@ describe('the signal contract', () => {
     stop();
     unsubscribe();
 
-    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+    expect(subscriberCount(lap)).toBe(0);
   });
 
   it('subscribes an effect to a computed it peeked before reading', () => {
@@ -299,13 +299,15 @@ describe('the signal contract', () => {
     const stop = effect(() => {
       ping.value = pong.value + 1;
     });
-    expect(() => effect(() => {
-      pong.value = ping.value + 1;
-    })).toThrow(/cycle/);
+    expect(() =>
+      effect(() => {
+        pong.value = ping.value + 1;
+      })
+    ).toThrow(/cycle/);
 
     stop();
 
-    expect([reelxDebug(ping).subscriberCount(), reelxDebug(pong).subscriberCount()]).toStrictEqual([0, 0]);
+    expect([subscriberCount(ping), subscriberCount(pong)]).toStrictEqual([0, 0]);
   });
 
   it('runs an effect once per write and once per batch', () => {

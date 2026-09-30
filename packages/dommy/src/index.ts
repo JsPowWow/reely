@@ -1,7 +1,6 @@
 export { defineDommyConfig } from './lib/config';
 export { createElement } from './lib/createElement';
 export { mount } from './lib/mount';
-export { onCleanup } from './lib/reactive/owner';
 export { For, type ForProps } from './lib/flow.for';
 export { Show, type ShowProps } from './lib/flow.show';
 export { Await, type AwaitProps } from './lib/flow.await';
@@ -28,5 +27,6 @@ export {
   effect,
   batch,
   untracked,
-} from './lib/reactive/preact-like/preact-like.signal';
+  onCleanup,
+} from '@reely/signals';
 

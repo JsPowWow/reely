@@ -1,5 +1,6 @@
+import { subscriberCount } from '@reely/signals/testing';
+
 import { effect, mount, Show, signal } from '../index';
-import { reelxDebug } from './reactive/reelx/reelx.core';
 
 describe('Show', () => {
   it('renders the children while `when` is truthy and the fallback otherwise', () => {
@@ -51,12 +52,12 @@ describe('Show', () => {
     ));
 
     shown.value = false;
-    const afterSwitch = reelxDebug(lap).subscriberCount();
+    const afterSwitch = subscriberCount(lap);
     dispose();
 
     expect(afterSwitch).toBe(1);
-    expect(reelxDebug(lap).subscriberCount()).toBe(0);
-    expect(reelxDebug(shown).subscriberCount()).toBe(0);
+    expect(subscriberCount(lap)).toBe(0);
+    expect(subscriberCount(shown)).toBe(0);
   });
 
   it('releases what a branch created when its render throws', () => {
@@ -72,7 +73,7 @@ describe('Show', () => {
     ));
 
     expect(() => (shown.value = true)).toThrow('broken branch');
-    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+    expect(subscriberCount(lap)).toBe(0);
   });
 
   it('does not subscribe the condition to what a branch reads while it is built', () => {
@@ -89,7 +90,7 @@ describe('Show', () => {
     lap.value = 2;
 
     expect(renders).toHaveBeenCalledOnce();
-    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+    expect(subscriberCount(lap)).toBe(0);
   });
 });
 

@@ -1,4 +1,4 @@
-import { onCleanup } from '../reactive/owner';
+import { onCleanup } from '@reely/signals';
 
 /**
  * Runs `fn` once after `ms`, unless its owner is disposed first; returns the cancel. With `ms` of 0

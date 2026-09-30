@@ -1,6 +1,7 @@
 ---
 paths:
   - "packages/dommy/**"
+  - "packages/signals/**"
   - "apps/free-dom/**"
 ---
 # @reely/dommy
@@ -8,7 +9,7 @@ paths:
 Signals bound to the DOM (point updates, no virtual DOM), owner/`dispose`, flow components, automatic JSX runtime; released on npm (0.1.0, JsPowWow/reely#1). First real consumer — JsPowWow/ai-race (a race scoreboard with split-flap letters: frequent point updates, row reordering); its needs drive what comes next.
 
 ## Minimal, yet mature (the repo principle in `CLAUDE.md`, applied to dommy)
-- The public surface stays small: tag factories, `createElement`, JSX runtime, signals (`signal`/`computed`/`effect`/`batch`), `For`/`Show`/`Keyed`/`Await`, owner/`dispose`. A new export earns its place by serving ai-race; otherwise it composes from these.
+- The public surface stays small: tag factories, `createElement`, JSX runtime, signals (`signal`/`computed`/`effect`/`batch`), `For`/`Show`/`Keyed`/`Await`, owner/`dispose`. The signals and the owner live in `@reely/signals` (no DOM, lib es2024) and dommy re-exports them; dommy binds them, never the other way round. A new export earns its place by serving ai-race; otherwise it composes from these.
 - One reactive model: any function in a prop (other than `on*`) or a child is a reactive value, bound as a new pipe step. No second mechanism beside it.
 - A signal has two access styles, both first-class: Preact's `.value` and Angular's `laps()` / `set` / `update`. They mix freely (a deliberate exception to "one way to do a thing", the author's choice); tests cover both.
 - One render type: `children` and component results are `ReelyNode`; a JSX expression is always a `Node` (`toNode` puts the rest into a fragment). A component that returns a tag declares `(): Node`, any other declares `(): ReelyNode`. Terms — `packages/dommy/CONTEXT.md`.

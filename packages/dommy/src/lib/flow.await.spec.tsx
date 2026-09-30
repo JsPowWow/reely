@@ -1,5 +1,6 @@
+import { subscriberCount } from '@reely/signals/testing';
+
 import { Await, For, mount, signal } from '../index';
-import { reelxDebug } from './reactive/reelx/reelx.core';
 
 import type { AwaitProps } from '../index';
 
@@ -216,7 +217,7 @@ describe('Await', () => {
         {(winner) => <p>{winner}</p>}
       </Await>
     ));
-    const whilePending = reelxDebug(tick).subscriberCount();
+    const whilePending = subscriberCount(tick);
 
     dispose();
     final.resolve('Car 7');
@@ -224,8 +225,8 @@ describe('Await', () => {
 
     expect(whilePending).toBe(1);
     expect(panel.querySelectorAll('p')).toHaveLength(0);
-    expect(reelxDebug(tick).subscriberCount()).toBe(0);
-    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+    expect(subscriberCount(tick)).toBe(0);
+    expect(subscriberCount(lap)).toBe(0);
   });
 
   it('releases the fallback bindings once the result is shown', async () => {
@@ -236,12 +237,12 @@ describe('Await', () => {
         {(winner) => <p>{winner}</p>}
       </Await>
     ));
-    const whilePending = reelxDebug(dots).subscriberCount();
+    const whilePending = subscriberCount(dots);
 
     await settle();
 
     expect(whilePending).toBe(1);
-    expect(reelxDebug(dots).subscriberCount()).toBe(0);
+    expect(subscriberCount(dots)).toBe(0);
   });
 
   it('does not subscribe the promise getter to what the fallback reads while it is built', () => {
@@ -258,7 +259,7 @@ describe('Await', () => {
     lap.value = 2;
 
     expect(load).toHaveBeenCalledTimes(2);
-    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+    expect(subscriberCount(lap)).toBe(0);
   });
 
   it('keeps each row of a list waiting on its own promise', async () => {

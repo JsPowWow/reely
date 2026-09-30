@@ -1,5 +1,6 @@
+import { subscriberCount } from '@reely/signals/testing';
+
 import { createElement, mount, signal } from '../index';
-import { reelxDebug } from './reactive/reelx/reelx.core';
 
 import type { ReelyNode } from '../index';
 
@@ -42,11 +43,11 @@ describe('a JSX expression is a node', () => {
     const parent = document.createElement('div');
 
     const dispose = mount(parent, () => <p><Label /></p>);
-    const bound = reelxDebug(count).subscriberCount();
+    const bound = subscriberCount(count);
     dispose();
 
     expect(bound).toBe(1);
-    expect(reelxDebug(count).subscriberCount()).toBe(0);
+    expect(subscriberCount(count)).toBe(0);
   });
 
   it('gives a node for a component called through `createElement`', () => {

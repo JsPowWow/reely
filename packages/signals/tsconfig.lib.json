@@ -10,26 +10,12 @@
     "types": ["node", "vite/client", "vitest/globals", "vitest/importMeta", "vitest"],
     "moduleResolution": "node",
     "module": "esnext",
-    "lib": ["es2024", "esnext.promise", "dom"],
+    "lib": ["es2024"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*.ts"],
-  "references": [
-    {
-      "path": "../signals/tsconfig.lib.json"
-    },
-    {
-      "path": "../basics/tsconfig.lib.json"
-    },
-    {
-      "path": "../utils/tsconfig.lib.json"
-    },
-    {
-      "path": "../logger/tsconfig.lib.json"
-    }
-  ],
   "exclude": [
     "vite.config.ts",
     "vite.config.mts",
@@ -43,5 +29,13 @@
     "src/**/*.spec.js",
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx"
+  ],
+  "references": [
+    {
+      "path": "../basics/tsconfig.lib.json"
+    },
+    {
+      "path": "../utils/tsconfig.lib.json"
+    }
   ]
 }

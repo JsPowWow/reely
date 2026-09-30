@@ -27,5 +27,5 @@ _Avoid_: reactive prop, effect (an effect is the general primitive)
 _Avoid_: control flow component, directive
 
 **Owner**:
-What a render registers its bindings, effects and `onCleanup` callbacks with; `dispose` releases all of them.
+The signals owner (`packages/signals/CONTEXT.md`) a render registers its bindings, effects and `onCleanup` callbacks with; `dispose` releases all of them.
 _Avoid_: scope, context

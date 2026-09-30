@@ -1,18 +1,18 @@
 import { hasSome } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
 
-/** What a rendered view must release when it goes away: subscriptions, effects and nested owners. */
+/** What a piece of work must release when it ends: its effects, cleanups and nested owners. */
 export interface Owner {
-  readonly cleanups: Set<VoidFunction>;
+  readonly cleanups: Set<() => void>;
 }
 
 let currentOwner: Nullable<Owner> = null;
 
-/** For code that renders later, such as a list adding a row, to pass to `withOwner`. */
+/** For code that runs later, such as a callback creating effects, to pass to `withOwner`. */
 export const getOwner = (): Nullable<Owner> => currentOwner;
 
-/** Registers a release in the owner of the running render; outside any owner nothing holds it. */
-export const onCleanup = (cleanup: VoidFunction): void => {
+/** Registers a release in the running owner; outside any owner nothing holds it. */
+export const onCleanup = (cleanup: () => void): void => {
   currentOwner?.cleanups.add(cleanup);
 };
 
@@ -20,7 +20,7 @@ export const onCleanup = (cleanup: VoidFunction): void => {
  * Runs `fn` under a new owner nested in `parent` and passes it `dispose`. Every cleanup runs even
  * when one throws; the first error is rethrown after all have run.
  */
-export const withOwner = <T>(fn: (dispose: VoidFunction) => T, parent: Nullable<Owner> = currentOwner): T => {
+export const withOwner = <T>(fn: (dispose: () => void) => T, parent: Nullable<Owner> = currentOwner): T => {
   const owner: Owner = { cleanups: new Set() };
   const dispose = (): void => {
     parent?.cleanups.delete(dispose);
@@ -46,7 +46,7 @@ export const withOwner = <T>(fn: (dispose: VoidFunction) => T, parent: Nullable<
   try {
     return fn(dispose);
   } catch (error) {
-    // a render that failed leaves nothing subscribed
+    // work that failed leaves nothing subscribed
     currentOwner = previous;
     dispose();
     throw error;

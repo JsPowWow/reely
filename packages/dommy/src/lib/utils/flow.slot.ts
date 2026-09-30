@@ -1,9 +1,9 @@
 import { hasSome } from '@reely/basics';
+import { getOwner, withOwner } from '@reely/signals';
 import { noop } from '@reely/utils';
 
 import { toNodes } from './element.children';
 import { createAnchors, insertBefore, rangeOf, removeNodes } from './element.range';
-import { getOwner, withOwner } from '../reactive/owner';
 
 import type { ReelyNode } from '../types/dommy.types';
 

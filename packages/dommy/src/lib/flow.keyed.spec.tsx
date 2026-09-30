@@ -1,5 +1,6 @@
+import { subscriberCount } from '@reely/signals/testing';
+
 import { Keyed, mount, signal } from '../index';
-import { reelxDebug } from './reactive/reelx/reelx.core';
 
 describe('Keyed', () => {
   it('builds the branch for the value, and anew when the value changes', () => {
@@ -53,13 +54,13 @@ describe('Keyed', () => {
     ));
 
     cars.value = [{ id: 3, name: 'Dash' }];
-    const afterSwitch = reelxDebug(gap).subscriberCount();
+    const afterSwitch = subscriberCount(gap);
     dispose();
 
     expect(afterSwitch).toBe(1);
     expect(panel.textContent).toBe('');
-    expect(reelxDebug(gap).subscriberCount()).toBe(0);
-    expect(reelxDebug(cars).subscriberCount()).toBe(0);
+    expect(subscriberCount(gap)).toBe(0);
+    expect(subscriberCount(cars)).toBe(0);
   });
 
   it('types the value its children receive', () => {

@@ -1,3 +1,4 @@
+import type { ReactiveValue } from '@reely/signals';
 import type { Nullable, ObjectReference, PrimitiveValue } from '@reely/utils';
 
 import type { DOMElementAttributes } from './attributes.types';
@@ -11,8 +12,7 @@ export type DOMElement<Tag extends HtmlElementTag> = HTMLElementTagNameMap[Tag];
 /** An element dommy creates: HTML, or SVG for SVG-only tags. */
 export type DommyElement = HTMLElement | SVGElement;
 
-/** A signal or any getter; bound props and children re-read it when the signals it reads change. */
-export type ReactiveValue<T> = () => T;
+export type { ReactiveValue } from '@reely/signals';
 
 /** A child rendered once: a node, text, a number, or nothing. */
 export type StaticReelyNode = Nullable<Node | PrimitiveValue>;

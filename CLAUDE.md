@@ -26,7 +26,8 @@ Every new module, fix and refactor follows these; a fix that has to cross a boun
 - `packages/basics` — `@reely/basics`, published (`scope:shared`): production-grade helpers promoted from utils (`forEachSettled`, `reportUncaught`, `hasSome`, `isSomeFunction`, `isPlainObject`).
 - `packages/utils` — `@reely/utils`, private (`scope:shared`): type guards, fp (`pipe`, `flow`, `Either`, `Maybe`), nullable helpers, errors, shared types. **One function — one file** (`src/lib/<group>/<fnName>.ts`) with a spec next to it.
 - `packages/logger` — `@reely/logger` (`scope:shared`): `scopedLogger(scope)`, `logWith(level, prefix)` for `pipe`, `WithUseLogger<T>`.
-- `packages/dommy` — `@reely/dommy`: DOM element factories, JSX runtime, signals (`reelx`, a push-pull graph), async router. Its real consumer is JsPowWow/ai-race.
+- `packages/signals` — `@reely/signals`, published (`scope:shared`): `signal`/`computed`/`effect`/`batch`/`untracked` over `reelx`, a push-pull graph, and the owner (`withOwner`, `onCleanup`); no DOM.
+- `packages/dommy` — `@reely/dommy`: DOM element factories, JSX runtime, bindings of `@reely/signals` (re-exported), async router. Its real consumer is JsPowWow/ai-race.
 - `packages/async`, `strings`, `colors` — small published helpers (older, looser style — don't copy it).
 - `apps/free-dom` — dommy playground; `apps/star-battle` — canvas game; `labs-ignore/` — experiments, not linted, not shipped.
 

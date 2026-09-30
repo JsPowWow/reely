@@ -1,7 +1,7 @@
 import { isSomeFunction, toErrorWithMessage } from '@reely/basics';
+import { onCleanup } from '@reely/signals';
 import { toErrorString } from '@reely/utils';
 
-import { onCleanup } from './reactive/owner';
 import { bindValue } from './utils/element.bindings';
 import { createFlowSlot } from './utils/flow.slot';
 

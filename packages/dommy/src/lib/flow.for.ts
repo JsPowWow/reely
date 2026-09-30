@@ -1,13 +1,12 @@
+import { getOwner, signal, withOwner } from '@reely/signals';
+import type { Signal } from '@reely/signals';
 import { isInstanceOf, isNil } from '@reely/utils';
 
 import { getDommyLogger } from './config';
-import { getOwner, withOwner } from './reactive/owner';
-import { signal } from './reactive/preact-like/preact-like.signal';
 import { bindValue } from './utils/element.bindings';
 import { toNodes } from './utils/element.children';
 import { createAnchors, insertBefore, rangeOf, removeNodes } from './utils/element.range';
 
-import type { Signal } from './reactive/preact-like/preact-like.signal';
 import type { ReactiveValue, ReelyNode } from './types/dommy.types';
 
 export interface ForProps<T> {

@@ -1,6 +1,6 @@
-import { effect, For, mount, onCleanup, Show, signal } from '../../index';
-import { getOwner, withOwner } from './owner';
-import { reelxDebug } from './reelx/reelx.core';
+import { subscriberCount } from '@reely/signals/testing';
+
+import { effect, For, mount, onCleanup, Show, signal } from '../index';
 
 describe('onCleanup', () => {
   it('runs when the mounted view is disposed, not before', () => {
@@ -75,15 +75,6 @@ describe('onCleanup', () => {
         throw new Error('broken view');
       })
     ).toThrow('broken view');
-    expect(reelxDebug(lap).subscriberCount()).toBe(0);
-  });
-
-  it('forgets an effect disposed before its owner', () => {
-    const held = withOwner(() => {
-      effect(() => undefined)();
-      return getOwner()?.cleanups.size;
-    }, null);
-
-    expect(held).toBe(0);
+    expect(subscriberCount(lap)).toBe(0);
   });
 });

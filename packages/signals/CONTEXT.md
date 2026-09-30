@@ -1,0 +1,33 @@
+# signals
+
+Values that change over time and the code that follows them, released through owners. Knows nothing of the DOM.
+
+## Values
+
+**Signal**:
+A value that is written; whatever read it follows the change. Read and written as `.value` or as `lap()` / `set` / `update`.
+_Avoid_: atom, store, observable
+
+**Computed**:
+A value derived from signals, recomputed when read after one of them changed.
+_Avoid_: memo, derived signal, selector
+
+**Reactive value**:
+A signal, a computed or any getter of them: what an effect or computed reads and then follows.
+_Avoid_: accessor, reader
+
+## Following
+
+**Effect**:
+Code that runs now and again after every change of what it read, until disposed.
+_Avoid_: watcher, reaction, autorun
+
+**Batch**:
+Writes grouped so that effects run once, when the outermost batch ends.
+_Avoid_: transaction
+
+## Releasing
+
+**Owner**:
+What a piece of work registers its effects, `onCleanup` callbacks and nested owners with; `dispose` releases all of them, the last registered first.
+_Avoid_: scope, context

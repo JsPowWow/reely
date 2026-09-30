@@ -1,6 +1,7 @@
+import { subscriberCount } from '@reely/signals/testing';
+
 import { For, Show, computed, defineDommyConfig, effect, mount, signal } from '../index';
 import { later } from '../kit';
-import { reelxDebug } from './reactive/reelx/reelx.core';
 
 import type { ILogger } from '@reely/logger';
 
@@ -275,7 +276,7 @@ describe('Releasing bindings', () => {
 
     expect(host.textContent).toBe('c');
     dispose();
-    expect(reelxDebug(text).subscriberCount()).toBe(0);
+    expect(subscriberCount(text)).toBe(0);
   });
 
   it('releases a computed made inside a branch when the branch goes', () => {
@@ -289,12 +290,12 @@ describe('Releasing bindings', () => {
         }}
       </Show>
     ));
-    const whileShown = reelxDebug(prefix).subscriberCount();
+    const whileShown = subscriberCount(prefix);
 
     on.value = false;
 
     expect(whileShown).toBe(1);
-    expect(reelxDebug(prefix).subscriberCount()).toBe(0);
+    expect(subscriberCount(prefix)).toBe(0);
   });
 
   it('releases what a row of `For` made when its key goes', () => {
@@ -310,12 +311,12 @@ describe('Releasing bindings', () => {
         </For>
       </ol>
     ));
-    const withTwoRows = reelxDebug(prefix).subscriberCount();
+    const withTwoRows = subscriberCount(prefix);
 
     cars.value = ['7'];
 
     expect(withTwoRows).toBe(2);
-    expect(reelxDebug(prefix).subscriberCount()).toBe(1);
+    expect(subscriberCount(prefix)).toBe(1);
   });
 
   it('keeps the bindings of a node built outside any owner as long as their signals live', () => {
@@ -324,7 +325,7 @@ describe('Releasing bindings', () => {
     const orphan = <p>{text}</p>;
 
     expect(orphan.textContent).toBe('a');
-    expect(reelxDebug(text).subscriberCount()).toBe(1);
+    expect(subscriberCount(text)).toBe(1);
   });
 });
 

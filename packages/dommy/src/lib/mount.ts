@@ -1,6 +1,6 @@
 import { hasSome } from '@reely/basics';
+import { withOwner } from '@reely/signals';
 
-import { withOwner } from './reactive/owner';
 import { toNodes } from './utils/element.children';
 import { rangeOf, removeNodes } from './utils/element.range';
 

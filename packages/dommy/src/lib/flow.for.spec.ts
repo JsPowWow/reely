@@ -1,5 +1,6 @@
+import { subscriberCount } from '@reely/signals/testing';
+
 import { button, dd, div, dt, For, li, mount, signal, ul } from '../index';
-import { reelxDebug } from './reactive/reelx/reelx.core';
 
 import type { Signal } from '../index';
 
@@ -91,16 +92,16 @@ describe('For', () => {
     const lap = signal(1);
     const racers = signal<readonly Racer[]>([racer('a'), racer('b')]);
     const { dispose } = renderBoard(racers, lap);
-    const withTwoRows = reelxDebug(lap).subscriberCount();
+    const withTwoRows = subscriberCount(lap);
 
     racers.value = [racer('a')];
-    const withOneRow = reelxDebug(lap).subscriberCount();
+    const withOneRow = subscriberCount(lap);
     dispose();
 
     expect(withTwoRows).toBe(2);
     expect(withOneRow).toBe(1);
-    expect(reelxDebug(lap).subscriberCount()).toBe(0);
-    expect(reelxDebug(racers).subscriberCount()).toBe(0);
+    expect(subscriberCount(lap)).toBe(0);
+    expect(subscriberCount(racers)).toBe(0);
   });
 
   it('moves a row of several nodes as one, and takes all of them away with it', () => {

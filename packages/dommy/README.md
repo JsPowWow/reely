@@ -88,6 +88,8 @@ A fragment, whether from such a component, `<>…</>`, `Show`, `Keyed`, `Await` 
 
 ## Signals
 
+The signals are [`@reely/signals`](https://www.npmjs.com/package/@reely/signals), re-exported; its README tells about owners and the testing entry.
+
 ```ts
 import { batch, computed, effect, signal, untracked } from '@reely/dommy';
 
@@ -512,5 +514,4 @@ MIT
 
 ## Credits
 
-- The signal core (`reelx`) implements the push-pull graph known from [Reactively](https://github.com/milomg/reactively), [@preact/signals-core](https://github.com/preactjs/signals) and [alien-signals](https://github.com/stackblitz/alien-signals), written from the concept.
-- The signal tests are adapted from [@preact/signals-core](https://github.com/preactjs/signals), Copyright (c) 2022-present Preact Team, MIT licence.
+- The signals and their credits: [`@reely/signals`](https://www.npmjs.com/package/@reely/signals).

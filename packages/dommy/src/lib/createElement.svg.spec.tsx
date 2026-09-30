@@ -1,5 +1,6 @@
+import { subscriberCount } from '@reely/signals/testing';
+
 import { circle, mount, path, signal, svg } from '../index';
-import { reelxDebug } from './reactive/reelx/reelx.core';
 
 import type { SvgElementFactoryProps } from '../index';
 
@@ -68,11 +69,11 @@ describe('createElement: SVG', () => {
   it('releases its bindings when the view is disposed', () => {
     const color = signal('red');
     const dispose = mount(document.createElement('div'), () => <circle fill={color} className={() => color.value} />);
-    const whileMounted = reelxDebug(color).subscriberCount();
+    const whileMounted = subscriberCount(color);
 
     dispose();
 
     expect(whileMounted).toBe(2);
-    expect(reelxDebug(color).subscriberCount()).toBe(0);
+    expect(subscriberCount(color)).toBe(0);
   });
 });

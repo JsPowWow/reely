@@ -3,8 +3,8 @@ import { hasSome } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
 import { isInstanceOf, noop } from '@reely/utils';
 
-/** A function that reads a signal or a computed and subscribes the running effect or computed to it. */
-export type Reader<T> = () => T;
+/** A value read reactively: a signal, a computed or any getter of them; an effect or computed that reads it follows it. */
+export type ReactiveValue<T> = () => T;
 
 interface Source {
   // grows with every change of the value, so an observer can tell whether what it read is still current
@@ -321,22 +321,22 @@ const flushSync = (): void => {
   }
 };
 
-// the node behind each reader, for writes and for `reelxDebug`
-const nodes = new WeakMap<Reader<unknown>, Signal<unknown> | Computed<unknown>>();
+// the node behind each reader, for writes and for `subscriberCount`
+const nodes = new WeakMap<ReactiveValue<unknown>, Signal<unknown> | Computed<unknown>>();
 
-const toReader = <T>(node: Signal<T> | Computed<T>): Reader<T> => {
+const toReactiveValue = <T>(node: Signal<T> | Computed<T>): ReactiveValue<T> => {
   nodes.set(node.read, node);
   return node.read;
 };
 
 /** A value that effects and computeds re-read when it is written; a function is held as a value too. */
-export const signal = <T>(initial: T): Reader<T> => toReader(new Signal(initial));
+export const signal = <T>(initial: T): ReactiveValue<T> => toReactiveValue(new Signal(initial));
 
 /** A value derived from what `fn` reads, recomputed on read after one of them changes; what `fn` throws is rethrown until then. */
-export const computed = <T>(fn: () => T): Reader<T> => toReader(new Computed(fn));
+export const computed = <T>(fn: () => T): ReactiveValue<T> => toReactiveValue(new Computed(fn));
 
 /** Writes `value` to the signal `read` reads (a computed's reader is ignored); an equal value (by `Object.is`) changes nothing. */
-export const write = <T>(read: Reader<T>, value: T): void => {
+export const write = <T>(read: ReactiveValue<T>, value: T): void => {
   const node = nodes.get(read);
   if (isInstanceOf(Signal, node)) {
     node.write(value);
@@ -344,7 +344,7 @@ export const write = <T>(read: Reader<T>, value: T): void => {
 };
 
 /** Runs `fn` now and again after every change of what it read. Returns `dispose`; creation that throws leaves nothing subscribed. */
-export const effect = (fn: VoidFunction): VoidFunction => {
+export const effect = (fn: () => void): (() => void) => {
   const node = new Effect(fn);
   try {
     batch(() => {
@@ -367,7 +367,7 @@ export const effect = (fn: VoidFunction): VoidFunction => {
  * Calls `cb` with every new value of `read` (by `Object.is`, starting from `undefined`) and the one
  * before it, now and after each change. Returns `unsubscribe`.
  */
-export const subscribe = <T>(read: Reader<T>, cb: (value: T, prevValue?: T) => void): VoidFunction => {
+export const subscribe = <T>(read: ReactiveValue<T>, cb: (value: T, prevValue?: T) => void): (() => void) => {
   let last: T | undefined;
   return effect(() => {
     const value = read();
@@ -401,12 +401,5 @@ export const untracked = <T>(fn: () => T): T => {
   }
 };
 
-/** Introspection for tests. */
-export const reelxDebug = (
-  read: Reader<unknown>
-): {
-  /** How many effects and computeds read it now: tests count them to prove that `dispose` released them. */
-  subscriberCount: () => number;
-} => ({
-  subscriberCount: (): number => nodes.get(read)?.observers.size ?? 0,
-});
+/** How many effects and computeds read `read` now: tests count them to prove that `dispose` released them. */
+export const subscriberCount = (read: ReactiveValue<unknown>): number => nodes.get(read)?.observers.size ?? 0;

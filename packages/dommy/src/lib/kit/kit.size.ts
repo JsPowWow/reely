@@ -1,7 +1,5 @@
-import { onCleanup } from '../reactive/owner';
-import { computed, signal } from '../reactive/preact-like/preact-like.signal';
-
-import type { Computed } from '../reactive/preact-like/preact-like.signal';
+import { computed, onCleanup, signal } from '@reely/signals';
+import type { Computed } from '@reely/signals';
 
 /** The content box of an element, in CSS pixels. */
 export interface ElementSize {

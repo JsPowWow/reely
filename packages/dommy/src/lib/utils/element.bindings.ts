@@ -1,10 +1,9 @@
 import { isSomeFunction } from '@reely/basics';
+import { computed, onCleanup } from '@reely/signals';
 import { isInstanceOf } from '@reely/utils';
 
 import { getDommyLogger } from '../config';
 import { isFalsyElement } from './element.utils';
-import { onCleanup } from '../reactive/owner';
-import { computed } from '../reactive/preact-like/preact-like.signal';
 
 import type { ReactiveReelyNode, ReactiveValue, SingleReelyNode } from '../types/dommy.types';
 

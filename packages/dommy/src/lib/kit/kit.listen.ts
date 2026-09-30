@@ -1,6 +1,5 @@
 import { hasSome } from '@reely/basics';
-
-import { onCleanup } from '../reactive/owner';
+import { onCleanup } from '@reely/signals';
 
 /** The events a target dispatches, by type: `keydown` on `window` is a `KeyboardEvent`. */
 export type EventMapOf<T extends EventTarget> = T extends Window

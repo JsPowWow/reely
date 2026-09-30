@@ -1,9 +1,9 @@
+import { effect, signal } from '@reely/signals';
+import type { Signal } from '@reely/signals';
 import { Either, objectTypeOf } from '@reely/utils';
 
 import { listen } from './kit.listen';
-import { effect, signal } from '../reactive/preact-like/preact-like.signal';
 
-import type { Signal } from '../reactive/preact-like/preact-like.signal';
 
 export interface PersistedOptions<T> {
   /** `localStorage` by default. */

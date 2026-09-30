@@ -1,5 +1,6 @@
+import { subscriberCount } from '@reely/signals/testing';
+
 import { div, effect, li, mount, signal, span, ul } from '../index';
-import { reelxDebug } from './reactive/reelx/reelx.core';
 
 describe('mount', () => {
   it('appends the rendered view to the parent', () => {
@@ -27,8 +28,8 @@ describe('mount', () => {
     leader.value = 'Flash';
 
     expect(parent.childNodes).toHaveLength(0);
-    expect(reelxDebug(leader).subscriberCount()).toBe(0);
-    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+    expect(subscriberCount(leader)).toBe(0);
+    expect(subscriberCount(lap)).toBe(0);
     expect(laps).toEqual([1]);
   });
 

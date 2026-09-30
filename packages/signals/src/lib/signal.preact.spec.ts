@@ -1,8 +1,8 @@
 // Adapted from the tests of @preact/signals-core (https://github.com/preactjs/signals),
 // Copyright (c) 2022-present Preact Team, MIT licence.
-import { batch, computed, effect, signal, type Signal, untracked } from './preact-like.signal';
-import { onCleanup } from '../owner';
-import { reelxDebug } from '../reelx/reelx.core';
+import { onCleanup } from './owner';
+import { subscriberCount } from './reelx.core';
+import { batch, computed, effect, signal, type Signal, untracked } from './signal';
 
 describe('signal', () => {
   it('should return value', () => {
@@ -249,7 +249,7 @@ describe('effect()', () => {
         throw new Error('first run');
       })
     ).toThrow('first run');
-    expect(reelxDebug(lap).subscriberCount()).toBe(0);
+    expect(subscriberCount(lap)).toBe(0);
   });
 
   it('should dispose the effect when a cleanup throws, running its other cleanups', () => {
@@ -269,8 +269,8 @@ describe('effect()', () => {
 
     expect(() => (a.value = 1)).toThrow('cleanup');
     expect(released).toHaveBeenCalledOnce();
-    expect(reelxDebug(lap).subscriberCount()).toBe(0);
-    expect(reelxDebug(a).subscriberCount()).toBe(0);
+    expect(subscriberCount(lap)).toBe(0);
+    expect(subscriberCount(a)).toBe(0);
     a.value = 2;
     expect(spy).toHaveBeenCalledOnce();
   });
@@ -333,7 +333,7 @@ describe('effect()', () => {
     const spy = vi.fn(() => {
       return a.value + ' ' + b.value;
     });
-    effect(function (this: { dispose: VoidFunction }) {
+    effect(function (this: { dispose: () => void }) {
       spy();
       if (a.value === 'aa') {
         this.dispose();
@@ -355,7 +355,7 @@ describe('effect()', () => {
     const spy = vi.fn(() => {
       a.value + ' ' + b.value;
     });
-    effect(function (this: { dispose: VoidFunction }) {
+    effect(function (this: { dispose: () => void }) {
       spy();
       this.dispose();
     });
@@ -374,7 +374,7 @@ describe('effect()', () => {
     const spy = vi.fn(() => {
       return a.value + ' ' + b.value;
     });
-    const dispose = effect(function (this: { dispose: VoidFunction }) {
+    const dispose = effect(function (this: { dispose: () => void }) {
       spy();
       if (a.value === 'aa') {
         this.dispose();
@@ -395,7 +395,7 @@ describe('effect()', () => {
     const spy = vi.fn(() => {
       a.value + ' ' + b.value;
     });
-    effect(function (this: { dispose: VoidFunction }) {
+    effect(function (this: { dispose: () => void }) {
       this.dispose();
       spy();
     });
@@ -415,7 +415,7 @@ describe('effect()', () => {
     const spy = vi.fn(() => {
       a.value + ' ' + b.value;
     });
-    const dispose = effect(function (this: { dispose: VoidFunction }) {
+    const dispose = effect(function (this: { dispose: () => void }) {
       spy();
       this.dispose();
     });

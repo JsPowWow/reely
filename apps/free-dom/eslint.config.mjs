@@ -6,12 +6,10 @@ export default [
     ignores: ['**/out-tsc'],
   },
   {
-    // Vite queries (`./step.ts?highlight`) are resolved by Vite plugins, and package subpaths
-    // (`@reely/dommy/router`) through `exports`, which the node import resolver cannot read;
-    // typecheck resolves both.
+    // Vite queries (`./step.ts?highlight`) are resolved by Vite plugins; typecheck resolves them.
     files: ['src/**/*.{ts,tsx}'],
     rules: {
-      'import/no-unresolved': ['error', { ignore: ['\\?highlight$', '^@reely/dommy/'] }],
+      'import/no-unresolved': ['error', { ignore: ['\\?highlight$', '^@reely/[\\w-]+/'] }],
     },
   },
   {

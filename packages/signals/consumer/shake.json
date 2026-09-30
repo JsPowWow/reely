@@ -1,0 +1,8 @@
+[
+  {
+    "name": "owner alone",
+    "code": "import { onCleanup, withOwner } from '@reely/signals'; withOwner((dispose) => { onCleanup(() => console.log('bye')); dispose(); });",
+    "absent": ["signalProto", "computedProto"],
+    "once": ["withOwner"]
+  }
+]

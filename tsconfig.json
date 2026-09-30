@@ -44,6 +44,9 @@
     },
     {
       "path": "./packages/basics"
+    },
+    {
+      "path": "./packages/signals"
     }
   ],
   "compilerOptions": {

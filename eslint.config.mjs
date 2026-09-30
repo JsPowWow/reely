@@ -150,6 +150,17 @@ export default [
     },
   },
   {
+    // package subpaths (`@reely/signals/testing`) resolve through `exports`, which the node import
+    // resolver cannot read; typecheck resolves them, and `import/order` still groups them
+    files: ['**/*.{ts,tsx,js,mjs}'],
+    settings: {
+      'import/internal-regex': '^@reely/',
+    },
+    rules: {
+      'import/no-unresolved': ['error', { ignore: ['^@reely/[\\w-]+/'] }],
+    },
+  },
+  {
     // Vite 8 exposes its types only through `exports`, which the node import resolver can't read
     files: ['**/{vite,vitest}.config.{ts,mts}'],
     rules: {

@@ -1,9 +1,9 @@
 import { isSomeFunction } from '@reely/basics';
+import { computed, signal } from '@reely/signals';
+import type { Computed } from '@reely/signals';
 
 import { listen } from './kit.listen';
-import { computed, signal } from '../reactive/preact-like/preact-like.signal';
 
-import type { Computed } from '../reactive/preact-like/preact-like.signal';
 
 /**
  * Whether a media query matches, following it until the render that created it is disposed;
