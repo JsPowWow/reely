@@ -247,6 +247,21 @@ function makeShip(defId: ShipKind, x: number, y: number, angle: number, pi: numb
   };
 }
 
+// a quarter of the rocks are violet; of the rest, two in five are blue
+const pickTone = (): number => {
+  if (Math.random() < 0.25) {
+    return 0;
+  }
+  return Math.random() < 0.4 ? 1 : 2;
+};
+
+const splitCountOf = (size: number): number => {
+  if (size > 40) {
+    return 3;
+  }
+  return size > 22 ? 2 : 0;
+};
+
 function hypot(dx: number, dy: number): number {
   return Math.sqrt(dx * dx + dy * dy);
 }
@@ -267,7 +282,7 @@ function makeAsteroid(x: number, y: number, size: number): Asteroid {
       r: size * 0.08 + Math.random() * size * 0.12,
     });
   const toneArr = ['#8866aa', '#446688', '#776655'];
-  const tone = toneArr[Math.random() < 0.25 ? 0 : Math.random() < 0.4 ? 1 : 2];
+  const tone = toneArr[pickTone()];
   const cracks: number[][] = [];
   for (let i = 0, nc = 4 + Math.floor(Math.random() * 4); i < nc; i++) {
     const ca = Math.random() * Math.PI * 2,
@@ -819,7 +834,6 @@ export default class SpaceBattleServer implements Party.Server {
             this.splitAsteroid(ai, b.vx, b.vy);
           }
           this.bullets.splice(i, 1);
-          hit = true;
           break;
         }
       }
@@ -828,7 +842,7 @@ export default class SpaceBattleServer implements Party.Server {
 
   private splitAsteroid(idx: number, dvx: number, dvy: number): void {
     const ast = this.asteroids[idx];
-    const children = ast.size > 40 ? 3 : ast.size > 22 ? 2 : 0;
+    const children = splitCountOf(ast.size);
     const newKids: Asteroid[] = [];
     for (let k = 0; k < children; k++) {
       const angle = ((Math.PI * 2) / children) * k + Math.random() * 0.8;
