@@ -1,0 +1,26 @@
+[
+  {
+    "name": "listen alone",
+    "code": "import { listen } from '@reely/dommy-kit'; listen(window, 'resize', () => console.log(innerWidth));",
+    "absent": [
+      "signalProto",
+      "computedProto",
+      "persisted"
+    ],
+    "once": [
+      "listen"
+    ]
+  },
+  {
+    "name": "media alone",
+    "code": "import { media } from '@reely/dommy-kit'; console.log(media('(max-width: 700px)').value);",
+    "absent": [
+      "Either",
+      "persisted",
+      "throttled"
+    ],
+    "once": [
+      "media"
+    ]
+  }
+]

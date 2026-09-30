@@ -1,5 +1,6 @@
-import { effect, mount, signal } from '../../index';
-import { throttled } from '../../kit';
+import { effect, mount, signal } from '@reely/dommy';
+
+import { throttled } from '../index';
 
 describe('throttled', () => {
   beforeEach(() => {

@@ -1,5 +1,6 @@
-import { effect, mount, signal } from '../../index';
-import { later } from '../../kit';
+import { effect, mount, signal } from '@reely/dommy';
+
+import { later } from '../index';
 
 describe('later', () => {
   beforeEach(() => {

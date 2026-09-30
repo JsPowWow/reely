@@ -1,4 +1,4 @@
-import { flip } from '../../kit';
+import { flip } from '../index';
 
 const place = (element: Element, top: number): void => {
   element.getBoundingClientRect = () => ({ left: 0, top }) as DOMRect;

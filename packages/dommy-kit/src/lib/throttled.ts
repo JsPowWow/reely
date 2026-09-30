@@ -1,9 +1,7 @@
 import { hasSome } from '@reely/basics';
 import { computed, effect, onCleanup, signal, untracked } from '@reely/signals';
-import type { Computed } from '@reely/signals';
+import type { Computed, ReactiveValue } from '@reely/signals';
 import type { Nullable } from '@reely/utils';
-
-import type { ReactiveValue } from '../types/dommy.types';
 
 /**
  * Follows `source` at most once per `ms`: the first change passes at once, the latest one within

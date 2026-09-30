@@ -393,7 +393,7 @@ const en = {
           <h2>Advanced state derivation</h2>
           <p>
             One effect can write several signals from one source. The timed derivations come ready from{' '}
-            <code>@reely/dommy/kit</code>: <code>persisted</code> keeps a signal in storage, <code>throttled</code>{' '}
+            <code>@reely/dommy-kit</code>: <code>persisted</code> keeps a signal in storage, <code>throttled</code>{' '}
             passes at most one change per interval, and <code>later</code> delays a write and is cancelled by the next
             change.
           </p>
@@ -422,7 +422,7 @@ const en = {
           <h2>Lifecycle hooks</h2>
           <p>
             A component runs before its nodes are in the document. What must run once they are, such as focusing a field
-            or reading the rendered text, goes in <code>later(0, fn)</code> from <code>@reely/dommy/kit</code>; it is
+            or reading the rendered text, goes in <code>later(0, fn)</code> from <code>@reely/dommy-kit</code>; it is
             cancelled if the view goes first. Next slide rebuilds the caption, and the message reads it from the
             document. The other end is <code>onCleanup</code>, run when the owner lets the view go; a node moved out of
             the document by other code is noticed only by a custom element’s <code>disconnectedCallback</code>.

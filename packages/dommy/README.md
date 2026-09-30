@@ -336,36 +336,7 @@ const ring = (
 
 ## Kit
 
-Small helpers over signals and the owner live in their own entry, `@reely/dommy/kit`; an app that does not import it does not ship it. Each one that listens or times stops with the render that created it.
-
-```tsx
-import { effect, signal } from '@reely/dommy';
-import { flip, later, listen, media, persisted, size, throttled } from '@reely/dommy/kit';
-
-const phone = media('(max-width: 700px)'); // follows the media query
-const theme = persisted('theme', 'light'); // kept in localStorage, synced across tabs
-
-const menuOpen = signal(false);
-listen(window, 'keydown', (event) => event.key === 'Escape' && (menuOpen.value = false)); // removed with the view
-effect(() => {
-  if (menuOpen.value) {
-    later(5000, () => (menuOpen.value = false)); // closing it first, or disposing the view, cancels the timer
-  }
-});
-
-const board = document.createElement('ol');
-const box = size(board); // { width, height } through a ResizeObserver
-const width = throttled(() => box.value.width, 500); // at most one change per 500 ms, the latest last
-flip(board, () => board.append(...Array.from(board.children).reverse())); // rows glide to their new places
-
-effect(() => console.log(phone.value, theme.value, width.value));
-```
-
-- `media(query)`, `size(element)` and `throttled(source, ms)` give computeds.
-- `persisted(key, initial, { storage, is })` gives a signal; what is read back must be of the kind of `initial`, or pass `is` to check it; a storage that throws leaves it working in memory.
-- `listen(target, type, handler, options)` types the event by target and returns the function that removes it.
-- `later(ms, fn)` runs `fn` once after `ms`, unless the view is disposed or the effect runs again first; it returns its own cancel. `later(0, fn)` runs after the render is in the document.
-- `flip(container, change)` animates the children `change` moved, not those it added; nothing moves under reduced motion.
+Helpers for the browser, each stopping with the render that created it, live in [`@reely/dommy-kit`](https://www.npmjs.com/package/@reely/dommy-kit): `media` follows a media query, `size` an element's box, `throttled` passes at most one change per interval, `persisted` keeps a signal in storage, `listen` adds a typed listener, `later` delays a call, `flip` animates moved children.
 
 ## State machines
 
@@ -472,11 +443,10 @@ A binding, `computed` or `effect` depends on the signals its last run read. `` (
 
 ### Advanced state derivation
 
-An effect can write several signals from one source, and the kit covers the timed derivations: `persisted` keeps a signal in storage, `throttled` passes at most one change per interval, and `later` delays one:
+An effect can write several signals from one source, and a timer released by `onCleanup` delays one; [`@reely/dommy-kit`](https://www.npmjs.com/package/@reely/dommy-kit) covers the timed derivations in one call each (`later`, `throttled`, `persisted`):
 
 ```ts
-import { effect, signal } from '@reely/dommy';
-import { later } from '@reely/dommy/kit';
+import { effect, onCleanup, signal } from '@reely/dommy';
 
 const email = signal('maria.silva@example.com');
 const user = signal('');
@@ -488,7 +458,8 @@ effect(() => {
 });
 effect(() => {
   const address = email.value;
-  later(1000, () => (saved.value = address)); // saves a second after typing stops: the next change cancels the pending one
+  const timer = setTimeout(() => (saved.value = address), 1000); // saves a second after typing stops
+  onCleanup(() => clearTimeout(timer)); // the next change cancels the pending save
 });
 ```
 
@@ -519,15 +490,15 @@ The cost is the other side: a node built outside any owner (at module level, or 
 
 ### Lifecycle hooks
 
-A component runs once and returns its nodes before they are in the document; there is no mount hook. What must run once the view is connected, such as focusing a field or measuring a node, goes in `later(0, fn)` from the kit: it runs after the render that called it and is cancelled if the view is disposed first. The cleanup side is `onCleanup`, which runs when the owner lets the view go; a node that leaves the document some other way (moved by hand, or by outside code) is not noticed, and only a custom element's `disconnectedCallback` sees that. Effects run synchronously, so a signal written in a component is seen at once, not in a later cycle.
+A component runs once and returns its nodes before they are in the document; there is no mount hook. What must run once the view is connected, such as focusing a field or measuring a node, goes in a timer: it runs after the render that called it, and `onCleanup` cancels it if the view is disposed first (`later(0, fn)` of `@reely/dommy-kit` does both). The cleanup side is `onCleanup`, which runs when the owner lets the view go; a node that leaves the document some other way (moved by hand, or by outside code) is not noticed, and only a custom element's `disconnectedCallback` sees that. Effects run synchronously, so a signal written in a component is seen at once, not in a later cycle.
 
 ```tsx
-import { input } from '@reely/dommy';
-import { later } from '@reely/dommy/kit';
+import { input, onCleanup } from '@reely/dommy';
 
 const Search = (): Node => {
   const field = input({ type: 'search' }); // a factory gives the element type; a JSX tag is a `Node`
-  later(0, () => field.focus());
+  const timer = setTimeout(() => field.focus());
+  onCleanup(() => clearTimeout(timer));
   return field;
 };
 ```

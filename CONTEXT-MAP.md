@@ -16,6 +16,9 @@
 - **dommy → signals, utils, logger**: binds signals to the DOM and re-exports them; uses guards, fp steps
   and shared types, and the scoped logger; the published dommy must not import utils or logger in its
   emitted `.d.ts`/JS
+- **dommy-kit → signals, basics, utils**: browser helpers over signals, released through the owner; no
+  dommy at runtime (its specs render with it); the published kit must not import utils in its emitted
+  `.d.ts`/JS
 - **signals → basics, utils**: guards and shared types; knows nothing of the DOM; the published signals
   must not import utils in its emitted `.d.ts`/JS
 - **logger → utils**: shared types and guards

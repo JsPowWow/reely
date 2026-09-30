@@ -1,5 +1,5 @@
-import { effect } from '@reely/dommy';
-import { flip, later, listen, media, persisted, size, throttled } from '@reely/dommy/kit';
+import { effect } from '@reely/signals';
+import { flip, later, listen, media, persisted, size, throttled } from '@reely/dommy-kit';
 
 export const start = (board: HTMLElement): void => {
   const phone = media('(max-width: 700px)');
@@ -15,7 +15,8 @@ export const start = (board: HTMLElement): void => {
   flip(board, () => board.append(...Array.from(board.children).reverse()));
 };
 
-// what a consumer exports from the kit must have a type its declarations can name
-export const theme = persisted('theme', 'light');
-export const phoneLayout = media('(max-width: 700px)');
-export const calmTheme = throttled(theme, 100);
+// what a consumer's function returns from the kit must have a type its declarations can name
+export const settings = () => {
+  const theme = persisted('theme', 'light');
+  return { theme, phoneLayout: media('(max-width: 700px)'), calmTheme: throttled(theme, 100) };
+};

@@ -2,6 +2,7 @@
 paths:
   - "packages/dommy/**"
   - "packages/signals/**"
+  - "packages/dommy-kit/**"
   - "apps/free-dom/**"
 ---
 # @reely/dommy
@@ -13,7 +14,7 @@ Signals bound to the DOM (point updates, no virtual DOM), owner/`dispose`, flow 
 - One reactive model: any function in a prop (other than `on*`) or a child is a reactive value, bound as a new pipe step. No second mechanism beside it.
 - A signal has two access styles, both first-class: Preact's `.value` and Angular's `laps()` / `set` / `update`. They mix freely (a deliberate exception to "one way to do a thing", the author's choice); tests cover both.
 - One render type: `children` and component results are `ReelyNode`; a JSX expression is always a `Node` (`toNode` puts the rest into a fragment). A component that returns a tag declares `(): Node`, any other declares `(): ReelyNode`. Terms — `packages/dommy/CONTEXT.md`.
-- The main entry ships only finished code; experiments (the router until it is cleaned up) move to a separate entry or out. Helpers composed from the core (`media`, `size`, `throttled`, `persisted`, `listen`, `flip`, `later`) live in `@reely/dommy/kit`, one file each (`lib/kit/kit.<name>.ts`), each releasing what it holds through the owner.
+- The main entry ships only finished code; experiments (the router until it is cleaned up) move to a separate entry or out. Browser helpers composed from signals (`media`, `size`, `throttled`, `persisted`, `listen`, `flip`, `later`) live in `@reely/dommy-kit`, a layer above dommy that imports only `@reely/signals` (dommy only in its specs), one file each (`src/lib/<name>.ts`), each releasing what it holds through the owner.
 - Mature means: a bound value updates exactly one DOM node, every subscription is released by `dispose`, effects run synchronously (`batch` groups writes), types work in a consumer's `tsc`.
 
 ## Style (keep it — it is the author's)

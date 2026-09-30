@@ -1,5 +1,6 @@
-import { mount } from '../../index';
-import { listen } from '../../kit';
+import { mount } from '@reely/dommy';
+
+import { listen } from '../index';
 
 describe('listen', () => {
   it('calls the handler with the typed event until the render that added it is disposed', () => {

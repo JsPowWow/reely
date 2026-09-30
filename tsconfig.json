@@ -47,6 +47,9 @@
     },
     {
       "path": "./packages/signals"
+    },
+    {
+      "path": "./packages/dommy-kit"
     }
   ],
   "compilerOptions": {

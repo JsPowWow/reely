@@ -1,5 +1,6 @@
-import { mount } from '../../index';
-import { persisted } from '../../kit';
+import { mount } from '@reely/dommy';
+
+import { persisted } from '../index';
 
 const memoryStorage = (entries: Record<string, string> = {}): Storage => {
   const items = new Map(Object.entries(entries));

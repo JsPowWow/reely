@@ -23,7 +23,6 @@ export default defineConfig(() => ({
         index: resolve(import.meta.dirname, 'src/index.ts'),
         'jsx-runtime': resolve(import.meta.dirname, 'src/lib/jsx-runtime.ts'),
         router: resolve(import.meta.dirname, 'src/router.ts'),
-        kit: resolve(import.meta.dirname, 'src/kit.ts'),
       },
       fileName: (_format: string, entryName: string): string => `${entryName}.js`,
       formats: ['es' as const],

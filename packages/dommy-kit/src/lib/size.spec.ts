@@ -1,5 +1,6 @@
-import { mount } from '../../index';
-import { size } from '../../kit';
+import { mount } from '@reely/dommy';
+
+import { size } from '../index';
 
 class FakeResizeObserver {
   public static readonly observers = new Set<FakeResizeObserver>();

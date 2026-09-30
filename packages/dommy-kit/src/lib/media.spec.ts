@@ -1,5 +1,6 @@
-import { effect, mount } from '../../index';
-import { media } from '../../kit';
+import { effect, mount } from '@reely/dommy';
+
+import { media } from '../index';
 
 const fakeMatchMedia = (initial: boolean): { flip: (matches: boolean) => void; listeners: () => number } => {
   const target = new EventTarget();

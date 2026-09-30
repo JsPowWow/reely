@@ -1,5 +1,5 @@
 import { computed, effect } from '@reely/dommy';
-import { persisted } from '@reely/dommy/kit';
+import { persisted } from '@reely/dommy-kit';
 
 /** The languages the site is written in. */
 export type Locale = 'en' | 'ru';

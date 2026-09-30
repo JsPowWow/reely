@@ -1,5 +1,5 @@
 import { Keyed, signal } from '@reely/dommy';
-import { later } from '@reely/dommy/kit';
+import { later } from '@reely/dommy-kit';
 
 import css from '../demos.module.css';
 

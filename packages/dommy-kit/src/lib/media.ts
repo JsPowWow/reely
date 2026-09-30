@@ -2,8 +2,7 @@ import { isSomeFunction } from '@reely/basics';
 import { computed, signal } from '@reely/signals';
 import type { Computed } from '@reely/signals';
 
-import { listen } from './kit.listen';
-
+import { listen } from './listen';
 
 /**
  * Whether a media query matches, following it until the render that created it is disposed;

@@ -1,5 +1,5 @@
 import { effect, signal } from '@reely/dommy';
-import { later, persisted, throttled } from '@reely/dommy/kit';
+import { later, persisted, throttled } from '@reely/dommy-kit';
 
 // Kept in localStorage, and synced across tabs.
 export const email = persisted('email', 'kenji.watanabe@example.com');

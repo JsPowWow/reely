@@ -1,5 +1,5 @@
 import { button } from '@reely/dommy';
-import { media } from '@reely/dommy/kit';
+import { media } from '@reely/dommy-kit';
 
 import css from './examples.module.css';
 

@@ -1,7 +1,6 @@
 import { subscriberCount } from '@reely/signals/testing';
 
-import { For, Show, computed, defineDommyConfig, effect, mount, signal } from '../index';
-import { later } from '../kit';
+import { For, Show, computed, defineDommyConfig, effect, mount, onCleanup, signal } from '../index';
 
 import type { ILogger } from '@reely/logger';
 
@@ -122,29 +121,30 @@ describe('Advanced state derivation', () => {
     vi.useRealTimers();
   });
 
-  it('derives several signals in one effect, and a delayed one with `later`', () => {
+  it('derives several signals in one effect, and delays a save with a timer the next run cancels', () => {
     const fullName = signal('Tao Xin');
     const firstName = signal('');
     const lastName = signal('');
-    const delayed = signal('');
+    const saved: string[] = [];
     mount(document.createElement('div'), () => {
       effect(() => {
         [firstName.value = '', lastName.value = ''] = fullName.value.split(' ');
       });
       effect(() => {
         const name = fullName.value;
-        later(1000, () => (delayed.value = name));
+        const timer = setTimeout(() => saved.push(name), 1000);
+        onCleanup(() => clearTimeout(timer));
       });
       return null;
     });
 
     fullName.value = 'Ada Lovelace';
-    const beforeTheDelay = delayed.value;
+    const beforeTheDelay = [...saved];
     vi.advanceTimersByTime(1000);
 
     expect([firstName.value, lastName.value]).toEqual(['Ada', 'Lovelace']);
-    expect(beforeTheDelay).toBe('');
-    expect(delayed.value).toBe('Ada Lovelace');
+    expect(beforeTheDelay).toEqual([]);
+    expect(saved).toEqual(['Ada Lovelace']);
   });
 });
 
@@ -338,14 +338,15 @@ describe('Lifecycle hooks', () => {
     vi.useRealTimers();
   });
 
-  it('runs a component before its nodes are in the document, and `later(0)` after', () => {
+  it('runs a component before its nodes are in the document, and a timer after', () => {
     const host = document.createElement('div');
     document.body.append(host);
     const states: boolean[] = [];
     mount(host, () => {
       const field = document.createElement('input');
       states.push(field.isConnected);
-      later(0, () => states.push(field.isConnected));
+      const timer = setTimeout(() => states.push(field.isConnected));
+      onCleanup(() => clearTimeout(timer));
       return field;
     });
 

@@ -33,10 +33,13 @@
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
   "references": [
     {
+      "path": "../../packages/logger/tsconfig.lib.json"
+    },
+    {
       "path": "../../packages/basics/tsconfig.lib.json"
     },
     {
-      "path": "../../packages/logger/tsconfig.lib.json"
+      "path": "../../packages/dommy-kit/tsconfig.lib.json"
     },
     {
       "path": "../../packages/dommy/tsconfig.lib.json"
