@@ -7,4 +7,8 @@ export default [
     // built by tsc with `nodenext`: relative imports name the emitted `.js`, which tsc itself resolves
     rules: { 'import/no-unresolved': ['error', { ignore: ['^\\./.*\\.js$'] }] },
   },
+  {
+    // checked by scripts/consumer-check.mjs
+    ignores: ['consumer'],
+  },
 ];

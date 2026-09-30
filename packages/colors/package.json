@@ -1,6 +1,8 @@
 {
   "name": "@reely/colors",
   "version": "0.0.5",
+  "description": "Convert, lighten and darken hex colours, and check the contrast between two.",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -24,12 +26,26 @@
     "dist",
     "!**/*.tsbuildinfo"
   ],
+  "sideEffects": false,
   "dependencies": {
     "tslib": "^2.3.0"
   },
   "nx": {
     "tags": [
       "scope:colors"
-    ]
+    ],
+    "targets": {
+      "consumer": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "node ../../scripts/consumer-check.mjs",
+          "cwd": "packages/colors"
+        },
+        "dependsOn": [
+          "build",
+          "^build"
+        ]
+      }
+    }
   }
 }
