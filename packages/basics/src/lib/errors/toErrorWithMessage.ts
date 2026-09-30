@@ -1,7 +1,20 @@
 import { hasSome } from '../objects/hasSome';
 import { isString } from '../objects/isString';
 
-const describe = (value: unknown): string => {
+// a getter that throws is read as no message at all
+const messageIn = (value: unknown): unknown => {
+  try {
+    return hasSome(value) ? Reflect.get(Object(value), 'message') : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+// an Error from another realm (an iframe, a `vm` context) fails `instanceof` but keeps its tag
+const isError = (value: unknown, message: unknown): value is Error =>
+  value instanceof Error || (isString(message) && Object.prototype.toString.call(value) === '[object Error]');
+
+const asText = (value: unknown): string => {
   try {
     return JSON.stringify(value) ?? String(value);
   } catch {
@@ -10,16 +23,16 @@ const describe = (value: unknown): string => {
 };
 
 /**
- * Any thrown value as an `Error`: an `Error` as it is; an object's string `message`, a thrown string,
- * or else the value as JSON, as the message of a new one.
+ * Any thrown value as an `Error`: an `Error` as it is, one from another realm too; an object's string
+ * `message`, a thrown string, or else the value as JSON, as the message of a new one.
  */
 export function toErrorWithMessage(maybeError: unknown): Error {
-  if (maybeError instanceof Error) {
+  const message = messageIn(maybeError);
+  if (isError(maybeError, message)) {
     return maybeError;
   }
-  const message: unknown = hasSome(maybeError) ? Reflect.get(Object(maybeError), 'message') : undefined;
   if (isString(message)) {
     return new Error(message);
   }
-  return new Error(isString(maybeError) ? maybeError : describe(maybeError));
+  return new Error(isString(maybeError) ? maybeError : asText(maybeError));
 }

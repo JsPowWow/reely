@@ -3,11 +3,10 @@ export * from './lib/types/function.types';
 export * from './lib/types/utility.types';
 
 
-export { messageOf, toErrorWithMessage } from '@reely/basics';
+export { toErrorWithMessage } from '@reely/basics';
 export { default as toErrorString } from './lib/errors/toErrorString';
 export { default as exhaustiveGuard } from './lib/errors/exhaustiveGuard';
 export { default as reThrow } from './lib/errors/reThrow';
-export { hasStringMessage } from './lib/errors/hasStringMessage';
 export { reportUncaught } from '@reely/basics';
 
 export { Either } from './lib/fp/either/Either';

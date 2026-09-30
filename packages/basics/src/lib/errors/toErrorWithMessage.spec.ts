@@ -16,6 +16,24 @@ describe('toErrorWithMessage', () => {
     expect(toErrorWithMessage(new ApiFailure()).message).toBe('HTTP 503');
   });
 
+  it('keeps an Error from another realm, an iframe say, as it is', async () => {
+    const { runInNewContext } = await import('node:vm');
+    const foreign: unknown = runInNewContext('new RangeError("lap out of range")');
+
+    expect(foreign instanceof Error).toBe(false);
+    expect(toErrorWithMessage(foreign)).toBe(foreign);
+  });
+
+  it('describes an object whose message getter throws, instead of throwing', () => {
+    const hostile = Object.defineProperty({}, 'message', {
+      get: () => {
+        throw new Error('no access');
+      },
+    });
+
+    expect(toErrorWithMessage(hostile).message).toBe('{}');
+  });
+
   it('takes a thrown string as the message', () => {
     expect(toErrorWithMessage('offline').message).toBe('offline');
   });
