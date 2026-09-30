@@ -70,7 +70,9 @@ const profile = await patiently(() => loadProfile(userId));
 const saveDraft = withRetry(api.saveDraft, { retries: 2 }); // same parameters, retries on every call
 await saveDraft(draft);
 
-const [avatar, banner] = await retryAll([() => upload(avatarFile), () => upload(bannerFile)]); // each task retried on its own
+const [avatar, banner] = await retryAll([() => upload(avatarFile), () => upload(bannerFile)]); // each task retried on its own; one failing for good stops the other
 ```
 
-`retryRace` resolves with the first task to succeed after its retries, and rejects with an `AggregateError` only once every task has failed; `retryAllSettled` never rejects and returns every result, as `Promise.allSettled`.
+`retryRace` resolves with the first task to succeed after its retries and stops the rest, and rejects with an `AggregateError` only once every task has failed; `retryAllSettled` never rejects and returns every result, as `Promise.allSettled`.
+
+The signals need `AbortSignal.any`: Node 20.3+, and every current browser (Safari 17.4+, Firefox 124+).

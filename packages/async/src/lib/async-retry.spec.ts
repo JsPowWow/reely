@@ -176,6 +176,20 @@ describe('async-retry', () => {
     });
   });
 
+  describe('retryAll', () => {
+    it('stops the other tasks once one fails for good', async () => {
+      const failing = vi.fn().mockRejectedValue(new Error('quota'));
+      const retrying = vi.fn().mockRejectedValue(new Error('busy'));
+
+      const promise = retryAll([failing, retrying], { retries: 3, delay: 10, shouldRetry: (error) => error.message !== 'quota' });
+      await expect(promise).rejects.toThrow('quota');
+      await vi.advanceTimersByTimeAsync(10_000);
+
+      expect(retrying).toHaveBeenCalledTimes(1);
+      expect(vi.getTimerCount()).toBe(0);
+    });
+  });
+
   describe('retryRace', () => {
     it('should return the first successful result', async () => {
       const fn1 = vi.fn(async () => {
@@ -230,6 +244,28 @@ describe('async-retry', () => {
       await vi.advanceTimersByTimeAsync(50);
 
       await expect(promise).resolves.toBe('ok');
+    });
+
+    it('stops the tasks still retrying once one succeeds', async () => {
+      const signals: AbortSignal[] = [];
+      const loser = vi.fn((_attempt: number, signal: AbortSignal) => {
+        signals.push(signal);
+        return Promise.reject(new Error('busy'));
+      });
+      const winner = vi.fn(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        return 'first';
+      });
+
+      const promise = retryRace([loser, winner], { retries: 5, delay: 10 });
+      await vi.advanceTimersByTimeAsync(50);
+      await expect(promise).resolves.toBe('first');
+      const attempts = loser.mock.calls.length;
+      await vi.advanceTimersByTimeAsync(10_000);
+
+      expect(loser).toHaveBeenCalledTimes(attempts);
+      expect(signals.at(-1)?.aborted).toBe(true);
+      expect(vi.getTimerCount()).toBe(0);
     });
 
     it('rejects with every error once all tasks fail', async () => {
@@ -300,6 +336,19 @@ describe('async-retry', () => {
       await vi.advanceTimersByTimeAsync(10_000);
 
       expect(task).toHaveBeenCalledTimes(1);
+      expect(vi.getTimerCount()).toBe(0);
+    });
+
+    it('stops at once when onRetry aborts, instead of waiting out the delay', async () => {
+      const controller = new AbortController();
+      const task = vi.fn().mockRejectedValue(new Error('offline'));
+      const promise = retry(task, {
+        signal: controller.signal,
+        delay: 30_000,
+        onRetry: () => controller.abort('gave up'),
+      });
+
+      await expect(promise).rejects.toBe('gave up');
       expect(vi.getTimerCount()).toBe(0);
     });
 

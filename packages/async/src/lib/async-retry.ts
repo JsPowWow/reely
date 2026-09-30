@@ -1,3 +1,5 @@
+import { toErrorWithMessage } from '@reely/basics';
+
 export interface RetryOptions {
   /** Maximum number of retries (default: 3) */
   retries?: number;
@@ -19,7 +21,7 @@ export interface RetryOptions {
 
 /** What an attempt fails with when it runs longer than `timeout`. */
 export class TimeoutError extends Error {
-  public code = 'TIMEOUT';
+  public readonly code = 'TIMEOUT';
 
   constructor(message = 'The attempt took too long') {
     super(message);
@@ -30,9 +32,13 @@ export class TimeoutError extends Error {
 /** A task `retry` calls: the attempt number from 0, and a signal to pass on, to `fetch` say. */
 export type RetryTask<T> = (attempt: number, signal: AbortSignal) => Promise<T>;
 
-// Rejects with the signal's reason once it aborts; the listener goes when `settled` does.
+// Rejects with the signal's reason once it aborts, at once if it has; the listener goes when `settled` does.
 const abortOf = (signal: AbortSignal, settled: Promise<unknown>): Promise<never> =>
   new Promise((_, reject) => {
+    if (signal.aborted) {
+      reject(signal.reason);
+      return;
+    }
     const onAbort = (): void => reject(signal.reason);
     signal.addEventListener('abort', onAbort, { once: true });
     void settled.finally(() => signal.removeEventListener('abort', onAbort)).catch(() => undefined);
@@ -49,16 +55,18 @@ const sleep = (ms: number, signal: AbortSignal | undefined): Promise<void> => {
   return Promise.race([slept, abortOf(signal, slept)]).finally(() => clearTimeout(timer));
 };
 
-const attempt = async <T>(task: RetryTask<T>, number: number, timeout?: number, outer?: AbortSignal): Promise<T> => {
-  const limit = new AbortController();
+type AttemptLimits = Pick<RetryOptions, 'timeout' | 'signal'>;
+
+const runAttempt = async <T>(task: RetryTask<T>, attempt: number, { timeout, signal }: AttemptLimits): Promise<T> => {
+  const timeLimit = new AbortController();
   const timer =
     timeout === undefined
       ? undefined
-      : setTimeout(() => limit.abort(new TimeoutError(`The attempt took longer than ${timeout} ms`)), timeout);
-  const signal = outer ? AbortSignal.any([outer, limit.signal]) : limit.signal;
-  const running = Promise.resolve().then(() => task(number, signal));
+      : setTimeout(() => timeLimit.abort(new TimeoutError(`The attempt took longer than ${timeout} ms`)), timeout);
+  const attemptSignal = signal ? AbortSignal.any([signal, timeLimit.signal]) : timeLimit.signal;
+  const running = Promise.resolve().then(() => task(attempt, attemptSignal));
   try {
-    return await Promise.race([running, abortOf(signal, running)]);
+    return await Promise.race([running, abortOf(attemptSignal, running)]);
   } finally {
     clearTimeout(timer);
   }
@@ -73,41 +81,46 @@ export async function retry<T>(fn: RetryTask<T>, options: RetryOptions = {}): Pr
     delay = 1000,
     maxDelay = 30000,
     factor = 2,
-    onRetry = (): void => {
-      return;
-    },
+    onRetry,
     shouldRetry = (): boolean => true,
-    timeout,
     signal,
   } = options;
 
-  let lastError: Error | undefined;
   let currentDelay = delay;
 
-  for (let number = 0; number <= retries; number++) {
+  for (let attempt = 0; ; attempt++) {
     signal?.throwIfAborted();
     try {
-      return await attempt(fn, number, timeout, signal);
+      return await runAttempt(fn, attempt, options);
     } catch (error) {
       if (signal?.aborted) {
         throw signal.reason;
       }
-      lastError = error instanceof Error ? error : new Error(String(error));
-
-      if (number === retries || !shouldRetry(lastError, number)) {
+      const failure = toErrorWithMessage(error);
+      if (attempt === retries || !shouldRetry(failure, attempt)) {
         throw error;
       }
-
-      onRetry(lastError, number, currentDelay);
-
+      onRetry?.(failure, attempt, currentDelay);
       await sleep(currentDelay, signal);
-
       currentDelay = Math.min(currentDelay * factor, maxDelay);
     }
   }
-
-  throw lastError;
 }
+
+// Runs every task under one signal, and stops those still running once `settle` has its answer.
+const together = async <T, R>(
+  fns: Array<RetryTask<T>>,
+  options: RetryOptions,
+  settle: (runs: Array<Promise<T>>) => Promise<R>
+): Promise<R> => {
+  const group = new AbortController();
+  const signal = options.signal ? AbortSignal.any([options.signal, group.signal]) : group.signal;
+  try {
+    return await settle(fns.map((fn) => retry(fn, { ...options, signal })));
+  } finally {
+    group.abort(new Error('Another task settled the group'));
+  }
+};
 
 /**
  * Create a reusable retry wrapper with preset options
@@ -135,13 +148,14 @@ export function withRetry(
 }
 
 /**
- * Execute multiple async operations with individual retry logic
+ * Retries each task on its own and resolves with every result; once one fails for good, rejects with
+ * its error and stops the others.
  */
 export async function retryAll<T>(
   fns: Array<RetryTask<T>>,
   options: RetryOptions = {}
 ): Promise<T[]> {
-  return Promise.all(fns.map((fn) => retry(fn, options)));
+  return together(fns, options, (runs) => Promise.all(runs));
 }
 
 /**
@@ -152,7 +166,7 @@ export async function retryRace<T>(
   fns: Array<RetryTask<T>>,
   options: RetryOptions = {}
 ): Promise<T> {
-  return Promise.any(fns.map((fn) => retry(fn, options)));
+  return together(fns, options, (runs) => Promise.any(runs));
 }
 
 /**
