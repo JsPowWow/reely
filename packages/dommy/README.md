@@ -505,7 +505,7 @@ const Search = (): Node => {
 
 ## Router
 
-`@reely/dommy/router` is a separate entry: an app without routes ships none of it. `defineRoutes` turns path patterns into the app's routes, `Router` shows the page of the current URL and follows the site's links, back and forward without loading the document, `navigate` moves from code, `href` fills a pattern in for a link, and `currentPath` tells bindings the path shown.
+`@reely/dommy/router` is a separate entry: an app without routes ships none of it. It puts [`@reely/router`](https://www.npmjs.com/package/@reely/router) in a component: `defineRoutes` turns path patterns into the app's routes, `Router` shows the page of the current URL and follows the site's links, back and forward without loading the document, `navigate` moves from code, `href` fills a pattern in for a link, and `currentPath` tells bindings the path shown. The rest of the router (a router inside part of the page, the loading state) is in its README.
 
 ```tsx
 import { mount } from '@reely/dommy';
@@ -544,7 +544,9 @@ navigate(href('/messages/:id', { id: '42' }));
 - The page shown stays until the next one has loaded, and only the latest move counts. A new page starts at the top, or at the place its URL names, with focus on its heading; back, forward and a reload return to where the reader had scrolled.
 - `catch` is required, as on `Await`: a page that fails to load or to render, and a path no route answers, still have a view.
 - A route's pattern is its name: `href` fills it in, typed from it, and a plain `<a href>` is all a link needs, since the router takes over every link of the site.
-- Routes answer the pathname; a new query (`?sort=price`) shows the page again, a new `#place` only scrolls to it.
+- A route gets the query after its params, `(params, query)`; a new query (`?sort=price`) shows the page again, a new `#place` only scrolls to it.
+- `navigate(to, { replace: true })` takes the place of the current history entry: a redirect from a guard.
+- `history={memoryHistory('/help')}` gives a widget pages of its own without touching the address bar; `followLinks(widget, history.navigate)` hands it the widget's links, and `history.path()` is the path it shows.
 
 ## License
 

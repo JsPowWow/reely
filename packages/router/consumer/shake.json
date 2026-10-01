@@ -1,0 +1,32 @@
+[
+  {
+    "name": "href alone",
+    "code": "import { href } from '@reely/router'; console.log(href('/messages/:id', { id: '7' }));",
+    "absent": ["matchSegments", "browserHistory", "followLinks", "signalProto"],
+    "once": ["href"]
+  },
+  {
+    "name": "defineRoutes alone",
+    "code": "import { defineRoutes } from '@reely/router'; defineRoutes({ '/': () => 'inbox' })('/').then(console.log);",
+    "absent": ["browserHistory", "followLinks", "signalProto", "href"],
+    "once": ["matchSegments"]
+  },
+  {
+    "name": "navigate alone",
+    "code": "import { navigate } from '@reely/router'; navigate('/inbox');",
+    "absent": ["browserHistory", "followLinks", "signalProto", "matchSegments"],
+    "once": ["navigate"]
+  },
+  {
+    "name": "followLinks alone",
+    "code": "import { followLinks } from '@reely/router'; followLinks(document.body, console.log);",
+    "absent": ["browserHistory", "matchSegments", "href"],
+    "once": ["followLinks"]
+  },
+  {
+    "name": "a router with an effect",
+    "code": "import { effect } from '@reely/signals'; import { defineRoutes, startRouter } from '@reely/router'; const main = document.body; const router = startRouter(defineRoutes({ '/': () => 'inbox' }), { show: (page) => { main.textContent = page; return main; }, fail: (error) => error.message }); effect(() => console.log(router.path()));",
+    "absent": ["href"],
+    "once": ["signalProto", "browserHistory"]
+  }
+]

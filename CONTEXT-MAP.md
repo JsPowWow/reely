@@ -3,7 +3,8 @@
 ## Contexts
 
 - [signals](./packages/signals/CONTEXT.md): signals, computed values, effects and owners, without the DOM
-- [dommy](./packages/dommy/CONTEXT.md): DOM element factories, JSX runtime, signal bindings, async router
+- [dommy](./packages/dommy/CONTEXT.md): DOM element factories, JSX runtime, signal bindings, the `Router` component
+- [router](./packages/router/CONTEXT.md): typed routes, and a router that shows the page of an address, with no framework
 - [utils](./packages/utils/CONTEXT.md): shared guards, fp (`pipe`, `Either`, `Maybe`), nullable helpers, errors, types
 - [logger](./packages/logger/CONTEXT.md): scoped logging
 - [state-machine](./packages/state-machine/CONTEXT.md): finite state machine for app logic, independent of the DOM
@@ -14,9 +15,12 @@
 
 ## Relationships
 
-- **dommy → signals, utils, logger**: binds signals to the DOM and re-exports them; uses guards, fp steps
-  and shared types, and the scoped logger; the published dommy must not import utils or logger in its
-  emitted `.d.ts`/JS
+- **dommy → signals, router, utils, logger**: binds signals to the DOM and re-exports them; its `Router`
+  renders the pages of `@reely/router` in a flow slot; uses guards, fp steps and shared types, and the
+  scoped logger; the published dommy must not import utils or logger in its emitted `.d.ts`/JS
+- **router → signals, basics, utils**: the path shown and the loading state are signals, a router stops
+  with its owner; knows no framework, the app's `show` puts each page on screen; the published router
+  must not import utils in its emitted `.d.ts`/JS
 - **dommy-kit → signals, basics, utils**: browser helpers over signals, released through the owner; no
   dommy at runtime (its specs render with it); the published kit must not import utils in its emitted
   `.d.ts`/JS

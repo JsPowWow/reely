@@ -2,6 +2,7 @@
 export const sitePackages = [
   'basics',
   'signals',
+  'router',
   'dommy',
   'dommy-kit',
   'emitter',

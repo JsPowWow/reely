@@ -1,15 +1,14 @@
 import { defineRoutes } from './router.routes';
 
-import type { Page } from './router.types';
+import type { Routes } from './router.types';
 
 /** A page that names itself, so a test reads which route answered. */
 const named =
-  (name: string): Page =>
+  (name: string): (() => string) =>
   () =>
     name;
 
-const answerAt = async (routes: ReturnType<typeof defineRoutes>, pathname: string): Promise<unknown> =>
-  (await routes(pathname))?.();
+const answerAt = async (routes: Routes<() => string>, address: string): Promise<unknown> => (await routes(address))?.();
 
 describe('defineRoutes', () => {
   it('answers a pathname with the page of the route that matches it', async () => {
@@ -82,6 +81,15 @@ describe('defineRoutes', () => {
     expect(await answerAt(routes, '/docs/old')).toBe('missing');
   });
 
+  it('matches the path of an address, and hands a route its query', async () => {
+    const routes = defineRoutes({
+      '/search': (_params, query) => named(`search: ${query.get('q') ?? ''}, page ${query.get('page') ?? '1'}`),
+    });
+
+    expect(await answerAt(routes, '/search?q=winter%20tyres&page=2')).toBe('search: winter tyres, page 2');
+    expect(await answerAt(routes, '/search')).toBe('search: , page 1');
+  });
+
   it('rejects with the error of a route that fails', async () => {
     const routes = defineRoutes({ '/broken': () => Promise.reject(new Error('The chunk did not load')) });
 
@@ -97,5 +105,15 @@ describe('defineRoutes', () => {
       // @ts-expect-error the pattern names no `topic`
       '/docs/:slug': ({ topic }) => named(String(topic)),
     });
+  });
+
+  it('types the page from what the routes answer, loaded', () => {
+    const routes = defineRoutes({
+      '/': () => ({ title: 'Inbox', unread: 3 }),
+      '/settings': () => Promise.resolve({ title: 'Settings', unread: 0 }),
+      '/:folder': ({ folder }) => (folder === 'spam' ? undefined : { title: folder, unread: 0 }),
+    });
+
+    expectTypeOf(routes).returns.resolves.toEqualTypeOf<{ title: string; unread: number } | undefined>();
   });
 });

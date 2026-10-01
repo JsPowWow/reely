@@ -21,6 +21,9 @@
       "path": "../signals/tsconfig.lib.json"
     },
     {
+      "path": "../router/tsconfig.lib.json"
+    },
+    {
       "path": "../basics/tsconfig.lib.json"
     },
     {

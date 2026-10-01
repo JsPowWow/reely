@@ -1,4 +1,5 @@
 import { effect } from '@reely/dommy';
+import type { ReelyNode } from '@reely/dommy';
 
 import { packageExamples } from './package.examples';
 import { packageText } from './package.text';
@@ -14,6 +15,7 @@ import { docHref, packageHref } from '../../site/site.paths';
 
 import css from './package.module.css';
 
+import type { PackageExample } from './package.examples';
 import type { PagedPackage } from '../../site/site.packages';
 
 const readmeHref = (name: PagedPackage): string =>
@@ -24,11 +26,29 @@ const npmHref = (name: PagedPackage): string => `https://www.npmjs.com/package/@
 // a package that dommy's docs show at work in the DOM, and where
 const dommyDocs: Partial<Record<PagedPackage, string>> = { signals: docHref('signals') };
 
-/** A package's page: what it is for, how to install it, its measured facts, and one live example. */
+const Example = ({ example, children }: { example: PackageExample; children?: ReelyNode }): Node => (
+  <section className={exampleCss.example} aria={{ ariaLabelledby: `${example.id}-title` }}>
+    <header className={exampleCss.exampleHeading}>
+      <h2 id={`${example.id}-title`} className={exampleCss.exampleTitle}>
+        {() => packageText().examples[example.id].title}
+      </h2>
+      <p className={exampleCss.claim}>{() => packageText().examples[example.id].claim}</p>
+      {children}
+    </header>
+    <div className={exampleCss.panels}>
+      <MutationMeter>
+        <example.Demo />
+      </MutationMeter>
+      <SourceView source={example.source} caption={example.file} />
+    </div>
+  </section>
+);
+
+/** A package's page: what it is for, how to install it, its measured facts, and its live examples. */
 export const PackagePage = ({ name }: { name: PagedPackage }): Node => {
   const { version, gzipBytes, uses, exports } = packages[name];
   const builtOn = sitePackages.filter((used) => uses.includes(used));
-  const { Demo, file, source } = packageExamples[name];
+  const examples = packageExamples[name];
   effect(() => {
     document.title = `@reely/${name} | reely`;
   });
@@ -73,25 +93,15 @@ export const PackagePage = ({ name }: { name: PagedPackage }): Node => {
             </div>
           </dl>
         </section>
-        <section className={exampleCss.example} aria={{ ariaLabelledby: 'example-title' }}>
-          <header className={exampleCss.exampleHeading}>
-            <h2 id='example-title' className={exampleCss.exampleTitle}>
-              {() => packageText().examples[name].title}
-            </h2>
-            <p className={exampleCss.claim}>{() => packageText().examples[name].claim}</p>
-            {dommyDocs[name] && (
+        {examples.map((example, index) => (
+          <Example example={example}>
+            {index === 0 && dommyDocs[name] && (
               <a className={css.inDocs} href={dommyDocs[name]}>
                 {() => packageText().inDommyDocs}
               </a>
             )}
-          </header>
-          <div className={exampleCss.panels}>
-            <MutationMeter>
-              <Demo />
-            </MutationMeter>
-            <SourceView source={source} caption={file} />
-          </div>
-        </section>
+          </Example>
+        ))}
         <section className={exampleCss.example} aria={{ ariaLabelledby: 'exports-title' }}>
           <header className={exampleCss.exampleHeading}>
             <h2 id='exports-title' className={exampleCss.exampleTitle}>

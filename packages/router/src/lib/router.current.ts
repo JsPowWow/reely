@@ -7,7 +7,7 @@ let shown: Signal<string> | undefined;
 const shownPath = (): Signal<string> => (shown ??= signal(location.pathname));
 
 /**
- * The path of the page the `Router` shows, read like a signal: a binding or effect that reads it
+ * The path of the page the browser's router shows, read like a signal: a binding or effect that reads it
  * follows every move, as a menu's `aria-current` does.
  */
 export const currentPath = (): string => shownPath().value;

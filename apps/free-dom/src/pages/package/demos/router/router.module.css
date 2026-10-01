@@ -1,0 +1,243 @@
+/* A small app in a frame: its address in memory on top, a menu beside the page it shows. */
+.app {
+  display: grid;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.address {
+  position: relative;
+  margin: 0;
+  padding: 0.55rem 0.85rem;
+  background: var(--graphite);
+  color: var(--code-text);
+  font-family: var(--mono);
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+/* While the next page loads, a bar runs under the address; the page shown stays. */
+.address::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: var(--signal);
+  transform: scaleX(0);
+  transform-origin: left;
+  content: '';
+}
+
+.app[aria-busy='true'] .address::after {
+  animation: loading 1.2s ease-out forwards;
+}
+
+@keyframes loading {
+  to {
+    transform: scaleX(0.9);
+  }
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  min-height: 15rem;
+}
+
+.menu {
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-right: 1px solid var(--line);
+}
+
+.menu a {
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  color: var(--graphite);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.menu a:hover {
+  background: var(--asphalt);
+}
+
+.menu a[aria-current='page'] {
+  background: var(--signal);
+}
+
+.page {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+.page h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.75rem;
+  line-height: 1.1;
+}
+
+/* the router focuses a new page's heading for a screen reader; a ring there would read as a control */
+.page h2:focus {
+  outline: none;
+}
+
+.page p {
+  margin: 0;
+}
+
+.page a {
+  color: var(--graphite);
+  text-underline-offset: 0.2em;
+}
+
+.rows {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rows a {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.rows a:hover {
+  border-color: var(--slate);
+}
+
+.rows small {
+  color: var(--slate);
+  white-space: nowrap;
+}
+
+.failed {
+  color: var(--flag);
+  font-weight: 700;
+}
+
+@media (max-width: 34em) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .menu {
+    display: flex;
+    flex-wrap: wrap;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app[aria-busy='true'] .address::after {
+    animation: none;
+    transform: scaleX(0.9);
+  }
+}
+
+.log {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0 0 0 1.25rem;
+  color: var(--slate);
+  font-variant-numeric: tabular-nums;
+}
+
+.search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.search input,
+.search select {
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--slate);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--graphite);
+  font: inherit;
+}
+
+.search input {
+  flex: 1 1 10rem;
+}
+
+.sorts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  color: var(--slate);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tiles a,
+.photo {
+  display: grid;
+  place-items: end start;
+  aspect-ratio: 4 / 3;
+  padding: 0.4rem 0.5rem;
+  border-radius: 4px;
+  background: linear-gradient(160deg, var(--light), var(--dark));
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.45);
+}
+
+.photo {
+  aspect-ratio: 16 / 9;
+  font-size: 1.25rem;
+}
+
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  color: var(--slate);
+  list-style: none;
+}
+
+.crumbs li + li::before {
+  margin-right: 0.35rem;
+  content: '/';
+}
+
+.filters a[aria-current='page'] {
+  color: var(--graphite);
+  font-weight: 700;
+  text-decoration: none;
+}

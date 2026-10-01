@@ -26,6 +26,46 @@ const en = {
       claim:
         'The total is computed from the quantity and the discount. The bulk order changes both inside one batch, so the effect that saves the draft runs once, as its count shows. The signals know no DOM: dommy binds them here.',
     },
+    router: {
+      title: 'A mail client with folders',
+      claim:
+        'Every folder and message is an address: /:folder/:id hands its route the params, typed, and href makes the links from the same pattern. A folder the mailbox lacks answers nothing and falls through to the page for unknown paths; the menu follows path(). The history is kept in memory, so the address above is the demo’s, not the site’s.',
+    },
+    routerLazy: {
+      title: 'Settings that load on demand',
+      claim:
+        'Billing and Notifications are chunks that take their time. The page shown stays until the next one has loaded, the bar under the address follows loading(), and only the latest click counts: open Billing, then Notifications at once, and Billing loads but never shows. Reports fails to load, and fail gives it a page.',
+    },
+    routerSearch: {
+      title: 'A search that lives in the address',
+      claim:
+        'The form goes to /search?q=…&sort=…, and the route reads both from the query it gets after its params, so a link is a search too: Chairs by price, the sort links, More lamps. Each page here is a plain element.',
+    },
+    routerGuard: {
+      title: 'A guard that sends you to sign in',
+      claim:
+        'Orders and Account answer only a signed-in reader. Signed out, the route sends the reader to /login?next=… and answers nothing; signing in goes on to next. Both moves pass { replace: true }, which in the browser keeps the sign-in page out of Back. A guard is a function around a route’s answer, nothing the router has to know of.',
+    },
+    routerGallery: {
+      title: 'A photo gallery with keys',
+      claim:
+        'The album and each photo are addresses; Previous and Next are links that wrap round the album. Focus the gallery and the arrow keys move through the photos, Escape goes back to the album: the keys read path() and send the router with navigate, moves from code like any other. A photo the album lacks answers nothing, and fail says so.',
+    },
+    routerHelp: {
+      title: 'With dommy: a help widget with pages',
+      claim:
+        '<Router> takes a history of its own, so the widget has pages and the site’s address stays put; followLinks hands it the widget’s links. The menu’s aria-current binds to path(). Each page renders under its own owner: vote on Returns, leave and come back, and the vote is gone with the page it belonged to. A topic no route answers lands in catch.',
+    },
+    routerFiles: {
+      title: 'With dommy: a drive with folders in the path',
+      claim:
+        '/drive/*path takes the rest of the path, slashes and all, decoded; the route walks the folders and answers a folder or a file, or nothing. The crumbs are links made by href, which encodes each segment and keeps the slashes: see Office%20party above.',
+    },
+    routerIssues: {
+      title: 'With dommy: issue filters in the query',
+      claim:
+        'State and label live in /issues?state=…&label=…, so each filter is a link that keeps the other. The page binds to a signal of the issues: close one and the open list it goes back to has one fewer, the count and the For list following it without another load.',
+    },
     'dommy-kit': {
       title: 'A text size that outlives a reload',
       claim:
@@ -71,7 +111,7 @@ const en = {
       claim:
         'capitalize gives every word a capital, in any script; slugify makes the address: a Latin letter loses its accent, Cyrillic stays as it is, anything but letters, digits and hyphens goes.',
     },
-  } satisfies Record<PagedPackage, ExampleText>,
+  } satisfies Record<PagedPackage, ExampleText> & Record<string, ExampleText>,
 };
 
 export type PackageText = typeof en;

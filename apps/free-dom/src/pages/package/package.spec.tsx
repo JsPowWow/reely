@@ -31,7 +31,7 @@ describe('PackagePage', () => {
     expect(host.querySelector('code')?.textContent).toBe(`npm i @reely/${name}`);
     expect(host.querySelector('dd')?.textContent).toMatch(/^\d+\.\d+\.\d+$/);
     expect(host.querySelector('figure > div > *')).not.toBeNull();
-    expect(host.querySelector('[id^="source-caption-"]')?.textContent).toMatch(/\.tsx$/);
+    expect(host.querySelector('[id^="source-caption-"]')?.textContent).toMatch(/\.tsx?$/);
     expect(document.title).toBe(`@reely/${name} | reely`);
   });
 

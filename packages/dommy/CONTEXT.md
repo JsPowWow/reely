@@ -32,11 +32,9 @@ _Avoid_: scope, context
 
 ## Routing
 
-**Route**:
-A path pattern (`/messages/:id`, `/*rest`) with the function that answers it with a page, or with nothing to pass the path to the next route.
-_Avoid_: handler, action
+Routes, addresses and moves are `@reely/router`'s terms (`packages/router/CONTEXT.md`).
 
 **Page**:
-A component without props that a route answers with; the router renders it under its own owner and takes it down at the next move.
+A component without props that a route answers with; `Router` renders it under its own owner and takes it down at the next move.
 _Avoid_: view, screen
 

@@ -30,7 +30,7 @@ export default defineConfig(() => ({
     minify: true,
     outDir: 'dist',
     rolldownOptions: {
-      external: ['tslib', '@reely/basics', /^@reely\/signals/],
+      external: ['tslib', '@reely/basics', '@reely/router', /^@reely\/signals/],
       output: {
         preserveModules: false,
         // code shared by the entries

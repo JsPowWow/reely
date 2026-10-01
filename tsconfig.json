@@ -50,6 +50,9 @@
     },
     {
       "path": "./packages/dommy-kit"
+    },
+    {
+      "path": "./packages/router"
     }
   ],
   "compilerOptions": {

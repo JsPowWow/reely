@@ -10,6 +10,7 @@ import {
 } from './docs.snippets';
 import { localized } from '../../i18n/localized';
 import { measured } from '../../measure/measures';
+import { packageHref } from '../../site/site.paths';
 
 import type { AdvancedExamples } from './advanced.examples';
 import type { DocGroup, DocSlug } from './docs.topics';
@@ -346,7 +347,7 @@ const en = {
     },
     routing: {
       title: 'Routing',
-      lead: 'defineRoutes turns path patterns into the routes of an app: a pathname gets the page of the first route that matches and answers. Router, from @reely/dommy/router, shows that page and follows links, back and forward without loading the document.',
+      lead: 'defineRoutes turns path patterns into the routes of an app: an address gets the page of the first route that matches and answers. Router, from @reely/dommy/router, shows that page and follows links, back and forward without loading the document. It is @reely/router in a component; that package works in an app without dommy too.',
       Details: (): Node => (
         <>
           <h2>Patterns and params</h2>
@@ -397,9 +398,17 @@ const en = {
               <code>aria-current</code> follows every move.
             </li>
             <li>
-              <code>navigate(url)</code> moves from code; a move to the URL already shown adds no history entry.
+              <code>navigate(url)</code> moves from code; a move to the URL already shown adds no history entry, and{' '}
+              <code>{'{ replace: true }'}</code> takes the place of the entry left, as a redirect does.
+            </li>
+            <li>
+              A route gets the query after its params: <code>{"'/search': (_params, query) => …"}</code>.
             </li>
           </ul>
+          <p>
+            A router inside part of the page, the loading state and apps without dommy:{' '}
+            <a href={packageHref('router')}>@reely/router</a>.
+          </p>
           <p>
             This site runs on it: every page but the home page is its own chunk, so the first visit loads about a fifth
             of the code it used to.

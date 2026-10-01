@@ -1,0 +1,70 @@
+{
+  "name": "@reely/router",
+  "version": "0.1.0",
+  "description": "A small typed router for any web app: routes from path patterns, lazy pages, links and history taken over, scroll and focus kept, no framework.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JsPowWow/reely.git"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
+  "nx": {
+    "tags": [
+      "scope:shared"
+    ],
+    "projectType": "library",
+    "sourceRoot": "packages/router/src",
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "vite build",
+          "cwd": "packages/router"
+        },
+        "dependsOn": [
+          "^build"
+        ],
+        "outputs": [
+          "{projectRoot}/dist"
+        ]
+      },
+      "consumer": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "node ../../scripts/consumer-check.mjs --readme",
+          "cwd": "packages/router"
+        },
+        "dependsOn": [
+          "build",
+          "^build"
+        ]
+      }
+    }
+  },
+  "devDependencies": {
+    "@reely/utils": "*"
+  },
+  "dependencies": {
+    "@reely/basics": "^0.1.1",
+    "@reely/signals": "^0.1.1"
+  }
+}

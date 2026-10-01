@@ -16,7 +16,7 @@ The repo exists for `@reely/dommy` and the small `@reely/*` helpers it stands on
 
 Every new module, fix and refactor follows these; a fix that has to cross a boundary means the code sits in the wrong place — move the code, keep the rule.
 
-- **Dependencies point inward**, toward the general and stable: `basics`/`utils` ← signals (the reactive core) ← DOM binding ← flow components and JSX ← kit ← apps. An inner layer never imports an outer one; the reactive core knows nothing of the DOM.
+- **Dependencies point inward**, toward the general and stable: `basics`/`utils` ← signals (the reactive core) ← router ← DOM binding ← flow components and JSX ← kit ← apps. An inner layer never imports an outer one; the reactive core knows nothing of the DOM.
 - **The outside world stays at the edge:** DOM, storage, clock, network are reached through thin adapters or taken as parameters, so the logic inside runs and is tested without them.
 - **High cohesion:** a file, folder or package holds what changes together for one reason and is named after it; one that changes for several reasons is split.
 - **Low coupling:** modules meet at a small typed interface — no reaching into another module's internals, no shared mutable state between modules, no cycles.
@@ -27,7 +27,8 @@ Every new module, fix and refactor follows these; a fix that has to cross a boun
 - `packages/utils` — `@reely/utils`, private (`scope:shared`): type guards, fp (`pipe`, `flow`, `Either`, `Maybe`), nullable helpers, errors, shared types. **One function — one file** (`src/lib/<group>/<fnName>.ts`) with a spec next to it.
 - `packages/logger` — `@reely/logger` (`scope:shared`): `scopedLogger(scope)`, `logWith(level, prefix)` for `pipe`, `WithUseLogger<T>`.
 - `packages/signals` — `@reely/signals`, published (`scope:shared`): `signal`/`computed`/`effect`/`batch`/`untracked` over `reelx`, a push-pull graph, and the owner (`withOwner`, `onCleanup`); no DOM.
-- `packages/dommy` — `@reely/dommy`: DOM element factories, JSX runtime, bindings of `@reely/signals` (re-exported), async router. Its real consumer is JsPowWow/ai-race.
+- `packages/router` — `@reely/router`, published (`scope:shared`): typed routes (`defineRoutes`, `href`) and `startRouter` with the browser's history or `memoryHistory`; any page type, no framework.
+- `packages/dommy` — `@reely/dommy`: DOM element factories, JSX runtime, bindings of `@reely/signals` (re-exported), the `Router` component over `@reely/router`. Its real consumer is JsPowWow/ai-race.
 - `packages/dommy-kit` — `@reely/dommy-kit` (`scope:dommy`): browser helpers over signals (`media`, `size`, `throttled`, `persisted`, `listen`, `later`, `flip`), each stopping with the owner (render) that created it.
 - `packages/async`, `strings`, `colors` — small published helpers (older, looser style — don't copy it).
 - `apps/free-dom` — dommy playground; `apps/star-battle` — canvas game; `labs-ignore/` — experiments, not linted, not shipped.

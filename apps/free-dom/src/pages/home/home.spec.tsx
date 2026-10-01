@@ -30,7 +30,7 @@ describe('HomePage', () => {
     const facts = Array.from(host.querySelectorAll('main dl dd'), (fact) => fact.textContent);
 
     expect(host.querySelector('a[href="#packages"]')?.textContent).toBe('Find your package');
-    expect(facts.slice(0, 2)).toEqual(['12', '0']);
+    expect(facts.slice(0, 2)).toEqual(['13', '0']);
     expect(facts[2]).toMatch(/^\d\.\d kB$/);
   });
 
@@ -47,6 +47,7 @@ describe('HomePage', () => {
     expect(plates.map((plate) => plate.getAttribute('href'))).toEqual([
       '/basics',
       '/signals',
+      '/router',
       '/dommy',
       '/dommy-kit',
       '/emitter',
@@ -60,7 +61,7 @@ describe('HomePage', () => {
     ]);
     expect(plates.every((plate) => (plate.textContent ?? '').includes(' kB'))).toBe(true);
     expect(plates[0]?.textContent).toContain('Stands on its own');
-    expect(plates[3]?.textContent).toContain('Built on @reely/basics, @reely/signals');
+    expect(plates[3]?.textContent).toContain('Built on @reely/basics, @reely/router, @reely/signals');
   });
 
   it('speaks Russian once it is chosen', async () => {

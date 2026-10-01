@@ -33,28 +33,31 @@
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
   "references": [
     {
-      "path": "../../packages/async/tsconfig.lib.json"
-    },
-    {
       "path": "../../packages/state-machine/tsconfig.lib.json"
     },
     {
-      "path": "../../packages/emitter/tsconfig.lib.json"
+      "path": "../../packages/router/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/async/tsconfig.lib.json"
+    },
+    {
+      "path": "../../packages/strings/tsconfig.lib.json"
     },
     {
       "path": "../../packages/queue/tsconfig.lib.json"
     },
     {
-      "path": "../../packages/colors/tsconfig.lib.json"
+      "path": "../../packages/signals/tsconfig.lib.json"
     },
     {
       "path": "../../packages/simple-store/tsconfig.lib.json"
     },
     {
-      "path": "../../packages/signals/tsconfig.lib.json"
+      "path": "../../packages/colors/tsconfig.lib.json"
     },
     {
-      "path": "../../packages/strings/tsconfig.lib.json"
+      "path": "../../packages/emitter/tsconfig.lib.json"
     },
     {
       "path": "../../packages/logger/tsconfig.lib.json"
