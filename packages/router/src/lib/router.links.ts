@@ -9,8 +9,12 @@ const linkOf = (target: Nullable<EventTarget>): Nullable<HTMLAnchorElement> =>
 const isPlainClick = (event: MouseEvent): boolean =>
   event.button === 0 && !event.defaultPrevented && !(event.altKey || event.ctrlKey || event.metaKey || event.shiftKey);
 
+// `rel="external"` marks a link of this site the server answers (a file, a page of another app)
 const opensHere = (link: HTMLAnchorElement): boolean =>
-  (link.target === '' || link.target === '_self') && !link.hasAttribute('download') && link.origin === location.origin;
+  (link.target === '' || link.target === '_self') &&
+  !link.hasAttribute('download') &&
+  !link.relList.contains('external') &&
+  link.origin === location.origin;
 
 // takes over the plain clicks on the links of this site inside `root` that `follow` takes: it
 // answers whether it went to the link's page, or leaves the click to the browser

@@ -1,4 +1,4 @@
-export { currentPath } from './lib/router.current';
+export { currentPath, pageLoading } from './lib/router.current';
 export { href, type HrefParams } from './lib/router.href';
 export { type RouterHistory } from './lib/router.history';
 export { followLinks } from './lib/router.links';

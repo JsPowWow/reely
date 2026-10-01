@@ -1,4 +1,4 @@
-import { defineRoutes, followLinks, memoryHistory, navigate } from '@reely/router';
+import { defineRoutes, followLinks, memoryHistory, navigate, pageLoading } from '@reely/router';
 import { onCleanup } from '@reely/signals';
 
 import { Router } from './router.flow';
@@ -192,5 +192,30 @@ describe('Router', () => {
     expect(heading()).toBe('Cart');
     expect(document.querySelector('aside > p')?.textContent).toBe('At /cart');
     expect(location.pathname).toBe('/site');
+  });
+
+  it('lets a bar anywhere in the app say that the next page is loading', async () => {
+    const slowCart = Promise.withResolvers<Page>();
+    history.replaceState(null, '', '/');
+    dispose = mount(document.body, () => (
+      <>
+        <progress hidden={() => !pageLoading()} />
+        <Router
+          routes={defineRoutes({ '/': () => pageNamed('Shop'), '/cart': () => slowCart.promise })}
+          catch={(error) => <p role='alert'>{error.message}</p>}
+        />
+      </>
+    ));
+    await settle();
+    const bar = document.querySelector('progress');
+
+    navigate('/cart');
+    const whileLoading = bar?.hidden;
+    slowCart.resolve(pageNamed('Cart'));
+    await settle();
+
+    expect(whileLoading).toBe(false);
+    expect(bar?.hidden).toBe(true);
+    expect(heading()).toBe('Cart');
   });
 });

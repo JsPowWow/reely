@@ -16,3 +16,18 @@ export const currentPath = (): string => shownPath().value;
 export const showPath = (path: string): void => {
   shownPath().value = path;
 };
+
+// and one page loading at a time
+let loading: Signal<boolean> | undefined;
+
+const loadingPage = (): Signal<boolean> => (loading ??= signal(false));
+
+/**
+ * Whether the browser's router is loading the next page, read like a signal: the page shown stays
+ * until it has loaded, so a progress bar anywhere in the app says one is coming.
+ */
+export const pageLoading = (): boolean => loadingPage().value;
+
+export const showLoading = (value: boolean): void => {
+  loadingPage().value = value;
+};

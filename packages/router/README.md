@@ -103,7 +103,7 @@ navigate(href(paths.message, { id: '43' }));
 navigate('/login?next=/account', { replace: true });
 ```
 
-- The router takes over a plain left click on a link of this site. A click with a modifier key or another button, a link with `target="_blank"` or `download`, a link to another site, and a link to a place on the page shown stay the browser's.
+- The router takes over a plain left click on a link of this site. A click with a modifier key or another button, a link with `target="_blank"` or `download`, a link marked `rel="external"` (a file or a page the server answers), a link to another site, and a link to a place on the page shown stay the browser's.
 - A new query (`?sort=price`) shows the page again; a new `#place` on the page shown only scrolls to it.
 - `navigate` to the URL already shown adds no history entry.
 
@@ -165,7 +165,7 @@ effect(() => {
 });
 ```
 
-Only the latest move counts: a page still loading when the reader clicks another link is dropped. `currentPath()` reads the path the browser's router shows from anywhere in the app, without the router at hand.
+Only the latest move counts: a page still loading when the reader clicks another link is dropped. `currentPath()` and `pageLoading()` read the same for the browser's router from anywhere in the app, without the router at hand: a progress bar in the header needs only `pageLoading()`.
 
 ## Scroll and focus
 
@@ -177,7 +177,7 @@ The browser's router opens each page the way the reader expects:
 
 ## A router inside part of the page
 
-A widget, a dialog or a help panel can have pages of its own and leave the address bar alone. `memoryHistory(start)` keeps the address in memory; `followLinks(root, navigate)` hands it the plain clicks on the links inside `root`, each read against its own address (so `href="7"` on `/orders/3` goes to `/orders/7`):
+A widget, a dialog or a help panel can have pages of its own and leave the address bar alone. `memoryHistory(start)` keeps the address in memory; `followLinks(root, navigate)` hands it the plain clicks on the links inside `root`, each read against its own address (so `href="7"` on `/orders/3` goes to `/orders/7`). It keeps no Back stack, so `replace` changes nothing there:
 
 ```ts
 import { defineRoutes, followLinks, href, memoryHistory, startRouter } from '@reely/router';
@@ -208,7 +208,7 @@ startRouter(
 );
 
 help.navigate(href(paths.topic, { slug: 'returns' })); // from code, the same way
-console.log(help.path()); // the path shown, read like a signal
+console.log(help.path(), help.loading()); // the path shown and the next page loading, read like signals
 ```
 
 After a move, the page's `h1` gets the focus, or its first heading of any level when it has none: a widget's pages start at `h2`.
@@ -291,8 +291,8 @@ export const HelpWidget = (): Node => {
 - `startRouter(routes, { show, fail, history })`: shows the page of the current address and keeps following it; returns `{ path, loading, navigate, stop }`.
 - `href(pattern, params)`: a URL from a pattern, typed and encoded.
 - `navigate(to, { replace })`: goes to a URL of this site in the browser.
-- `currentPath()`: the path the browser's router shows, read like a signal.
-- `memoryHistory(start)`: a history in memory, for a router inside part of the page; `path()` and `navigate()` on it.
+- `currentPath()` and `pageLoading()`: the path the browser's router shows and whether the next page is loading, read like signals.
+- `memoryHistory(start)`: a history in memory, for a router inside part of the page; `path()`, `loading()` and `navigate()` on it.
 - `followLinks(root, navigate)`: sends the plain clicks on the links inside `root` to `navigate`; returns the stop.
 - Types: `Routes`, `RouteTable`, `ParamsOf`, `HrefParams`, `PageOf`, `Router`, `RouterOptions`, `RouterHistory`, `NavigateOptions`.
 

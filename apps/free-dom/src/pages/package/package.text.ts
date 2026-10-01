@@ -54,7 +54,7 @@ const en = {
     routerHelp: {
       title: 'With dommy: a help widget with pages',
       claim:
-        '<Router> takes a history of its own, so the widget has pages and the site’s address stays put; followLinks hands it the widget’s links. The menu’s aria-current binds to path(). Each page renders under its own owner: vote on Returns, leave and come back, and the vote is gone with the page it belonged to. A topic no route answers lands in catch.',
+        '<Router> takes a history of its own, so the widget has pages and the site’s address stays put; followLinks hands it the widget’s links. The menu’s aria-current binds to path(), and the bar under the address to loading() while the help desk answers. Each page renders under its own owner: vote on Returns, leave and come back, and the vote is gone with the page it belonged to. A topic no route answers lands in catch.',
     },
     routerFiles: {
       title: 'With dommy: a drive with folders in the path',

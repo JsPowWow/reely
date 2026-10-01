@@ -20,6 +20,10 @@ _Avoid_: view, screen, component
 A change of address: a link the router took over, back or forward, `navigate`. Only the latest move counts.
 _Avoid_: transition, navigation event
 
+**Loading**:
+The wait between a move and its page: the page shown stays until the next one has loaded, and the router says one is coming. A move that a later one overtakes ends its wait unseen.
+_Avoid_: pending, transition, busy
+
 **History**:
 Where a router's addresses come from and how it moves between them: the browser's history, or one kept in memory for a router inside part of the page.
 _Avoid_: location provider, mode

@@ -371,7 +371,8 @@ const en = {
           <ul>
             <li>
               It takes over a plain click on a link of the site (no modifier, no <code>target</code>, no{' '}
-              <code>download</code>); a link to a place on the page is left to the browser.
+              <code>download</code>, no <code>rel="external"</code>); a link to a place on the page is left to the
+              browser.
             </li>
             <li>
               The page shown stays until the next one has loaded, and only the latest move counts: a slow page overtaken
@@ -395,7 +396,8 @@ const en = {
             </li>
             <li>
               <code>currentPath()</code> is the path of the page shown, read like a signal: a menu’s{' '}
-              <code>aria-current</code> follows every move.
+              <code>aria-current</code> follows every move. <code>pageLoading()</code> says the next page is loading,
+              for a progress bar anywhere in the app.
             </li>
             <li>
               <code>navigate(url)</code> moves from code; a move to the URL already shown adds no history entry, and{' '}

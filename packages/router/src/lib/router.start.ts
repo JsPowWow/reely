@@ -1,5 +1,5 @@
 import { reportUncaught, toErrorWithMessage } from '@reely/basics';
-import { batch, onCleanup, signal } from '@reely/signals';
+import { batch, onCleanup } from '@reely/signals';
 import { identity } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
@@ -39,7 +39,6 @@ export const startRouter = <Page>(
   routes: Routes<Page>,
   { show, fail, history = browserHistory() }: RouterOptions<NoInfer<Page>>
 ): Router => {
-  const loading = signal(true);
   let latest = 0;
   let requested = pageAddress(history.url());
   let shown = '';
@@ -50,7 +49,7 @@ export const startRouter = <Page>(
   const display = (page: Page, url: URL, moved: boolean): void => {
     shown = pageAddress(url);
     batch(() => {
-      loading.value = false;
+      history.loads(false);
       history.showing();
     });
     try {
@@ -64,7 +63,7 @@ export const startRouter = <Page>(
   const load = (moved: boolean): void => {
     const turn = ++latest;
     const url = history.url();
-    loading.value = true;
+    history.loads(true);
     // a route that throws rejects like one whose page fails to load
     Promise.resolve()
       .then(() => routes(pageAddress(url)))
@@ -78,7 +77,7 @@ export const startRouter = <Page>(
       .catch((error: unknown) => {
         // even the failure page failed: nothing more is coming for this move
         if (turn === latest) {
-          loading.value = false;
+          history.loads(false);
         }
         reportUncaught(error);
       });
@@ -90,7 +89,7 @@ export const startRouter = <Page>(
       // back on the page shown, or a new place on it: a load still pending for another is dropped
       latest += 1;
       requested = address;
-      loading.value = false;
+      history.loads(false);
       history.arrive(onScreen, true);
     } else if (address !== requested) {
       requested = address;
@@ -103,10 +102,10 @@ export const startRouter = <Page>(
     unfollow?.();
     unfollow = null;
     latest += 1;
-    loading.value = false;
+    history.loads(false);
   };
   onCleanup(stop);
   load(false);
 
-  return { path: history.path, loading: () => loading.value, navigate: history.navigate, stop };
+  return { path: history.path, loading: history.loading, navigate: history.navigate, stop };
 };

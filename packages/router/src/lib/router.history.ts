@@ -12,6 +12,10 @@ export interface RouterHistory {
   url: () => URL;
   /** The path of the page shown, read like a signal. */
   path: () => string;
+  /** Whether the next page is loading, read like a signal. */
+  loading: () => boolean;
+  /** The router says a page for the address now starts loading, or that loading is over. */
+  loads: (loading: boolean) => void;
   /** Goes to an address, as a click on a link to it does. */
   navigate: (to: string | URL, options?: NavigateOptions) => void;
   /** Calls `moved` after each move until the stop it returns. */

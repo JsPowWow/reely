@@ -1,6 +1,6 @@
 import { hasSome } from '@reely/basics';
 
-import { currentPath, showPath } from './router.current';
+import { currentPath, pageLoading, showLoading, showPath } from './router.current';
 import { focusOn, headingIn } from './router.focus';
 import { pageAddress } from './router.history';
 import { takeOverLinks } from './router.links';
@@ -20,6 +20,8 @@ export const browserHistory = (): RouterHistory => {
   return {
     url: () => new URL(location.href),
     path: currentPath,
+    loading: pageLoading,
+    loads: showLoading,
     navigate,
     follow: (moved) => {
       const listening = new AbortController();

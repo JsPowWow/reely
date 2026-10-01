@@ -3,7 +3,6 @@ import type { Nullable } from '@reely/utils';
 
 import type { Shown } from './router.history';
 
-
 const firstOf = (shown: Shown, selector: string): Nullable<Element> => {
   for (const node of isInstanceOf(Node, shown) ? [shown] : shown) {
     const found = isInstanceOf(Element, node) && !node.matches(selector) ? node.querySelector(selector) : node;

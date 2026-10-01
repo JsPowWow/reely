@@ -80,3 +80,34 @@
   outline: 3px solid var(--signal);
   outline-offset: 3px;
 }
+
+/* While the next page's chunk loads, a bar runs along the top; the page shown stays until it is there.
+   A load quicker than 150 ms never shows it. */
+.loading {
+  position: fixed;
+  z-index: 10;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--signal);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: loading 2s cubic-bezier(0.1, 0.7, 0.3, 1) 150ms forwards;
+  pointer-events: none;
+}
+
+@keyframes loading {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(0.9);
+  }
+}
+
+/* No run, but the same wait: the bar appears whole after 150 ms. */
+@media (prefers-reduced-motion: reduce) {
+  .loading {
+    animation-duration: 1ms;
+  }
+}

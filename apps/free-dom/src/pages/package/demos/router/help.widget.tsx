@@ -12,6 +12,14 @@ const topics = [
   { slug: 'payment', title: 'Payment', answer: 'Cards, bank transfer, or pay in 30 days.' },
 ];
 
+type Topic = (typeof topics)[number];
+
+// stands in for `fetch('/api/help/' + slug)`: the help desk answers after 400 ms
+const askHelpDesk = (slug: string): Promise<Topic | undefined> => {
+  const topic = topics.find((each) => each.slug === slug);
+  return new Promise((answered) => setTimeout(answered, 400, topic));
+};
+
 const NavLink = ({ to, label, help }: { to: string; label: string; help: RouterHistory }): Node => (
   <a href={to} aria={{ ariaCurrent: () => (help.path() === to ? 'page' : null) }}>
     {label}
@@ -19,7 +27,7 @@ const NavLink = ({ to, label, help }: { to: string; label: string; help: RouterH
 );
 
 // a page is a component; its state lives as long as it is shown, so the vote resets on leaving
-const Topic = ({ title, answer }: { title: string; answer: string }): Node => {
+const TopicPage = ({ title, answer }: Topic): Node => {
   const voted = signal(false);
   return (
     <div>
@@ -49,16 +57,14 @@ const helpRoutes = defineRoutes({
         </p>
       </div>
     ),
-  [paths.topic]: ({ slug }) => {
-    const topic = topics.find((each) => each.slug === slug);
-    return topic && ((): Node => <Topic {...topic} />);
-  },
+  [paths.topic]: ({ slug }) => askHelpDesk(slug).then((topic) => topic && ((): Node => <TopicPage {...topic} />)),
 });
 
 export const HelpWidget = (): Node => {
   const help = memoryHistory(paths.topics);
   const widget = (
-    <aside className={css.app}>
+    // the topic shown stays while the next answer is on its way: the bar under the address says one is coming
+    <aside className={css.app} aria={{ ariaBusy: () => String(help.loading()) }}>
       <p className={css.address}>{() => help.path()}</p>
       <div className={css.body}>
         <nav className={css.menu}>

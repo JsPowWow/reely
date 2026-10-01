@@ -24,6 +24,12 @@
     "once": ["followLinks"]
   },
   {
+    "name": "pageLoading alone",
+    "code": "import { effect } from '@reely/signals'; import { pageLoading } from '@reely/router'; effect(() => console.log(pageLoading()));",
+    "absent": ["browserHistory", "matchSegments", "followLinks", "href"],
+    "once": ["signalProto"]
+  },
+  {
     "name": "a router with an effect",
     "code": "import { effect } from '@reely/signals'; import { defineRoutes, startRouter } from '@reely/router'; const main = document.body; const router = startRouter(defineRoutes({ '/': () => 'inbox' }), { show: (page) => { main.textContent = page; return main; }, fail: (error) => error.message }); effect(() => console.log(router.path()));",
     "absent": ["href"],

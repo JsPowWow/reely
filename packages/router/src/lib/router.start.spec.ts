@@ -1,6 +1,6 @@
 import { effect, onCleanup, withOwner } from '@reely/signals';
 
-import { currentPath } from './router.current';
+import { currentPath, pageLoading } from './router.current';
 import { followLinks } from './router.links';
 import { memoryHistory } from './router.memory';
 import { navigate } from './router.navigate';
@@ -117,7 +117,7 @@ describe('startRouter', () => {
     expect(document.querySelectorAll('section')).toHaveLength(1);
   });
 
-  it('leaves to the browser the clicks that open elsewhere, and a link to a place on the page', async () => {
+  it('leaves to the browser the clicks that open elsewhere, a link marked `rel="external"`, and a link to a place on the page', async () => {
     await start();
     const cart = document.querySelector('a[href="/cart"]');
 
@@ -129,11 +129,15 @@ describe('startRouter', () => {
     cart?.setAttribute('download', '');
     const download = clickLink('Cart');
     cart?.removeAttribute('download');
+    cart?.setAttribute('rel', 'external noopener');
+    const external = clickLink('Cart');
+    cart?.removeAttribute('rel');
     cart?.setAttribute('href', 'https://example.com/cart');
     const elsewhere = clickLink('Cart');
     const placeOnPage = clickLink('Reviews');
 
-    expect([withModifier, middleButton, inNewTab, download, elsewhere, placeOnPage]).toEqual([
+    expect([withModifier, middleButton, inNewTab, download, external, elsewhere, placeOnPage]).toEqual([
+      false,
       false,
       false,
       false,
@@ -386,6 +390,20 @@ describe('startRouter', () => {
     expect(seen).toEqual([false, true, false]);
   });
 
+  it('tells the whole app that a page is loading, with `pageLoading`', async () => {
+    const slowCart = Promise.withResolvers<Page>();
+    await start(defineRoutes({ '/': () => pageNamed('Shop'), '/cart': () => slowCart.promise }));
+    const seen: boolean[] = [];
+    const stop = effect(() => void seen.push(pageLoading()));
+
+    navigate('/cart');
+    slowCart.resolve(pageNamed('Cart'));
+    await settle();
+    stop();
+
+    expect(seen).toEqual([false, true, false]);
+  });
+
   it('shows the failure of a page that does not load, and of a path no route answers', async () => {
     await start(
       defineRoutes({
@@ -545,17 +563,31 @@ describe('memoryHistory', () => {
     expect(document.activeElement).toBe(panel.querySelector('h1'));
   });
 
-  it('starts at the root, follows only the links `followLinks` gives it, and goes where it is sent', async () => {
+  it('starts at the root, follows only the links `followLinks` gives it, and goes where it is sent, `replace` or not', async () => {
     const inPanel = await start();
     const first = heading();
 
     const outside = clickLink('Site cart');
     inPanel.navigate('/orders/5');
     await settle();
+    const sent = heading();
+    inPanel.navigate('/orders/6', { replace: true });
+    await settle();
 
     expect(first).toBe('Inbox');
     expect(outside).toBe(false);
-    expect(heading()).toBe('Order 5');
+    expect([sent, heading()]).toEqual(['Order 5', 'Order 6']);
+  });
+
+  it('says when a page of its own is loading, and leaves `pageLoading` alone', async () => {
+    const inPanel = await start('/');
+
+    inPanel.navigate('/orders/1');
+    const whileMoving = [inPanel.loading(), pageLoading()];
+    await settle();
+
+    expect(whileMoving).toEqual([true, false]);
+    expect(inPanel.loading()).toBe(false);
   });
 
   it('reads a link against its own address', async () => {

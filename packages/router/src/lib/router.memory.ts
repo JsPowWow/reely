@@ -13,11 +13,16 @@ import type { RouterHistory } from './router.history';
 export const memoryHistory = (start = '/'): RouterHistory => {
   let now = new URL(start, anyOrigin);
   const shown = signal(now.pathname);
+  const loading = signal(false);
   const movers = new Set<() => void>();
 
   return {
     url: () => new URL(now),
     path: () => shown.value,
+    loading: () => loading.value,
+    loads: (value): void => {
+      loading.value = value;
+    },
     navigate: (to): void => {
       const next = new URL(to, now);
       if (next.href !== now.href) {
