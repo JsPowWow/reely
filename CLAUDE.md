@@ -44,6 +44,7 @@ Always through Nx (caching, `^build` deps): `npx nx test dommy`, `npx nx lint do
 - **Lean comments:** a short JSDoc on public API only; a code comment only for a non-obvious why. Never restate what the code says.
 - **Module boundaries:** a package depends only on `scope:shared` and itself (`@nx/enforce-module-boundaries`).
 - **Every feature and fix ships with Vitest tests** next to the source (`*.spec.ts`).
+- **The site follows the API.** A change to a published package's API, and every new package, updates in the same change its README and its pages and live demos on the docs site (`apps/free-dom`); only published packages appear there.
 - Published packages must work for a consumer: `npm i @reely/<pkg>` + `tsc` in a clean project — no imports of unpublished `@reely/*` in the emitted `.d.ts`/JS.
 - **Tree-shakeable:** a consumer ships only what it uses, even with a bundler that ignores `/*#__PURE__*/` and `sideEffects`; module scope holds nothing a bundler cannot prove pure. How to write it, prove it (`consumer`, `consumer/shake.json`) and measure it (`scripts/shake-report.mjs`) — `.claude/rules/tree-shaking.md`.
 
