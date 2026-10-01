@@ -8,19 +8,19 @@ const maxNotifications = 100;
 
 export type Equality<R> = (previous: R, next: R) => boolean;
 
-/** A read-only store of a part of another store's value, made by `select`. */
-export interface StoreSelection<R> {
-  readonly value: R;
-  readonly on: IEventEmitter<StoreEvents<R>>['on'];
-  readonly off: IEventEmitter<StoreEvents<R>>['off'];
-  select<Q>(selector: (value: R) => Q, equals?: Equality<Q>): StoreSelection<Q>;
+/** A store to read and follow: a selection, or a store passed to code that must not change it. */
+export interface ReadableStore<T> {
+  readonly value: T;
+  readonly on: IEventEmitter<StoreEvents<T>>['on'];
+  readonly off: IEventEmitter<StoreEvents<T>>['off'];
+  select<R>(selector: (value: T) => R, equals?: Equality<R>): ReadableStore<R>;
 }
 
 /**
  * The `changed` listeners of a store, notified one change at a time: a change made during a
  * notification waits for it to finish, and several such changes arrive once, as the latest.
  */
-export abstract class Store<T> {
+export abstract class Store<T> implements ReadableStore<T> {
   public readonly on: IEventEmitter<StoreEvents<T>>['on'];
   public readonly off: IEventEmitter<StoreEvents<T>>['off'];
 
@@ -51,12 +51,14 @@ export abstract class Store<T> {
     };
   }
 
+  public abstract get value(): T;
+
   /**
    * A read-only store of a part of the value: it notifies only when the part changes (by `equals`)
    * and follows this store only while it has listeners.
    */
-  public select<R>(selector: (value: T) => R, equals: Equality<R> = Object.is): StoreSelection<R> {
-    return new SelectedStore(this.on, () => selector(this.read()), equals);
+  public select<R>(selector: (value: T) => R, equals: Equality<R> = Object.is): ReadableStore<R> {
+    return new SelectedStore(this.on, () => this.value, selector, equals);
   }
 
   /** Called on the first listener; a throw takes that listener back. */
@@ -79,7 +81,7 @@ export abstract class Store<T> {
     try {
       forEachSettled(
         this.rounds(),
-        () => this.emitter.emit('changed', this.read()),
+        () => this.emitter.emit('changed', this.value),
         'Notifications of the store threw'
       );
     } finally {
@@ -93,7 +95,7 @@ export abstract class Store<T> {
     for (let round = 1; round === 1 || this.changedMeanwhile; round++) {
       if (round > maxNotifications) {
         throw new Error(`The listeners keep changing the store: ${maxNotifications} notifications for one change`, {
-          cause: this.read(),
+          cause: this.value,
         });
       }
       this.changedMeanwhile = false;
@@ -106,45 +108,56 @@ export abstract class Store<T> {
       this.unwatch();
     }
   }
-
-  protected abstract read(): T;
 }
 
 interface Followed<R> {
-  value: R;
+  notified: R;
   readonly stop: Unsubscribe;
 }
 
-class SelectedStore<R> extends Store<R> implements StoreSelection<R> {
+interface Picked<S, R> {
+  readonly from: S;
+  readonly part: R;
+}
+
+class SelectedStore<S, R> extends Store<R> {
   private followed: Followed<R> | null = null;
+  private picked: Picked<S, R> | null = null;
 
   public constructor(
     private readonly follow: (event: 'changed', listener: () => void) => Unsubscribe,
-    private readonly pick: () => R,
+    private readonly source: () => S,
+    private readonly selector: (value: S) => R,
     private readonly equals: Equality<R>
   ) {
     super();
   }
 
+  // picked whenever the store holds another value, so a listener of that store reads the new part
+  // before this selection has heard of the change; a part equal to the last one keeps its object
   public get value(): R {
-    return this.read();
-  }
-
-  protected read(): R {
-    return hasSome(this.followed) ? this.followed.value : this.pick();
+    const from = this.source();
+    const last = this.picked;
+    if (hasSome(last) && Object.is(last.from, from)) {
+      return last.part;
+    }
+    const part = this.selector(from);
+    const picked = { from, part: hasSome(last) && this.equals(last.part, part) ? last.part : part };
+    this.picked = picked;
+    return picked.part;
   }
 
   protected override watch(): void {
     // follow before picking, so a selection this one picks from is fresh
     const stop = this.follow('changed', () => {
-      const next = this.pick();
-      if (hasSome(this.followed) && !this.equals(this.followed.value, next)) {
-        this.followed.value = next;
+      const next = this.value;
+      if (hasSome(this.followed) && !Object.is(this.followed.notified, next)) {
+        this.followed.notified = next;
         this.notify();
       }
     });
     try {
-      this.followed = { value: this.pick(), stop };
+      this.followed = { notified: this.value, stop };
     } catch (error) {
       stop();
       throw error;

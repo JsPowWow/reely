@@ -1,33 +1,33 @@
 [
   {
-    "name": "a PrimitiveStore alone",
-    "code": "import { PrimitiveStore } from '@reely/simple-store'; new PrimitiveStore(0).value = 1;",
+    "name": "a ValueStore alone",
+    "code": "import { ValueStore } from '@reely/simple-store'; new ValueStore(0).value = 1;",
     "absent": [
       "ObjectStore",
       "isPlainObject"
     ],
     "once": [
       "EventEmitter",
+      "ValueStore",
       "isSomeFunction"
     ]
   },
   {
     "name": "an ObjectStore alone",
     "code": "import { ObjectStore } from '@reely/simple-store'; new ObjectStore({ lap: 0 }).set({ lap: 1 });",
-    "absent": [
-      "PrimitiveStore"
-    ],
     "once": [
-      "EventEmitter"
+      "EventEmitter",
+      "ValueStore",
+      "ObjectStore"
     ]
   },
   {
     "name": "both stores and an emitter",
-    "code": "import { EventEmitter } from '@reely/emitter'; import { ObjectStore, PrimitiveStore } from '@reely/simple-store'; new EventEmitter().emit('lap'); new ObjectStore({ lap: 0 }).set({ lap: 1 }); new PrimitiveStore(0).value = 1;",
+    "code": "import { EventEmitter } from '@reely/emitter'; import { ObjectStore, ValueStore } from '@reely/simple-store'; new EventEmitter().emit('lap'); new ObjectStore({ lap: 0 }).set({ lap: 1 }); new ValueStore(0).value = 1;",
     "once": [
       "EventEmitter",
       "ObjectStore",
-      "PrimitiveStore",
+      "ValueStore",
       "isSomeFunction",
       "hasSome",
       "forEachSettled"

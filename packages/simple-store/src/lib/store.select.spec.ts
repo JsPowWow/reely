@@ -1,7 +1,7 @@
 import { ObjectStore } from './objectStore';
-import { PrimitiveStore } from './primitiveStore';
+import { ValueStore } from './valueStore';
 
-import type { StoreSelection } from './store';
+import type { ReadableStore } from './store';
 
 interface Race {
   leader: string;
@@ -19,6 +19,18 @@ describe('select', () => {
     race.set({ leader: 'Blue' });
 
     expect(leader.value).toBe('Blue');
+  });
+
+  it('reads the part of the new value while its store is notifying', () => {
+    const race = newRace();
+    const leader = race.select((value) => value.leader);
+    const seen: string[] = [];
+    race.on('changed', () => seen.push(leader.value));
+    leader.on('changed', () => undefined);
+
+    race.set({ leader: 'Blue' });
+
+    expect(seen).toStrictEqual(['Blue']);
   });
 
   it('notifies only when the selected part changes', () => {
@@ -85,6 +97,24 @@ describe('select', () => {
     expect(selector).not.toHaveBeenCalled();
   });
 
+  it('keeps the part it picked while the store holds the same value, or picks an equal one', () => {
+    const race = newRace();
+    const selector = vi.fn((value: Race) => ({ leader: value.leader }));
+    const top = race.select(selector, (before, after) => before.leader === after.leader);
+    const notified: Array<{ leader: string }> = [];
+    top.on('changed', (value) => notified.push(value));
+    const first = top.value;
+
+    race.set({ lap: 1 });
+    const afterLap = top.value;
+    race.set({ leader: 'Blue' });
+
+    expect(afterLap).toBe(first);
+    expect(notified).toStrictEqual([{ leader: 'Blue' }]);
+    expect(notified[0]).toBe(top.value);
+    expect(selector).toHaveBeenCalledTimes(3);
+  });
+
   it('selects from a selection', () => {
     const race = newRace();
     const initials: string[] = [];
@@ -98,8 +128,8 @@ describe('select', () => {
     expect(initials).toStrictEqual(['B']);
   });
 
-  it('selects from a PrimitiveStore', () => {
-    const lap = new PrimitiveStore(0);
+  it('selects from a ValueStore', () => {
+    const lap = new ValueStore(0);
     const finals: boolean[] = [];
     const final = lap.select((value) => value >= 3);
     final.on('changed', (isFinal) => finals.push(isFinal));
@@ -191,7 +221,7 @@ describe('select', () => {
 
 // never run: the compiler checks these uses
 export function misuses(race: ObjectStore<Race>): void {
-  const leader: StoreSelection<string> = race.select((value) => value.leader);
+  const leader: ReadableStore<string> = race.select((value) => value.leader);
   // @ts-expect-error a selection is read only
   leader.value = 'Blue';
   // @ts-expect-error a leader is a string

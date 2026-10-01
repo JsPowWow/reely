@@ -7,6 +7,7 @@
 - [utils](./packages/utils/CONTEXT.md): shared guards, fp (`pipe`, `Either`, `Maybe`), nullable helpers, errors, types
 - [logger](./packages/logger/CONTEXT.md): scoped logging
 - [state-machine](./packages/state-machine/CONTEXT.md): finite state machine for app logic, independent of the DOM
+- [simple-store](./packages/simple-store/CONTEXT.md): stores you subscribe to explicitly, a value or a plain object, and selections of their parts
 
 `CONTEXT.md` files are created lazily, when the first term is resolved.
 `async`, `strings`, `colors` and `apps/*` get an entry when they get a `CONTEXT.md`.
@@ -23,3 +24,4 @@
   must not import utils in its emitted `.d.ts`/JS
 - **logger → utils**: shared types and guards
 - **state-machine → utils, queue, emitter**: guards and shared types; `SyncQueue`/`AsyncQueue` run its transitions, the emitter tells listeners of a state change; dommy does not depend on it, and it knows nothing of signals
+- **simple-store → basics, emitter**: guards and `forEachSettled`; the emitter holds each store's `changed` listeners; it knows nothing of signals or the DOM

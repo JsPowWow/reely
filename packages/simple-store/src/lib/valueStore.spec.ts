@@ -1,8 +1,8 @@
-import { PrimitiveStore } from './primitiveStore';
+import { ValueStore } from './valueStore';
 
-describe('PrimitiveStore', () => {
+describe('ValueStore', () => {
   it('holds a value and notifies when a different one is set', () => {
-    const lap = new PrimitiveStore(0);
+    const lap = new ValueStore(0);
     const changes: number[] = [];
     lap.on('changed', (value) => changes.push(value));
 
@@ -15,7 +15,7 @@ describe('PrimitiveStore', () => {
   });
 
   it('compares values as Object.is does', () => {
-    const gap = new PrimitiveStore(Number.NaN);
+    const gap = new ValueStore(Number.NaN);
     const changes: number[] = [];
     gap.on('changed', (value) => changes.push(value));
 
@@ -27,7 +27,7 @@ describe('PrimitiveStore', () => {
   });
 
   it('stops notifying the listener it unsubscribes, and the one taken off', () => {
-    const lap = new PrimitiveStore(0);
+    const lap = new ValueStore(0);
     const changes: number[] = [];
     const onChanged = (value: number): void => {
       changes.push(value);
@@ -44,7 +44,7 @@ describe('PrimitiveStore', () => {
   });
 
   it('keeps on and off working when taken off the store', () => {
-    const lap = new PrimitiveStore(0);
+    const lap = new ValueStore(0);
     const { on } = lap;
     const changes: number[] = [];
 
@@ -57,7 +57,7 @@ describe('PrimitiveStore', () => {
   });
 
   it('notifies a value set by a listener after the current one reaches every listener', () => {
-    const lap = new PrimitiveStore(0);
+    const lap = new ValueStore(0);
     const seen: number[] = [];
     lap.on('changed', (value) => {
       if (value === 1) {
@@ -72,7 +72,7 @@ describe('PrimitiveStore', () => {
   });
 
   it('stops listeners that keep changing the store', () => {
-    const lap = new PrimitiveStore(0);
+    const lap = new ValueStore(0);
     lap.on('changed', (value) => {
       lap.value = value + 1;
     });
@@ -83,7 +83,7 @@ describe('PrimitiveStore', () => {
   });
 
   it('keeps the errors of the listeners when it stops them', () => {
-    const lap = new PrimitiveStore(0);
+    const lap = new ValueStore(0);
     const broken = new Error('broken sensor');
     lap.on('changed', (value) => {
       if (value === 1) {
@@ -105,7 +105,9 @@ describe('PrimitiveStore', () => {
 });
 
 // never run: the compiler checks these calls
-export function misuses(lap: PrimitiveStore<number>): void {
+export function misuses(lap: ValueStore<number>, laps: ValueStore<number[]>): void {
+  // @ts-expect-error a change goes through the store, which then notifies
+  laps.value.push(1);
   // @ts-expect-error a lap is a number
   lap.value = '1';
   // @ts-expect-error a store has only `changed`

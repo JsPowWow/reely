@@ -33,9 +33,6 @@
   "references": [
     {
       "path": "./tsconfig.lib.json"
-    },
-    {
-      "path": "../simple-store/tsconfig.lib.json"
     }
   ]
 }
