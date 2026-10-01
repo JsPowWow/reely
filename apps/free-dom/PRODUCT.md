@@ -40,7 +40,7 @@ Small packages that each do one thing for a consumer who uses no other `@reely` 
 - The name on the site is reely; users install its packages, `@reely/<package>`, each on its own. No package is the main one. "free-dom" is only the app's name inside the repo and does not appear as a brand.
 - Author: JsPowWow; source at https://github.com/JsPowWow/reely.
 - Voice: plain and precise, like a good engineer explaining their own code to a teammate.
-- The visual world is a race-timing screen: asphalt ground, graphite ink, signal yellow and flag red, a condensed display face. The stories vary: examples come from the real consumers of reely (AI::Race first, more to come) and from everyday subjects (a like button, concert tickets, a delivery, an exchange rate, a stock board), never one story told everywhere. A race is told plainly: positions, names and times, no laps, sectors or splits on the landing page.
+- The visual world is a race-timing screen: asphalt ground, graphite ink, signal yellow and flag red, a condensed display face. The stories vary: a race, AI::Race's, is told in two or three places only (the landing board, a pit crew, the start lights); every other example is a frontend developer's working day (a cart, a checkout log, analytics trackers, toasts, an order total, reader settings, a retried request), never one story told everywhere. A race is told plainly: positions, names and times, no laps, sectors or splits on the landing page.
 
 ## Evidence on Hand
 

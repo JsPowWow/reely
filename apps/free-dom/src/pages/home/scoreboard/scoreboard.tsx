@@ -1,7 +1,7 @@
 import { isSomeFunction } from '@reely/basics';
 import { computed, effect, For, onCleanup, signal } from '@reely/dommy';
 import type { Signal } from '@reely/dommy';
-import { listen } from '@reely/dommy-kit';
+import { flip, listen } from '@reely/dommy-kit';
 
 import { FlapText } from './flap.text';
 import { advance, formatGap, standingsOf, startRace } from './race';
@@ -33,8 +33,9 @@ const followOnScreen =
   };
 
 /**
- * A split-flap board of a simulated race: rows stay in their places and their words turn when a car
- * passes another. The race runs while the page is in view and its reader has not paused it.
+ * A split-flap board of a simulated race: a car that passes another slides its row to its new place,
+ * and the times turn on split-flap tiles. The race runs while the page is in view and its reader has
+ * not paused it.
  */
 export const Scoreboard = ({ cars, seed }: { cars: readonly Car[]; seed: number }): Node => {
   const race = signal(startRace(cars, seed));
@@ -45,11 +46,31 @@ export const Scoreboard = ({ cars, seed }: { cars: readonly Car[]; seed: number 
   listen(document, 'visibilitychange', () => {
     pageShown.value = pageShownNow();
   });
+  // the race runs on the board element, so a car that passes another can slide its row there
+  const runRace = (element: Element): void => {
+    followOnScreen(boardShown)(element);
+    effect(() => {
+      if (paused.value || !pageShown.value || !boardShown.value) {
+        return;
+      }
+      const timer = setInterval(() => {
+        const next = advance(race.value, tickMs / 1000);
+        flip(
+          element,
+          () => {
+            race.value = next.elapsed < raceSeconds ? next : startRace(cars, next.seed + 1);
+          },
+          { duration: 600, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' }
+        );
+      }, tickMs);
+      onCleanup(() => clearInterval(timer));
+    });
+  };
 
   const board = (
     <div
       className={css.board}
-      elementRef={followOnScreen(boardShown)}
+      elementRef={runRace}
       {...unflashed}
       aria={{ role: 'table', ariaLabel: () => scoreboardText().label }}
     >
@@ -60,11 +81,11 @@ export const Scoreboard = ({ cars, seed }: { cars: readonly Car[]; seed: number 
           {() => scoreboardText().columns.time}
         </span>
       </div>
-      <For each={rows} by={(row) => row.place}>
+      <For each={rows} by={(row) => row.standing.car.name}>
         {(row) => (
           <div className={css.row} aria={{ role: 'row' }}>
             <span className={css.place} aria={{ role: 'cell' }}>
-              {String(row().place + 1)}
+              {() => String(row().place + 1)}
             </span>
             <span className={css.car} aria={{ role: 'cell' }}>
               <span className={css.dot} styles={{ '--dot': () => row().standing.car.color }} />
@@ -78,17 +99,6 @@ export const Scoreboard = ({ cars, seed }: { cars: readonly Car[]; seed: number 
       </For>
     </div>
   );
-  effect(() => {
-    if (paused.value || !pageShown.value || !boardShown.value) {
-      return;
-    }
-    const timer = setInterval(() => {
-      const next = advance(race.value, tickMs / 1000);
-      race.value = next.elapsed < raceSeconds ? next : startRace(cars, next.seed + 1);
-    }, tickMs);
-    onCleanup(() => clearInterval(timer));
-  });
-
   return (
     <div className={css.scoreboard}>
       <div className={css.bar}>

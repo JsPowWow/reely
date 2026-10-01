@@ -17,6 +17,7 @@ declare module 'virtual:measures' {
         readonly version: string;
         readonly gzipBytes: number;
         readonly uses: readonly string[];
+        readonly outside: readonly string[];
         readonly exports: readonly string[];
       }
     >

@@ -27,6 +27,15 @@
   border-bottom-color: var(--signal);
 }
 
+/* On asphalt, under the example's claim: the way on into dommy's docs. */
+.inDocs {
+  justify-self: start;
+  color: var(--graphite);
+  font-weight: 700;
+  text-decoration-color: var(--signal-ink);
+  text-underline-offset: 0.2em;
+}
+
 /* The measured facts as a timing sheet on the band: labels left, figures in the display face. */
 .facts {
   display: grid;

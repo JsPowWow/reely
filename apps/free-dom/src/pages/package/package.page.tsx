@@ -10,7 +10,7 @@ import exampleCss from '../../site/example.module.css';
 import { packagesText } from '../../site/packages.text';
 import { SiteHeader } from '../../site/site.header';
 import { sitePackages } from '../../site/site.packages';
-import { packageHref } from '../../site/site.paths';
+import { docHref, packageHref } from '../../site/site.paths';
 
 import css from './package.module.css';
 
@@ -20,6 +20,9 @@ const readmeHref = (name: PagedPackage): string =>
   `https://github.com/JsPowWow/reely/tree/main/packages/${name}#readme`;
 
 const npmHref = (name: PagedPackage): string => `https://www.npmjs.com/package/@reely/${name}`;
+
+// a package that dommy's docs show at work in the DOM, and where
+const dommyDocs: Partial<Record<PagedPackage, string>> = { signals: docHref('signals') };
 
 /** A package's page: what it is for, how to install it, its measured facts, and one live example. */
 export const PackagePage = ({ name }: { name: PagedPackage }): Node => {
@@ -76,6 +79,11 @@ export const PackagePage = ({ name }: { name: PagedPackage }): Node => {
               {() => packageText().examples[name].title}
             </h2>
             <p className={exampleCss.claim}>{() => packageText().examples[name].claim}</p>
+            {dommyDocs[name] && (
+              <a className={css.inDocs} href={dommyDocs[name]}>
+                {() => packageText().inDommyDocs}
+              </a>
+            )}
           </header>
           <div className={exampleCss.panels}>
             <MutationMeter>

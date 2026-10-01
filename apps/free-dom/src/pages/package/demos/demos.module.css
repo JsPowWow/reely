@@ -1,4 +1,4 @@
-/* Screens on a pit wall, crews in a pit lane: a name and what it shows, one per row. */
+/* Trackers, crews: a name and what it shows, one per row. */
 .screens {
   display: grid;
   gap: 0.35rem;
@@ -37,28 +37,17 @@
   list-style: none;
 }
 
-.flag {
-  margin: 0;
-  padding: 0.6rem 0.9rem;
+/* An unread count on a pill-free plate: a figure in the display face. */
+.unread {
+  min-width: 2.25rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 4px;
-  font-family: var(--display);
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1.1;
-}
-
-/* Signal yellow is the yellow flag; red stays for node writes, so a stopped session is graphite. */
-.flag[data-flag='green'] {
-  border: 1px solid var(--line);
-}
-
-.flag[data-flag='yellow'] {
-  background: var(--signal);
-}
-
-.flag[data-flag='red'] {
   background: var(--graphite);
   color: var(--asphalt);
+  font-family: var(--display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-align: center;
 }
 
 .lights {

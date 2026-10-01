@@ -12,12 +12,18 @@ const en = {
   title: 'reely — small TypeScript packages, no dependencies',
   lead: 'Each one does one job, is typed for your tsc and ships only what you import; none needs anything outside reely. Take one, or let several work together, as on this board.',
   builtWith: 'This site is built with them.',
+  findPackage: 'Find your package',
+  facts: {
+    packages: 'packages, none of them the main one',
+    outside: 'dependencies from outside reely',
+    lightest: 'the lightest, minified and gzipped',
+  },
   board: {
     madeWith: 'The board is made with',
     parts: {
       signals: 'the standings and the times',
       dommy: 'the rows and their letters',
-      'dommy-kit': 'when letters turn, and stillness under reduced motion',
+      'dommy-kit': 'the rows’ slide, the letters’ timing, and stillness under reduced motion',
     } satisfies Record<BoardPackage, string>,
   },
   packages: {

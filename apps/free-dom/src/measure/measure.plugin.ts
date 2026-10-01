@@ -13,6 +13,8 @@ export interface PackageFacts {
   readonly gzipBytes: number;
   /** The other reely packages it depends on, by directory name. */
   readonly uses: readonly string[];
+  /** Its runtime dependencies from outside reely, by package name. */
+  readonly outside: readonly string[];
   /** The values its entries export, sorted; types are not counted. */
   readonly exports: readonly string[];
 }
@@ -76,6 +78,7 @@ export const factsOf = async (packagesDir: string, dir: string): Promise<Package
     version,
     gzipBytes: await gzipOf(everything, packagesDir),
     uses: dependencies.filter((name) => name.startsWith(scope)).map((name) => name.slice(scope.length)),
+    outside: dependencies.filter((name) => !name.startsWith(scope)),
     exports: [...new Set(names.flat())].sort(),
   };
 };

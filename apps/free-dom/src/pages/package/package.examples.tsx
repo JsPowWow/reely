@@ -1,20 +1,20 @@
 import { ConsoleEcho } from './console.echo';
+import { AnalyticsTrackers } from './demos/analytics.trackers';
+import analyticsTrackersSource from './demos/analytics.trackers.tsx?highlight';
+import { AppNotices } from './demos/app.notices';
+import appNoticesSource from './demos/app.notices.tsx?highlight';
 import { BrandButton } from './demos/brand.button';
 import brandButtonSource from './demos/brand.button.tsx?highlight';
 import { CartStore } from './demos/cart.store';
 import cartStoreSource from './demos/cart.store.tsx?highlight';
 import { CheckoutLog } from './demos/checkout.log';
 import checkoutLogSource from './demos/checkout.log.tsx?highlight';
-import { FuelStrategy } from './demos/fuel.strategy';
-import fuelStrategySource from './demos/fuel.strategy.tsx?highlight';
+import { OrderTotal } from './demos/order.total';
+import orderTotalSource from './demos/order.total.tsx?highlight';
 import { PitCrews } from './demos/pit.crews';
 import pitCrewsSource from './demos/pit.crews.tsx?highlight';
-import { PitWall } from './demos/pit.wall';
-import pitWallSource from './demos/pit.wall.tsx?highlight';
 import { PostSlugs } from './demos/post.slugs';
 import postSlugsSource from './demos/post.slugs.tsx?highlight';
-import { RaceControl } from './demos/race.control';
-import raceControlSource from './demos/race.control.tsx?highlight';
 import { RatesRetry } from './demos/rates.retry';
 import ratesRetrySource from './demos/rates.retry.tsx?highlight';
 import { ReaderSettings } from './demos/reader.settings';
@@ -34,10 +34,10 @@ export interface PackageExample {
 }
 
 export const packageExamples: Readonly<Record<PagedPackage, PackageExample>> = {
-  basics: { file: 'pit.wall.tsx', Demo: PitWall, source: pitWallSource },
-  signals: { file: 'fuel.strategy.tsx', Demo: FuelStrategy, source: fuelStrategySource },
+  basics: { file: 'analytics.trackers.tsx', Demo: AnalyticsTrackers, source: analyticsTrackersSource },
+  signals: { file: 'order.total.tsx', Demo: OrderTotal, source: orderTotalSource },
   'dommy-kit': { file: 'reader.settings.tsx', Demo: ReaderSettings, source: readerSettingsSource },
-  emitter: { file: 'race.control.tsx', Demo: RaceControl, source: raceControlSource },
+  emitter: { file: 'app.notices.tsx', Demo: AppNotices, source: appNoticesSource },
   queue: { file: 'pit.crews.tsx', Demo: PitCrews, source: pitCrewsSource },
   'state-machine': { file: 'start.lights.tsx', Demo: StartLights, source: startLightsSource },
   'simple-store': { file: 'cart.store.tsx', Demo: CartStore, source: cartStoreSource },

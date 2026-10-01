@@ -41,8 +41,9 @@ describe('PackagePage', () => {
     const links = Array.from(host.querySelectorAll('dd a'), (link) => link.getAttribute('href'));
 
     expect(links).toEqual(['/basics', '/emitter', '/queue']);
-    expect(host.querySelector('a[href="https://github.com/JsPowWow/reely/tree/main/packages/state-machine#readme"]'))
-      .not.toBeNull();
+    expect(
+      host.querySelector('a[href="https://github.com/JsPowWow/reely/tree/main/packages/state-machine#readme"]')
+    ).not.toBeNull();
     expect(host.querySelector('a[href="https://www.npmjs.com/package/@reely/state-machine"]')).not.toBeNull();
   });
 
@@ -57,6 +58,14 @@ describe('PackagePage', () => {
 
     expect(echoed).toContain('[[checkout]]\t cart restored {"items":2}');
     expect(console.info).toBe(info);
+  });
+
+  it("leads from signals to dommy's docs, where signals drive the DOM", () => {
+    open('signals');
+
+    expect(host.querySelector('a[href="/dommy/docs/signals"]')?.textContent).toBe(
+      'See them drive the DOM in dommy’s docs'
+    );
   });
 
   it('lists the values a package exports', () => {

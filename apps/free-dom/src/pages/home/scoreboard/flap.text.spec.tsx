@@ -42,6 +42,22 @@ describe('FlapText', () => {
     dispose();
   });
 
+  it('turns a digit through digits and a letter through letters, as two drums would', () => {
+    const time = signal('+1.333');
+    const host = document.createElement('div');
+    const dispose = mount(host, () => <FlapText text={time} width={6} />);
+    time.value = '+2.667';
+    const seen: string[] = [];
+
+    for (let ms = 0; ms < 250; ms += 10) {
+      vi.advanceTimersByTime(10);
+      seen.push(tilesOf(host));
+    }
+
+    expect(seen.every((tiles) => /^\+\d\.\d{3}$/.test(tiles))).toBe(true);
+    dispose();
+  });
+
   it('changes letters in place, with no turn, under reduced motion', () => {
     vi.stubGlobal('matchMedia', () => Object.assign(new EventTarget(), { matches: true }));
     const name = signal('Lynx');

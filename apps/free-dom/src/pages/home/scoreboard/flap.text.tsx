@@ -3,7 +3,8 @@ import { later, media } from '@reely/dommy-kit';
 
 import css from './flap.text.module.css';
 
-const drum = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-:.';
+// a letter turns through the letters' drum, a digit through the digits'; a sign is printed on its own
+const drums = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ', '0123456789'];
 const turnsPerChange = 2;
 const turnMs = 55;
 // each tile of a word starts a little after the one before it
@@ -15,8 +16,11 @@ const fit = (text: string, width: number, align: 'start' | 'end'): string => {
 };
 
 // a drum letter, not a random one: the same change turns the same way every time
-const drumLetter = (target: string, turn: number): string =>
-  drum[(Math.max(0, drum.indexOf(target.toUpperCase())) + (turn + 1) * 7) % drum.length] ?? target;
+const drumLetter = (target: string, turn: number): string => {
+  const letter = target.toUpperCase();
+  const drum = drums.find((each) => each.includes(letter));
+  return drum ? drum[(drum.indexOf(letter) + (turn + 1) * 7) % drum.length] ?? target : target;
+};
 
 /**
  * Text on split-flap tiles: a changed letter turns through two drum letters and settles; under
@@ -61,7 +65,7 @@ export const FlapText = ({
         return;
       }
       for (let turn = 0; turn < turnsPerChange; turn++) {
-        later(index * waveMs + turn * turnMs, () => show(index, char === ' ' ? ' ' : drumLetter(char, turn), true));
+        later(index * waveMs + turn * turnMs, () => show(index, drumLetter(char, turn), true));
       }
       later(index * waveMs + turnsPerChange * turnMs, () => show(index, char, true));
     });

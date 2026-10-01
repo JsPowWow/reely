@@ -26,6 +26,14 @@ describe('HomePage', () => {
     expect(document.title).toBe('reely: small TypeScript packages, no dependencies');
   });
 
+  it('leads to the packages, with what the build measured of them all', () => {
+    const facts = Array.from(host.querySelectorAll('main dl dd'), (fact) => fact.textContent);
+
+    expect(host.querySelector('a[href="#packages"]')?.textContent).toBe('Find your package');
+    expect(facts.slice(0, 2)).toEqual(['12', '0']);
+    expect(facts[2]).toMatch(/^\d\.\d kB$/);
+  });
+
   it('names the packages that draw the board, each leading to its plate', () => {
     const credits = Array.from(host.querySelectorAll('a[href^="#package-"]'), (link) => link.getAttribute('href'));
 

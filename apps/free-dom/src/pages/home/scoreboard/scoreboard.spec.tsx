@@ -45,12 +45,18 @@ describe('Scoreboard', () => {
     dispose();
     vi.useRealTimers();
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    Reflect.deleteProperty(Element.prototype, 'animate');
   });
 
   it('lists every car once, the leader with its race time and the others with their gap', () => {
     expect(cellsOf(host, 2).sort()).toEqual(['Comet', 'Falcon', 'Lynx', 'Orca']);
     expect(cellsOf(host, 3)[0]).toBe('0:00.0');
-    expect(cellsOf(host, 3).slice(1).every((gap) => gap.startsWith('+'))).toBe(true);
+    expect(
+      cellsOf(host, 3)
+        .slice(1)
+        .every((gap) => gap.startsWith('+'))
+    ).toBe(true);
   });
 
   it('runs the race on by itself', () => {
@@ -66,6 +72,42 @@ describe('Scoreboard', () => {
 
     expect(last).toBe('9:58.5');
     expect(cellsOf(host, 3)[0]).toBe('0:00.0');
+  });
+
+  it("moves a car's own row to its new place when it passes another", () => {
+    const rowOf = (name: string): Element | null | undefined =>
+      Array.from(host.querySelectorAll('[role="row"]')).find((row) => row.textContent?.includes(name));
+    const before = new Map(cars.map(({ name }) => [name, rowOf(name)]));
+    const order = cellsOf(host, 2).join();
+
+    for (let tick = 0; tick < 40 && cellsOf(host, 2).join() === order; tick++) {
+      vi.advanceTimersByTime(1500);
+    }
+
+    expect(cellsOf(host, 2).join()).not.toBe(order);
+    expect(cars.every(({ name }) => rowOf(name) === before.get(name))).toBe(true);
+    const places = host.querySelectorAll('[role="row"] > [role="cell"]:first-child');
+    expect(Array.from(places, (place) => place.textContent)).toEqual(['1', '2', '3', '4']);
+  });
+
+  it('slides a row that changed places from where it stood', () => {
+    // jsdom lays nothing out: a row stands as many rows down as it is in the board
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (this: Element) {
+      const row = this.parentElement ? Array.from(this.parentElement.children).indexOf(this) : 0;
+      return new DOMRect(0, row * 30, 300, 30);
+    });
+    const animate = vi.fn();
+    Element.prototype.animate = animate;
+    const order = cellsOf(host, 2).join();
+
+    for (let tick = 0; tick < 40 && cellsOf(host, 2).join() === order; tick++) {
+      vi.advanceTimersByTime(1500);
+    }
+
+    expect(animate).toHaveBeenCalledWith(
+      [{ transform: expect.stringMatching(/^translate\(0px, -?\d+px\)$/) }, { transform: 'none' }],
+      expect.objectContaining({ duration: 600 })
+    );
   });
 
   it('stops while paused and runs on when resumed', () => {

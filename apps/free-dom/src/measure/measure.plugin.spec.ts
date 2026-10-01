@@ -13,7 +13,15 @@ describe('factsOf', () => {
     const facts = await factsOf(packagesDir, 'dommy-kit');
 
     expect(facts.uses).toEqual(['basics', 'signals']);
+    expect(facts.outside).toEqual([]);
     expect(manifest).toMatchObject({ version: facts.version });
+  });
+
+  it('names the dependencies a package takes from outside reely', async () => {
+    // utils, unpublished, still depends on tslib
+    const facts = await factsOf(packagesDir, 'utils');
+
+    expect(facts.outside).toEqual(['tslib']);
   });
 
   it('weighs a package with the packages it uses', async () => {
@@ -62,13 +70,19 @@ describe('gzipOf', () => {
 
 describe('measures', () => {
   it('serves the facts and the bundle sizes as `virtual:measures`', async () => {
-    const plugin = measures({ packagesDir, packages: ['basics'], bundles: { guard: "export { hasSome } from '@reely/basics';" } });
+    const plugin = measures({
+      packagesDir,
+      packages: ['basics'],
+      bundles: { guard: "export { hasSome } from '@reely/basics';" },
+    });
     const resolveId = plugin.resolveId as (id: string) => string;
     const load = plugin.load as (id: string) => Promise<string | null>;
 
     const code = await load(resolveId('virtual:measures'));
 
-    expect(code).toMatch(/^export const packages = \{"basics":\{"version":"[\d.]+","gzipBytes":\d+,"uses":\[\],"exports":\[[^\]]*\]\}\};/);
+    expect(code).toMatch(
+      /^export const packages = \{"basics":\{"version":"[\d.]+","gzipBytes":\d+,"uses":\[\],"outside":\[\],"exports":\[[^\]]*\]\}\};/
+    );
     expect(code).toMatch(/export const bundles = \{"guard":\d+\};$/);
     expect(await load('other')).toBeNull();
   });

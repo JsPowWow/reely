@@ -29,6 +29,10 @@ const cars: readonly Car[] = [
 
 const plateId = (name: SitePackage): string => `package-${name}`;
 
+const facts = sitePackages.map((name) => packages[name]);
+const outsideDependencies = new Set(facts.flatMap(({ outside }) => outside)).size;
+const lightest = Math.min(...facts.map(({ gzipBytes }) => gzipBytes));
+
 const npmName = (name: string): string => `@reely/${name}`;
 
 const PackagePlate = ({ name }: { name: SitePackage }): Node => {
@@ -49,9 +53,7 @@ const PackagePlate = ({ name }: { name: SitePackage }): Node => {
       </span>
       <span className={css.uses}>
         {() =>
-          uses.length === 0
-            ? packagesText().standsAlone
-            : `${packagesText().builtOn} ${uses.map(npmName).join(', ')}`
+          uses.length === 0 ? packagesText().standsAlone : `${packagesText().builtOn} ${uses.map(npmName).join(', ')}`
         }
       </span>
     </a>
@@ -67,13 +69,32 @@ export const HomePage = (): Node => {
     <>
       <SiteHeader current='home' />
       <main>
-        <section className={band.start} aria={{ ariaLabelledby: 'start-title' }}>
+        <section className={`${band.start} ${band.startTop}`} aria={{ ariaLabelledby: 'start-title' }}>
           <div className={band.startCopy}>
             <h1 id='start-title' className={`${band.title} ${band.titleLong}`}>
               {() => homeText().title}
             </h1>
             <p className={band.pitch}>{() => homeText().lead}</p>
-            <p className={band.builtWith}>{() => homeText().builtWith}</p>
+            <dl className={band.facts}>
+              <div>
+                <dt>{() => homeText().facts.packages}</dt>
+                <dd>{String(sitePackages.length)}</dd>
+              </div>
+              <div>
+                <dt>{() => homeText().facts.outside}</dt>
+                <dd>{String(outsideDependencies)}</dd>
+              </div>
+              <div>
+                <dt>{() => homeText().facts.lightest}</dt>
+                <dd>{kB(lightest)}</dd>
+              </div>
+            </dl>
+            <div className={band.actions}>
+              <a className={band.primary} href='#packages'>
+                {() => homeText().findPackage}
+              </a>
+              <p className={band.builtWith}>{() => homeText().builtWith}</p>
+            </div>
             <div className={css.credits}>
               <p className={css.creditsTitle}>{() => homeText().board.madeWith}</p>
               <ul className={css.creditList}>

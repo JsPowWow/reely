@@ -12,18 +12,19 @@ const en = {
   readme: 'Read the README',
   npm: 'See it on npm',
   console: 'What reached the console',
+  inDommyDocs: 'See them drive the DOM in dommy’s docs',
   exports: 'What it exports',
   exportsNote: 'The values you can import; its types are in the README.',
   examples: {
     basics: {
-      title: 'One screen breaks, the lap time still gets out',
+      title: 'One tracker blocked, the order still reported',
       claim:
-        'forEachSettled calls every screen on the pit wall even when one throws, then throws that error once each has had its turn; messageOf reads its message whatever was thrown.',
+        'forEachSettled calls every analytics tracker even when one throws, then throws that error once each has had its turn; messageOf reads its message whatever was thrown.',
     },
     signals: {
-      title: 'One lap, two changes, one radio call',
+      title: 'Two changes, one save',
       claim:
-        'The fuel plan is computed from the laps left, the burn per lap and the fuel in the tank. A lap changes the laps and the fuel inside one batch, so the effect radios the driver once per lap, as the call number shows. The signals know no DOM: dommy binds them here.',
+        'The total is computed from the quantity and the discount. The bulk order changes both inside one batch, so the effect that saves the draft runs once, as its count shows. The signals know no DOM: dommy binds them here.',
     },
     'dommy-kit': {
       title: 'A text size that outlives a reload',
@@ -31,9 +32,9 @@ const en = {
         'persisted keeps a signal in localStorage and follows writes from other tabs; media follows a media query. Both stop with the render that made them.',
     },
     emitter: {
-      title: 'Every screen hears the flag',
+      title: 'A notice every part of the app hears',
       claim:
-        'Race control emits one typed event. The team radio’s listener throws, and the flag panel and the ticker hear the flag anyway; emit throws the radio’s error once all have run.',
+        'Any part of the app emits one typed notice. The chat widget’s listener throws, and the toasts and the unread badge hear it anyway; emit throws the widget’s error once all have run.',
     },
     queue: {
       title: 'Two crews, five cars',
