@@ -1,0 +1,53 @@
+.flap {
+  display: inline-flex;
+}
+
+.tiles {
+  display: inline-flex;
+  gap: 1px;
+}
+
+/* A tile is two halves on a hinge; a turn drops the upper half onto it. */
+.tile {
+  display: grid;
+  place-items: center;
+  width: 0.95rem;
+  height: 1.6rem;
+  border-radius: 2px;
+  background: linear-gradient(
+    color-mix(in srgb, var(--slate) 45%, var(--graphite)) 0 calc(50% - 0.5px),
+    color-mix(in srgb, black 45%, var(--graphite)) 0 calc(50% + 0.5px),
+    color-mix(in srgb, var(--slate) 30%, var(--graphite)) 0
+  );
+  /* a flap drum carries capitals; the screen reader still gets the name as written */
+  text-transform: uppercase;
+  white-space: pre;
+  backface-visibility: hidden;
+}
+
+.turnA {
+  animation: turn-a 0.1s ease-out;
+}
+
+.turnB {
+  animation: turn-b 0.1s ease-out;
+}
+
+@keyframes turn-a {
+  from {
+    transform: perspective(40px) rotateX(-75deg);
+  }
+}
+
+@keyframes turn-b {
+  from {
+    transform: perspective(40px) rotateX(-75deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .turnA,
+  .turnB {
+    animation: none;
+  }
+}

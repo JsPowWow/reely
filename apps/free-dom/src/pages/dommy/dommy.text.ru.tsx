@@ -32,7 +32,7 @@ export const ru: DommyText = {
   },
   numbers: {
     title: 'Размер и скорость',
-    caption: 'Размер после минификации и gzip, измерен по npm-архиву',
+    caption: 'Размер после минификации и gzip, измерен сборкой сайта',
     signalsOnly: 'Приложение только на сигналах',
     jsxApp: 'JSX-приложение с For, Show и mount',
     wholePackage: 'Весь пакет',

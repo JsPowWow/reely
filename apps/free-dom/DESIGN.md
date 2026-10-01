@@ -157,9 +157,9 @@ components:
 
 The whole site reads like a race timing screen: an asphalt ground, graphite ink and bands, white panels where the live demos run, signal yellow for whatever is current, leading or posted, and flag red for the one kind of write that matters most. Every number that the reader might compare (DOM writes, sizes, times, places) is set in a condensed display face with tabular figures, as a timing tower would post it. The world is carried by palette, type and plates, not by a story: headings say plainly what they show. The site is built with the library it documents, so the visual system is there to make each live demo and its write count legible, not to decorate around them.
 
-Density is that of a working tool: a docs rail, a demo beside its source, a write board under each demo. The dommy page (`/dommy`) is the same world at a larger scale: a graphite band opens it with the thesis and the first live demo, plain example sections follow on asphalt, and a graphite band of measured figures closes it. Nothing is lifted by shadow; depth is the step from asphalt to white panel to graphite band.
+Density is that of a working tool: a docs rail, a demo beside its source, a write board under each demo. The home page (`/`) opens on a graphite band: the headline of what reely is, the credits naming which package draws which part of the board, and a live split-flap scoreboard on a white panel; below it, every package on the same white plate, in the order they stack. The dommy page (`/dommy`) is the same world at a larger scale: a graphite band opens it with the thesis and the first live demo, plain example sections follow on asphalt, and a graphite band of measured figures closes it. Nothing is lifted by shadow; depth is the step from asphalt to white panel to graphite band.
 
-Motion only answers the reader: the write board outlines the nodes a change touched and fades the outline, controls shift colour in 120ms, and nothing moves on its own.
+Motion answers the reader: the write board outlines the nodes a change touched and fades the outline, and controls shift colour in 120ms. The one thing that moves on its own is the home page's scoreboard, a live race the reader can pause; it stops while off screen or in a hidden tab, and under reduced motion its letters change without turning.
 
 **Key Characteristics:**
 - Asphalt ground, white demo panels, graphite bands and code panes; flat, bordered with 1px hairlines.
@@ -274,6 +274,12 @@ Graphite, 6px, code-text mono at 0.8125rem/1.6, lines kept on one line and scrol
 ### Timing Plates
 Ranked rows (hairline, 4px) lead with a graphite place plate in the display face; the first row's plate is signal, and moves with whichever row leads. Read-out boxes are white with a hairline, display at 3.5rem. A posted result (a preview, a delivery, a rate) is a signal plate with display text at 2rem; not yet settled, it is a dashed hairline with slate text; a failed call is a white plate with a 2px graphite border and bold body text. Result lists of code chips sit on graphite at 3px in mono.
 
+### Package Plates
+On the home page each package is one white plate (6px, hairline) that opens the package's page: the name in the display face at 1.75rem with a slate `@reely/` scope, the version in slate tabular figures, one line on why it exists, then over a hairline its gzip size as a display figure at 1.75rem with a slate label, and what reely packages it is built on in slate. The plates fill a grid of columns at least 17rem wide, one column on a phone. Hover turns the border graphite; a plate reached by its anchor from the credits gets a 2px signal-ink outline at 2px offset. No plate is featured.
+
+### Scoreboard
+A split-flap board on graphite (6px) inside the opening band's white panel: a slate header row in the body face, then rows of a place plate (the leader's in signal), a car's colour bar, its name and its time on tiles. A tile is a 0.95rem by 1.6rem plate of two graphite halves split by a dark hinge line, the letter in the display face at 800, uppercase, tabular figures. A changed letter turns through two drum letters, 55ms apart, each tile a little after the one before it; rows keep their places and their words turn. A race runs ten minutes, then the next one starts. A bordered pause button sits above the board and names what it will do (Pause, Resume). The board's own writes are counted by the write board but not outlined, since its letters already show each change.
+
 ### Timing Sheet
 Figures tables (docs sizes, the dommy page's size and speed band): a visible caption, tabular figures right-aligned in the display face, one rule per row, labels left in body weight 400.
 
@@ -284,7 +290,7 @@ Figures tables (docs sizes, the dommy page's size and speed band): a visible cap
 - **Do** set every posted figure in the display face at 800 (Big Shoulders Display; its Russian stand-in) with tabular figures.
 - **Do** mark the current item with a signal plate or underline, and draw focus as a 3px graphite ring on light surfaces and a 3px signal ring on graphite.
 - **Do** separate layers by tone and 1px hairlines (line on light, slate on graphite).
-- **Do** move only in answer to the reader, and under reduced motion drop transitions and fades.
+- **Do** move only in answer to the reader, with the home page's scoreboard as the one live exception, and under reduced motion drop transitions, fades and turns.
 
 ### Don't:
 - **Don't** use box-shadow or any lift; the screen is flat.

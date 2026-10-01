@@ -68,7 +68,7 @@ describe('DommyPage', () => {
     const examples = dommyExamples.map(({ id }) => section(host, id));
 
     expect(examples.every((example) => example.querySelector('figure') && example.querySelector('pre'))).toBe(true);
-    expect(section(host, 'numbers').querySelector('td')?.textContent).toBe('1.7 kB');
+    expect(section(host, 'numbers').querySelector('td')?.textContent).toMatch(/^\d+\.\d kB$/);
   });
 
   it('animates the button a factory returned, and writes nothing to the DOM for it', async () => {

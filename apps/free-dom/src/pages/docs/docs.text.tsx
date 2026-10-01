@@ -6,7 +6,7 @@ import listsSource from './snippets/lists.inbox.tsx?highlight';
 import signalsSource from './snippets/signals.api.ts?highlight';
 import mountSource from './snippets/start.mount.tsx?highlight';
 import { localized } from '../../i18n/localized';
-import { measured } from '../../site/measurements';
+import { measured } from '../../measure/measures';
 
 import type { AdvancedExamples } from './advanced.examples';
 import type { DocGroup, DocSlug } from './docs.topics';
@@ -465,7 +465,7 @@ const en = {
             </tbody>
           </table>
           <p>
-            Measured on the packed npm tarball, bundled with esbuild. There are no third-party runtime dependencies, and
+            Measured by the site's build on the package built in the repo, bundled with esbuild. There are no third-party runtime dependencies, and
             the package is tree-shakeable: what an app does not import, it does not ship.
           </p>
           <h2>Speed</h2>

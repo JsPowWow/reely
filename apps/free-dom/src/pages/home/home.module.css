@@ -1,0 +1,145 @@
+/* The board on its white panel beside the thesis; which package draws what, under the thesis. */
+.startBoard {
+  display: grid;
+  gap: 1rem;
+  color: var(--graphite);
+}
+
+.credits {
+  color: var(--code-text);
+  font-size: 0.9375rem;
+}
+
+.creditsTitle {
+  margin: 0 0 0.35rem;
+}
+
+.creditList {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.creditList a {
+  color: var(--asphalt);
+  font-weight: 700;
+  text-decoration-color: var(--signal);
+  text-underline-offset: 0.2em;
+}
+
+/* Every package on the same plate, in the order they stack. */
+.packages {
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --measure: 80rem;
+  display: grid;
+  gap: 0.75rem;
+  padding: clamp(3rem, 7vw, 5.5rem) max(var(--gutter), (100% - var(--measure)) / 2);
+}
+
+.packagesTitle {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.packagesLead {
+  max-width: 62ch;
+  margin: 0 0 1.25rem;
+  color: var(--slate);
+  font-size: 1.125rem;
+}
+
+.plates {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plates > li {
+  display: grid;
+}
+
+.plate {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 0.6rem;
+  padding: 1.1rem 1.2rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--graphite);
+  text-decoration: none;
+}
+
+.plate:hover {
+  border-color: var(--graphite);
+}
+
+.plate:target {
+  outline: 2px solid var(--signal-ink);
+  outline-offset: 2px;
+}
+
+.plateHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.name {
+  font-family: var(--display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.scope {
+  color: var(--slate);
+  font-size: 1.125rem;
+}
+
+.version {
+  color: var(--slate);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.why {
+  color: var(--graphite);
+}
+
+.size {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+}
+
+.figure {
+  font-family: var(--display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.sizeLabel,
+.uses {
+  color: var(--slate);
+  font-size: 0.875rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .plate {
+    transition: border-color 120ms ease-out;
+  }
+}

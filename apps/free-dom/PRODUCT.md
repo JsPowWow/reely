@@ -44,7 +44,7 @@ Small packages that each do one thing for a consumer who uses no other `@reely` 
 
 ## Evidence on Hand
 
-- Sizes, gzip, measured by the site's build from the repo sources with esbuild, never typed by hand: each package whole; for dommy also an app that uses only signals and a typical JSX app with `For`, `Show` and `mount`. No runtime dependencies.
+- Sizes, gzip, measured by the site's build with esbuild from the packages built in the repo, never typed by hand: each package whole; for dommy also an app that uses only signals and a typical JSX app with `For`, `Show` and `mount`. No runtime dependencies.
 - Speed: not quoted as a number (a headless-browser figure says nothing about the reader's machine); the performance page times a 500-row keyed board live in the visitor's own browser.
 - The live demos and their DOM-write counts: `apps/free-dom/src/pages/`.
 - The packages, their tests and consumer checks: `packages/*`; first real consumer: JsPowWow/ai-race, which uses dommy, signals, dommy-kit and the small helpers.

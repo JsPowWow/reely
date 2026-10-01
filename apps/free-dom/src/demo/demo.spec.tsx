@@ -1,6 +1,6 @@
 import { isInstanceOf } from '@reely/utils';
 
-import { MutationMeter } from './mutation.meter';
+import { MutationMeter, unflashed } from './mutation.meter';
 import { SourceView } from './source.view';
 import { evolutionSteps } from '../pages/evolution/evolution.steps';
 import { clickButton, flushMutations } from '../testing/dom.testing';
@@ -48,6 +48,26 @@ describe('demo', () => {
 
       expect(flashed.has(meter.querySelector('ol'))).toBe(false);
       expect([...flashed].some((element) => isInstanceOf(HTMLLIElement, element))).toBe(true);
+    });
+
+    it('counts but does not flash the writes inside a part that animates itself', async () => {
+      const animate = vi.fn();
+      Element.prototype.animate = animate;
+      const tile = document.createElement('span');
+      tile.append('A');
+      const board = (<div {...unflashed}>{tile}</div>);
+      const meter = MutationMeter({ children: board });
+      await flushMutations();
+
+      tile.firstChild?.replaceWith('B');
+      tile.className = 'turn';
+      await flushMutations();
+      const [, text, attributes, , nodes] = Array.from(meter.querySelectorAll('figcaption dd'), (count) =>
+        Number(count.firstChild?.textContent)
+      );
+
+      expect(animate).not.toHaveBeenCalled();
+      expect([text, attributes, nodes]).toEqual([0, 1, 2]);
     });
 
     it('flashes the nodes a small change touched, and leaves a large change to the counts', async () => {

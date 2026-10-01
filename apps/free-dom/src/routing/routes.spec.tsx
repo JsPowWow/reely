@@ -17,6 +17,10 @@ const headingAt = async (pathname: string): Promise<string | null | undefined> =
   (await renderAt(pathname)).querySelector('h1')?.textContent;
 
 describe('routes', () => {
+  it('opens the home page, the way into every package, at the root', async () => {
+    expect(await headingAt('/')).toBe('reely — small TypeScript packages, no dependencies');
+  });
+
   it('opens the dommy page under its own path', async () => {
     expect(await headingAt('/dommy')).toBe('Real DOM. One write per change.');
   });

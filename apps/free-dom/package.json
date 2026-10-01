@@ -6,6 +6,20 @@
     "name": "free-dom",
     "tags": [
       "scope:free-dom"
+    ],
+    "implicitDependencies": [
+      "basics",
+      "signals",
+      "dommy",
+      "dommy-kit",
+      "emitter",
+      "queue",
+      "state-machine",
+      "simple-store",
+      "logger",
+      "async",
+      "colors",
+      "strings"
     ]
   }
 }

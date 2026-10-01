@@ -33,7 +33,7 @@ const en = {
   } satisfies Record<DommyExampleId, { title: string; claim: string }>,
   numbers: {
     title: 'Size and speed',
-    caption: 'Sizes minified and gzipped, measured on the npm tarball',
+    caption: 'Sizes minified and gzipped, measured when the site is built',
     signalsOnly: 'An app that uses only signals ships',
     jsxApp: 'A JSX app with For, Show and mount ships',
     wholePackage: 'The whole package',

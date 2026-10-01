@@ -1,9 +1,14 @@
 /// <reference types='vitest' />
+import { resolve } from 'node:path';
+
 import { defineConfig } from 'vite';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 import { sourceHighlight } from './src/highlight/source.highlight';
+import { dommyBundles } from './src/measure/measure.cases';
+import { measures } from './src/measure/measure.plugin';
+import { sitePackages } from './src/site/site.packages';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
@@ -16,7 +21,12 @@ export default defineConfig(() => ({
     port: 4300,
     host: 'localhost',
   },
-  plugins: [nxViteTsPaths(), nxCopyAssetsPlugin(['netlify.toml']), sourceHighlight()],
+  plugins: [
+    nxViteTsPaths(),
+    nxCopyAssetsPlugin(['netlify.toml']),
+    sourceHighlight(),
+    measures({ packagesDir: resolve(import.meta.dirname, '../../packages'), packages: sitePackages, bundles: dommyBundles }),
+  ],
   build: {
     outDir: './dist',
     emptyOutDir: true,

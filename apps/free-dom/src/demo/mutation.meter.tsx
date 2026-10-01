@@ -86,11 +86,14 @@ const prefersReducedMotion = (): boolean =>
 const touchedBy = (record: MutationRecord): Node[] =>
   record.type === 'childList' ? Array.from(record.addedNodes) : [record.target];
 
+/** Props of a part that shows its own changes (a split-flap board turning its letters): its writes are counted, not flashed. */
+export const unflashed = { 'data-flash': 'off' } as const;
+
 const flash = (record: MutationRecord, moved: ReadonlySet<Node>): void => {
   for (const node of touchedBy(record)) {
     const token = record.type === 'childList' && !moved.has(node) ? '--flag' : '--signal-ink';
     const element = isInstanceOf(Element, node) ? node : node.parentElement;
-    if (isNil(element) || !isSomeFunction(element.animate)) {
+    if (isNil(element) || !isSomeFunction(element.animate) || element.closest('[data-flash="off"]')) {
       continue;
     }
     const outline = `3px solid ${getComputedStyle(element).getPropertyValue(token)}`;

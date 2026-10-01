@@ -19,14 +19,14 @@ THESIS: One headline says what reely is ("reely — small TypeScript packages, n
 
 OWN-WORLD: The site's timing screen, unchanged: asphalt ground, graphite band, signal yellow for the leader's plate and the one action, flag red only for node writes, Big Shoulders Display for headings and figures in tabular numerals, Atkinson Hyperlegible for prose, JetBrains Mono only for code (package names in an install line count as code).
 
-FIRST VIEWPORT: A graphite band under the site header. Left: the headline at display size and one sentence under it. Right, on a white panel: the scoreboard (place, name, time; no laps, sectors or splits), a pause control, the write counter, and the caption mapping parts to packages (signals: standings and times; dommy: rows and letters; dommy-kit: letter timing and reduced motion), each name linking to its plate below.
+FIRST VIEWPORT: A graphite band under the site header. Left: the headline at display size, one sentence under it, and the credits mapping the board's parts to packages (signals: standings and times; dommy: rows and letters; dommy-kit: letter timing and reduced motion), each name linking to its plate below. Right, on a white panel: the scoreboard (place, name, time; no laps, sectors or splits), a pause control, and the write counter.
 
-PACKAGES: A section `#packages` on asphalt: plates in a responsive grid, ordered by layer (basics, signals, dommy, dommy-kit, emitter, queue, state-machine, simple-store, logger, async, colors, strings). Each plate: the package name, one line on why it exists, its size in gzip (figure in the display face), what other reely packages it uses; the whole plate opens the package's page. No icons, no badges, no "featured" plate.
+PACKAGES: A section `#packages` on asphalt: plates in a responsive grid, ordered by layer (basics, signals, dommy, dommy-kit, emitter, queue, state-machine, simple-store, logger, async, colors, strings). Each plate: the package name and version, one line on why it exists, its size in gzip (figure in the display face), what other reely packages it is built on; the whole plate opens the package's page. No icons, no badges, no "featured" plate.
 
-MOTION: Only the scoreboard moves: letters turn through two drum letters and settle; the board reorders every few seconds. Paused while the tab is hidden or the board is off screen, on the visitor's pause, and under reduced motion (rows then change in place without turning).
+MOTION: Only the scoreboard moves: letters turn through two drum letters and settle; the board reorders every few seconds. Paused while the tab is hidden or the board is off screen, and on the visitor's pause; under reduced motion the letters change in place without turning.
 
 STATES: The race data is a deterministic simulation, labelled as one ("Simulated race"); the board is the shape AI::Race's real one has. Sizes come from the build; a package added to the site gets its size the same way.
 
-RESPONSIVE: Below 68.75em the band stacks (headline, then board). On a phone the board shows its top five rows; the plates go to one column.
+RESPONSIVE: Below 68.75em the band stacks (headline and credits, then board). On a phone the board keeps all eight rows, which fit at 390px; the plates go to one column.
 
 FINISH: unreviewed and undocumented is unfinished; the build ends with the finish review and DESIGN.md updated for the home page and the plates.

@@ -5,7 +5,7 @@ import forecastSource from './snippets/async.forecast.tsx?highlight';
 import listsSource from './snippets/lists.inbox.tsx?highlight';
 import signalsSource from './snippets/signals.api.ts?highlight';
 import mountSource from './snippets/start.mount.tsx?highlight';
-import { measured } from '../../site/measurements';
+import { measured } from '../../measure/measures';
 
 import type { DocsText } from './docs.text';
 
@@ -455,7 +455,7 @@ export const ru: DocsText = {
             </tbody>
           </table>
           <p>
-            Измерено по упакованному npm-архиву, собрано с помощью esbuild. Сторонних зависимостей во время выполнения
+            Измерено сборкой сайта по пакету, собранному в репозитории, с помощью esbuild. Сторонних зависимостей во время выполнения
             нет, и пакет поддерживает tree shaking: то, что приложение не импортирует, в него и не попадает.
           </p>
           <h2>Скорость</h2>

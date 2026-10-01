@@ -6,7 +6,8 @@ import { dommyText } from './dommy.text';
 import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
 import { Localized } from '../../i18n/localized.view';
-import { measured } from '../../site/measurements';
+import { measured } from '../../measure/measures';
+import band from '../../site/band.module.css';
 import { sitePaths } from '../../site/site.paths';
 import { siteText } from '../../site/site.text';
 import { LikeButton } from '../docs/demos/like.button';
@@ -41,19 +42,19 @@ export const DommyPage = (): Node => {
     <>
       <DommyHeader current='overview' />
       <main className={css.page}>
-        <section className={css.start} aria={{ ariaLabelledby: 'start-title' }}>
-          <div className={css.startCopy}>
-            <h1 id='start-title' className={css.title}>
+        <section className={band.start} aria={{ ariaLabelledby: 'start-title' }}>
+          <div className={band.startCopy}>
+            <h1 id='start-title' className={band.title}>
               {() => dommyText().title}
             </h1>
-            <p className={css.pitch}>{() => dommyText().pitch}</p>
+            <p className={band.pitch}>{() => dommyText().pitch}</p>
             <div className={css.actions}>
               <a className={css.primary} href={sitePaths.docs}>
                 {() => siteText().openDocs}
               </a>
               <code className={css.install}>npm i @reely/dommy</code>
             </div>
-            <p className={css.builtWith}>{() => dommyText().builtWith}</p>
+            <p className={band.builtWith}>{() => dommyText().builtWith}</p>
           </div>
           <div className={css.startDemo}>
             <MutationMeter>

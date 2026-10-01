@@ -6,10 +6,10 @@ export default [
     ignores: ['**/out-tsc'],
   },
   {
-    // Vite queries (`./step.ts?highlight`) are resolved by Vite plugins; typecheck resolves them.
+    // Vite queries (`./step.ts?highlight`) and `virtual:` modules are resolved by Vite plugins; typecheck resolves them.
     files: ['src/**/*.{ts,tsx}'],
     rules: {
-      'import/no-unresolved': ['error', { ignore: ['\\?highlight$', '^@reely/[\\w-]+/'] }],
+      'import/no-unresolved': ['error', { ignore: ['\\?highlight$', '^@reely/[\\w-]+/', '^virtual:'] }],
     },
   },
   {
