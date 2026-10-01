@@ -29,7 +29,7 @@ describe('docs', () => {
       const page = renderPage();
 
       expect(page.querySelector('h1')?.textContent).toBe('Getting started');
-      expect(page.querySelector('nav a[href="/docs/getting-started"]')?.getAttribute('aria-current')).toBe('page');
+      expect(page.querySelector('nav a[href="/dommy/docs/getting-started"]')?.getAttribute('aria-current')).toBe('page');
       expect(document.title).toBe('Getting started | reely docs');
     });
 
@@ -64,10 +64,10 @@ describe('docs', () => {
       const signals = renderPage('signals');
       const last = renderPage(docTopics.at(-1)?.slug);
 
-      expect(signals.querySelector('a[rel="prev"]')?.getAttribute('href')).toBe('/docs/components');
-      expect(signals.querySelector('a[rel="next"]')?.getAttribute('href')).toBe('/docs/bindings');
+      expect(signals.querySelector('a[rel="prev"]')?.getAttribute('href')).toBe('/dommy/docs/components');
+      expect(signals.querySelector('a[rel="next"]')?.getAttribute('href')).toBe('/dommy/docs/bindings');
       expect(last.querySelector('a[rel="next"]')).toBeNull();
-      expect(last.querySelector('footer a[href="/evolution"]')).not.toBeNull();
+      expect(last.querySelector('footer a[href="/dommy/evolution"]')).not.toBeNull();
     });
 
     it('speaks Russian once it is chosen, and keeps the demo as the reader left it', async () => {
@@ -114,7 +114,7 @@ describe('docs', () => {
       const page = renderPage('nope');
 
       expect(page.querySelector('h1')?.textContent).toBe('There is no topic “nope”');
-      expect(page.querySelector('main a[href="/docs/getting-started"]')).not.toBeNull();
+      expect(page.querySelector('main a[href="/dommy/docs/getting-started"]')).not.toBeNull();
       expect(page.querySelector('figure')).toBeNull();
     });
   });

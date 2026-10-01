@@ -17,33 +17,46 @@ const headingAt = async (pathname: string): Promise<string | null | undefined> =
   (await renderAt(pathname)).querySelector('h1')?.textContent;
 
 describe('routes', () => {
-  it('opens the landing page at the root', async () => {
-    expect(await headingAt('/')).toBe('Real DOM. One write per change.');
+  it('opens the dommy page under its own path', async () => {
+    expect(await headingAt('/dommy')).toBe('Real DOM. One write per change.');
   });
 
-  it('opens the docs at their first topic and at a topic', async () => {
-    expect(await headingAt('/docs')).toBe('Getting started');
-    expect(await headingAt('/docs/signals')).toBe('Signals');
+  it("opens dommy's docs at their first topic and at a topic", async () => {
+    expect(await headingAt('/dommy/docs')).toBe('Getting started');
+    expect(await headingAt('/dommy/docs/signals')).toBe('Signals');
   });
 
   it('opens reely evolution at its first step and at a step', async () => {
-    expect(await headingAt('/evolution')).toMatch(/^Step 1\. /);
-    expect(await headingAt('/evolution/jsx')).toMatch(/^Step 2\. /);
+    expect(await headingAt('/dommy/evolution')).toMatch(/^Step 1\. /);
+    expect(await headingAt('/dommy/evolution/jsx')).toMatch(/^Step 2\. /);
   });
 
-  it('marks the part of the site a page belongs to', async () => {
-    const docs = await renderAt('/docs/lists');
-    const evolution = await renderAt('/evolution/batch');
+  it('opens the labs', async () => {
+    const labs = await renderAt('/labs');
 
-    expect(docs.querySelector('header nav [aria-current="true"]')?.textContent).toBe('Docs');
-    expect(evolution.querySelector('header nav [aria-current="true"]')?.textContent).toBe('Evolution');
+    expect(labs.querySelector('header nav [aria-current="true"]')?.textContent).toBe('Labs');
+  });
+
+  it('marks the package and the part of its pages a page belongs to', async () => {
+    const docs = await renderAt('/dommy/docs/lists');
+    const evolution = await renderAt('/dommy/evolution/batch');
+
+    expect(docs.querySelector('header nav [aria-current="true"]')?.textContent).toBe('Packages');
+    expect(docs.querySelector('nav[aria-label="@reely/dommy"] [aria-current="true"]')?.textContent).toBe('Docs');
+    expect(evolution.querySelector('nav[aria-label="@reely/dommy"] [aria-current="true"]')?.textContent).toBe(
+      'Evolution'
+    );
+  });
+
+  it('keeps no page at the paths the docs had before they moved under dommy', async () => {
+    expect(await headingAt('/docs/signals')).toBe('There is no page at /docs/signals');
   });
 
   it('answers an unknown URL with a page that says what is missing', async () => {
     const page = await renderAt('/nope/deeper');
 
     expect(page.querySelector('h1')?.textContent).toBe('There is no page at /nope/deeper');
-    expect(page.querySelector('main a[href="/docs"]')?.textContent).toBe('Open the docs');
+    expect(page.querySelector('main a[href="/#packages"]')?.textContent).toBe('See the packages');
     expect(page.querySelector('[aria-current]')).toBeNull();
   });
 });

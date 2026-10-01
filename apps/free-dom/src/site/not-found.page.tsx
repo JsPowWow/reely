@@ -1,6 +1,7 @@
 import { effect } from '@reely/dommy';
 
 import { SiteHeader } from './site.header';
+import { sitePaths } from './site.paths';
 import { siteText } from './site.text';
 
 import guide from './guide.module.css';
@@ -17,8 +18,8 @@ export const NotFoundPage = ({ pathname }: { pathname: string }): Node => {
         <header className={guide.missing}>
           <h1 className={guide.title}>{() => siteText().notFound.title(pathname)}</h1>
           <p className={guide.lead}>{() => siteText().notFound.lead}</p>
-          <a className={guide.start} href='/docs'>
-            {() => siteText().openDocs}
+          <a className={guide.start} href={sitePaths.packages}>
+            {() => siteText().seePackages}
           </a>
         </header>
       </main>

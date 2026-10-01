@@ -272,7 +272,7 @@ describe('evolution', () => {
       const page = renderPage();
 
       expect(page.querySelector('h1')?.textContent).toBe('Step 1. Markup with tag factories');
-      expect(page.querySelector('nav a[href="/evolution/factories"]')?.getAttribute('aria-current')).toBe('step');
+      expect(page.querySelector('nav a[href="/dommy/evolution/factories"]')?.getAttribute('aria-current')).toBe('step');
     });
 
     it('diffs a step against the previous step of the same demo and says so', () => {
@@ -290,7 +290,7 @@ describe('evolution', () => {
 
       expect(last.querySelector('a[rel="next"]')).toBeNull();
       expect(last.querySelector('footer h2')?.textContent).toBe('Where to go from here');
-      expect(last.querySelector('footer a[href="/docs"]')?.textContent).toBe('Read the docs');
+      expect(last.querySelector('footer a[href="/dommy/docs"]')?.textContent).toBe('Read the docs');
     });
 
     it('names the step in the document title', () => {
@@ -323,7 +323,7 @@ describe('evolution', () => {
       const page = renderPage('nope');
 
       expect(page.querySelector('h1')?.textContent).toBe('There is no step “nope”');
-      expect(page.querySelector('main a[href="/evolution/factories"]')?.textContent).toBe('Start with step 1');
+      expect(page.querySelector('main a[href="/dommy/evolution/factories"]')?.textContent).toBe('Start with step 1');
       expect(page.querySelector('figure')).toBeNull();
       expect(document.title).toBe('Not found | reely');
     });

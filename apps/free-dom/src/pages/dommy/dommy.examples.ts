@@ -9,19 +9,19 @@ import elementSource from './examples/real.element.ts?highlight';
 
 import type { SourceLines } from '../../highlight/source.types';
 
-/** The examples on the landing page, in the order they are shown; their words are in `landing.text`. */
-export type LandingExampleId = 'signals' | 'elements' | 'lists' | 'async';
+/** The examples on the dommy page, in the order they are shown; their words are in `dommy.text`. */
+export type DommyExampleId = 'signals' | 'elements' | 'lists' | 'async';
 
-/** One example on the landing page: the live module that proves its claim. */
-export interface LandingExample {
-  id: LandingExampleId;
+/** One example on the dommy page: the live module that proves its claim. */
+export interface DommyExample {
+  id: DommyExampleId;
   /** The module's file, as the source caption names it. */
   file: string;
   Demo: () => Node;
   source: SourceLines;
 }
 
-export const landingExamples: readonly LandingExample[] = [
+export const dommyExamples: readonly DommyExample[] = [
   {
     id: 'signals',
     file: 'live.preview.tsx',

@@ -17,22 +17,22 @@ describe('SiteHeader', () => {
 
   it('switches the site to Russian and back in place, and keeps the choice', async () => {
     const host = document.createElement('div');
-    const unmount = mount(host, () => <SiteHeader current='docs' />);
+    const unmount = mount(host, () => <SiteHeader current='packages' />);
     const russian = host.querySelector('button[lang="ru"]');
 
-    expect(navLabels(host)).toEqual(['Docs', 'Evolution', 'Labs', 'GitHub']);
+    expect(navLabels(host)).toEqual(['Packages', 'Labs', 'GitHub']);
     expect(russian?.getAttribute('aria-pressed')).toBe('false');
 
     clickButton(host, 'RU');
     await textsLoaded();
 
-    expect(navLabels(host)).toEqual(['Документация', 'Эволюция', 'Лаборатория', 'GitHub']);
+    expect(navLabels(host)).toEqual(['Пакеты', 'Лаборатория', 'GitHub']);
     expect(russian?.getAttribute('aria-pressed')).toBe('true');
     expect(host.querySelector('[role="group"]')?.getAttribute('aria-label')).toBe('Язык');
     expect(localStorage.getItem('reely.locale')).toBe(JSON.stringify('ru'));
 
     clickButton(host, 'EN');
-    expect(navLabels(host)[0]).toBe('Docs');
+    expect(navLabels(host)[0]).toBe('Packages');
     unmount();
   });
 

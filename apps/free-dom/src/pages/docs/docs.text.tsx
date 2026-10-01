@@ -1,4 +1,4 @@
-import { Code, plain } from './docs.live';
+import { Code, DocLink, plain } from './docs.live';
 import derivationSource from './snippets/advanced.derivation.ts?highlight';
 import granularitySource from './snippets/advanced.granularity.ts?highlight';
 import forecastSource from './snippets/async.forecast.tsx?highlight';
@@ -67,7 +67,7 @@ const en = {
           <p>
             esbuild takes <code>--jsx=automatic --jsx-import-source=@reely/dommy</code>; Vite reads both options from{' '}
             <code>tsconfig.json</code>. JSX is optional: every tag is also a function, see{' '}
-            <a href='/docs/elements'>Elements and JSX</a>.
+            <DocLink slug='elements'>Elements and JSX</DocLink>.
           </p>
           <h2>Mount a view</h2>
           <Code caption='main.tsx' source={mountSource} />
@@ -186,7 +186,7 @@ const en = {
           <p>
             A bound <code>null</code> or <code>undefined</code> removes the attribute; boolean props such as{' '}
             <code>hidden</code> and <code>disabled</code> take <code>true</code> and <code>false</code>. A function
-            child renders text; to switch between whole nodes, use <a href='/docs/conditions'>Show</a>.
+            child renders text; to switch between whole nodes, use <DocLink slug='conditions'>Show</DocLink>.
           </p>
           <h2>Released with their view</h2>
           <p>

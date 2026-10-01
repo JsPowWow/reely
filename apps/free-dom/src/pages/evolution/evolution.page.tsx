@@ -10,18 +10,17 @@ import { SourceView } from '../../demo/source.view';
 import { Localized } from '../../i18n/localized.view';
 import css from '../../site/guide.module.css';
 import { Pager } from '../../site/pager';
-import { SiteHeader } from '../../site/site.header';
+import { sitePaths, stepHref } from '../../site/site.paths';
 import { siteText } from '../../site/site.text';
+import { DommyHeader } from '../dommy/dommy.header';
 
 import type { EvolutionStep } from './evolution.steps';
 import type { PagerLink } from '../../site/pager';
 
-const stepHref = (step: EvolutionStep): string => `/evolution/${step.slug}`;
-
 const titleOf = (step: EvolutionStep): string => evolutionText().steps[step.slug].title;
 
 const toPagerLink = (step: EvolutionStep | undefined): Nullable<PagerLink> =>
-  hasSome(step) ? { href: stepHref(step), title: () => titleOf(step) } : null;
+  hasSome(step) ? { href: stepHref(step.slug), title: () => titleOf(step) } : null;
 
 export const EvolutionPage = ({ slug }: { slug?: string }): Node => {
   const index = isNil(slug) ? 0 : evolutionSteps.findIndex((item) => item.slug === slug);
@@ -43,10 +42,10 @@ export const EvolutionPage = ({ slug }: { slug?: string }): Node => {
 
   return (
     <>
-      <SiteHeader current='evolution' />
+      <DommyHeader current='evolution' />
       <div className={css.guide}>
         <nav className={css.rail} aria={{ ariaLabel: () => evolutionText().railLabel }}>
-          <a className={css.home} href='/evolution'>
+          <a className={css.home} href={sitePaths.evolution}>
             {() => evolutionText().home}
           </a>
           <ol className={css.steps}>
@@ -54,7 +53,7 @@ export const EvolutionPage = ({ slug }: { slug?: string }): Node => {
               <li>
                 <a
                   className={css.stepLink}
-                  href={stepHref(item)}
+                  href={stepHref(item.slug)}
                   aria={itemIndex === index ? { ariaCurrent: 'step' } : {}}
                 >
                   <span className={css.stepNumber}>{itemIndex + 1}</span>
@@ -73,7 +72,7 @@ export const EvolutionPage = ({ slug }: { slug?: string }): Node => {
               <h1 className={css.title}>{() => evolutionText().missing.title(String(slug))}</h1>
               <p className={css.lead}>{() => evolutionText().missing.lead}</p>
               {hasSome(first) && (
-                <a className={css.start} href={stepHref(first)}>
+                <a className={css.start} href={stepHref(first.slug)}>
                   {() => evolutionText().missing.start}
                 </a>
               )}
@@ -110,7 +109,7 @@ export const EvolutionPage = ({ slug }: { slug?: string }): Node => {
                   <p>
                     <Localized view={() => evolutionText().ending.Text} />
                   </p>
-                  <a href='/docs'>{() => evolutionText().ending.docs}</a>
+                  <a href={sitePaths.docs}>{() => evolutionText().ending.docs}</a>
                 </section>
               </Pager>,
             ]

@@ -1,9 +1,10 @@
 import { localized } from '../../i18n/localized';
+import { DocLink } from '../docs/docs.live';
 
-import type { LandingExampleId } from './landing.examples';
+import type { DommyExampleId } from './dommy.examples';
 
 const en = {
-  documentTitle: 'reely: real DOM, one write per change',
+  documentTitle: '@reely/dommy: real DOM, one write per change',
   title: 'Real DOM. One write per change.',
   pitch:
     '@reely/dommy builds real DOM from tag factories and JSX, and binds each signal to the one node it changes. No virtual DOM, no re-render, no third-party dependencies.',
@@ -29,7 +30,7 @@ const en = {
       claim:
         'Type eff quickly. This server answers shorter queries later, as a slow network would; Await shows the answer to the latest query and drops the late ones, counted under the results.',
     },
-  } satisfies Record<LandingExampleId, { title: string; claim: string }>,
+  } satisfies Record<DommyExampleId, { title: string; claim: string }>,
   numbers: {
     title: 'Size and speed',
     caption: 'Sizes minified and gzipped, measured on the npm tarball',
@@ -38,7 +39,7 @@ const en = {
     wholePackage: 'The whole package',
     Note: (): Node => (
       <>
-        Bundled with esbuild. Time a 500-row board in your own browser on <a href='/docs/performance'>Size and speed</a>
+        Bundled with esbuild. Time a 500-row board in your own browser on <DocLink slug='performance'>Size and speed</DocLink>
         .
       </>
     ),
@@ -47,7 +48,7 @@ const en = {
   },
 };
 
-/** The words of the landing page, its examples' titles and claims included. */
-export type LandingText = typeof en;
+/** The words of the dommy page, its examples' titles and claims included. */
+export type DommyText = typeof en;
 
-export const landingText = localized(en, () => import('./landing.text.ru').then((module) => module.ru));
+export const dommyText = localized(en, () => import('./dommy.text.ru').then((module) => module.ru));

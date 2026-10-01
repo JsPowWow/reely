@@ -11,20 +11,19 @@ import { SourceView } from '../../demo/source.view';
 import { Localized } from '../../i18n/localized.view';
 import guide from '../../site/guide.module.css';
 import { Pager } from '../../site/pager';
-import { SiteHeader } from '../../site/site.header';
+import { docHref, sitePaths } from '../../site/site.paths';
 import { siteText } from '../../site/site.text';
+import { DommyHeader } from '../dommy/dommy.header';
 
 import css from './docs.module.css';
 
 import type { DocSlug, DocTopic } from './docs.topics';
 import type { PagerLink } from '../../site/pager';
 
-const topicHref = (topic: DocTopic): string => `/docs/${topic.slug}`;
-
 const titleOf = (topic: DocTopic): string => docsText().topics[topic.slug].title;
 
 const toPagerLink = (topic: DocTopic | undefined): Nullable<PagerLink> =>
-  hasSome(topic) ? { href: topicHref(topic), title: () => titleOf(topic) } : null;
+  hasSome(topic) ? { href: docHref(topic.slug), title: () => titleOf(topic) } : null;
 
 const TopicDetails = ({ slug }: { slug: DocSlug }): Node => {
   if (slug !== 'advanced') {
@@ -49,10 +48,10 @@ export const DocsPage = ({ slug }: { slug?: string }): Node => {
 
   return (
     <>
-      <SiteHeader current='docs' />
+      <DommyHeader current='docs' />
       <div className={guide.guide}>
         <nav className={guide.rail} aria={{ ariaLabel: () => docsText().railLabel }}>
-          <a className={guide.home} href='/docs'>
+          <a className={guide.home} href={sitePaths.docs}>
             {() => docsText().home}
           </a>
           {docGroups.map((group) => (
@@ -65,7 +64,7 @@ export const DocsPage = ({ slug }: { slug?: string }): Node => {
                     <li>
                       <a
                         className={css.topicLink}
-                        href={topicHref(item)}
+                        href={docHref(item.slug)}
                         aria={item === topic ? { ariaCurrent: 'page' } : {}}
                       >
                         {() => titleOf(item)}
@@ -85,7 +84,7 @@ export const DocsPage = ({ slug }: { slug?: string }): Node => {
               <h1 className={guide.title}>{() => docsText().missing.title(String(slug))}</h1>
               <p className={guide.lead}>{() => docsText().missing.lead}</p>
               {hasSome(first) && (
-                <a className={guide.start} href={topicHref(first)}>
+                <a className={guide.start} href={docHref(first.slug)}>
                   {() => docsText().missing.start}
                 </a>
               )}
@@ -106,7 +105,7 @@ export const DocsPage = ({ slug }: { slug?: string }): Node => {
                 <TopicDetails slug={topic.slug} />
               </article>,
               <Pager previous={toPagerLink(previous)} next={toPagerLink(next)}>
-                <a className={guide.next} href='/evolution'>
+                <a className={guide.next} href={sitePaths.evolution}>
                   {() => docsText().onward}
                 </a>
               </Pager>,

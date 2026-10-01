@@ -1,4 +1,4 @@
-import { Code, plain } from './docs.live';
+import { Code, DocLink, plain } from './docs.live';
 import derivationSource from './snippets/advanced.derivation.ts?highlight';
 import granularitySource from './snippets/advanced.granularity.ts?highlight';
 import forecastSource from './snippets/async.forecast.tsx?highlight';
@@ -52,7 +52,7 @@ export const ru: DocsText = {
           <p>
             esbuild принимает <code>--jsx=automatic --jsx-import-source=@reely/dommy</code>; Vite берёт обе настройки из{' '}
             <code>tsconfig.json</code>. JSX не обязателен: каждый тег — это ещё и функция, см.{' '}
-            <a href='/docs/elements'>Элементы и JSX</a>.
+            <DocLink slug='elements'>Элементы и JSX</DocLink>.
           </p>
           <h2>Монтирование</h2>
           <Code caption='main.tsx' source={mountSource} />
@@ -177,7 +177,7 @@ export const ru: DocsText = {
             Привязанные <code>null</code> или <code>undefined</code> удаляют атрибут; булевы пропсы вроде{' '}
             <code>hidden</code> и <code>disabled</code> принимают <code>true</code> и <code>false</code>. Функция в
             children отрисовывает текст; чтобы переключаться между целыми узлами, используйте{' '}
-            <a href='/docs/conditions'>Show</a>.
+            <DocLink slug='conditions'>Show</DocLink>.
           </p>
           <h2>Освобождаются вместе с представлением</h2>
           <p>

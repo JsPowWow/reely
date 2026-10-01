@@ -1,8 +1,8 @@
 import { mount } from '@reely/dommy';
 
+import { dommyExamples } from './dommy.examples';
+import { DommyPage } from './dommy.page';
 import { answerDelay } from './examples/api.search';
-import { landingExamples } from './landing.examples';
-import { LandingPage } from './landing.page';
 import { chooseLocale } from '../../i18n/locale';
 import { textsLoaded } from '../../i18n/localized';
 import { clickButton, flushMutations } from '../../testing/dom.testing';
@@ -27,13 +27,13 @@ const section = (host: Element, id: string): Element => {
 const writes = (example: Element): number[] =>
   Array.from(example.querySelectorAll('figcaption dd'), (count) => Number(count.firstChild?.textContent)).slice(1);
 
-describe('LandingPage', () => {
+describe('DommyPage', () => {
   let host: HTMLElement;
   let dispose: VoidFunction;
 
   beforeEach(() => {
     host = document.createElement('div');
-    dispose = mount(host, () => <LandingPage />);
+    dispose = mount(host, () => <DommyPage />);
   });
 
   afterEach(() => {
@@ -41,9 +41,9 @@ describe('LandingPage', () => {
     chooseLocale('en');
   });
 
-  it('says what reely is and leads into the docs', () => {
+  it('says what dommy is and leads into the docs', () => {
     expect(host.querySelector('h1')?.textContent).toBe('Real DOM. One write per change.');
-    expect(host.querySelector('main a[href="/docs"]')?.textContent).toBe('Open the docs');
+    expect(host.querySelector('main a[href="/dommy/docs"]')?.textContent).toBe('Open the docs');
     expect(host.querySelector('main code')?.textContent).toBe('npm i @reely/dommy');
     expect(host.textContent).toContain('This page, its examples and their write counters are built with reely.');
   });
@@ -55,17 +55,17 @@ describe('LandingPage', () => {
     await textsLoaded();
 
     expect(host.querySelector('h1')?.textContent).toBe('Настоящий DOM. Одна запись на изменение.');
-    expect(host.querySelector('main a[href="/docs"]')?.textContent).toBe('Открыть документацию');
+    expect(host.querySelector('main a[href="/dommy/docs"]')?.textContent).toBe('Открыть документацию');
     expect(section(host, 'lists').querySelector('h2')?.textContent).toBe('Строки переезжают, а не собираются заново');
-    expect(section(host, 'numbers').querySelector('a[href="/docs/performance"]')?.textContent).toBe(
+    expect(section(host, 'numbers').querySelector('a[href="/dommy/docs/performance"]')?.textContent).toBe(
       'Размер и скорость'
     );
     expect(section(host, 'lists').querySelector('ol')).toBe(keyed);
-    expect(document.title).toBe('reely: настоящий DOM, одна запись на изменение');
+    expect(document.title).toBe('@reely/dommy: настоящий DOM, одна запись на изменение');
   });
 
   it('shows every example live beside its source, then the size and speed', () => {
-    const examples = landingExamples.map(({ id }) => section(host, id));
+    const examples = dommyExamples.map(({ id }) => section(host, id));
 
     expect(examples.every((example) => example.querySelector('figure') && example.querySelector('pre'))).toBe(true);
     expect(section(host, 'numbers').querySelector('td')?.textContent).toBe('1.7 kB');
@@ -137,7 +137,7 @@ describe('LandingPage', () => {
       vi.useFakeTimers();
       dispose();
       host = document.createElement('div');
-      dispose = mount(host, () => <LandingPage />);
+      dispose = mount(host, () => <DommyPage />);
     });
 
     afterEach(() => {

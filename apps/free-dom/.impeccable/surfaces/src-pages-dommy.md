@@ -1,15 +1,15 @@
 ---
 version: 1
-slug: "src-pages-landing"
-primary_target: "src/pages/landing"
+slug: "src-pages-dommy"
+primary_target: "src/pages/dommy"
 related_targets: []
 ---
 
-# Landing page
+# dommy page
 
-Scope: the reely landing page at `/`. Mode: Persuade.
+Scope: the page of `@reely/dommy` at `/dommy`, the first of its three pages (overview, docs, evolution), under the strip that names them. Mode: Persuade. It was the site's landing page before the site became the home of every reely package; the home page (`/`) is a surface of its own.
 
-Audience: any JS/TS developer arriving from npm, GitHub or a talk. Job: decide reely is worth trying. Action: open the docs (primary); install with `npm i @reely/dommy` and read the source on GitHub (secondary). Proof: live demos with their DOM writes counted, the measured sizes (1.7 / 5.1 / 7.1 kB gzip), a pointer to time a 500-row board in the reader's own browser (no headless speed figure), and the fact that this page and the whole site are built with reely. Constraints: no invented adopters or claims; only `@reely/*` at runtime; the palette and type of the site's timing-screen world, with no race story on this page (the author found the lap, sectors and splits confusing).
+Audience: a JS/TS developer who came for dommy, from the home page, npm, GitHub or a talk. Job: decide dommy is worth trying. Action: open the docs (primary); install with `npm i @reely/dommy` and read the source on GitHub (secondary). Proof: live demos with their DOM writes counted, the measured sizes (1.7 / 5.1 / 7.1 kB gzip), a pointer to time a 500-row board in the reader's own browser (no headless speed figure), and the fact that this page and the whole site are built with reely. Constraints: no invented adopters or claims; only `@reely/*` at runtime; the palette and type of the site's timing-screen world, with no laps, sectors or splits on this page (the author found them confusing).
 
 Memorable moment: an example the visitor can break with their own hands (type, reverse, type fast) while the board under it counts the DOM writes.
 

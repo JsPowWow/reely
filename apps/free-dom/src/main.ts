@@ -1,14 +1,14 @@
-import { a, defineDommyConfig, p } from '@reely/dommy';
+import { defineDommyConfig } from '@reely/dommy';
 import { createAsyncRouter } from '@reely/dommy/router';
 import { scopedLogger } from '@reely/logger';
-import { isInstanceOf, isSomeFunction } from '@reely/utils';
+import { isSomeFunction } from '@reely/utils';
 
 import { textsLoaded } from './i18n/localized';
 import { navigateInPage } from './routing/page.navigation';
-import { createPageView } from './routing/page.view';
+import { createPageView, enterPage } from './routing/page.view';
 import { followPagerKey } from './routing/pager.keys';
 import { routes } from './routing/routes';
-import { siteText } from './site/site.text';
+import { FailedPage } from './site/failed.page';
 
 defineDommyConfig({
   debug: import.meta.env.DEV,
@@ -32,32 +32,17 @@ const renderPage = async (pathname: string): Promise<boolean> => {
   } catch (error: unknown) {
     // every URL has a route, so this is a bug: say so instead of leaving a blank page
     scopedLogger('free-dom').error(error);
-    showPage(() =>
-      p(
-        null,
-        () => siteText().failed,
-        ' ',
-        a({ href: '/docs' }, () => siteText().openDocs),
-        '.'
-      )
-    );
+    showPage(FailedPage);
   }
   return true;
-};
-
-/** After a move to another page: start at its top, with focus on its heading for screen readers. */
-const enterPage = (): void => {
-  window.scrollTo(0, 0);
-  const heading = document.querySelector('h1');
-  if (isInstanceOf(HTMLElement, heading)) {
-    heading.tabIndex = -1;
-    heading.focus({ preventScroll: true });
-  }
 };
 
 document.addEventListener('keydown', followPagerKey);
 navigateInPage((pathname) => {
   void renderPage(pathname).then((drawn) => drawn && enterPage());
 });
-// a reader who chose Russian last time sees it from the first render, not after a flash of English
-void textsLoaded().then(() => renderPage(location.pathname));
+// a reader who chose Russian last time sees it from the first render, not after a flash of English;
+// a link to a place on a page opens there, drawn after the browser looked for it
+void textsLoaded()
+  .then(() => renderPage(location.pathname))
+  .then((drawn) => drawn && location.hash !== '' && enterPage());

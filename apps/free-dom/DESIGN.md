@@ -1,6 +1,6 @@
 ---
 name: reely
-description: The home and docs of @reely/dommy, drawn as a race-timing screen.
+description: The home of the reely packages and the docs of @reely/dommy, drawn as a race-timing screen.
 colors:
   asphalt: "#e9edf1"
   panel: "#ffffff"
@@ -157,7 +157,7 @@ components:
 
 The whole site reads like a race timing screen: an asphalt ground, graphite ink and bands, white panels where the live demos run, signal yellow for whatever is current, leading or posted, and flag red for the one kind of write that matters most. Every number that the reader might compare (DOM writes, sizes, times, places) is set in a condensed display face with tabular figures, as a timing tower would post it. The world is carried by palette, type and plates, not by a story: headings say plainly what they show. The site is built with the library it documents, so the visual system is there to make each live demo and its write count legible, not to decorate around them.
 
-Density is that of a working tool: a docs rail, a demo beside its source, a write board under each demo. The landing page is the same world at a larger scale: a graphite band opens it with the thesis and the first live demo, plain example sections follow on asphalt, and a graphite band of measured figures closes it. Nothing is lifted by shadow; depth is the step from asphalt to white panel to graphite band.
+Density is that of a working tool: a docs rail, a demo beside its source, a write board under each demo. The dommy page (`/dommy`) is the same world at a larger scale: a graphite band opens it with the thesis and the first live demo, plain example sections follow on asphalt, and a graphite band of measured figures closes it. Nothing is lifted by shadow; depth is the step from asphalt to white panel to graphite band.
 
 Motion only answers the reader: the write board outlines the nodes a change touched and fades the outline, controls shift colour in 120ms, and nothing moves on its own.
 
@@ -182,7 +182,7 @@ A cool graphite-and-asphalt neutral scale with two race signals: a yellow for st
 ### Neutral
 - **Asphalt** (asphalt): the page ground, text on graphite bands, the primary button's hover fill.
 - **Panel White** (panel): demo panels, read-out boxes, inputs, failure plates, inline code, mobile rail chips.
-- **Graphite** (graphite): body text on light surfaces, the site header, the landing's opening and figures bands, code panes, place plates, the solid button, the hollow pip and delta of moved nodes, the border of a failure plate, the focus ring on light surfaces.
+- **Graphite** (graphite): body text on light surfaces, the site header, the dommy page's opening and figures bands, code panes, place plates, the solid button, the hollow pip and delta of moved nodes, the border of a failure plate, the focus ring on light surfaces.
 - **Slate** (slate): secondary text on light surfaces (leads, claims, captions, board labels, idle rail links, placeholders), input borders, hover of solid graphite controls, row rules on graphite bands.
 - **Hairline** (line): every 1px border and rule on light surfaces, and the dashed outline of a pending plate.
 - **Code Text** (code-text): text in code panes and code chips, and quiet prose on graphite (header links, pitch, table captions and notes).
@@ -205,12 +205,12 @@ A cool graphite-and-asphalt neutral scale with two race signals: a yellow for st
 **In Russian** (`:root:lang(ru)`), where neither face has Cyrillic: Fira Sans Extra Condensed 800 takes the display role and Golos Text 400/700 the body; mono stays. The site switches as a whole, demos included, so a page never mixes two body faces.
 
 ### Hierarchy
-- **Display** (800, clamp(3.25rem, 6.6vw, 5.5rem), 0.92): the landing thesis, max 11ch, balanced. The figures band title runs clamp(3rem, 7vw, 5rem) at 0.95.
-- **Headline** (800, clamp(2.5rem, 5vw, 4rem), 1): landing example headings, which state the claim the example proves, balanced.
+- **Display** (800, clamp(3.25rem, 6.6vw, 5.5rem), 0.92): the dommy page's thesis, max 11ch, balanced. The figures band title runs clamp(3rem, 7vw, 5rem) at 0.95.
+- **Headline** (800, clamp(2.5rem, 5vw, 4rem), 1): dommy page example headings, which state the claim the example proves, balanced.
 - **Title** (800, clamp(2rem, 4vw, 3rem), 1.05): docs and evolution page titles; evolution pairs it with a step number at clamp(5rem, 12vw, 8rem).
 - **Subtitle** (800, 1.75rem, 1.1): section headings in docs prose, the guide ending, the wordmark.
 - **Readout** (800, 2.75rem, 1, tabular): write-board figures; 2.25rem on phones. Demo read-out boxes run 3.5rem, the opening demo up to 6rem, result plates 2rem, figures on the graphite band 2 to 3rem in signal.
-- **Body** (400, 1.0625rem, 1.5): prose at 62 to 68ch; leads and claims in slate at 1.125rem, the landing pitch at 1.1875rem.
+- **Body** (400, 1.0625rem, 1.5): prose at 62 to 68ch; leads and claims in slate at 1.125rem, the dommy page's pitch at 1.1875rem.
 - **Label** (400, 0.875rem, 1.3): board labels, code captions, table heads, the keyboard hint; slate.
 - **Code** (400, 0.8125rem, 1.6): code panes, 0.75rem on phones; inline code at 0.85em on panel white.
 
@@ -223,9 +223,9 @@ A cool graphite-and-asphalt neutral scale with two race signals: a yellow for st
 
 ## Layout
 
-Two frames. Guide pages (docs and evolution) are a 17rem rail beside a main column capped at 76rem, padded 2.5rem on top and by the gutter (clamp(1rem, 4vw, 3rem)) at the sides; the rail sits on a 1px hairline. The landing is full-width bands whose content centres in an 80rem measure, each padded vertically by clamp(3rem, 7vw, 5.5rem) or more: a graphite opening band at 7fr to 5fr (thesis beside the first demo), example sections on asphalt divided by hairlines (heading, one paragraph, then demo beside source), and a graphite figures band whose table (max 56rem) carries a visible caption.
+Two frames. Guide pages (docs and evolution) are a 17rem rail beside a main column capped at 76rem, padded 2.5rem on top and by the gutter (clamp(1rem, 4vw, 3rem)) at the sides; the rail sits on a 1px hairline. The dommy page is full-width bands whose content centres in an 80rem measure, each padded vertically by clamp(3rem, 7vw, 5.5rem) or more: a graphite opening band at 7fr to 5fr (thesis beside the first demo), example sections on asphalt divided by hairlines (heading, one paragraph, then demo beside source), and a graphite figures band whose table (max 56rem) carries a visible caption.
 
-A live demo and its source sit side by side at 5fr to 7fr with a 1.5rem gap; the demo is sticky while the source scrolls. Below 68.75em they stack and the landing's opening band goes to one column. Below 45em the rail becomes a wrap of 2.75rem chips (evolution) or topic plates (docs) above the page, the demo stage tightens to 1.25rem 1rem, and the main column leaves 5rem at the bottom for the floating Netlify badge.
+A live demo and its source sit side by side at 5fr to 7fr with a 1.5rem gap; the demo is sticky while the source scrolls. Below 68.75em they stack and the dommy page's opening band goes to one column. Below 45em the rail becomes a wrap of 2.75rem chips (evolution) or topic plates (docs) above the page, the demo stage tightens to 1.25rem 1rem, and the main column leaves 5rem at the bottom for the floating Netlify badge.
 
 Rhythm comes from a short set of gaps (0.25, 0.5, 0.75, 1, 1.5, 2rem) and 2rem between page blocks. Prose holds 62 to 68ch; docs headings sit 1rem above their block and closer to it than to what came before.
 
@@ -247,7 +247,7 @@ Plain and firm: a filled or outlined plate with bold text, no icon.
 - **Shape:** gently squared (4px).
 - **Primary:** signal fill, graphite text, display face at 1.5rem, padding 0.8rem 1.35rem. One per view, on graphite bands; hover turns it asphalt.
 - **Demo:** transparent with a 1px graphite border and bold body text, padding 0.5rem 0.9rem; hover fills graphite with asphalt text; disabled keeps a hairline border and slate text.
-- **Solid:** graphite fill, asphalt text; hover goes slate. The "back to start" action at 0.6rem 1rem in bold body; the one action a landing demo is about in the display face at 1.5rem (0.75rem 1.25rem), and 2rem in the opening demo.
+- **Solid:** graphite fill, asphalt text; hover goes slate. The "back to start" action at 0.6rem 1rem in bold body; the one action a dommy page demo is about in the display face at 1.5rem (0.75rem 1.25rem), and 2rem in the opening demo.
 - **Secondary link:** bold asphalt text on a 2px slate underline that turns signal on hover.
 - **Transitions:** background and border colour in 120ms ease-out, only without reduced motion.
 
@@ -259,7 +259,8 @@ Plain and firm: a filled or outlined plate with bold text, no icon.
 The `npm i @reely/dommy` command: mono at 0.9375rem, asphalt on graphite, a 1px slate border at 4px, selectable in one click.
 
 ### Navigation
-- **Header:** a graphite strip with the display wordmark at 1.75rem and bold code-text links; hover lightens to asphalt over a slate 3px underline, the current part of the site gets a signal underline.
+- **Header:** a graphite strip with the display wordmark at 1.75rem and bold code-text links (Packages, Labs, GitHub); hover lightens to asphalt over a slate 3px underline, the current part of the site gets a signal underline.
+- **Package strip:** under the header on a package with several pages (dommy: overview, docs, evolution), a white strip on a hairline: the package name in bold graphite, then slate bold links; hover graphite over a hairline 3px underline, the current page graphite over a signal-ink underline. Focus is the global graphite ring.
 - **Rail:** idle links in slate, hover graphite, the current page a signal plate with graphite bold text. Docs groups are headed in slate display at 1.125rem; evolution steps carry a display number in a 2rem column.
 - **Mobile:** rail items become white chips with a hairline; the current chip is signal with a 2px graphite border.
 - **Pager:** bold underlined graphite links split left and right over a hairline; the last page closes with where to go next instead.
@@ -274,7 +275,7 @@ Graphite, 6px, code-text mono at 0.8125rem/1.6, lines kept on one line and scrol
 Ranked rows (hairline, 4px) lead with a graphite place plate in the display face; the first row's plate is signal, and moves with whichever row leads. Read-out boxes are white with a hairline, display at 3.5rem. A posted result (a preview, a delivery, a rate) is a signal plate with display text at 2rem; not yet settled, it is a dashed hairline with slate text; a failed call is a white plate with a 2px graphite border and bold body text. Result lists of code chips sit on graphite at 3px in mono.
 
 ### Timing Sheet
-Figures tables (docs sizes, the landing's size and speed band): a visible caption, tabular figures right-aligned in the display face, one rule per row, labels left in body weight 400.
+Figures tables (docs sizes, the dommy page's size and speed band): a visible caption, tabular figures right-aligned in the display face, one rule per row, labels left in body weight 400.
 
 ## Do's and Don'ts
 

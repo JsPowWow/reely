@@ -51,7 +51,7 @@ body {
   outline-offset: 2px;
 }
 
-/* A heading focused after a move to another page is a reading position, not a control. */
-h1[tabindex='-1']:focus {
+/* A heading or a place focused after a move to another page is a reading position, not a control. */
+:is(h1, section)[tabindex='-1']:focus {
   outline: none;
 }

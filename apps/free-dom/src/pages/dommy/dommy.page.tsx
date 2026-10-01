@@ -1,26 +1,27 @@
 import { effect } from '@reely/dommy';
 
-import { landingExamples } from './landing.examples';
-import { landingText } from './landing.text';
+import { dommyExamples } from './dommy.examples';
+import { DommyHeader } from './dommy.header';
+import { dommyText } from './dommy.text';
 import { MutationMeter } from '../../demo/mutation.meter';
 import { SourceView } from '../../demo/source.view';
 import { Localized } from '../../i18n/localized.view';
 import { measured } from '../../site/measurements';
-import { SiteHeader } from '../../site/site.header';
+import { sitePaths } from '../../site/site.paths';
 import { siteText } from '../../site/site.text';
 import { LikeButton } from '../docs/demos/like.button';
 
-import css from './landing.module.css';
+import css from './dommy.module.css';
 
-import type { LandingExample } from './landing.examples';
+import type { DommyExample } from './dommy.examples';
 
-const Example = ({ example }: { example: LandingExample }): Node => (
+const Example = ({ example }: { example: DommyExample }): Node => (
   <section id={example.id} className={css.example} aria={{ ariaLabelledby: `${example.id}-title` }}>
     <header className={css.exampleHeading}>
       <h2 id={`${example.id}-title`} className={css.exampleTitle}>
-        {() => landingText().examples[example.id].title}
+        {() => dommyText().examples[example.id].title}
       </h2>
-      <p className={css.claim}>{() => landingText().examples[example.id].claim}</p>
+      <p className={css.claim}>{() => dommyText().examples[example.id].claim}</p>
     </header>
     <div className={css.panels}>
       <MutationMeter>
@@ -31,28 +32,28 @@ const Example = ({ example }: { example: LandingExample }): Node => (
   </section>
 );
 
-export const LandingPage = (): Node => {
+export const DommyPage = (): Node => {
   effect(() => {
-    document.title = landingText().documentTitle;
+    document.title = dommyText().documentTitle;
   });
 
   return (
     <>
-      <SiteHeader current='home' />
-      <main className={css.landing}>
+      <DommyHeader current='overview' />
+      <main className={css.page}>
         <section className={css.start} aria={{ ariaLabelledby: 'start-title' }}>
           <div className={css.startCopy}>
             <h1 id='start-title' className={css.title}>
-              {() => landingText().title}
+              {() => dommyText().title}
             </h1>
-            <p className={css.pitch}>{() => landingText().pitch}</p>
+            <p className={css.pitch}>{() => dommyText().pitch}</p>
             <div className={css.actions}>
-              <a className={css.primary} href='/docs'>
+              <a className={css.primary} href={sitePaths.docs}>
                 {() => siteText().openDocs}
               </a>
               <code className={css.install}>npm i @reely/dommy</code>
             </div>
-            <p className={css.builtWith}>{() => landingText().builtWith}</p>
+            <p className={css.builtWith}>{() => dommyText().builtWith}</p>
           </div>
           <div className={css.startDemo}>
             <MutationMeter>
@@ -60,43 +61,43 @@ export const LandingPage = (): Node => {
             </MutationMeter>
           </div>
         </section>
-        {landingExamples.map((example) => (
+        {dommyExamples.map((example) => (
           <Example example={example} />
         ))}
         <section id='numbers' className={css.numbers} aria={{ ariaLabelledby: 'numbers-title' }}>
           <div className={css.numbersInner}>
             <h2 id='numbers-title' className={css.numbersTitle}>
-              {() => landingText().numbers.title}
+              {() => dommyText().numbers.title}
             </h2>
             <table className={css.times}>
-              <caption className={css.timesCaption}>{() => landingText().numbers.caption}</caption>
+              <caption className={css.timesCaption}>{() => dommyText().numbers.caption}</caption>
               <tbody>
                 <tr>
-                  <th scope='row'>{() => landingText().numbers.signalsOnly}</th>
+                  <th scope='row'>{() => dommyText().numbers.signalsOnly}</th>
                   <td>{measured.signalsOnly}</td>
                 </tr>
                 <tr>
-                  <th scope='row'>{() => landingText().numbers.jsxApp}</th>
+                  <th scope='row'>{() => dommyText().numbers.jsxApp}</th>
                   <td>{measured.jsxApp}</td>
                 </tr>
                 <tr>
-                  <th scope='row'>{() => landingText().numbers.wholePackage}</th>
+                  <th scope='row'>{() => dommyText().numbers.wholePackage}</th>
                   <td>{measured.wholePackage}</td>
                 </tr>
               </tbody>
             </table>
             <p className={css.numbersNote}>
-              <Localized view={() => landingText().numbers.Note} />
+              <Localized view={() => dommyText().numbers.Note} />
             </p>
             <div className={css.actions}>
-              <a className={css.primary} href='/docs'>
+              <a className={css.primary} href={sitePaths.docs}>
                 {() => siteText().openDocs}
               </a>
-              <a className={css.secondary} href='/evolution'>
-                {() => landingText().numbers.stepByStep}
+              <a className={css.secondary} href={sitePaths.evolution}>
+                {() => dommyText().numbers.stepByStep}
               </a>
               <a className={css.secondary} href='https://github.com/JsPowWow/reely'>
-                {() => landingText().numbers.github}
+                {() => dommyText().numbers.github}
               </a>
             </div>
           </div>

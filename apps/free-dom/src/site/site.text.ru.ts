@@ -1,14 +1,16 @@
 import type { SiteText } from './site.text';
 
 export const ru: SiteText = {
-  nav: { label: 'Сайт', docs: 'Документация', evolution: 'Эволюция', labs: 'Лаборатория' },
+  nav: { label: 'Сайт', packages: 'Пакеты', labs: 'Лаборатория' },
+  dommyNav: { overview: 'Обзор', docs: 'Документация', evolution: 'Эволюция' },
   language: { label: 'Язык' },
   pager: { previous: 'Назад', next: 'Дальше' },
   openDocs: 'Открыть документацию',
+  seePackages: 'Посмотреть пакеты',
   notFound: {
     documentTitle: 'Страница не найдена | reely',
     title: (pathname) => `Страницы ${pathname} нет`,
-    lead: 'Каждая страница документации отвечает на один вопрос, а эволюция reely собирает всё шаг за шагом.',
+    lead: 'reely — это набор небольших пакетов, у каждого своя страница; список — на главной.',
   },
   failed: 'Страница не загрузилась.',
 };

@@ -1,7 +1,9 @@
-import type { LandingText } from './landing.text';
+import { DocLink } from '../docs/docs.live';
 
-export const ru: LandingText = {
-  documentTitle: 'reely: настоящий DOM, одна запись на изменение',
+import type { DommyText } from './dommy.text';
+
+export const ru: DommyText = {
+  documentTitle: '@reely/dommy: настоящий DOM, одна запись на изменение',
   title: 'Настоящий DOM. Одна запись на изменение.',
   pitch:
     '@reely/dommy строит настоящий DOM из фабрик тегов и JSX и привязывает каждый сигнал к единственному узлу, который он меняет. Без виртуального DOM, без перерисовок, без сторонних зависимостей.',
@@ -37,7 +39,7 @@ export const ru: LandingText = {
     Note: () => (
       <>
         Собрано с помощью esbuild. Скорость обновления табло из 500 строк замерьте в своём браузере на странице «
-        <a href='/docs/performance'>Размер и скорость</a>».
+        <DocLink slug='performance'>Размер и скорость</DocLink>».
       </>
     ),
     stepByStep: 'Как это собирается, шаг за шагом',
