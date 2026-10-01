@@ -27,8 +27,7 @@
   ],
   "sideEffects": false,
   "dependencies": {
-    "@reely/basics": "^0.1.0",
-    "tslib": "^2.3.0"
+    "@reely/basics": "^0.1.0"
   },
   "devDependencies": {
     "vite": "^7.0.0"
