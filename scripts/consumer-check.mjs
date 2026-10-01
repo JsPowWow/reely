@@ -106,10 +106,13 @@ try {
     });
     return outputFiles[0].text;
   };
-  // ignoreAnnotations: pure code, not just `sideEffects: false`
-  for (const ignoreAnnotations of [false, true]) {
+  // every entry, and with ignoreAnnotations: pure code, not just `sideEffects: false`
+  const entries = Object.keys(manifest.exports ?? { '.': '' })
+    .filter((subpath) => subpath !== './package.json')
+    .map((subpath) => manifest.name + subpath.slice(1));
+  for (const [entry, ignoreAnnotations] of entries.flatMap((entry) => [[entry, false], [entry, true]])) {
     const { outputFiles } = await build({
-      stdin: { contents: `import '${manifest.name}';`, resolveDir: work },
+      stdin: { contents: `import '${entry}';`, resolveDir: work },
       absWorkingDir: work,
       bundle: true,
       format: 'esm',
@@ -118,7 +121,7 @@ try {
       write: false,
       logLevel: 'error',
     });
-    assert.equal(outputFiles[0].text.trim(), '', `importing ${manifest.name} ships code (ignoreAnnotations: ${ignoreAnnotations})`);
+    assert.equal(outputFiles[0].text.trim(), '', `importing ${entry} ships code (ignoreAnnotations: ${ignoreAnnotations})`);
   }
   for (const { name, code, absent = [], once = [] } of shakeCases) {
     const text = await bundle(code, false);

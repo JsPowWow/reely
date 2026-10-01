@@ -1,0 +1,31 @@
+[
+  {
+    "name": "getContrastRatio alone",
+    "code": "import { getContrastRatio } from '@reely/colors'; console.log(getContrastRatio('#ffffff', 'rgb(37 99 235)'));",
+    "absent": [
+      "mix",
+      "withAlpha",
+      "randomHex",
+      "rgbToHsl",
+      "darken",
+      "lighten"
+    ],
+    "once": [
+      "getContrastRatio"
+    ]
+  },
+  {
+    "name": "randomHex alone",
+    "code": "import { randomHex } from '@reely/colors'; console.log(randomHex());",
+    "absent": [
+      "parseColor",
+      "hexToRgb",
+      "mix",
+      "getContrastRatio",
+      "withAlpha"
+    ],
+    "once": [
+      "randomHex"
+    ]
+  }
+]

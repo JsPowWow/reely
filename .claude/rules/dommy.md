@@ -22,7 +22,7 @@ Signals bound to the DOM (point updates, no virtual DOM), owner/`dispose`, flow 
 - Setters return the element, so they chain.
 - Exported functions — `const` arrows with explicit return types; `function` only for guards, small internal helpers and overloaded exports (e.g. `createElement`), which a `const` cannot type without `as`. Guards are `is*`/`has*` with `x is T` predicates. `unknown` params are named `maybe*`.
 - Files: `<subject>.<detail>[.<kind>].ts`, lowercase with dots — `element.listeners.ts`, `reelx.core.ts`, `element.bool.attributes.ts`, types in `*.types.ts`. One barrel — `src/index.ts`, explicit named exports (`export *` only for types).
-- Lookup tables — `as const` + `Set`/`Map`; config objects checked with `satisfies`.
+- Lookup tables — `as const` + `Set`/`Map` of a literal, or the literal read with `Object.hasOwn` where a set would need a call (`.claude/rules/tree-shaking.md`); config objects checked with `satisfies`.
 - Comments in English and lean (see `CLAUDE.md`): `@param`/`@returns` only where the signature does not say it; TODO as `// TODO AR`.
 - Unused destructured fields — `_ignored*`.
 

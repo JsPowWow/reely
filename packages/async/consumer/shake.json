@@ -1,0 +1,14 @@
+[
+  {
+    "name": "TimeoutError alone",
+    "code": "import { TimeoutError } from '@reely/async'; console.log(new TimeoutError());",
+    "absent": ["retry", "runAttempt", "together", "toErrorWithMessage"],
+    "once": ["TimeoutError"]
+  },
+  {
+    "name": "retry alone",
+    "code": "import { retry } from '@reely/async'; await retry(() => fetch('/laps'), { retries: 2, timeout: 5000 });",
+    "absent": ["retryAll", "retryRace", "retryAllSettled", "together"],
+    "once": ["retry"]
+  }
+]
