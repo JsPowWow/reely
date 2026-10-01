@@ -1,6 +1,6 @@
 {
   "name": "@reely/simple-store",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Two tiny stores you subscribe to explicitly: a value, and a plain object changed a few fields at a time, with selections of their parts.",
   "license": "MIT",
   "type": "module",
