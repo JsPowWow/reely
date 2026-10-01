@@ -8,6 +8,7 @@ import { SourceView } from '../../demo/source.view';
 import { Localized } from '../../i18n/localized.view';
 import { measured } from '../../measure/measures';
 import band from '../../site/band.module.css';
+import exampleCss from '../../site/example.module.css';
 import { sitePaths } from '../../site/site.paths';
 import { siteText } from '../../site/site.text';
 import { LikeButton } from '../docs/demos/like.button';
@@ -17,14 +18,14 @@ import css from './dommy.module.css';
 import type { DommyExample } from './dommy.examples';
 
 const Example = ({ example }: { example: DommyExample }): Node => (
-  <section id={example.id} className={css.example} aria={{ ariaLabelledby: `${example.id}-title` }}>
-    <header className={css.exampleHeading}>
-      <h2 id={`${example.id}-title`} className={css.exampleTitle}>
+  <section id={example.id} className={exampleCss.example} aria={{ ariaLabelledby: `${example.id}-title` }}>
+    <header className={exampleCss.exampleHeading}>
+      <h2 id={`${example.id}-title`} className={exampleCss.exampleTitle}>
         {() => dommyText().examples[example.id].title}
       </h2>
-      <p className={css.claim}>{() => dommyText().examples[example.id].claim}</p>
+      <p className={exampleCss.claim}>{() => dommyText().examples[example.id].claim}</p>
     </header>
-    <div className={css.panels}>
+    <div className={exampleCss.panels}>
       <MutationMeter>
         <example.Demo />
       </MutationMeter>
@@ -48,11 +49,11 @@ export const DommyPage = (): Node => {
               {() => dommyText().title}
             </h1>
             <p className={band.pitch}>{() => dommyText().pitch}</p>
-            <div className={css.actions}>
+            <div className={band.actions}>
               <a className={css.primary} href={sitePaths.docs}>
                 {() => siteText().openDocs}
               </a>
-              <code className={css.install}>npm i @reely/dommy</code>
+              <code className={band.install}>npm i @reely/dommy</code>
             </div>
             <p className={band.builtWith}>{() => dommyText().builtWith}</p>
           </div>
@@ -90,7 +91,7 @@ export const DommyPage = (): Node => {
             <p className={css.numbersNote}>
               <Localized view={() => dommyText().numbers.Note} />
             </p>
-            <div className={css.actions}>
+            <div className={band.actions}>
               <a className={css.primary} href={sitePaths.docs}>
                 {() => siteText().openDocs}
               </a>

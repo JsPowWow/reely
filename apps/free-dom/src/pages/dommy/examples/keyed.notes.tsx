@@ -1,6 +1,6 @@
 import { For, signal } from '@reely/dommy';
 
-import css from './examples.module.css';
+import css from '../../../demo/examples.module.css';
 
 interface Task {
   id: number;

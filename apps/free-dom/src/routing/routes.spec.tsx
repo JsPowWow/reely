@@ -35,6 +35,12 @@ describe('routes', () => {
     expect(await headingAt('/dommy/evolution/jsx')).toMatch(/^Step 2\. /);
   });
 
+  it('opens the page of every package but dommy at its name', async () => {
+    expect(await headingAt('/emitter')).toBe('@reely/emitter');
+    expect(await headingAt('/simple-store')).toBe('@reely/simple-store');
+    expect(await headingAt('/nope')).toBe('There is no page at /nope');
+  });
+
   it('opens the labs', async () => {
     const labs = await renderAt('/labs');
 

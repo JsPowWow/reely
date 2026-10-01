@@ -1,6 +1,6 @@
 import { signal } from '@reely/dommy';
 
-import css from './examples.module.css';
+import css from '../../../demo/examples.module.css';
 
 const maxLength = 15;
 

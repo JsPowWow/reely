@@ -1,0 +1,131 @@
+/* The package's name at display size; the shared scope steps back in code-text. */
+.name {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(3rem, 6.6vw, 5.5rem);
+  font-weight: 800;
+  line-height: 0.92;
+  overflow-wrap: anywhere;
+}
+
+.scope {
+  display: block;
+  color: var(--code-text);
+  font-size: 0.4em;
+  line-height: 1.2;
+}
+
+.link {
+  padding: 0.35rem 0;
+  border-bottom: 2px solid var(--slate);
+  color: var(--asphalt);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.link:hover {
+  border-bottom-color: var(--signal);
+}
+
+/* The measured facts as a timing sheet on the band: labels left, figures in the display face. */
+.facts {
+  display: grid;
+  align-self: center;
+  margin: 0;
+}
+
+.facts > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1.5rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--slate);
+}
+
+.facts dt {
+  color: var(--code-text);
+}
+
+.facts dd {
+  margin: 0;
+  color: var(--signal);
+  font-family: var(--display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.facts .uses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  font-family: var(--body);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.uses a {
+  color: var(--asphalt);
+  text-underline-offset: 0.2em;
+}
+
+.facts :focus-visible,
+.link:focus-visible {
+  outline-color: var(--signal);
+  outline-offset: 3px;
+}
+
+/* What a package exports, as code chips in a wrap. */
+.exports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.exports code {
+  display: block;
+  padding: 0.3rem 0.55rem;
+  border-radius: 3px;
+  background: var(--graphite);
+  color: var(--code-text);
+  font-family: var(--mono);
+  font-size: 0.9375rem;
+}
+
+/* The logger example writes to the console; its lines are shown under the demo as code. */
+.echoed {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.console {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: var(--graphite);
+  color: var(--code-text);
+}
+
+.consoleTitle {
+  margin: 0 0 0.35rem;
+  font-size: 0.875rem;
+}
+
+.console pre {
+  min-height: 1.5em;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .link {
+    transition: border-color 120ms ease-out;
+  }
+}

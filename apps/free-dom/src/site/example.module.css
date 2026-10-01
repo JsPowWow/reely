@@ -1,0 +1,38 @@
+/* An example: what it proves, then the live demo beside the module that renders it. */
+.example {
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --measure: 80rem;
+  display: grid;
+  gap: 2rem;
+  padding: clamp(3rem, 7vw, 5.5rem) max(var(--gutter), (100% - var(--measure)) / 2);
+}
+
+.example + .example {
+  border-top: 1px solid var(--line);
+}
+
+.exampleHeading {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.exampleTitle {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.claim {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--slate);
+  font-size: 1.125rem;
+}
+
+/* The live demo stays in view beside a long source while it is read. */
+.panels {
+  composes: panels from './guide.module.css';
+}

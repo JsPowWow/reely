@@ -65,7 +65,14 @@ export default [
             // *************** Apps settings ****************************
             {
               sourceTag: 'scope:free-dom',
-              onlyDependOnLibsWithTags: ['scope:shared', 'scope:dommy', 'scope:async', 'scope:colors', 'scope:strings'],
+              onlyDependOnLibsWithTags: [
+                'scope:shared',
+                'scope:dommy',
+                'scope:async',
+                'scope:colors',
+                'scope:strings',
+                'scope:state-machine',
+              ],
             },
             {
               sourceTag: 'scope:star-battle',

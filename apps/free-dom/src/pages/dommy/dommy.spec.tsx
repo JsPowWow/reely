@@ -5,15 +5,7 @@ import { DommyPage } from './dommy.page';
 import { answerDelay } from './examples/api.search';
 import { chooseLocale } from '../../i18n/locale';
 import { textsLoaded } from '../../i18n/localized';
-import { clickButton, flushMutations } from '../../testing/dom.testing';
-
-const typeInto = (input: HTMLInputElement | null | undefined, text: string): void => {
-  if (!input) {
-    throw new Error('No input');
-  }
-  input.value = text;
-  input.dispatchEvent(new Event('input', { bubbles: true }));
-};
+import { clickButton, flushMutations, typeInto } from '../../testing/dom.testing';
 
 const section = (host: Element, id: string): Element => {
   const found = host.querySelector(`section#${id}`);
@@ -93,7 +85,7 @@ describe('DommyPage', () => {
     const signals = section(host, 'signals');
     await flushMutations();
 
-    typeInto(signals.querySelector('input'), 'gracehopper');
+    typeInto(signals, 'gracehopper');
     await flushMutations();
 
     expect(signals.querySelector('figure p')?.textContent).toBe('example.com/@gracehopper');
@@ -104,7 +96,7 @@ describe('DommyPage', () => {
   it('moves a row with the note typed into it, and counts moves, no new nodes', async () => {
     const lists = section(host, 'lists');
     const firstNote = lists.querySelector('input');
-    typeInto(firstNote, 'check the typos');
+    typeInto(lists, 'check the typos');
     await flushMutations();
 
     clickButton(lists, 'Reverse');
@@ -122,9 +114,9 @@ describe('DommyPage', () => {
   it('previews a placeholder address when empty, and one character in the singular', () => {
     const signals = section(host, 'signals');
 
-    typeInto(signals.querySelector('input'), '');
+    typeInto(signals, '');
     const empty = signals.querySelector('figure p')?.textContent;
-    typeInto(signals.querySelector('input'), 'mariasilva2026');
+    typeInto(signals, 'mariasilva2026');
 
     expect(empty).toBe('example.com/@you');
     expect(signals.textContent).toContain('1 character left');
@@ -146,12 +138,11 @@ describe('DommyPage', () => {
 
     it('shows only the answer to the latest query, and counts the late answers it dropped', async () => {
       const search = section(host, 'async');
-      const input = search.querySelector('input');
       const idle = search.textContent;
 
-      typeInto(input, 'e');
-      typeInto(input, 'ef');
-      typeInto(input, 'eff');
+      typeInto(search, 'e');
+      typeInto(search, 'ef');
+      typeInto(search, 'eff');
       await vi.advanceTimersByTimeAsync(answerDelay('eff'));
       const first = Array.from(search.querySelectorAll('li'), (item) => item.textContent);
       await vi.advanceTimersByTimeAsync(answerDelay('e'));

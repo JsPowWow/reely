@@ -27,6 +27,17 @@ describe('factsOf', () => {
   });
 });
 
+describe('factsOf, for what a package exports', () => {
+  it('names the values every entry exports, in order', async () => {
+    const [basics, dommy] = await Promise.all([factsOf(packagesDir, 'basics'), factsOf(packagesDir, 'dommy')]);
+
+    expect(basics.exports).toEqual(expect.arrayContaining(['forEachSettled', 'hasSome', 'isPlainObject']));
+    expect(basics.exports).toEqual([...basics.exports].sort());
+    expect(dommy.exports).toEqual(expect.arrayContaining(['For', 'jsx', 'createAsyncRouter']));
+    expect(new Set(dommy.exports).size).toBe(dommy.exports.length);
+  });
+});
+
 describe('factsOf, for a package of several entries', () => {
   it('weighs every entry, not only the main one', async () => {
     const [facts, main] = await Promise.all([
@@ -57,7 +68,7 @@ describe('measures', () => {
 
     const code = await load(resolveId('virtual:measures'));
 
-    expect(code).toMatch(/^export const packages = \{"basics":\{"version":"[\d.]+","gzipBytes":\d+,"uses":\[\]\}\};/);
+    expect(code).toMatch(/^export const packages = \{"basics":\{"version":"[\d.]+","gzipBytes":\d+,"uses":\[\],"exports":\[[^\]]*\]\}\};/);
     expect(code).toMatch(/export const bundles = \{"guard":\d+\};$/);
     expect(await load('other')).toBeNull();
   });

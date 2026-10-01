@@ -1,6 +1,6 @@
 import { Await, Show, signal } from '@reely/dommy';
 
-import css from './examples.module.css';
+import css from '../../../demo/examples.module.css';
 
 const api = ['signal', 'computed', 'effect', 'batch', 'untracked', 'For',
   'Show', 'Keyed', 'Await', 'mount', 'onCleanup'];

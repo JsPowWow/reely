@@ -1,7 +1,7 @@
 import { button } from '@reely/dommy';
 import { media } from '@reely/dommy-kit';
 
-import css from './examples.module.css';
+import css from '../../../demo/examples.module.css';
 
 const popFrames = [1, 1.12, 0.96, 1].map((scale) => ({
   transform: `scale(${scale})`,

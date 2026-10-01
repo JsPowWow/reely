@@ -18,6 +18,7 @@ export default [
       'src/pages/evolution/evolution.steps.ts',
       'src/pages/docs/docs.topics.tsx',
       'src/pages/docs/advanced.examples.tsx',
+      'src/pages/package/package.examples.tsx',
     ],
     rules: {
       'import/max-dependencies': 'off',

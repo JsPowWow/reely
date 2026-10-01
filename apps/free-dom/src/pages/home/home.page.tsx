@@ -5,6 +5,7 @@ import { Scoreboard } from './scoreboard/scoreboard';
 import { MutationMeter } from '../../demo/mutation.meter';
 import { kB, packages } from '../../measure/measures';
 import band from '../../site/band.module.css';
+import { packagesText } from '../../site/packages.text';
 import { SiteHeader } from '../../site/site.header';
 import { sitePackages } from '../../site/site.packages';
 import { packageHref } from '../../site/site.paths';
@@ -41,16 +42,16 @@ const PackagePlate = ({ name }: { name: SitePackage }): Node => {
         </span>
         <span className={css.version}>{version}</span>
       </span>
-      <span className={css.why}>{() => homeText().packages.why[name]}</span>
+      <span className={css.why}>{() => packagesText().why[name]}</span>
       <span className={css.size}>
         <span className={css.figure}>{kB(gzipBytes)}</span>
-        <span className={css.sizeLabel}>{() => homeText().packages.gzip}</span>
+        <span className={css.sizeLabel}>{() => packagesText().gzip}</span>
       </span>
       <span className={css.uses}>
         {() =>
           uses.length === 0
-            ? homeText().packages.standsAlone
-            : `${homeText().packages.builtOn} ${uses.map(npmName).join(', ')}`
+            ? packagesText().standsAlone
+            : `${packagesText().builtOn} ${uses.map(npmName).join(', ')}`
         }
       </span>
     </a>

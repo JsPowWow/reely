@@ -3,13 +3,6 @@
   --measure: 80rem;
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem 1rem;
-}
-
 /* The one primary action on the page, in signal yellow wherever it appears. */
 .primary {
   padding: 0.8rem 1.35rem;
@@ -25,16 +18,6 @@
 
 .primary:hover {
   background: var(--asphalt);
-}
-
-.install {
-  padding: 0.7rem 0.9rem;
-  border: 1px solid var(--slate);
-  border-radius: 4px;
-  color: var(--asphalt);
-  font-family: var(--mono);
-  font-size: 0.9375rem;
-  user-select: all;
 }
 
 .startDemo {
@@ -59,43 +42,6 @@
 
 .startDemo button:hover {
   background: var(--slate);
-}
-
-/* An example: what it proves, then the live demo beside the module that renders it. */
-.example {
-  display: grid;
-  gap: 2rem;
-  padding: clamp(3rem, 7vw, 5.5rem) max(var(--gutter), (100% - var(--measure)) / 2);
-}
-
-.example + .example {
-  border-top: 1px solid var(--line);
-}
-
-.exampleHeading {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.exampleTitle {
-  margin: 0;
-  font-family: var(--display);
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 800;
-  line-height: 1;
-  text-wrap: balance;
-}
-
-.claim {
-  max-width: 62ch;
-  margin: 0;
-  color: var(--slate);
-  font-size: 1.125rem;
-}
-
-/* The live demo stays in view beside a long source while it is read. */
-.panels {
-  composes: panels from '../../site/guide.module.css';
 }
 
 /* Size and speed: graphite again, the figures as a plain table, and the way into the docs. */

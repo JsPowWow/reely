@@ -13,9 +13,24 @@ export interface PackageFacts {
   readonly gzipBytes: number;
   /** The other reely packages it depends on, by directory name. */
   readonly uses: readonly string[];
+  /** The values its entries export, sorted; types are not counted. */
+  readonly exports: readonly string[];
 }
 
 const scope = '@reely/';
+
+/** The names of the values `specifier` exports, as esbuild sees them once it is bundled. */
+const exportsOf = async (specifier: string, resolveDir: string): Promise<readonly string[]> => {
+  const { metafile } = await build({
+    stdin: { contents: `export * from '${specifier}';`, resolveDir, loader: 'ts' },
+    bundle: true,
+    format: 'esm',
+    write: false,
+    metafile: true,
+    logLevel: 'error',
+  });
+  return Object.values(metafile.outputs).flatMap((output) => output.exports);
+};
 
 /** Bundles `code` as an app would, from the packages built in the repo: minified, gzipped bytes. */
 export const gzipOf = async (code: string, resolveDir: string): Promise<number> => {
@@ -53,14 +68,15 @@ const readManifest = async (file: string): Promise<Manifest> => {
 
 export const factsOf = async (packagesDir: string, dir: string): Promise<PackageFacts> => {
   const { version, dependencies, entries } = await readManifest(join(packagesDir, dir, 'package.json'));
+  const specifiers = entries.map((entry) => `${scope}${dir}${entry.slice(1)}`);
   // a namespace per entry keeps all of it, and entries that export the same names do not clash
-  const everything = entries
-    .map((entry, index) => `export * as entry${index} from '${scope}${dir}${entry.slice(1)}';`)
-    .join('\n');
+  const everything = specifiers.map((specifier, index) => `export * as entry${index} from '${specifier}';`).join('\n');
+  const names = await Promise.all(specifiers.map((specifier) => exportsOf(specifier, packagesDir)));
   return {
     version,
     gzipBytes: await gzipOf(everything, packagesDir),
     uses: dependencies.filter((name) => name.startsWith(scope)).map((name) => name.slice(scope.length)),
+    exports: [...new Set(names.flat())].sort(),
   };
 };
 

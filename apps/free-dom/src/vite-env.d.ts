@@ -11,7 +11,15 @@ declare module '*?highlight' {
 // to the site's own types, so a fact's shape cannot drift; a package left out fails the home spec.
 declare module 'virtual:measures' {
   export const packages: Readonly<
-    Record<string, { readonly version: string; readonly gzipBytes: number; readonly uses: readonly string[] }>
+    Record<
+      string,
+      {
+        readonly version: string;
+        readonly gzipBytes: number;
+        readonly uses: readonly string[];
+        readonly exports: readonly string[];
+      }
+    >
   >;
   export const bundles: Readonly<Record<string, number>>;
 }
