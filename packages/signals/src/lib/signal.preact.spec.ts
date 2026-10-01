@@ -1,8 +1,10 @@
 // Adapted from the tests of @preact/signals-core (https://github.com/preactjs/signals),
 // Copyright (c) 2022-present Preact Team, MIT licence.
+// Not adapted: `createModel`, `watched`/`unwatched`, disposal with `using`, `instanceof Signal`, the
+// Symbol brands and the internals (`_start`, `_sources`, `_callback`): API this package does not have.
 import { onCleanup } from './owner';
 import { subscriberCount } from './reelx.core';
-import { batch, computed, effect, signal, type Signal, untracked } from './signal';
+import { batch, computed, type Computed, effect, signal, type Signal, untracked } from './signal';
 
 describe('signal', () => {
   it('should return value', () => {
@@ -17,6 +19,7 @@ describe('signal', () => {
     expect(s.toString()).toBe('123');
   });
 
+  // `.toJSON()` stays off the type: this is upstream's `.toJSON()` test
   it('should support JSON.Stringify()', () => {
     const s = signal(123);
     expect(JSON.stringify({ s })).toBe(JSON.stringify({ s: 123 }));
@@ -647,6 +650,41 @@ describe('effect()', () => {
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
+  // preact throws "Cycle detected" for these two: here a run does not depend on what it writes
+  it('settles, not cycles, when an effect writes a signal it reads (preact throws)', () => {
+    const a = signal(0);
+    let i = 0;
+
+    effect(() => {
+      if (i++ > 200) {
+        throw new Error('test failed');
+      }
+      a.value;
+      a.value = Number.NaN;
+    });
+
+    expect(i).toBe(1);
+  });
+
+  it('settles, not cycles, when a computed an effect reads writes a signal it reads (preact throws)', () => {
+    const a = signal(0);
+    let i = 0;
+    const c = computed(() => {
+      a.value;
+      a.value = Number.NaN;
+      return Number.NaN;
+    });
+
+    effect(() => {
+      if (i++ > 200) {
+        throw new Error('test failed');
+      }
+      c.value;
+    });
+
+    expect(i).toBe(1);
+  });
+
   it('should run the cleanup in an implicit batch', () => {
     const a = signal(0);
     const b = signal('a');
@@ -916,7 +954,8 @@ describe('computed', () => {
     expect(spy).toHaveBeenCalledOnce();
   });
 
-  it('should recompute if a dependency changes during computation after becoming a dependency', () => {
+  // preact recomputes it: a run does not depend on a signal it writes, as for an effect
+  it('does not recompute for a dependency it changes itself (preact recomputes it)', () => {
     const a = signal(0);
     const spy = vi.fn(() => {
       a.value++;
@@ -925,7 +964,55 @@ describe('computed', () => {
     c.value;
     expect(spy).toHaveBeenCalledOnce();
     c.value;
-    expect(spy).toHaveBeenCalledTimes(1); // TODO AR difference, 2 vs 1 but Ok ?
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
+  it('should detect simple dependency cycles', () => {
+    const a: Computed<number> = computed(() => a.value);
+    expect(() => a.value).toThrow(/cycle/);
+  });
+
+  it('should detect deep dependency cycles', () => {
+    const a: Computed<number> = computed(() => b.value);
+    const b: Computed<number> = computed(() => c.value);
+    const c: Computed<number> = computed(() => d.value);
+    const d: Computed<number> = computed(() => a.value);
+    expect(() => a.value).toThrow(/cycle/);
+  });
+
+  it('should not allow a computed signal to become a direct dependency of itself', () => {
+    const spy = vi.fn(() => {
+      try {
+        a.value;
+      } catch {
+        // pass
+      }
+    });
+    const a: Computed<void> = computed(spy);
+    a.value;
+    expect(() => effect(() => a.value)).not.toThrow();
+  });
+
+  it('should detect a cycle that forms after the first computation', () => {
+    const closed = signal(false);
+    const b: Computed<number> = computed(() => (closed.value ? a.value : 0));
+    const a: Computed<number> = computed(() => b.value + 1);
+    effect(() => void a.value);
+
+    expect(() => (closed.value = true)).toThrow(/cycle/);
+    expect(() => b.value).toThrow(/cycle/);
+  });
+
+  it('should not keep a stale value in a computed a cycle broke off mid-check', () => {
+    const closed = signal(false);
+    const a: Computed<number> = computed(() => b.value + 1);
+    const b: Computed<number> = computed(() => (closed.value ? a.value : 0));
+    expect(a.value).toBe(1);
+
+    closed.value = true;
+
+    expect(() => b.value).toThrow(/cycle/);
+    expect(() => a.value).toThrow(/cycle/);
   });
 
   it('should store thrown errors and recompute only after a dependency changes', () => {
@@ -1178,6 +1265,19 @@ describe('computed', () => {
   });
 
   describe('.peek()', () => {
+    it('should detect simple dependency cycles', () => {
+      const a: Computed<number> = computed(() => a.peek());
+      expect(() => a.peek()).toThrow(/cycle/);
+    });
+
+    it('should detect deep dependency cycles', () => {
+      const a: Computed<number> = computed(() => b.value);
+      const b: Computed<number> = computed(() => c.value);
+      const c: Computed<number> = computed(() => d.value);
+      const d: Computed<number> = computed(() => a.peek());
+      expect(() => a.peek()).toThrow(/cycle/);
+    });
+
     it('should get value', () => {
       const s = signal(1);
 
@@ -1678,6 +1778,139 @@ describe('computed', () => {
 });
 
 describe('batch/transaction', () => {
+  it('should not rerun an effect for a no-op batch assignment', () => {
+    const foo = signal(42);
+    const spy = vi.fn(() => {
+      foo.value;
+    });
+
+    effect(spy);
+    expect(spy).toHaveBeenCalledOnce();
+    spy.mockClear();
+
+    batch(() => {
+      foo.value = 0;
+      foo.value = 42;
+    });
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('should not rerun an effect for repeated no-op top-level batches', () => {
+    const foo = signal(42);
+    const spy = vi.fn(() => {
+      foo.value;
+    });
+
+    effect(spy);
+    expect(spy).toHaveBeenCalledOnce();
+    spy.mockClear();
+
+    batch(() => {
+      foo.value = 0;
+      foo.value = 42;
+    });
+    expect(spy).not.toHaveBeenCalled();
+
+    batch(() => {
+      foo.value = -1;
+      foo.value = 42;
+    });
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('should not rerun an effect subscribed through a computed for a no-op batch assignment', () => {
+    const foo = signal(42);
+    const double = computed(() => foo.value * 2);
+    const spy = vi.fn(() => {
+      double.value;
+    });
+
+    effect(spy);
+    expect(spy).toHaveBeenCalledOnce();
+    spy.mockClear();
+
+    batch(() => {
+      foo.value = 0;
+      foo.value = 42;
+    });
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('should keep unsubscribed computeds coherent when they are read during a reverted batch', () => {
+    const foo = signal('A');
+    const double = computed(() => foo.value + '!');
+    expect(double.value).toBe('A!');
+
+    batch(() => {
+      foo.value = 'B';
+      expect(double.value).toBe('B!');
+      foo.value = 'A';
+    });
+
+    foo.value = 'C';
+    expect(double.value).toBe('C!');
+  });
+
+  it('should keep unsubscribed computeds coherent when they are peeked during a reverted batch', () => {
+    const foo = signal(1);
+    const double = computed(() => foo.value * 2);
+    expect(double.peek()).toBe(2);
+
+    batch(() => {
+      foo.value = 2;
+      expect(double.peek()).toBe(4);
+      foo.value = 1;
+    });
+
+    foo.value = 3;
+    expect(double.peek()).toBe(6);
+  });
+
+  it('should not rerun an effect for a value a nested batch puts back by its own `equals`', () => {
+    const standings = signal(
+      { leader: 'Ada', lap: 3 },
+      { equals: (previous, next) => previous.leader === next.leader }
+    );
+    const spy = vi.fn(() => {
+      standings.value;
+    });
+
+    effect(spy);
+    spy.mockClear();
+    batch(() => {
+      standings.value = { leader: 'Grace', lap: 4 };
+      batch(() => {
+        standings.value = { leader: 'Ada', lap: 5 };
+      });
+    });
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('should rerun an effect after a batch that threw once it put a value back, for the next change', () => {
+    const foo = signal(1);
+    const spy = vi.fn(() => {
+      foo.value;
+    });
+
+    effect(spy);
+    spy.mockClear();
+    expect(() =>
+      batch(() => {
+        foo.value = 2;
+        throw new Error('stopped');
+      })
+    ).toThrow('stopped');
+    batch(() => {
+      foo.value = 3;
+      foo.value = 2;
+    });
+
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
   it('should return the value from the callback', () => {
     expect(batch(() => 1)).toBe(1);
   });

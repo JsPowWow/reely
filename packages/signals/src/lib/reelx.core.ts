@@ -1,7 +1,7 @@
 // A push-pull signal graph: a write marks what may have changed, a read brings a node up to date.
 import { hasSome } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
-import { isInstanceOf, noop } from '@reely/utils';
+import { isInstanceOf, isNil, noop } from '@reely/utils';
 
 /** A value read reactively: a signal, a computed or any getter of them; an effect or computed that reads it follows it. */
 export type ReactiveValue<T> = () => T;
@@ -37,12 +37,15 @@ type Outcome<T> = { readonly threw: false; readonly value: T } | { readonly thre
 
 const MAX_FLUSH_WAVES = 100;
 
-// grows with every write: an unlinked computed hears no writes, but one checked at this epoch is current
+// grows with every write: an unlinked computed hears no writes, but one checked at this epoch is current;
+// a signal's version is the epoch of its last change, so a version is never handed out twice
 let epoch = 0;
 let tracker: Nullable<Computation<unknown>> = null;
 // the computation whose `fn` runs now, tracked or not: its own writes never run it again
 let running: Nullable<Computation<unknown>> = null;
 let batchDepth = 0;
+// the signals written in the batch running now, which remember what they held before it
+let batchWrites: Signal<unknown>[] = [];
 let queue: Effect[] = [];
 let flushing = false;
 
@@ -62,6 +65,8 @@ class Signal<T> implements Source {
   public version = 0;
   public readonly observers = new Set<Computation<unknown>>();
   public readonly refresh = noop;
+  // the value and version before the first write of the batch running now
+  private beforeBatch: Nullable<{ readonly value: T; readonly version: number }> = null;
 
   constructor(private value: T, private readonly options: SignalOptions<T>) {}
 
@@ -74,6 +79,10 @@ class Signal<T> implements Source {
     this.observers.add(observer);
   }
 
+  public forgetBatch(): void {
+    this.beforeBatch = null;
+  }
+
   public unobserve(observer: Computation<unknown>): void {
     this.observers.delete(observer);
   }
@@ -83,9 +92,16 @@ class Signal<T> implements Source {
     if (equals !== false && equals(this.value, value)) {
       return;
     }
-    this.value = value;
-    this.version++;
+    if (batchDepth > 0 && isNil(this.beforeBatch)) {
+      this.beforeBatch = { value: this.value, version: this.version };
+      batchWrites.push(this);
+    }
+    const { beforeBatch } = this;
+    // a batch that puts the value back changes nothing for what read it before the batch
+    const reverted = hasSome(beforeBatch) && equals !== false && equals(beforeBatch.value, value);
     epoch++;
+    this.value = value;
+    this.version = reverted ? beforeBatch.version : epoch;
     running?.onOwnWrite(this);
     const idle = queue.length === 0;
     for (const observer of this.observers) {
@@ -109,6 +125,8 @@ abstract class Computation<T> {
   private checkedAt = -1;
   private markedAt = -1;
   private deafTo: Nullable<Set<Source>> = null;
+  // checking its sources or computing: a read of it now is a cycle
+  private refreshing = false;
 
   constructor(private readonly fn: () => T) {}
 
@@ -155,10 +173,32 @@ abstract class Computation<T> {
   }
 
   public refresh(): Outcome<T> {
+    if (this.refreshing) {
+      throw new Error('reelx: a cycle of computeds, one reads itself through what it reads');
+    }
     const current = this.outcome;
     if (hasSome(current) && !this.needsCheck && (this.linked || this.checkedAt === epoch)) {
       return current;
     }
+    this.refreshing = true;
+    try {
+      return this.update(current);
+    } catch (error) {
+      // a cycle among its sources broke the check off: the next read computes it afresh
+      this.outcome = null;
+      throw error;
+    } finally {
+      this.refreshing = false;
+    }
+  }
+
+  protected detach(): void {
+    for (const source of this.sources.keys()) {
+      source.unobserve(this);
+    }
+  }
+
+  private update(current: Nullable<Outcome<T>>): Outcome<T> {
     this.needsCheck = false;
     this.checkedAt = epoch;
     if (hasSome(current) && !this.sourceChanged()) {
@@ -184,12 +224,6 @@ abstract class Computation<T> {
     }
     this.outcome = next;
     return next;
-  }
-
-  protected detach(): void {
-    for (const source of this.sources.keys()) {
-      source.unobserve(this);
-    }
   }
 
   private unlink(source: Source): void {
@@ -402,6 +436,9 @@ export const batch = <T>(fn: () => T): T => {
     return fn();
   } finally {
     if (--batchDepth === 0) {
+      const written = batchWrites;
+      batchWrites = [];
+      written.forEach((each) => each.forgetBatch());
       flushSync();
     }
   }

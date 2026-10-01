@@ -483,7 +483,8 @@ const en = {
             being its dependency, so its own write does not run it again and Reset sets the count to 0 for good. It
             still runs for <code>playing</code>, which it only reads. The price: an effect cannot clamp a signal it
             writes; a <code>computed</code> can. Two effects that write what the other reads would run forever; after
-            100 waves of writes the flush throws a cycle error instead.
+            100 waves of writes the flush throws a cycle error instead, and a <code>computed</code> that reads itself,
+            directly or through others, throws one when it is read.
           </p>
           {playCounter}
           <h2>Releasing bindings</h2>
