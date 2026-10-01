@@ -1,7 +1,7 @@
 // Times the same five graphs on each core, rounds interleaved, and prints the median of each.
 import * as act from './act/preact-like/preact-like.signal';
 import * as restructured from './restructured/preact-like/preact-like.signal';
-import * as shipped from '../../packages/dommy/src/lib/reactive/preact-like/preact-like.signal';
+import * as shipped from '../../packages/signals/src/lib/signal';
 
 type Core = Pick<typeof shipped, 'signal' | 'computed' | 'effect' | 'batch'>;
 

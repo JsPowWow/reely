@@ -1,8 +1,8 @@
 # Signal cores
 
 Which signal core should dommy ship? Three cores were brought to the same specs and timed on the
-same graphs. dommy ships the third, a push-pull graph (`packages/dommy/src/lib/reactive/reelx`);
-the other two stay here.
+same graphs. dommy shipped the third, a push-pull graph, which became `@reely/signals`
+(`packages/signals/src/lib/reelx.core.ts`); the other two stay here.
 
 - `act/`: the core dommy had, an adapted port of [act](https://github.com/artalar/act) by artalar
   (MIT): states push to the subscriptions that read them, a computed checks snapshots of what it
@@ -14,9 +14,14 @@ the other two stay here.
   effects, a read brings a node up to date by comparing versions. The design known from
   Reactively, Preact signals and alien-signals, written from the concept.
 
-Before the choice every core was fixed and aligned until it passed the same tests; the specs
-`*.contract.spec.ts` run dommy's own signal specs against each core here, so they also show
-whether a core here still keeps dommy's contract today.
+Before the choice every core was fixed and aligned until it passed the same tests: specs that
+ran dommy's own signal specs against each core here. Once the shipped core moved into
+`@reely/signals` its internal interface changed, so the two cores here no longer fit those specs
+and they were removed; `git checkout f4fff52 -- labs-ignore/signal-cores` brings them back as
+they last passed. `cores.spec.ts` keeps what the three still share through the public API alone
+(a glitch-free diamond, one run per batch, equal and untracked writes, dispose), and the bench
+still times all three, the shipped one from `@reely/signals`. The numbers below were taken at the
+choice; `@reely/signals` has grown since (about 1865 B for the same five exports).
 
 ## Numbers
 

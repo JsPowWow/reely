@@ -1,4 +1,4 @@
-import { appendTo } from '@reely/dommy';
+import { Fragment } from '@reely/dommy';
 
 import type { DommyElement, ReelyNode } from '@reely/dommy';
 
@@ -23,7 +23,7 @@ export const add = (...children: ReelyNode[]): void => {
   if (parent === undefined) {
     throw new Error('add: no parent, call it inside a `using within(...)` block');
   }
-  children.forEach(appendTo(parent));
+  parent.append(Fragment({ children }));
 };
 
 /**
