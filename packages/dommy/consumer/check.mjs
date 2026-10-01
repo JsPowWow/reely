@@ -61,7 +61,7 @@ try {
     run(process.execPath, [tsc, '-p', work, '--jsx', jsx]);
   }
 
-  const { window } = new JSDOM('<!doctype html><body></body>');
+  const { window } = new JSDOM('<!doctype html><body></body>', { url: 'https://shop.example/' });
   for (const name of ['window', 'document', 'Node', 'Element', 'HTMLElement', 'SVGElement', 'Text', 'Comment']) {
     globalThis[name] = window[name];
   }
@@ -95,6 +95,23 @@ try {
     labelled(parent);
     parent.querySelector('button').click();
     assert.equal(parent.innerHTML, '1<button>1</button>');
+
+    // the router shows the page of the URL and follows `navigate` without loading a document
+    for (const name of ['location', 'history', 'HTMLAnchorElement', 'MouseEvent', 'Event', 'AbortController']) {
+      globalThis[name] = window[name];
+    }
+    const shopFile = join(work, `out/shop-${jsxDev ? 'dev' : 'prod'}.js`);
+    await build({ ...options, entryPoints: ['src/shop.tsx'], outfile: shopFile });
+    const shop = await import(pathToFileURL(shopFile).href);
+    window.scrollTo = () => undefined;
+    const stopShop = shop.start(document.body);
+    await new Promise((done) => setTimeout(done, 0));
+    assert.equal(document.querySelector('h1')?.textContent, 'Shop');
+    shop.navigate('/orders/7');
+    await new Promise((done) => setTimeout(done, 0));
+    assert.equal(document.querySelector('h1')?.textContent, 'Order 7');
+    stopShop();
+    window.history.replaceState(null, '', '/');
   }
   // tree shaking: importing an entry and using nothing ships nothing, by pure code rather than by
   // annotations or `sideEffects: false`

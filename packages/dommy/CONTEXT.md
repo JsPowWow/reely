@@ -29,3 +29,14 @@ _Avoid_: control flow component, directive
 **Owner**:
 The signals owner (`packages/signals/CONTEXT.md`) a render registers its bindings, effects and `onCleanup` callbacks with; `dispose` releases all of them.
 _Avoid_: scope, context
+
+## Routing
+
+**Route**:
+A path pattern (`/messages/:id`, `/*rest`) with the function that answers it with a page, or with nothing to pass the path to the next route.
+_Avoid_: handler, action
+
+**Page**:
+A component without props that a route answers with; the router renders it under its own owner and takes it down at the next move.
+_Avoid_: view, screen
+

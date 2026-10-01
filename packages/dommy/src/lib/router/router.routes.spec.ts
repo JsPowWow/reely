@@ -1,0 +1,101 @@
+import { defineRoutes } from './router.routes';
+
+import type { Page } from './router.types';
+
+/** A page that names itself, so a test reads which route answered. */
+const named =
+  (name: string): Page =>
+  () =>
+    name;
+
+const answerAt = async (routes: ReturnType<typeof defineRoutes>, pathname: string): Promise<unknown> =>
+  (await routes(pathname))?.();
+
+describe('defineRoutes', () => {
+  it('answers a pathname with the page of the route that matches it', async () => {
+    const routes = defineRoutes({
+      '/': () => named('home'),
+      '/labs': () => named('labs'),
+    });
+
+    expect(await answerAt(routes, '/')).toBe('home');
+    expect(await answerAt(routes, '/labs')).toBe('labs');
+    expect(await routes('/nope')).toBeUndefined();
+  });
+
+  it('hands a route the params its pattern names, decoded', async () => {
+    const routes = defineRoutes({
+      '/docs/:topic': ({ topic }) => named(`docs: ${topic}`),
+      '/orders/:id/items/:item': ({ id, item }) => named(`order ${id}, item ${item}`),
+    });
+
+    expect(await answerAt(routes, '/docs/batch')).toBe('docs: batch');
+    expect(await answerAt(routes, '/orders/7/items/caf%C3%A9')).toBe('order 7, item café');
+    expect(await routes('/docs')).toBeUndefined();
+    expect(await routes('/docs/batch/more')).toBeUndefined();
+  });
+
+  it('keeps a param that is not valid percent-encoding as it came', async () => {
+    const routes = defineRoutes({ '/search/:query': ({ query }) => named(query) });
+
+    expect(await answerAt(routes, '/search/100%')).toBe('100%');
+  });
+
+  it('matches the rest of a pathname with a named wildcard, nothing included', async () => {
+    const routes = defineRoutes({
+      '/files/*path': ({ path }) => named(`file ${path}`),
+      '/*rest': ({ rest }) => named(`missing /${rest}`),
+    });
+
+    expect(await answerAt(routes, '/files/docs/read%20me.md')).toBe('file docs/read me.md');
+    expect(await answerAt(routes, '/nope/deeper')).toBe('missing /nope/deeper');
+    expect(await answerAt(routes, '/')).toBe('missing /');
+  });
+
+  it('takes a pathname with or without its trailing slash', async () => {
+    const routes = defineRoutes({ '/labs': () => named('labs'), '/docs/:topic': ({ topic }) => named(topic) });
+
+    expect(await answerAt(routes, '/labs/')).toBe('labs');
+    expect(await answerAt(routes, '/docs/lists/')).toBe('lists');
+  });
+
+  it('tries the routes in order, and passes to the next one when a route answers nothing', async () => {
+    const packages = new Set(['queue', 'emitter']);
+    const routes = defineRoutes({
+      '/labs': () => named('labs'),
+      '/:name': ({ name }) => (packages.has(name) ? named(`package ${name}`) : undefined),
+      '/*rest': ({ rest }) => named(`missing /${rest}`),
+    });
+
+    expect(await answerAt(routes, '/labs')).toBe('labs');
+    expect(await answerAt(routes, '/queue')).toBe('package queue');
+    expect(await answerAt(routes, '/nope')).toBe('missing /nope');
+  });
+
+  it('waits for a route that loads its page, and passes on when the load answers nothing', async () => {
+    const routes = defineRoutes({
+      '/docs/:topic': ({ topic }) => Promise.resolve(topic === 'old' ? null : named(`docs: ${topic}`)),
+      '/*rest': () => named('missing'),
+    });
+
+    expect(await answerAt(routes, '/docs/signals')).toBe('docs: signals');
+    expect(await answerAt(routes, '/docs/old')).toBe('missing');
+  });
+
+  it('rejects with the error of a route that fails', async () => {
+    const routes = defineRoutes({ '/broken': () => Promise.reject(new Error('The chunk did not load')) });
+
+    await expect(routes('/broken')).rejects.toThrow('The chunk did not load');
+  });
+
+  it('types the params from the pattern', () => {
+    defineRoutes({
+      '/orders/:id/*rest': (params) => {
+        expectTypeOf(params).toEqualTypeOf<{ id: string; rest: string }>();
+        return undefined;
+      },
+      // @ts-expect-error the pattern names no `topic`
+      '/docs/:slug': ({ topic }) => named(String(topic)),
+    });
+  });
+});

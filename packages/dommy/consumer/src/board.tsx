@@ -1,5 +1,4 @@
 import { batch, computed, For, mount, onCleanup, Show, signal, untracked } from '@reely/dommy';
-import { createAsyncRouter } from '@reely/dommy/router';
 
 import type { Signal } from '@reely/dommy';
 
@@ -52,7 +51,3 @@ export const start = (root: HTMLElement): VoidFunction => {
   const finished = signal(false);
   return mount(root, () => <Board racers={racers} finished={finished} />);
 };
-
-// not exported: its declaration cannot be emitted yet (JsPowWow/reely#4)
-const router = createAsyncRouter([{ path: '/', action: () => <main /> }]);
-void router;

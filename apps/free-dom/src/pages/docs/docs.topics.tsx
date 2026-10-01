@@ -4,6 +4,8 @@ import { ExchangeRate } from './demos/exchange.rate';
 import exchangeRateSource from './demos/exchange.rate.tsx?highlight';
 import { LikeButton } from './demos/like.button';
 import likeButtonSource from './demos/like.button.tsx?highlight';
+import { ShopAddress } from './demos/shop.routes';
+import shopRoutesSource from './demos/shop.routes.tsx?highlight';
 import { StopwatchSlot } from './demos/stopwatch';
 import stopwatchSource from './demos/stopwatch.tsx?highlight';
 import { Tickets as BatchTickets } from '../evolution/steps/step11.batch';
@@ -42,6 +44,7 @@ export type DocSlug =
   | 'conditions'
   | 'async'
   | 'lifecycle'
+  | 'routing'
   | 'advanced'
   | 'performance';
 
@@ -65,6 +68,7 @@ export const docTopics: readonly DocTopic[] = [
   { slug: 'conditions', group: 'structure', Demo: DeliveryTracker, source: deliveryTrackerSource },
   { slug: 'async', group: 'structure', Demo: ExchangeRate, source: exchangeRateSource },
   { slug: 'lifecycle', group: 'structure', Demo: StopwatchSlot, source: stopwatchSource },
+  { slug: 'routing', group: 'structure', Demo: ShopAddress, source: shopRoutesSource },
   { slug: 'advanced', group: 'deeper', Demo: DeliveryCost, source: deliveryCostSource },
   { slug: 'performance', group: 'measure', Demo: LiveBoard, source: fiveHundredSource },
 ];

@@ -13,6 +13,8 @@ export interface FlowSlot {
   readonly fragment: DocumentFragment;
   /** Removes the shown branch with its subscriptions, then renders `render`; nothing without it. */
   readonly show: (render?: () => ReelyNode) => void;
+  /** The nodes of the branch shown, between the anchors. */
+  readonly nodes: () => Node[];
 }
 
 // Branches render under the owner that created the slot, so disposing it disposes a branch shown later too.
@@ -32,5 +34,5 @@ export const createFlowSlot = (name: string): FlowSlot => {
     }, owner);
   };
 
-  return { fragment, show };
+  return { fragment, show, nodes: () => rangeOf(start, end).slice(1, -1) };
 };

@@ -41,7 +41,7 @@ describe('factsOf, for what a package exports', () => {
 
     expect(basics.exports).toEqual(expect.arrayContaining(['forEachSettled', 'hasSome', 'isPlainObject']));
     expect(basics.exports).toEqual([...basics.exports].sort());
-    expect(dommy.exports).toEqual(expect.arrayContaining(['For', 'jsx', 'createAsyncRouter']));
+    expect(dommy.exports).toEqual(expect.arrayContaining(['For', 'jsx', 'Router']));
     expect(new Set(dommy.exports).size).toBe(dommy.exports.length);
   });
 });

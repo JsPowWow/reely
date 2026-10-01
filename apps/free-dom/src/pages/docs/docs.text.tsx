@@ -1,10 +1,13 @@
 import { Code, DocLink, plain } from './docs.live';
-import derivationSource from './snippets/advanced.derivation.ts?highlight';
-import granularitySource from './snippets/advanced.granularity.ts?highlight';
-import forecastSource from './snippets/async.forecast.tsx?highlight';
-import listsSource from './snippets/lists.inbox.tsx?highlight';
-import signalsSource from './snippets/signals.api.ts?highlight';
-import mountSource from './snippets/start.mount.tsx?highlight';
+import {
+  derivationSource,
+  forecastSource,
+  granularitySource,
+  listsSource,
+  mountSource,
+  routingSource,
+  signalsSource,
+} from './docs.snippets';
 import { localized } from '../../i18n/localized';
 import { measured } from '../../measure/measures';
 
@@ -341,6 +344,69 @@ const en = {
         </>
       ),
     },
+    routing: {
+      title: 'Routing',
+      lead: 'defineRoutes turns path patterns into the routes of an app: a pathname gets the page of the first route that matches and answers. Router, from @reely/dommy/router, shows that page and follows links, back and forward without loading the document.',
+      Details: (): Node => (
+        <>
+          <h2>Patterns and params</h2>
+          <ul>
+            <li>
+              <code>:id</code> takes one segment of the path, <code>*rest</code> the rest of it; both reach the route
+              decoded and typed, so <code>{'({ id })'}</code> compiles for <code>/products/:id</code> and a name the
+              pattern lacks does not.
+            </li>
+            <li>
+              The routes are tried in order. A route that answers <code>undefined</code> passes the path on: the site’s{' '}
+              <code>/:name</code> answers only for a package and leaves the rest to <code>/*rest</code>.
+            </li>
+            <li>
+              A route can answer with a promise of its page, so a page behind <code>import()</code> ships in its own
+              chunk and loads when it is first opened.
+            </li>
+          </ul>
+          <h2>The router</h2>
+          <Code caption='main.tsx' source={routingSource} />
+          <ul>
+            <li>
+              It takes over a plain click on a link of the site (no modifier, no <code>target</code>, no{' '}
+              <code>download</code>); a link to a place on the page is left to the browser.
+            </li>
+            <li>
+              The page shown stays until the next one has loaded, and only the latest move counts: a slow page overtaken
+              by a quicker click never shows.
+            </li>
+            <li>
+              A new page starts at the top, or at the place its URL names, with focus on its heading; back and forward
+              return to where the reader had scrolled.
+            </li>
+            <li>
+              <code>catch</code> is required, as on <code>Await</code>: a page that fails to load, and a path no route
+              answers, still have a view.
+            </li>
+          </ul>
+          <h2>Links and the page shown</h2>
+          <ul>
+            <li>
+              <code>href(pattern, params)</code> fills a route’s pattern in, encoded and typed from it: links and routes
+              share one path. This site keeps its patterns in one object; the routes are its keys, the links come from{' '}
+              <code>href</code>.
+            </li>
+            <li>
+              <code>currentPath()</code> is the path of the page shown, read like a signal: a menu’s{' '}
+              <code>aria-current</code> follows every move.
+            </li>
+            <li>
+              <code>navigate(url)</code> moves from code; a move to the URL already shown adds no history entry.
+            </li>
+          </ul>
+          <p>
+            This site runs on it: every page but the home page is its own chunk, so the first visit loads about a fifth
+            of the code it used to.
+          </p>
+        </>
+      ),
+    },
     advanced: {
       title: 'Advanced topics',
       lead: 'The questions that come up once the basics work, each answered with a live demo. First, conditional bindings: a binding depends on what its last run read, so the delivery cost below runs for the courier fees or for the pickup fees, never for all four.',
@@ -396,8 +462,8 @@ const en = {
             <code>@reely/dommy-kit</code>: <code>persisted</code> keeps a signal in storage, <code>throttled</code>{' '}
             passes at most one change per interval, and <code>later</code> delays a write and is cancelled by the next
             change, which makes it a debounce. A full quota does not break <code>persisted</code>: it keeps the value in
-            memory and tries the storage again on the next write; the <code>@reely/dommy-kit</code> README has a
-            storage that reports a failed save.
+            memory and tries the storage again on the next write; the <code>@reely/dommy-kit</code> README has a storage
+            that reports a failed save.
           </p>
           <Code caption='derivation.ts' source={derivationSource} />
           <h2>Self-referencing in effects</h2>
@@ -465,8 +531,9 @@ const en = {
             </tbody>
           </table>
           <p>
-            Measured by the site's build on the package built in the repo, bundled with esbuild. There are no third-party runtime dependencies, and
-            the package is tree-shakeable: what an app does not import, it does not ship.
+            Measured by the site's build on the package built in the repo, bundled with esbuild. There are no
+            third-party runtime dependencies, and the package is tree-shakeable: what an app does not import, it does
+            not ship.
           </p>
           <h2>Speed</h2>
           <p>

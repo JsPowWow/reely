@@ -1,48 +1,29 @@
 import type { Nullable } from '@reely/utils';
 
-/** Arbitrary data passed to `router.resolve()`, available inside actions. */
-export interface RouterContext {
-  [propName: string]: any;
-}
+import type { ReelyNode } from '../types/dommy.types';
 
-export interface Route<R = any, C extends RouterContext = RouterContext> {
-  path: string;
-  /** A unique name to generate the route URL by. */
-  name?: string;
-  /** Populated by the router; useful for breadcrumbs. */
-  parent?: Route<R, C> | null;
-  children?: Routes<R, C> | null;
-  /** Returns non-nil to resolve; when every matched route returns nothing, the router throws. */
-  action?: (context: RouteContext<R, C>, params: RouteParams) => RouteResult<R>;
-}
+/** A component without props: what a route answers with, rendered once its route is shown. */
+export type Page = () => ReelyNode;
 
-export interface RouteContext<R = any, C extends RouterContext = RouterContext> extends ResolveContext {
-  route: Route<R, C>;
-  /** Relative to the path of the current route. */
-  baseUrl: string;
-  path: string;
-  params: RouteParams;
-}
+/** A page, or nothing to pass to the next route; a page that loads (`import()`) comes as a promise. */
+export type RouteAnswer = Nullable<Page> | PromiseLike<Nullable<Page>>;
 
-export type Routes<R = any, C extends RouterContext = RouterContext> = Route<R, C>[];
+/** The params a path pattern names: `:name` for one segment, `*name` for the rest of the path. */
+export type ParamsOf<P extends string> = Flat<
+  P extends `${string}:${infer Name}/${infer Rest}`
+    ? Record<Name, string> & ParamsOf<`/${Rest}`>
+    : P extends `${string}:${infer Name}`
+    ? Record<Name, string>
+    : P extends `${string}*${infer Name}`
+    ? Name extends ''
+      ? NoParams
+      : Record<Name, string>
+    : NoParams
+>;
 
-export interface ResolveContext extends RouterContext {
-  /** The URL passed to `router.resolve()`. */
-  pathname: string;
-}
+type NoParams = Record<never, string>;
 
-export interface RouteParams {
-  [paramName: string]: string;
-}
+type Flat<T> = { [K in keyof T]: T[K] } & {};
 
-export type RouteResult<T> = Nullable<T> | Promise<Nullable<T>>;
-
-export type RouteResolver<R = any, C extends RouterContext = RouterContext> = (
-  context: RouteContext<R, C>,
-  params: RouteParams
-) => RouteResult<R>;
-
-export interface RouterOptions<R = any, C extends RouterContext = RouterContext> {
-  baseUrl?: string;
-  resolveRoute?: RouteResolver<R, C>;
-}
+/** The routes of an app as one function: the page for a pathname, or undefined when none answers. */
+export type Routes = (pathname: string) => Promise<Page | undefined>;

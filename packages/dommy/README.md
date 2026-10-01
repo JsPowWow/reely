@@ -505,7 +505,46 @@ const Search = (): Node => {
 
 ## Router
 
-`@reely/dommy/router` holds an experimental async router (`createAsyncRouter`). Its API will change; it is not part of the stable surface.
+`@reely/dommy/router` is a separate entry: an app without routes ships none of it. `defineRoutes` turns path patterns into the app's routes, `Router` shows the page of the current URL and follows the site's links, back and forward without loading the document, `navigate` moves from code, `href` fills a pattern in for a link, and `currentPath` tells bindings the path shown.
+
+```tsx
+import { mount } from '@reely/dommy';
+import { currentPath, defineRoutes, href, navigate, Router } from '@reely/dommy/router';
+
+const routes = defineRoutes({
+  '/': () => () => <h1>Inbox</h1>,
+  '/messages/:id':
+    ({ id }) =>
+    () =>
+      <h1>Message {id}</h1>,
+  '/*rest':
+    ({ rest }) =>
+    () =>
+      <h1>No page at /{rest}</h1>,
+});
+
+mount(document.body, () => <Router routes={routes} catch={(error) => <p role='alert'>{error.message}</p>} />);
+
+const MessageLink = ({ id }: { id: string }): Node => (
+  <a
+    href={href('/messages/:id', { id })}
+    aria={{ ariaCurrent: () => (currentPath() === href('/messages/:id', { id }) ? 'page' : null) }}
+  >
+    Message {id}
+  </a>
+);
+
+mount(document.querySelector('nav') ?? document.body, () => <MessageLink id='42' />);
+navigate(href('/messages/:id', { id: '42' }));
+```
+
+- A route answers with a page, a component without props. `:id` takes one segment and `*rest` the rest of the path; the params reach the route decoded and typed from the pattern.
+- Routes are tried in order; one that answers `undefined` passes the path to the next.
+- A route may answer with a promise of its page, so a page behind `import()` ships in its own chunk: `'/settings': () => import('./settings.page').then(({ SettingsPage }) => SettingsPage)`.
+- The page shown stays until the next one has loaded, and only the latest move counts. A new page starts at the top, or at the place its URL names, with focus on its heading; back, forward and a reload return to where the reader had scrolled.
+- `catch` is required, as on `Await`: a page that fails to load or to render, and a path no route answers, still have a view.
+- A route's pattern is its name: `href` fills it in, typed from it, and a plain `<a href>` is all a link needs, since the router takes over every link of the site.
+- Routes answer the pathname; a new query (`?sort=price`) shows the page again, a new `#place` only scrolls to it.
 
 ## License
 

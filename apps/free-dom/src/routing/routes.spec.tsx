@@ -1,15 +1,15 @@
-import { createAsyncRouter } from '@reely/dommy/router';
-import { isSomeFunction } from '@reely/utils';
+import { mount } from '@reely/dommy';
+import { isNil } from '@reely/utils';
 
-import { routes } from './routes';
+import { siteRoutes } from './routes';
 
 const renderAt = async (pathname: string): Promise<Element> => {
-  const render = await createAsyncRouter(routes).resolve(pathname);
-  if (!isSomeFunction(render)) {
+  const page = await siteRoutes(pathname);
+  if (isNil(page)) {
     throw new Error(`No page at ${pathname}`);
   }
   const host = document.createElement('div');
-  host.append(render());
+  mount(host, page);
   return host;
 };
 
@@ -56,6 +56,10 @@ describe('routes', () => {
     expect(evolution.querySelector('nav[aria-label="@reely/dommy"] [aria-current="true"]')?.textContent).toBe(
       'Evolution'
     );
+  });
+
+  it('takes a pathname with a trailing slash to the same page', async () => {
+    expect(await headingAt('/dommy/docs/signals/')).toBe('Signals');
   });
 
   it('keeps no page at the paths the docs had before they moved under dommy', async () => {
