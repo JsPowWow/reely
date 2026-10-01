@@ -488,6 +488,24 @@ reely has no garbage collection of bindings, so nothing is dropped behind your b
 
 The cost is the other side: a node built outside any owner (at module level, or in an event handler and appended by hand) keeps its bindings as long as their signals live. Build views inside `mount`, and show nodes that come and go through `Show`, `Keyed`, `For` or `Await`.
 
+To find such a node, ask dommy to warn of the first binding made outside any owner. It is off by default, since a view built at module level and mounted later is a fair case. A node made in an event handler goes under an owner with `mount`, whose dispose takes it out and releases it:
+
+```tsx
+import { defineDommyConfig, mount, signal } from '@reely/dommy';
+import { scopedLogger } from '@reely/logger';
+
+defineDommyConfig({ useLogger: true, logger: scopedLogger(), warnUnowned: true });
+
+const unread = signal(3);
+const list = document.createElement('ul');
+
+document.querySelector('button')?.addEventListener('click', () => {
+  // `list.append(<li>{unread}</li>)` would warn: nothing would ever release that binding
+  const remove = mount(list, () => <li>Inbox ({unread})</li>);
+  setTimeout(remove, 5000);
+});
+```
+
 ### Lifecycle hooks
 
 A component runs once and returns its nodes before they are in the document; there is no mount hook. What must run once the view is connected, such as focusing a field or measuring a node, goes in a timer: it runs after the render that called it, and `onCleanup` cancels it if the view is disposed first (`later(0, fn)` of `@reely/dommy-kit` does both). The cleanup side is `onCleanup`, which runs when the owner lets the view go; a node that leaves the document some other way (moved by hand, or by outside code) is not noticed, and only a custom element's `disconnectedCallback` sees that. Effects run synchronously, so a signal written in a component is seen at once, not in a later cycle.

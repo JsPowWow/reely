@@ -3,11 +3,13 @@ import { computed, onCleanup } from '@reely/signals';
 import { isInstanceOf } from '@reely/utils';
 
 import { getDommyLogger } from '../config';
+import { reportIfUnowned } from './element.unowned';
 import { isSkippedChild } from './element.utils';
 
 import type { ReactiveReelyNode, ReactiveValue, SingleReelyNode } from '../types/dommy.types';
 
 export const bindValue = <T>(read: ReactiveValue<T>, write: (value: T) => void): void => {
+  reportIfUnowned();
   onCleanup(computed(read).subscribe(write));
 };
 

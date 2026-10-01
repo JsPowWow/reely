@@ -496,6 +496,11 @@ const en = {
             keeps its bindings as long as their signals live. Build views inside <code>mount</code> and switch nodes
             with the flow components.
           </p>
+          <p>
+            To find such a node, <code>{'defineDommyConfig({ useLogger: true, logger, warnUnowned: true })'}</code>{' '}
+            warns of the first binding made outside any owner. A node made in an event handler goes under an owner with{' '}
+            <code>mount(list, () =&gt; …)</code>, whose dispose takes it out and releases it.
+          </p>
           <h2>Lifecycle hooks</h2>
           <p>
             A component runs before its nodes are in the document. What must run once they are, such as focusing a field

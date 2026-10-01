@@ -7,10 +7,10 @@ import { followPagerKey } from './routing/pager.keys';
 import { siteRoutes } from './routing/routes';
 import { FailedPage } from './site/failed.page';
 
-defineDommyConfig({
-  debug: import.meta.env.DEV,
-  logger: scopedLogger('dommy'),
-});
+// in development, dommy's warnings reach the console: a bound node, a string handler, an unowned binding
+if (import.meta.env.DEV) {
+  defineDommyConfig({ useLogger: true, logger: scopedLogger('dommy').setEnabled(true), warnUnowned: true });
+}
 
 // a page that did not load (a lost connection, a chunk gone after a deploy) or a bug: say so, not a blank page
 const failed = (error: Error): Node => {

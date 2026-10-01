@@ -38,11 +38,20 @@ try {
     }
     return seen;
   };
-  const dependencyTarballs = [...localDependencies(packageDir)].map((dir) => `./${pack(dir)}`);
+  const readme = readFileSync(join(packageDir, 'README.md'), 'utf8');
+  // and the other @reely packages the README uses beside dommy (a logger for its warnings)
+  const usedInReadme = [...readme.matchAll(/from '@reely\/([\w-]+)/g)]
+    .map(([, name]) => resolve(packageDir, '..', name))
+    .filter((dir) => dir !== packageDir);
+  const dependencyDirs = localDependencies(packageDir);
+  for (const dir of usedInReadme) {
+    dependencyDirs.add(dir);
+    localDependencies(dir, dependencyDirs);
+  }
+  const dependencyTarballs = [...dependencyDirs].map((dir) => `./${pack(dir)}`);
   writeFileSync(join(work, 'package.json'), JSON.stringify({ name: 'consumer', private: true, type: 'module' }));
   cpSync(join(here, 'src'), join(work, 'src'), { recursive: true });
   cpSync(join(here, 'tsconfig.json'), join(work, 'tsconfig.json'));
-  const readme = readFileSync(join(packageDir, 'README.md'), 'utf8');
   for (const [index, [, code]] of [...readme.matchAll(/```tsx?\n([\s\S]*?)```/g)].entries()) {
     writeFileSync(join(work, 'src', `readme-${index}.tsx`), `${code}\nexport {};\n`);
   }

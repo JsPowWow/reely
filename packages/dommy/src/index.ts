@@ -1,4 +1,4 @@
-export { defineDommyConfig } from './lib/config';
+export { defineDommyConfig, type DommyConfig } from './lib/config';
 export { createElement } from './lib/createElement';
 export { mount } from './lib/mount';
 export { For, type ForProps } from './lib/flow/flow.for';
@@ -25,4 +25,3 @@ export {
   untracked,
   onCleanup,
 } from '@reely/signals';
-

@@ -5,6 +5,7 @@ import { isInstanceOf, isNil } from '@reely/utils';
 import { getDommyLogger } from '../config';
 import { toNodes } from '../utils/element.children';
 import { createAnchors, insertBefore, rangeOf, removeNodes } from '../utils/element.range';
+import { reportIfUnowned } from '../utils/element.unowned';
 
 import type { ReactiveValue, ReelyNode } from '../types/dommy.types';
 
@@ -44,7 +45,7 @@ const findStaying = (oldPositions: readonly number[]): Set<number> => {
         high = middle;
       }
     }
-    previous[i] = low > 0 ? (tails[low - 1] ?? -1) : -1;
+    previous[i] = low > 0 ? tails[low - 1] ?? -1 : -1;
     tails[low] = i;
   });
   const staying = new Set<number>();
@@ -67,7 +68,7 @@ const keepFocus = (move: VoidFunction): void => {
  * Renders a keyed list: one row per key, created once and moved, never recreated, so focus and
  * state inside rows survive; a row of a gone key is removed with its subscriptions.
  */
-export const For = <T,>({ each, by, children }: ForProps<T>): DocumentFragment => {
+export const For = <T>({ each, by, children }: ForProps<T>): DocumentFragment => {
   const owner = getOwner();
   const { fragment, end } = createAnchors('For');
   let rows = new Map<PropertyKey, Row<T>>();
@@ -124,6 +125,7 @@ export const For = <T,>({ each, by, children }: ForProps<T>): DocumentFragment =
     rows = next;
   };
 
+  reportIfUnowned();
   // every notification re-reads the list, not only a new array: a list changed in place is diffed too
   effect(() => {
     const items = each();

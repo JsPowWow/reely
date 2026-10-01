@@ -326,6 +326,52 @@ describe('Releasing bindings', () => {
     expect(orphan.textContent).toBe('a');
     expect(subscriberCount(text)).toBe(1);
   });
+  describe('reporting a binding made outside any owner', () => {
+    const loggerWith = (warn: (...data: unknown[]) => void): ILogger =>
+      ({ info: vi.fn(), warn, error: vi.fn(), log: vi.fn(), logWith: vi.fn() } as unknown as ILogger);
+
+    afterEach(() => {
+      defineDommyConfig({ useLogger: false, warnUnowned: false });
+    });
+
+    it('warns once of the first one, once asked to, and of none made in `mount`', () => {
+      const warn = vi.fn();
+      const text = signal('a');
+      defineDommyConfig({ useLogger: true, logger: loggerWith(warn), warnUnowned: true });
+
+      render(() => <p title={text}>{text}</p>);
+      const owned = warn.mock.calls.length;
+      void (<p>{text}</p>);
+      void (<p title={text}>b</p>);
+
+      expect(owned).toBe(0);
+      expect(warn).toHaveBeenCalledOnce();
+      expect(warn.mock.calls[0]?.[0]).toContain('outside any owner');
+    });
+
+    it('warns of a `For` made outside any owner, whose rows nothing releases either', () => {
+      const warn = vi.fn();
+      defineDommyConfig({ useLogger: true, logger: loggerWith(warn), warnUnowned: true });
+      const laps = signal(['1:31']);
+      void (
+        <For each={laps} by={(lap) => lap}>
+          {(lap) => <li>{lap}</li>}
+        </For>
+      );
+
+      expect(warn).toHaveBeenCalledOnce();
+    });
+
+    it('stays silent unless asked to, and without a logger', () => {
+      const warn = vi.fn();
+      defineDommyConfig({ useLogger: true, logger: loggerWith(warn) });
+      void (<p>{signal('a')}</p>);
+      defineDommyConfig({ useLogger: false, warnUnowned: true });
+      void (<p>{signal('b')}</p>);
+
+      expect(warn).not.toHaveBeenCalled();
+    });
+  });
 });
 
 describe('Lifecycle hooks', () => {

@@ -485,6 +485,11 @@ export const ru: DocsText = {
             <code>mount</code>, а узлы переключайте компонентами <code>For</code>, <code>Show</code>, <code>Keyed</code>{' '}
             и <code>Await</code>.
           </p>
+          <p>
+            Чтобы найти такой узел, <code>{'defineDommyConfig({ useLogger: true, logger, warnUnowned: true })'}</code>{' '}
+            предупреждает о первой привязке, созданной вне владельца. Узел из обработчика события отдаётся владельцу
+            через <code>mount(list, () =&gt; …)</code>: его dispose убирает узел и освобождает привязки.
+          </p>
           <h2>Хуки жизненного цикла</h2>
           <p>
             Компонент выполняется раньше, чем его узлы попадают в документ. То, что должно выполниться, когда они уже
