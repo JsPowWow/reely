@@ -3,235 +3,237 @@ import { isValidChildDOMNode } from './utils/element.utils';
 
 import type { DOMElementFactoryFunction, HtmlElementTag } from './types/dommy.types';
 
-export const a = /* @__PURE__ */ createElementFromTag('a');
+export const a: DOMElementFactoryFunction<'a'> = (...args) => fromTag('a', ...args);
 
-export const abbr = /* @__PURE__ */ createElementFromTag('abbr');
+export const abbr: DOMElementFactoryFunction<'abbr'> = (...args) => fromTag('abbr', ...args);
 
-export const address = /* @__PURE__ */ createElementFromTag('address');
+export const address: DOMElementFactoryFunction<'address'> = (...args) => fromTag('address', ...args);
 
-export const area = /* @__PURE__ */ createElementFromTag('area');
+export const area: DOMElementFactoryFunction<'area'> = (...args) => fromTag('area', ...args);
 
-export const article = /* @__PURE__ */ createElementFromTag('article');
+export const article: DOMElementFactoryFunction<'article'> = (...args) => fromTag('article', ...args);
 
-export const aside = /* @__PURE__ */ createElementFromTag('aside');
+export const aside: DOMElementFactoryFunction<'aside'> = (...args) => fromTag('aside', ...args);
 
-export const audio = /* @__PURE__ */ createElementFromTag('audio');
+export const audio: DOMElementFactoryFunction<'audio'> = (...args) => fromTag('audio', ...args);
 
-export const b = /* @__PURE__ */ createElementFromTag('b');
+export const b: DOMElementFactoryFunction<'b'> = (...args) => fromTag('b', ...args);
 
-export const base = /* @__PURE__ */ createElementFromTag('base');
+export const base: DOMElementFactoryFunction<'base'> = (...args) => fromTag('base', ...args);
 
-export const bdi = /* @__PURE__ */ createElementFromTag('bdi');
+export const bdi: DOMElementFactoryFunction<'bdi'> = (...args) => fromTag('bdi', ...args);
 
-export const bdo = /* @__PURE__ */ createElementFromTag('bdo');
+export const bdo: DOMElementFactoryFunction<'bdo'> = (...args) => fromTag('bdo', ...args);
 
-export const blockquote = /* @__PURE__ */ createElementFromTag('blockquote');
+export const blockquote: DOMElementFactoryFunction<'blockquote'> = (...args) => fromTag('blockquote', ...args);
 
-export const body = /* @__PURE__ */ createElementFromTag('body');
+export const body: DOMElementFactoryFunction<'body'> = (...args) => fromTag('body', ...args);
 
-export const br = /* @__PURE__ */ createElementFromTag('br');
+export const br: DOMElementFactoryFunction<'br'> = (...args) => fromTag('br', ...args);
 
-export const button = /* @__PURE__ */ createElementFromTag('button');
+export const button: DOMElementFactoryFunction<'button'> = (...args) => fromTag('button', ...args);
 
-export const canvas = /* @__PURE__ */ createElementFromTag('canvas');
+export const canvas: DOMElementFactoryFunction<'canvas'> = (...args) => fromTag('canvas', ...args);
 
-export const caption = /* @__PURE__ */ createElementFromTag('caption');
+export const caption: DOMElementFactoryFunction<'caption'> = (...args) => fromTag('caption', ...args);
 
-export const cite = /* @__PURE__ */ createElementFromTag('cite');
+export const cite: DOMElementFactoryFunction<'cite'> = (...args) => fromTag('cite', ...args);
 
-export const code = /* @__PURE__ */ createElementFromTag('code');
+export const code: DOMElementFactoryFunction<'code'> = (...args) => fromTag('code', ...args);
 
-export const col = /* @__PURE__ */ createElementFromTag('col');
+export const col: DOMElementFactoryFunction<'col'> = (...args) => fromTag('col', ...args);
 
-export const colgroup = /* @__PURE__ */ createElementFromTag('colgroup');
+export const colgroup: DOMElementFactoryFunction<'colgroup'> = (...args) => fromTag('colgroup', ...args);
 
-export const data = /* @__PURE__ */ createElementFromTag('data');
+export const data: DOMElementFactoryFunction<'data'> = (...args) => fromTag('data', ...args);
 
-export const datalist = /* @__PURE__ */ createElementFromTag('datalist');
+export const datalist: DOMElementFactoryFunction<'datalist'> = (...args) => fromTag('datalist', ...args);
 
-export const dd = /* @__PURE__ */ createElementFromTag('dd');
+export const dd: DOMElementFactoryFunction<'dd'> = (...args) => fromTag('dd', ...args);
 
-export const del = /* @__PURE__ */ createElementFromTag('del');
+export const del: DOMElementFactoryFunction<'del'> = (...args) => fromTag('del', ...args);
 
-export const details = /* @__PURE__ */ createElementFromTag('details');
+export const details: DOMElementFactoryFunction<'details'> = (...args) => fromTag('details', ...args);
 
-export const dfn = /* @__PURE__ */ createElementFromTag('dfn');
+export const dfn: DOMElementFactoryFunction<'dfn'> = (...args) => fromTag('dfn', ...args);
 
-export const dialog = /* @__PURE__ */ createElementFromTag('dialog');
+export const dialog: DOMElementFactoryFunction<'dialog'> = (...args) => fromTag('dialog', ...args);
 
-export const div = /* @__PURE__ */ createElementFromTag('div');
+export const div: DOMElementFactoryFunction<'div'> = (...args) => fromTag('div', ...args);
 
-export const dl = /* @__PURE__ */ createElementFromTag('dl');
+export const dl: DOMElementFactoryFunction<'dl'> = (...args) => fromTag('dl', ...args);
 
-export const dt = /* @__PURE__ */ createElementFromTag('dt');
+export const dt: DOMElementFactoryFunction<'dt'> = (...args) => fromTag('dt', ...args);
 
-export const em = /* @__PURE__ */ createElementFromTag('em');
+export const em: DOMElementFactoryFunction<'em'> = (...args) => fromTag('em', ...args);
 
-export const embed = /* @__PURE__ */ createElementFromTag('embed');
+export const embed: DOMElementFactoryFunction<'embed'> = (...args) => fromTag('embed', ...args);
 
-export const fieldset = /* @__PURE__ */ createElementFromTag('fieldset');
+export const fieldset: DOMElementFactoryFunction<'fieldset'> = (...args) => fromTag('fieldset', ...args);
 
-export const figcaption = /* @__PURE__ */ createElementFromTag('figcaption');
+export const figcaption: DOMElementFactoryFunction<'figcaption'> = (...args) => fromTag('figcaption', ...args);
 
-export const figure = /* @__PURE__ */ createElementFromTag('figure');
+export const figure: DOMElementFactoryFunction<'figure'> = (...args) => fromTag('figure', ...args);
 
-export const footer = /* @__PURE__ */ createElementFromTag('footer');
+export const footer: DOMElementFactoryFunction<'footer'> = (...args) => fromTag('footer', ...args);
 
-export const form = /* @__PURE__ */ createElementFromTag('form');
+export const form: DOMElementFactoryFunction<'form'> = (...args) => fromTag('form', ...args);
 
-export const h1 = /* @__PURE__ */ createElementFromTag('h1');
+export const h1: DOMElementFactoryFunction<'h1'> = (...args) => fromTag('h1', ...args);
 
-export const h2 = /* @__PURE__ */ createElementFromTag('h2');
+export const h2: DOMElementFactoryFunction<'h2'> = (...args) => fromTag('h2', ...args);
 
-export const h3 = /* @__PURE__ */ createElementFromTag('h3');
+export const h3: DOMElementFactoryFunction<'h3'> = (...args) => fromTag('h3', ...args);
 
-export const h4 = /* @__PURE__ */ createElementFromTag('h4');
+export const h4: DOMElementFactoryFunction<'h4'> = (...args) => fromTag('h4', ...args);
 
-export const h5 = /* @__PURE__ */ createElementFromTag('h5');
+export const h5: DOMElementFactoryFunction<'h5'> = (...args) => fromTag('h5', ...args);
 
-export const h6 = /* @__PURE__ */ createElementFromTag('h6');
+export const h6: DOMElementFactoryFunction<'h6'> = (...args) => fromTag('h6', ...args);
 
-export const head = /* @__PURE__ */ createElementFromTag('head');
+export const head: DOMElementFactoryFunction<'head'> = (...args) => fromTag('head', ...args);
 
-export const header = /* @__PURE__ */ createElementFromTag('header');
+export const header: DOMElementFactoryFunction<'header'> = (...args) => fromTag('header', ...args);
 
-export const hgroup = /* @__PURE__ */ createElementFromTag('hgroup');
+export const hgroup: DOMElementFactoryFunction<'hgroup'> = (...args) => fromTag('hgroup', ...args);
 
-export const hr = /* @__PURE__ */ createElementFromTag('hr');
+export const hr: DOMElementFactoryFunction<'hr'> = (...args) => fromTag('hr', ...args);
 
-export const html = /* @__PURE__ */ createElementFromTag('html');
+export const html: DOMElementFactoryFunction<'html'> = (...args) => fromTag('html', ...args);
 
-export const i = /* @__PURE__ */ createElementFromTag('i');
+export const i: DOMElementFactoryFunction<'i'> = (...args) => fromTag('i', ...args);
 
-export const iframe = /* @__PURE__ */ createElementFromTag('iframe');
+export const iframe: DOMElementFactoryFunction<'iframe'> = (...args) => fromTag('iframe', ...args);
 
-export const img = /* @__PURE__ */ createElementFromTag('img');
+export const img: DOMElementFactoryFunction<'img'> = (...args) => fromTag('img', ...args);
 
-export const input = /* @__PURE__ */ createElementFromTag('input');
+export const input: DOMElementFactoryFunction<'input'> = (...args) => fromTag('input', ...args);
 
-export const ins = /* @__PURE__ */ createElementFromTag('ins');
+export const ins: DOMElementFactoryFunction<'ins'> = (...args) => fromTag('ins', ...args);
 
-export const kbd = /* @__PURE__ */ createElementFromTag('kbd');
+export const kbd: DOMElementFactoryFunction<'kbd'> = (...args) => fromTag('kbd', ...args);
 
-export const label = /* @__PURE__ */ createElementFromTag('label');
+export const label: DOMElementFactoryFunction<'label'> = (...args) => fromTag('label', ...args);
 
-export const legend = /* @__PURE__ */ createElementFromTag('legend');
+export const legend: DOMElementFactoryFunction<'legend'> = (...args) => fromTag('legend', ...args);
 
-export const li = /* @__PURE__ */ createElementFromTag('li');
+export const li: DOMElementFactoryFunction<'li'> = (...args) => fromTag('li', ...args);
 
-export const link = /* @__PURE__ */ createElementFromTag('link');
+export const link: DOMElementFactoryFunction<'link'> = (...args) => fromTag('link', ...args);
 
-export const main = /* @__PURE__ */ createElementFromTag('main');
+export const main: DOMElementFactoryFunction<'main'> = (...args) => fromTag('main', ...args);
 
-export const map = /* @__PURE__ */ createElementFromTag('map');
+export const map: DOMElementFactoryFunction<'map'> = (...args) => fromTag('map', ...args);
 
-export const mark = /* @__PURE__ */ createElementFromTag('mark');
+export const mark: DOMElementFactoryFunction<'mark'> = (...args) => fromTag('mark', ...args);
 
-export const menu = /* @__PURE__ */ createElementFromTag('menu');
+export const menu: DOMElementFactoryFunction<'menu'> = (...args) => fromTag('menu', ...args);
 
-export const meta = /* @__PURE__ */ createElementFromTag('meta');
+export const meta: DOMElementFactoryFunction<'meta'> = (...args) => fromTag('meta', ...args);
 
-export const meter = /* @__PURE__ */ createElementFromTag('meter');
+export const meter: DOMElementFactoryFunction<'meter'> = (...args) => fromTag('meter', ...args);
 
-export const nav = /* @__PURE__ */ createElementFromTag('nav');
+export const nav: DOMElementFactoryFunction<'nav'> = (...args) => fromTag('nav', ...args);
 
-export const noscript = /* @__PURE__ */ createElementFromTag('noscript');
+export const noscript: DOMElementFactoryFunction<'noscript'> = (...args) => fromTag('noscript', ...args);
 
-export const object = /* @__PURE__ */ createElementFromTag('object');
+export const object: DOMElementFactoryFunction<'object'> = (...args) => fromTag('object', ...args);
 
-export const ol = /* @__PURE__ */ createElementFromTag('ol');
+export const ol: DOMElementFactoryFunction<'ol'> = (...args) => fromTag('ol', ...args);
 
-export const optgroup = /* @__PURE__ */ createElementFromTag('optgroup');
+export const optgroup: DOMElementFactoryFunction<'optgroup'> = (...args) => fromTag('optgroup', ...args);
 
-export const option = /* @__PURE__ */ createElementFromTag('option');
+export const option: DOMElementFactoryFunction<'option'> = (...args) => fromTag('option', ...args);
 
-export const output = /* @__PURE__ */ createElementFromTag('output');
+export const output: DOMElementFactoryFunction<'output'> = (...args) => fromTag('output', ...args);
 
-export const p = /* @__PURE__ */ createElementFromTag('p');
+export const p: DOMElementFactoryFunction<'p'> = (...args) => fromTag('p', ...args);
 
-export const picture = /* @__PURE__ */ createElementFromTag('picture');
+export const picture: DOMElementFactoryFunction<'picture'> = (...args) => fromTag('picture', ...args);
 
-export const pre = /* @__PURE__ */ createElementFromTag('pre');
+export const pre: DOMElementFactoryFunction<'pre'> = (...args) => fromTag('pre', ...args);
 
-export const progress = /* @__PURE__ */ createElementFromTag('progress');
+export const progress: DOMElementFactoryFunction<'progress'> = (...args) => fromTag('progress', ...args);
 
-export const q = /* @__PURE__ */ createElementFromTag('q');
+export const q: DOMElementFactoryFunction<'q'> = (...args) => fromTag('q', ...args);
 
-export const rp = /* @__PURE__ */ createElementFromTag('rp');
+export const rp: DOMElementFactoryFunction<'rp'> = (...args) => fromTag('rp', ...args);
 
-export const rt = /* @__PURE__ */ createElementFromTag('rt');
+export const rt: DOMElementFactoryFunction<'rt'> = (...args) => fromTag('rt', ...args);
 
-export const ruby = /* @__PURE__ */ createElementFromTag('ruby');
+export const ruby: DOMElementFactoryFunction<'ruby'> = (...args) => fromTag('ruby', ...args);
 
-export const s = /* @__PURE__ */ createElementFromTag('s');
+export const s: DOMElementFactoryFunction<'s'> = (...args) => fromTag('s', ...args);
 
-export const samp = /* @__PURE__ */ createElementFromTag('samp');
+export const samp: DOMElementFactoryFunction<'samp'> = (...args) => fromTag('samp', ...args);
 
-export const script = /* @__PURE__ */ createElementFromTag('script');
+export const script: DOMElementFactoryFunction<'script'> = (...args) => fromTag('script', ...args);
 
-export const search = /* @__PURE__ */ createElementFromTag('search');
+export const search: DOMElementFactoryFunction<'search'> = (...args) => fromTag('search', ...args);
 
-export const section = /* @__PURE__ */ createElementFromTag('section');
+export const section: DOMElementFactoryFunction<'section'> = (...args) => fromTag('section', ...args);
 
-export const select = /* @__PURE__ */ createElementFromTag('select');
+export const select: DOMElementFactoryFunction<'select'> = (...args) => fromTag('select', ...args);
 
-export const slot = /* @__PURE__ */ createElementFromTag('slot');
+export const slot: DOMElementFactoryFunction<'slot'> = (...args) => fromTag('slot', ...args);
 
-export const small = /* @__PURE__ */ createElementFromTag('small');
+export const small: DOMElementFactoryFunction<'small'> = (...args) => fromTag('small', ...args);
 
-export const source = /* @__PURE__ */ createElementFromTag('source');
+export const source: DOMElementFactoryFunction<'source'> = (...args) => fromTag('source', ...args);
 
-export const span = /* @__PURE__ */ createElementFromTag('span');
+export const span: DOMElementFactoryFunction<'span'> = (...args) => fromTag('span', ...args);
 
-export const strong = /* @__PURE__ */ createElementFromTag('strong');
+export const strong: DOMElementFactoryFunction<'strong'> = (...args) => fromTag('strong', ...args);
 
-export const style = /* @__PURE__ */ createElementFromTag('style');
+export const style: DOMElementFactoryFunction<'style'> = (...args) => fromTag('style', ...args);
 
-export const sub = /* @__PURE__ */ createElementFromTag('sub');
+export const sub: DOMElementFactoryFunction<'sub'> = (...args) => fromTag('sub', ...args);
 
-export const summary = /* @__PURE__ */ createElementFromTag('summary');
+export const summary: DOMElementFactoryFunction<'summary'> = (...args) => fromTag('summary', ...args);
 
-export const sup = /* @__PURE__ */ createElementFromTag('sup');
+export const sup: DOMElementFactoryFunction<'sup'> = (...args) => fromTag('sup', ...args);
 
-export const table = /* @__PURE__ */ createElementFromTag('table');
+export const table: DOMElementFactoryFunction<'table'> = (...args) => fromTag('table', ...args);
 
-export const tbody = /* @__PURE__ */ createElementFromTag('tbody');
+export const tbody: DOMElementFactoryFunction<'tbody'> = (...args) => fromTag('tbody', ...args);
 
-export const td = /* @__PURE__ */ createElementFromTag('td');
+export const td: DOMElementFactoryFunction<'td'> = (...args) => fromTag('td', ...args);
 
-export const template = /* @__PURE__ */ createElementFromTag('template');
+export const template: DOMElementFactoryFunction<'template'> = (...args) => fromTag('template', ...args);
 
-export const textarea = /* @__PURE__ */ createElementFromTag('textarea');
+export const textarea: DOMElementFactoryFunction<'textarea'> = (...args) => fromTag('textarea', ...args);
 
-export const tfoot = /* @__PURE__ */ createElementFromTag('tfoot');
+export const tfoot: DOMElementFactoryFunction<'tfoot'> = (...args) => fromTag('tfoot', ...args);
 
-export const th = /* @__PURE__ */ createElementFromTag('th');
+export const th: DOMElementFactoryFunction<'th'> = (...args) => fromTag('th', ...args);
 
-export const thead = /* @__PURE__ */ createElementFromTag('thead');
+export const thead: DOMElementFactoryFunction<'thead'> = (...args) => fromTag('thead', ...args);
 
-export const time = /* @__PURE__ */ createElementFromTag('time');
+export const time: DOMElementFactoryFunction<'time'> = (...args) => fromTag('time', ...args);
 
-export const title = /* @__PURE__ */ createElementFromTag('title');
+export const title: DOMElementFactoryFunction<'title'> = (...args) => fromTag('title', ...args);
 
-export const tr = /* @__PURE__ */ createElementFromTag('tr');
+export const tr: DOMElementFactoryFunction<'tr'> = (...args) => fromTag('tr', ...args);
 
-export const track = /* @__PURE__ */ createElementFromTag('track');
+export const track: DOMElementFactoryFunction<'track'> = (...args) => fromTag('track', ...args);
 
-export const u = /* @__PURE__ */ createElementFromTag('u');
+export const u: DOMElementFactoryFunction<'u'> = (...args) => fromTag('u', ...args);
 
-export const ul = /* @__PURE__ */ createElementFromTag('ul');
+export const ul: DOMElementFactoryFunction<'ul'> = (...args) => fromTag('ul', ...args);
 
-export const var_ = /* @__PURE__ */ createElementFromTag('var');
+export const var_: DOMElementFactoryFunction<'var'> = (...args) => fromTag('var', ...args);
 
-export const video = /* @__PURE__ */ createElementFromTag('video');
+export const video: DOMElementFactoryFunction<'video'> = (...args) => fromTag('video', ...args);
 
-export const wbr = /* @__PURE__ */ createElementFromTag('wbr');
+export const wbr: DOMElementFactoryFunction<'wbr'> = (...args) => fromTag('wbr', ...args);
 
-function createElementFromTag<Tag extends HtmlElementTag>(tag: Tag): DOMElementFactoryFunction<Tag> {
-  return (props, ...children) => {
-    if (isValidChildDOMNode(props)) {
-      return createElement(tag, null, [props, ...children]);
-    }
-    return createElement(tag, props, ...children);
-  };
+// an arrow per tag, not a call at module scope, so an unused tag ships nothing even without annotations
+function fromTag<Tag extends HtmlElementTag>(
+  tag: Tag,
+  ...[props, ...children]: Parameters<DOMElementFactoryFunction<Tag>>
+): ReturnType<DOMElementFactoryFunction<Tag>> {
+  if (isValidChildDOMNode(props)) {
+    return createElement(tag, null, [props, ...children]);
+  }
+  return createElement(tag, props, ...children);
 }

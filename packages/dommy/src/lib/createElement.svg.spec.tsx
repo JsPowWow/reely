@@ -29,6 +29,16 @@ describe('createElement: SVG', () => {
     expect(icon.outerHTML).toBe('<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4"></circle><path d="M0 0"></path></svg>');
   });
 
+  it('takes a node as the first argument of a tag factory as a child', () => {
+    const dot = circle({ r: 2 });
+
+    const icon = svg(dot, path({ d: 'M0 0' }));
+
+    expect(icon.firstChild).toBe(dot);
+    expect(icon.childNodes).toHaveLength(2);
+    expect(icon.namespaceURI).toBe(SVG_NS);
+  });
+
   it('binds an attribute and updates it in place', () => {
     const color = signal('red');
     const dot = circle({ r: 4, fill: color, className: () => `dot-${color.value}` });

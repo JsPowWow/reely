@@ -65,9 +65,7 @@ const svgTagTable = {
   view: true,
 } as const satisfies Record<SvgElementTag, true>;
 
-// pure, so a bundle that never creates an element drops the table
-const svgTags: ReadonlySet<string> = /* @__PURE__ */ new Set(/* @__PURE__ */ Object.keys(svgTagTable));
-
+// a lookup in the literal, not a set built at module scope, so a bundle that never creates an element drops it
 export function isSvgTag(tag: string): tag is SvgElementTag {
-  return svgTags.has(tag);
+  return Object.hasOwn(svgTagTable, tag);
 }

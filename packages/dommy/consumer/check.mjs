@@ -96,6 +96,23 @@ try {
     parent.querySelector('button').click();
     assert.equal(parent.innerHTML, '1<button>1</button>');
   }
+  // tree shaking: importing an entry and using nothing ships nothing, by pure code rather than by
+  // annotations or `sideEffects: false`
+  for (const entry of ['@reely/dommy', '@reely/dommy/jsx-runtime', '@reely/dommy/router']) {
+    for (const ignoreAnnotations of [false, true]) {
+      const { outputFiles: bare } = await build({
+        stdin: { contents: `import '${entry}';`, resolveDir: work },
+        absWorkingDir: work,
+        bundle: true,
+        format: 'esm',
+        minify: true,
+        ignoreAnnotations,
+        write: false,
+        logLevel: 'error',
+      });
+      assert.equal(bare[0].text.trim(), '', `importing ${entry} ships code (ignoreAnnotations: ${ignoreAnnotations})`);
+    }
+  }
   // tree shaking: an app that uses only signals ships no element factories
   writeFileSync(
     join(work, 'signals-only.ts'),

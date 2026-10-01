@@ -4,36 +4,40 @@ import { isValidChildDOMNode } from './utils/element.utils';
 import type { SvgElementFactoryFunction, SvgElementTag } from './types/svg.types';
 
 // Factories for the SVG tags in common use; every other SVG tag works through JSX and `createElement`.
-export const svg = /* @__PURE__ */ createSvgElementFromTag('svg');
-export const g = /* @__PURE__ */ createSvgElementFromTag('g');
-export const defs = /* @__PURE__ */ createSvgElementFromTag('defs');
-export const symbol = /* @__PURE__ */ createSvgElementFromTag('symbol');
-export const use = /* @__PURE__ */ createSvgElementFromTag('use');
-export const path = /* @__PURE__ */ createSvgElementFromTag('path');
-export const circle = /* @__PURE__ */ createSvgElementFromTag('circle');
-export const ellipse = /* @__PURE__ */ createSvgElementFromTag('ellipse');
-export const line = /* @__PURE__ */ createSvgElementFromTag('line');
-export const polyline = /* @__PURE__ */ createSvgElementFromTag('polyline');
-export const polygon = /* @__PURE__ */ createSvgElementFromTag('polygon');
-export const rect = /* @__PURE__ */ createSvgElementFromTag('rect');
-export const text = /* @__PURE__ */ createSvgElementFromTag('text');
-export const tspan = /* @__PURE__ */ createSvgElementFromTag('tspan');
-export const textPath = /* @__PURE__ */ createSvgElementFromTag('textPath');
-export const image = /* @__PURE__ */ createSvgElementFromTag('image');
-export const foreignObject = /* @__PURE__ */ createSvgElementFromTag('foreignObject');
-export const linearGradient = /* @__PURE__ */ createSvgElementFromTag('linearGradient');
-export const radialGradient = /* @__PURE__ */ createSvgElementFromTag('radialGradient');
-export const stop = /* @__PURE__ */ createSvgElementFromTag('stop');
-export const clipPath = /* @__PURE__ */ createSvgElementFromTag('clipPath');
-export const mask = /* @__PURE__ */ createSvgElementFromTag('mask');
-export const pattern = /* @__PURE__ */ createSvgElementFromTag('pattern');
-export const marker = /* @__PURE__ */ createSvgElementFromTag('marker');
+export const svg: SvgElementFactoryFunction<'svg'> = (...args) => fromTag('svg', ...args);
+export const g: SvgElementFactoryFunction<'g'> = (...args) => fromTag('g', ...args);
+export const defs: SvgElementFactoryFunction<'defs'> = (...args) => fromTag('defs', ...args);
+export const symbol: SvgElementFactoryFunction<'symbol'> = (...args) => fromTag('symbol', ...args);
+export const use: SvgElementFactoryFunction<'use'> = (...args) => fromTag('use', ...args);
+export const path: SvgElementFactoryFunction<'path'> = (...args) => fromTag('path', ...args);
+export const circle: SvgElementFactoryFunction<'circle'> = (...args) => fromTag('circle', ...args);
+export const ellipse: SvgElementFactoryFunction<'ellipse'> = (...args) => fromTag('ellipse', ...args);
+export const line: SvgElementFactoryFunction<'line'> = (...args) => fromTag('line', ...args);
+export const polyline: SvgElementFactoryFunction<'polyline'> = (...args) => fromTag('polyline', ...args);
+export const polygon: SvgElementFactoryFunction<'polygon'> = (...args) => fromTag('polygon', ...args);
+export const rect: SvgElementFactoryFunction<'rect'> = (...args) => fromTag('rect', ...args);
+export const text: SvgElementFactoryFunction<'text'> = (...args) => fromTag('text', ...args);
+export const tspan: SvgElementFactoryFunction<'tspan'> = (...args) => fromTag('tspan', ...args);
+export const textPath: SvgElementFactoryFunction<'textPath'> = (...args) => fromTag('textPath', ...args);
+export const image: SvgElementFactoryFunction<'image'> = (...args) => fromTag('image', ...args);
+export const foreignObject: SvgElementFactoryFunction<'foreignObject'> = (...args) => fromTag('foreignObject', ...args);
+export const linearGradient: SvgElementFactoryFunction<'linearGradient'> = (...args) =>
+  fromTag('linearGradient', ...args);
+export const radialGradient: SvgElementFactoryFunction<'radialGradient'> = (...args) =>
+  fromTag('radialGradient', ...args);
+export const stop: SvgElementFactoryFunction<'stop'> = (...args) => fromTag('stop', ...args);
+export const clipPath: SvgElementFactoryFunction<'clipPath'> = (...args) => fromTag('clipPath', ...args);
+export const mask: SvgElementFactoryFunction<'mask'> = (...args) => fromTag('mask', ...args);
+export const pattern: SvgElementFactoryFunction<'pattern'> = (...args) => fromTag('pattern', ...args);
+export const marker: SvgElementFactoryFunction<'marker'> = (...args) => fromTag('marker', ...args);
 
-function createSvgElementFromTag<Tag extends SvgElementTag>(tag: Tag): SvgElementFactoryFunction<Tag> {
-  return (props, ...children) => {
-    if (isValidChildDOMNode(props)) {
-      return createElement(tag, null, [props, ...children]);
-    }
-    return createElement(tag, props, ...children);
-  };
+// an arrow per tag, not a call at module scope, so an unused tag ships nothing even without annotations
+function fromTag<Tag extends SvgElementTag>(
+  tag: Tag,
+  ...[props, ...children]: Parameters<SvgElementFactoryFunction<Tag>>
+): ReturnType<SvgElementFactoryFunction<Tag>> {
+  if (isValidChildDOMNode(props)) {
+    return createElement(tag, null, [props, ...children]);
+  }
+  return createElement(tag, props, ...children);
 }
