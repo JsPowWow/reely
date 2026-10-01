@@ -290,7 +290,7 @@ Under the logger's example, what reached the console is shown again as code on a
 A split-flap board on graphite (6px) inside the opening band's white panel: a slate header row in the body face, then rows of a place plate (the leader's in signal), a car's colour bar, its name and its time on tiles. A tile is a 0.95rem by 1.6rem plate of two graphite halves split by a dark hinge line, the letter in the display face at 800, uppercase, tabular figures. A changed letter turns through two drum letters, 55ms apart, each tile a little after the one before it; when a car passes another its row slides to its new place over 600ms, and the place plates follow the positions, the leader's in signal. A race runs ten minutes, then the next one starts. A bordered pause button sits above the board and names what it will do (Pause, Resume). The board's own writes are counted by the write board but not outlined, since its letters already show each change.
 
 ### Timing Sheet
-Figures tables (docs sizes, the dommy page's size and speed band): a visible caption, tabular figures right-aligned in the display face, one rule per row, labels left in body weight 400.
+Figures tables (docs sizes, the dommy page's size and speed band, the labs' comparison of signal cores): a visible caption, tabular figures right-aligned in the display face, one rule per row, labels left in body weight 400. Where a table compares candidates, the column that won has its head in bold graphite over a 3px signal underline; a table wider than a phone scrolls inside its own box, its caption held still.
 
 ## Do's and Don'ts
 

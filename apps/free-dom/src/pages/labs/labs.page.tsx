@@ -11,7 +11,7 @@ import docs from '../docs/docs.module.css';
 
 import type { LabId } from './labs.text';
 
-const labs: readonly LabId[] = ['dml', 'signals-graph'];
+const labs: readonly LabId[] = ['dml', 'signals-graph', 'signal-cores'];
 
 export const LabsPage = (): Node => {
   const examples = labExamples();

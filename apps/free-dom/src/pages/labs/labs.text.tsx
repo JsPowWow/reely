@@ -1,15 +1,16 @@
+import { CoresTable } from './labs.cores';
 import { labSource } from './labs.source';
 import { localized } from '../../i18n/localized';
 
 import type { LabExamples } from './labs.examples';
 
 /** The labs, in the order the page shows them. */
-export type LabId = 'dml' | 'signals-graph';
+export type LabId = 'dml' | 'signals-graph' | 'signal-cores';
 
 const en = {
   documentTitle: 'Labs | reely',
   title: 'Labs',
-  lead: 'Experiments around reely that are not shipped. Each lab asks one question, answers it with specs, and ends on a verdict: what proves itself moves into a package, the rest stays as a record.',
+  lead: 'Experiments around reely that are not shipped. Each lab asks one question, answers it with specs and measurements, and ends on a verdict: what proves itself moves into a package, the rest stays as a record.',
   labs: {
     dml: {
       title: 'Statements inside markup',
@@ -69,6 +70,55 @@ const en = {
             Kept as a record. A push graph has to mark every dirty node before it runs any effect; running effects
             during the push is what makes the glitch and the loop.{' '}
             <a href={labSource('signals-graph')}>The lab and its specs</a>.
+          </p>
+        </>
+      ),
+    },
+    'signal-cores': {
+      title: 'Which signal core to ship',
+      Body: (): Node => (
+        <>
+          <p>
+            dommy began on a signal core ported from act by artalar. Before it moved into <code>@reely/signals</code>,
+            three cores were brought to the same specs and timed on the same graphs:
+          </p>
+          <ul>
+            <li>
+              <code>act</code>, the port: states push to whatever read them, a computed checks snapshots of what it
+              read. Small and fast enough, but one closure plays two kinds of node, and three type escapes hold it
+              together.
+            </li>
+            <li>
+              <code>restructured</code>: the same algorithm rewritten to be read, a state node and a computed node, no
+              type escapes.
+            </li>
+            <li>
+              A push-pull graph: a write marks what may have changed, a read brings a node up to date by comparing
+              versions. The design known from Reactively, Preact signals and alien-signals.
+            </li>
+          </ul>
+          <CoresTable
+            caption='Three cores at the choice, one run on the author’s machine: size of signal, computed, effect, batch and untracked, minified and gzipped; time, the median of 7 rounds'
+            labels={{
+              size: 'Size',
+              wide: 'Wide: 1000 signals, 10k writes',
+              deep: 'Deep: 200 computeds in a chain',
+              diamond: 'Diamond: 1 → 100 computeds → 1 effect',
+              batch: 'Batch: 100 writes per batch',
+              churn: 'Churn: 20k effects created and disposed',
+            }}
+          />
+          <p>
+            Bringing the cores to the same specs found four bugs in act, each fixed with a failing test first: an equal
+            write that subscribed the writer, <code>!==</code> where the rest used <code>Object.is</code>, a subscriber
+            left behind through a shared computed, and an effect that never subscribed to a computed it peeked first.
+          </p>
+          <h3>Verdict</h3>
+          <p>
+            The push-pull graph, now <code>@reely/signals</code> (it has grown about 40 B since): a model a reader can
+            look up, and the fastest on what a scoreboard does (many point writes, rows that come and go, batches), for
+            about 300 B more than act. The other two stay in the lab, still held to the same public specs, with the
+            bench that timed them. <a href={labSource('signal-cores')}>The lab and its bench</a>.
           </p>
         </>
       ),

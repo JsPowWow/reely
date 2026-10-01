@@ -29,7 +29,11 @@ describe('labs', () => {
     const page = render(() => <LabsPage />);
 
     expect(document.title).toBe('Labs | reely');
-    expect(texts(page, 'main h2')).toEqual(['Statements inside markup', 'A signal graph in the shape of Angular’s']);
+    expect(texts(page, 'main h2')).toEqual([
+      'Statements inside markup',
+      'A signal graph in the shape of Angular’s',
+      'Which signal core to ship',
+    ]);
     expect(page.querySelectorAll('figure')).toHaveLength(3);
     expect(page.querySelector('header a[href="/labs"]')?.getAttribute('aria-current')).toBe('true');
   });
@@ -43,11 +47,28 @@ describe('labs', () => {
     await textsLoaded();
 
     expect(document.title).toBe('Лаборатория | reely');
-    expect(texts(page, 'main h2')).toEqual(['Операторы внутри разметки', 'Граф сигналов по образцу Angular']);
-    expect(texts(page, 'main h3')).toEqual(['Вердикт', 'Вердикт']);
+    expect(texts(page, 'main h2')).toEqual([
+      'Операторы внутри разметки',
+      'Граф сигналов по образцу Angular',
+      'Какое ядро сигналов выпускать',
+    ]);
+    expect(texts(page, 'main h3')).toEqual(['Вердикт', 'Вердикт', 'Вердикт']);
+    expect(page.querySelector('table caption')?.textContent).toContain('Три ядра');
     expect(page.querySelectorAll('figure')).toHaveLength(3);
     expect(page.querySelector('ol')).toBe(log);
     expect(texts(log ?? page, 'li')).toEqual(['1 / 2', '2 / 4']);
+  });
+
+  it('weighs and times the three signal cores side by side, the chosen one last', () => {
+    const page = render(() => <LabsPage />);
+    const table = page.querySelector('section[aria-labelledby="signal-cores"] table');
+    const size = Array.from(table?.querySelectorAll('tbody tr') ?? []).find((row) =>
+      row.querySelector('th')?.textContent?.startsWith('Size')
+    );
+
+    expect(texts(table ?? page, 'thead th')).toEqual(['act', 'restructured', 'push-pull']);
+    expect(table?.querySelectorAll('tbody tr')).toHaveLength(6);
+    expect(texts(size ?? page, 'td')).toEqual(['1509 B', '1720 B', '1825 B']);
   });
 
   it('builds children with a loop and a condition inside JSX', () => {
