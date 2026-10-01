@@ -192,7 +192,7 @@ const tracks = (
 playlist.value = [...playlist.value].sort((one, other) => other.plays - one.plays); // most played first: moves rows, rewrites changed text
 ```
 
-`track()` and `index()` follow later updates of that key.
+`track()` and `index()` follow later updates of that key. `each` is a list that changes: a signal or `computed` kept in a variable, or a getter (`each={() => race.value.laps}`). A list that never changes is a `.map()`. Written in place inside JSX, `signal(...)` or `computed(...)` leaves the item `unknown`, a limit of TypeScript.
 
 ## Conditions
 
