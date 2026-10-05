@@ -56,7 +56,7 @@
       "pattern": "release/{projectName}/{version}"
     },
     "projectsRelationship": "independent",
-    "projects": ["*", "!utils", "!@reely/source"],
+    "projects": ["packages/*", "!@reely/utils"],
     "version": {
       "preVersionCommand": "npx nx run-many -t build",
       "conventionalCommits": true,
