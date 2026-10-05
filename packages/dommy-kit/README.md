@@ -32,7 +32,7 @@ effect(() => console.log(phone.value, theme.value, width.value));
 ```
 
 - `media(query)`, `size(element)` and `throttled(source, ms)` give computeds.
-- `persisted(key, initial, { storage, is })` gives a signal; what is read back must be of the kind of `initial`, or pass `is` to check it; a storage that throws leaves it working in memory.
+- `persisted(key, initial, { storage, is })` gives a signal, written to the storage only when it changes; what is read back must be of the kind of `initial`, or pass `is` to check it, which a nullable value (`persisted<string | null>('user', null, { is })`) must; a storage that throws leaves it working in memory. It follows writes from other tabs, and resets to `initial` when one clears the storage, only for a real storage area (`localStorage` by default, `sessionStorage`).
 - `listen(target, type, handler, options)` types the event by target and returns the function that removes it.
 - `later(ms, fn)` runs `fn` once after `ms`, unless the view is disposed or the effect runs again first; it returns its own cancel. `later(0, fn)` runs after the render is in the document.
 - `flip(container, change)` animates the children `change` moved, not those it added; nothing moves under reduced motion.
@@ -58,7 +58,7 @@ effect(() => {
 
 ### A storage that reports a failed save
 
-`persisted` keeps working in memory when the storage throws (a full quota, storage blocked in a private window), and tries it again on the next write. To tell the user, pass a storage that notes the failure in a signal and rethrows the error:
+`persisted` keeps working in memory when the storage throws (a full quota, storage blocked in a private window), and tries it again on the next write. To tell the user, pass a storage that notes the failure in a signal and rethrows the error (a wrapper is not a storage area, so it does not follow other tabs):
 
 ```ts
 import { signal } from '@reely/dommy';
