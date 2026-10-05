@@ -79,7 +79,8 @@ Default five roles, label = role name. See `docs/agents/triage-labels.md`.
 ### Domain docs
 
 Multi-context: `CONTEXT-MAP.md` → `packages/<pkg>/CONTEXT.md`; ADRs in `docs/adr/`
-(system-wide) and `packages/<pkg>/docs/adr/`. See `docs/agents/domain.md`.
+(system-wide) and `packages/<pkg>/docs/adr/`, each created with its first decision. See
+`docs/agents/domain.md`.
 
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
