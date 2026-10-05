@@ -1,6 +1,5 @@
 import { reportUncaught, toErrorWithMessage } from '@reely/basics';
 import { batch, onCleanup } from '@reely/signals';
-import { identity } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
 import { browserHistory } from './router.browser';
@@ -50,12 +49,15 @@ export const startRouter = <Page>(
   let latest = 0;
   let requested = addressOf(last);
   let shown = '';
+  // the address whose page failed: a move to it again loads it again, as when it failed offline
+  let failedAt = '';
   let onScreen: Shown = [];
 
   const failure = (error: unknown): Page => fail(toErrorWithMessage(error));
 
-  const display = (page: Page, url: URL, moved: boolean): void => {
+  const display = (page: Page, url: URL, moved: boolean, failed: boolean): void => {
     shown = addressOf(url);
+    failedAt = failed ? shown : '';
     batch(() => {
       history.loads(false);
       history.showing();
@@ -63,6 +65,7 @@ export const startRouter = <Page>(
     try {
       onScreen = show(page);
     } catch (error) {
+      failedAt = shown;
       onScreen = show(failure(error));
     }
     history.arrive(onScreen, moved);
@@ -71,15 +74,19 @@ export const startRouter = <Page>(
   const load = (moved: boolean): void => {
     const turn = ++latest;
     const url = history.url();
+    let failed = false;
     history.loads(true);
     // a route that throws rejects like one whose page fails to load
     Promise.resolve()
       .then(() => routes(addressOf(url)))
       .then((page) => page ?? Promise.reject(new Error(`No route answers ${url.pathname}`)))
-      .then(identity, failure)
+      .catch((error: unknown) => {
+        failed = true;
+        return failure(error);
+      })
       .then((page) => {
         if (turn === latest) {
-          display(page, url, moved);
+          display(page, url, moved, failed);
         }
       })
       .catch((error: unknown) => {
@@ -103,6 +110,11 @@ export const startRouter = <Page>(
     const address = addressOf(url);
     const settingOnly = address === addressOf(last) && url.hash === last.hash;
     last = url;
+    if (address === failedAt) {
+      requested = address;
+      load(true);
+      return;
+    }
     if (settingOnly) {
       return;
     }

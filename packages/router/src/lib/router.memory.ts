@@ -24,11 +24,8 @@ export const memoryHistory = (start = '/'): RouterHistory => {
       loading.value = value;
     },
     navigate: (to): void => {
-      const next = new URL(to, now);
-      if (next.href !== now.href) {
-        now = next;
-        forEachSettled(movers, (moved) => moved());
-      }
+      now = new URL(to, now);
+      forEachSettled(movers, (moved) => moved());
     },
     follow: (moved) => {
       movers.add(moved);

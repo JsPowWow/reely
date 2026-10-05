@@ -454,6 +454,31 @@ describe('startRouter', () => {
     expect(alert()).toBe('No route answers /orders/7');
   });
 
+  it('loads a page that failed to load again on a move to its address', async () => {
+    let cartLoads = 0;
+    await start(
+      defineRoutes({
+        '/': () => pageNamed('Shop'),
+        '/cart': () => (cartLoads++ === 0 ? Promise.reject(new Error('Offline')) : pageNamed('Cart')),
+      })
+    );
+    document.body.append(element('a', { href: '/cart' }, 'Basket'));
+    clickLink('Basket');
+    await settle();
+    const failed = alert();
+    const entries = history.length;
+
+    clickLink('Basket');
+    await settle();
+    const retried = heading();
+    navigate('/cart');
+    await settle();
+
+    expect([failed, retried]).toEqual(['Offline', 'Cart']);
+    expect(history.length).toBe(entries);
+    expect(cartLoads).toBe(2);
+  });
+
   it('goes where code sends it, with `navigate` or the router', async () => {
     const shown = await start();
 
@@ -709,6 +734,32 @@ describe('memoryHistory', () => {
 
     expect(whileMoving).toEqual([true, false]);
     expect(inPanel.loading()).toBe(false);
+  });
+
+  it('loads a page that failed to load again on a move to its address', async () => {
+    let failing = true;
+    history.replaceState(null, '', '/site/page');
+    document.body.replaceChildren(panel);
+    const inPanel = memoryHistory('/cart');
+    router = startRouter(
+      defineRoutes({ '/cart': () => (failing ? Promise.reject(new Error('Offline')) : pageNamed('Cart')) }),
+      {
+        history: inPanel,
+        show: (page) => {
+          panel.replaceChildren(page());
+          return panel;
+        },
+        fail: (error) => () => element('p', { role: 'alert' }, error.message),
+      }
+    );
+    await settle();
+    const failed = alert();
+
+    failing = false;
+    inPanel.navigate('/cart');
+    await settle();
+
+    expect([failed, heading()]).toEqual(['Offline', 'Cart']);
   });
 
   it('reads a link against its own address', async () => {

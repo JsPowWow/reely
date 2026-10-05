@@ -13,15 +13,13 @@ export interface NavigateOptions {
 /** Goes to a URL of this site without loading the document; the router shows its page. */
 export const navigate = (to: string | URL, { replace = false }: NavigateOptions = {}): void => {
   const url = new URL(to, location.href);
-  if (url.href === location.href) {
-    return;
-  }
   if (replace) {
     // the same page in place keeps what its entry holds, such as where it was scrolled
     history.replaceState(url.pathname === location.pathname ? history.state : null, '', url);
-  } else {
+  } else if (url.href !== location.href) {
     window.dispatchEvent(new Event(leavingEvent));
     history.pushState(null, '', url);
   }
+  // to the URL shown too: the router loads a page that failed there again
   window.dispatchEvent(new Event(navigationEvent));
 };
