@@ -21,4 +21,20 @@ describe('href', () => {
     // @ts-expect-error the pattern names no `slug`
     href('/docs/:topic', { slug: 'signals' });
   });
+
+  it('needs the params of every pattern a union may be, and takes any for a pattern typed `string`', () => {
+    const linkTo = (pattern: '/orders/:id' | '/cart'): string => {
+      // @ts-expect-error the pattern may be the one that needs `id`
+      href(pattern);
+      return href(pattern, { id: '7' });
+    };
+    const wide = (pattern: string): string[] => [href(pattern, { id: '8' }), href(pattern)];
+
+    expect([linkTo('/orders/:id'), linkTo('/cart'), ...wide('/orders/:id')]).toEqual([
+      '/orders/7',
+      '/cart',
+      '/orders/8',
+      '/orders/',
+    ]);
+  });
 });
