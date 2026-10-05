@@ -35,15 +35,15 @@ describe('memory page', () => {
       'Start with the rules, not the page',
       'Four moments, one state machine',
       'The machine keeps no time; the view does',
-      'Stores hold the game, signals draw it',
+      'One state, in signals',
       'A card binds two things, and CSS turns it',
-      'The best ten, saved by a listener',
+      'The best ten, as a pure function',
       'Use the dialog the browser already has',
       'Proof, not a promise',
     ]);
     expect(
       Array.from(page.host.querySelectorAll('main > section:first-child li a'), (link) => link.getAttribute('href'))
-    ).toEqual(['/state-machine', '/simple-store', '/signals', '/dommy', '/dommy-kit', '/logger']);
+    ).toEqual(['/state-machine', '/signals', '/dommy', '/dommy-kit', '/logger']);
   });
 
   it('quotes real code in every snippet once the sources arrive, and posts not one if', async () => {
@@ -54,7 +54,7 @@ describe('memory page', () => {
     await vi.dynamicImportSettled();
 
     const panes = Array.from(page.host.querySelectorAll('article pre'));
-    expect(panes).toHaveLength(16);
+    expect(panes).toHaveLength(14);
     expect(panes.filter((pane) => (pane.textContent ?? '').trim().length < 40)).toEqual([]);
     expect(panes.some((pane) => /#(end)?region/.test(pane.textContent ?? ''))).toBe(false);
     expect(memoryBranches).toBe(0);
@@ -75,7 +75,7 @@ describe('memory page', () => {
     expect(first?.dataset['side']).toBe('up');
     expect(page.host.querySelector('article h2')?.textContent).toBe('Как устроена игра');
     await vi.dynamicImportSettled();
-    expect(page.host.querySelectorAll('article pre')).toHaveLength(16);
+    expect(page.host.querySelectorAll('article pre')).toHaveLength(14);
   });
 
   it('keeps the best ten in localStorage, where a reload finds them', () => {
@@ -89,7 +89,7 @@ describe('memory page', () => {
         [card, cards[faces.indexOf(faces[place], place + 1)]].forEach((one) => one?.click())
     );
 
-    expect(JSON.parse(localStorage.getItem('reely.memory.leaderboard') ?? '[]')).toEqual([
+    expect(JSON.parse(localStorage.getItem('reely.memory.leaderboard') ?? '{}').board).toEqual([
       { moves: 8, at: expect.any(Number) },
     ]);
   });

@@ -5,7 +5,6 @@ import type { SitePackage } from '../../site/site.packages';
 /** The packages the memory game is made with; the credits name the part each one does. */
 export const memoryPackages = [
   'state-machine',
-  'simple-store',
   'signals',
   'dommy',
   'dommy-kit',
@@ -15,7 +14,7 @@ export const memoryPackages = [
 type MemoryPackage = (typeof memoryPackages)[number];
 
 /** The chapters of the story under the game, in reading order. */
-export const memoryChapters = ['rules', 'machine', 'time', 'stores', 'card', 'leaderboard', 'dialog', 'proof'] as const;
+export const memoryChapters = ['rules', 'machine', 'time', 'state', 'card', 'leaderboard', 'dialog', 'proof'] as const;
 
 export type MemoryChapter = (typeof memoryChapters)[number];
 
@@ -30,7 +29,7 @@ interface Chapter {
 const en = {
   documentTitle: 'Memory game without one if | reely',
   description:
-    'A memory game in TypeScript with no if in its code: a state machine moves it on, stores hold it, signals draw it. Play it, then read the code that just ran.',
+    'A memory game in TypeScript with no if in its code: a state machine moves it on over signals the page draws. Play it, then read how it is built.',
   title: 'Memory game',
   pitch: 'Sixteen cards, eight reely packages: find every pair in as few moves as you can.',
   branches: 'in its code, and not one switch either',
@@ -39,7 +38,6 @@ const en = {
   madeWith: 'The game is made with',
   parts: {
     'state-machine': 'the flow of the game',
-    'simple-store': 'its data and the leaderboard',
     signals: 'reactive state',
     dommy: 'the DOM: cards, counters, dialogs',
     'dommy-kit': 'the timer',
@@ -127,22 +125,23 @@ const en = {
           </>
         ),
       },
-      stores: {
-        title: 'Stores hold the game, signals draw it',
+      state: {
+        title: 'One state, in signals',
         Body: ({ Snippet }): Node => (
           <>
             <p>
-              The table and the best ten live in two <code>@reely/simple-store</code> stores, and only the machine
-              writes them. A store suits code that wants to hear about changes as events: the machine, the storage. The
-              DOM wants signals, because a signal bound to a node updates exactly that node. The bridge between the two
-              is a few lines, and it unsubscribes when the view goes.
+              The whole state of the game is two signals: the table, and the best ten. The machine writes them, the page
+              reads them, and a signal bound to a node updates exactly that node, so there is nothing to sync and
+              nothing to subscribe by hand.
             </p>
-            <Snippet file='memory.wiring.ts' region='following' />
+            <Snippet file='memory.game.tsx' region='state' />
             <p>
-              The deck follows a selection of its own. A selection notifies only when its part changes, so the sixteen
-              buttons are laid out again on a new game, and never on a turn.
+              The best ten are a <code>persisted</code> signal from <code>@reely/dommy-kit</code>: written to{' '}
+              <code>localStorage</code> on every change, checked when read back, and kept in memory alone where storage
+              fails, in a private window or with a full quota. The deck is a <code>computed</code> of the table: it
+              notifies only when the deck itself is new, so the sixteen buttons are laid out again on a new game, and
+              never on a turn.
             </p>
-            <Snippet file='memory.game.tsx' region='stores' />
           </>
         ),
       },
@@ -170,7 +169,7 @@ const en = {
         ),
       },
       leaderboard: {
-        title: 'The best ten, saved by a listener',
+        title: 'The best ten, as a pure function',
         Body: ({ Snippet }): Node => (
           <>
             <p>
@@ -180,11 +179,9 @@ const en = {
             </p>
             <Snippet file='memory.leaderboard.ts' region='rank' />
             <p>
-              Nobody calls save. The leaderboard store saves its board to <code>localStorage</code> from a listener on a
-              selection of the board, so changing the store is saving it. What storage gives back is checked before it
-              is trusted, and a private window or a full quota leaves the board working for this page.
+              Nobody calls save: the machine assigns the result to the leaderboard signal, and <code>persisted</code>{' '}
+              writes it down.
             </p>
-            <Snippet file='memory.leaderboard.ts' region='store' />
           </>
         ),
       },

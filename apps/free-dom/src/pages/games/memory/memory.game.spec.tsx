@@ -104,7 +104,7 @@ describe('memory game', () => {
     expect(victory?.open).toBe(true);
     expect(victory?.textContent).toContain('9 moves');
     expect(victory?.textContent).toContain('1 on the leaderboard');
-    expect(JSON.parse(storage.items.get('reely.memory.leaderboard') ?? '')).toEqual([
+    expect(JSON.parse(storage.items.get('reely.memory.leaderboard') ?? '').board).toEqual([
       { moves: 9, at: new Date('2026-10-05T12:00:00').getTime() },
     ]);
   });
@@ -161,10 +161,12 @@ describe('memory game', () => {
     const storage = memoryStorage();
     storage.setItem(
       'reely.memory.leaderboard',
-      JSON.stringify([
-        { moves: 9, at: new Date('2026-09-30T10:00:00').getTime() },
-        { moves: 14, at: new Date('2026-10-01T10:00:00').getTime() },
-      ])
+      JSON.stringify({
+        board: [
+          { moves: 9, at: new Date('2026-09-30T10:00:00').getTime() },
+          { moves: 14, at: new Date('2026-10-01T10:00:00').getTime() },
+        ],
+      })
     );
     const game = play(storage);
     turn(game, 0, 1);

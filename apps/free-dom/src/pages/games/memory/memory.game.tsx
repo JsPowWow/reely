@@ -1,18 +1,19 @@
-import { effect, Keyed, onCleanup, signal } from '@reely/dommy';
-import { later } from '@reely/dommy-kit';
+import { computed, effect, Keyed, onCleanup, signal } from '@reely/dommy';
+import { later, persisted } from '@reely/dommy-kit';
 
 import { MemoryCard } from './memory.card';
 import { BestTen, Victory } from './memory.dialogs';
+import { isLeaderboard } from './memory.leaderboard';
 import { memoryMachine } from './memory.machine';
 import { MomentCode, momentOf, moments, refused } from './memory.moments';
 import { cardAt, dealGame } from './memory.rules';
-import { browserStorage, following } from './memory.wiring';
 import { sitePackages } from '../../../site/site.packages';
 
 import css from './memory.module.css';
 
+import type { Leaderboard } from './memory.leaderboard';
 import type { CodeMoment } from './memory.moments';
-import type { RandomSource } from './memory.rules';
+import type { MemoryState, RandomSource } from './memory.rules';
 
 const pairs = 8;
 
@@ -28,24 +29,25 @@ interface MemoryGameProps {
 
 /**
  * Sixteen cards of eight reely packages: find the pairs in as few moves as you
- * can. A state machine moves the game on, stores hold the table and the best
- * ten, and signals bound to the DOM draw what the stores hold.
+ * can. A state machine moves the game on over signals the page draws.
  */
 export const MemoryGame = ({
   random = Math.random,
   now = Date.now,
-  storage = browserStorage(),
+  storage,
 }: MemoryGameProps = {}): Node => {
-  const game = memoryMachine({
-    deal: () => dealGame(sitePackages, pairs, random),
-    now,
-    storage,
-  });
-  // #region stores
-  const table = following(game.context.table);
-  const leaderboard = following(game.context.leaderboard);
+  // #region state
+  const deal = (): MemoryState => dealGame(sitePackages, pairs, random);
+  const table = signal(deal());
+  // kept in localStorage, and in memory alone where storage fails
+  const leaderboard = persisted<Leaderboard>(
+    'reely.memory.leaderboard',
+    { board: [], place: undefined },
+    { storage, is: isLeaderboard }
+  );
+  const game = memoryMachine({ table, leaderboard, deal, now });
   // the deck changes only with a new game, which lays out new cards
-  const cards = following(game.context.table.select(({ deck }) => deck));
+  const cards = computed(() => table.value.deck);
   // #endregion
 
   const phase = signal(game.state);
@@ -58,7 +60,7 @@ export const MemoryGame = ({
     game.on('stateChanged', (change) => {
       const moment = momentOf(change);
       phase.value = change.to;
-      status.value = moment.status(change.context.table.value);
+      status.value = moment.status(table.value);
       code.value = moment;
       victoryOpen.value = change.to === 'won';
     })

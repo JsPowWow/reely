@@ -1,5 +1,5 @@
+import type { Signal } from '@reely/dommy';
 import { scopedLogger } from '@reely/logger';
-import { ObjectStore } from '@reely/simple-store';
 import { createStateMachine, runActionEffect } from '@reely/state-machine';
 import type {
   IStateMachine,
@@ -7,31 +7,21 @@ import type {
   StateMachineStateConfig,
 } from '@reely/state-machine';
 
-import { createLeaderboard, postResult } from './memory.leaderboard';
+import { postResult } from './memory.leaderboard';
 import { canTurn, isWon, turnBack, turnCard } from './memory.rules';
 
 import type { Leaderboard } from './memory.leaderboard';
 import type { MemoryState } from './memory.rules';
 
 /**
- * The world outside the game, reached through parameters, so the machine runs
- * and is tested without it.
+ * What the machine works on: the table and the best ten, in signals the page
+ * draws, and the deal and the clock, given so a test brings its own.
  */
-export interface MemoryWorld {
+export interface MemoryContext {
+  readonly table: Signal<MemoryState>;
+  readonly leaderboard: Signal<Leaderboard>;
   readonly deal: () => MemoryState;
-  /** The clock that dates a win. */
   readonly now: () => number;
-  /** Where the best ten are kept; without it they last as long as the page. */
-  readonly storage?: Pick<Storage, 'getItem' | 'setItem'>;
-}
-
-/**
- * What the machine works on: the stores it writes, the table and the best ten,
- * and its world.
- */
-export interface MemoryContext extends MemoryWorld {
-  readonly table: ObjectStore<MemoryState>;
-  readonly leaderboard: ObjectStore<Leaderboard>;
 }
 
 /**
@@ -81,17 +71,9 @@ const turning: StateMachineStateConfig<Memory> = {
   on: { turn: toward },
 };
 
-/**
- * A game of memory as a state machine, with stores of its own for the table and
- * the best ten.
- */
-export const memoryMachine = (world: MemoryWorld): IStateMachine<Memory> => {
-  const context: MemoryContext = {
-    ...world,
-    table: new ObjectStore(world.deal()),
-    leaderboard: createLeaderboard(world.storage),
-  };
-  return createStateMachine<Memory>(
+/** A game of memory as a state machine over the signals it is given. */
+export const memoryMachine = (context: MemoryContext): IStateMachine<Memory> =>
+  createStateMachine<Memory>(
     {
       initial: 'ready',
       context,
@@ -124,9 +106,10 @@ export const memoryMachine = (world: MemoryWorld): IStateMachine<Memory> => {
           entry: [
             turnUp,
             ({ context: { table, leaderboard, now } }): void => {
-              leaderboard.set(({ board }) =>
-                postResult(board, { moves: table.value.moves, at: now() })
-              );
+              leaderboard.value = postResult(leaderboard.value.board, {
+                moves: table.value.moves,
+                at: now(),
+              });
             },
           ],
         },
@@ -136,4 +119,3 @@ export const memoryMachine = (world: MemoryWorld): IStateMachine<Memory> => {
     // a failed action is reported, not thrown at the click that sent the event
     { logger: scopedLogger('memory') }
   );
-};

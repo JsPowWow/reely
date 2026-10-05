@@ -1,16 +1,24 @@
+import { signal } from '@reely/dommy';
+
 import { memoryMachine } from './memory.machine';
 
-import type { MemoryWorld } from './memory.machine';
+import type { MemoryContext } from './memory.machine';
 import type { MemoryState } from './memory.rules';
 
 const deck = ['a', 'b', 'a', 'b'];
 const fresh = (): MemoryState => ({ deck, open: [], found: [], moves: 0 });
 
-const world: MemoryWorld = { deal: fresh, now: () => 1_000 };
+const contextOf = (overrides: Partial<MemoryContext> = {}): MemoryContext => ({
+  table: signal(fresh()),
+  leaderboard: signal({ board: [], place: undefined }),
+  deal: fresh,
+  now: () => 1_000,
+  ...overrides,
+});
 
 describe('memory machine', () => {
   it('turns one card, then keeps a found pair and is ready for the next', () => {
-    const game = memoryMachine(world);
+    const game = memoryMachine(contextOf());
     const { context } = game;
 
     expect(game.send('turn', 0)).toMatchObject({
@@ -30,7 +38,7 @@ describe('memory machine', () => {
   });
 
   it('refuses a card that cannot turn: the same card, a found one, any card while a wrong pair is up', () => {
-    const game = memoryMachine(world);
+    const game = memoryMachine(contextOf());
     const { context } = game;
 
     game.send('turn', 0);
@@ -42,7 +50,7 @@ describe('memory machine', () => {
   });
 
   it('turns a wrong pair back on `turnBack`, and refuses it anywhere else', () => {
-    const game = memoryMachine(world);
+    const game = memoryMachine(contextOf());
     const { context } = game;
     game.send('turn', 0);
     game.send('turn', 1);
@@ -54,7 +62,7 @@ describe('memory machine', () => {
   });
 
   it('deals a new game from any state, a wrong pair included', () => {
-    const game = memoryMachine(world);
+    const game = memoryMachine(contextOf());
     const { context } = game;
     game.send('turn', 0);
     game.send('turn', 1);
@@ -64,7 +72,7 @@ describe('memory machine', () => {
   });
 
   it('posts a win once, with its place on the leaderboard', () => {
-    const game = memoryMachine(world);
+    const game = memoryMachine(contextOf());
     const { context } = game;
 
     [0, 2, 1, 3].forEach((place) => game.send('turn', place));
@@ -79,16 +87,8 @@ describe('memory machine', () => {
 
   it('holds its invariants under any order of fast clicks, new games and turn-backs', () => {
     let clock = 0;
-    const game = memoryMachine({
-      ...world,
-      now: () => ++clock,
-      deal: () => ({
-        deck: ['a', 'b', 'c', 'a', 'b', 'c'],
-        open: [],
-        found: [],
-        moves: 0,
-      }),
-    });
+    const six = (): MemoryState => ({ deck: ['a', 'b', 'c', 'a', 'b', 'c'], open: [], found: [], moves: 0 });
+    const game = memoryMachine(contextOf({ table: signal(six()), deal: six, now: () => ++clock }));
     const { table, leaderboard } = game.context;
     // a seeded pseudo-random walk, so a failure replays the same way
     let seed = 7;

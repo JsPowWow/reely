@@ -1,11 +1,4 @@
-import { ObjectStore } from '@reely/simple-store';
-import {
-  Either,
-  hasProperty,
-  isNumber,
-  mapNullable,
-  withDefault,
-} from '@reely/utils';
+import { hasProperty, isNumber } from '@reely/utils';
 
 /** One win: how many moves it took, and when it ended (ms since the epoch). */
 export interface MemoryResult {
@@ -62,42 +55,14 @@ const isMemoryResult = (maybeResult: unknown): maybeResult is MemoryResult =>
   isNumber(maybeResult.moves) &&
   isNumber(maybeResult.at);
 
-/**
- * What storage gave back is a leaderboard: anything else, edited by hand or
- * from an older build, is dropped.
- */
-export const isMemoryResults = (
+const isMemoryResults = (
   maybeResults: unknown
 ): maybeResults is MemoryResult[] =>
   Array.isArray(maybeResults) && maybeResults.every(isMemoryResult);
 
-const storageKey = 'reely.memory.leaderboard';
-
-const load = (storage: Pick<Storage, 'getItem'>): MemoryResult[] =>
-  Either.tryCatch((): unknown =>
-    JSON.parse(storage.getItem(storageKey) ?? '[]')
-  )
-    .map((stored) => (isMemoryResults(stored) ? stored : []))
-    .getOrElse([]);
-
-/**
- * The leaderboard as a store, read from `storage` and written back on every
- * change of its board. A storage that is missing or throws (a private window, a
- * full quota) leaves it working for this page only.
- */
-// #region store
-export const createLeaderboard = (
-  storage?: Pick<Storage, 'getItem' | 'setItem'>
-): ObjectStore<Leaderboard> => {
-  const leaderboard = new ObjectStore<Leaderboard>({
-    board: withDefault([], mapNullable(load, storage)),
-    place: undefined,
-  });
-  leaderboard
-    .select(({ board }) => board)
-    .on('changed', (board) =>
-      Either.tryCatch(() => storage?.setItem(storageKey, JSON.stringify(board)))
-    );
-  return leaderboard;
-};
-// #endregion
+/** What storage gave back is a leaderboard: anything else is dropped. */
+export const isLeaderboard = (
+  maybeLeaderboard: unknown
+): maybeLeaderboard is Leaderboard =>
+  hasProperty('board', maybeLeaderboard) &&
+  isMemoryResults(maybeLeaderboard.board);
