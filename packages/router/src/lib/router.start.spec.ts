@@ -148,6 +148,28 @@ describe('startRouter', () => {
     expect(heading()).toBe('Shop');
   });
 
+  it('follows a link inside a shadow root, and leaves an SVG link to the browser', async () => {
+    await start();
+    const host = element('div', {});
+    host.attachShadow({ mode: 'open' }).append(element('a', { href: '/cart' }, 'Cart'));
+    const drawing = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const svgLink = document.createElementNS('http://www.w3.org/2000/svg', 'a');
+    svgLink.setAttribute('href', '/orders/7');
+    drawing.append(svgLink);
+    document.body.append(host, drawing);
+    const click = (): MouseEvent =>
+      new MouseEvent('click', { bubbles: true, cancelable: true, composed: true, button: 0 });
+
+    const inSvg = click();
+    svgLink.dispatchEvent(inSvg);
+    const inShadow = click();
+    host.shadowRoot?.querySelector('a')?.dispatchEvent(inShadow);
+    await settle();
+
+    expect([inSvg.defaultPrevented, inShadow.defaultPrevented]).toEqual([false, true]);
+    expect(heading()).toBe('Cart');
+  });
+
   it('starts a new page at the top, its heading focused for a screen reader', async () => {
     await start();
 

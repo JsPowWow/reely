@@ -2,8 +2,12 @@ import { onCleanup } from '@reely/signals';
 import { isInstanceOf, isNil } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
-const linkOf = (target: Nullable<EventTarget>): Nullable<HTMLAnchorElement> =>
-  isInstanceOf(Element, target) ? target.closest('a') : null;
+// the HTML link clicked, inside a shadow root too; an `<a>` of SVG is no link the router follows
+const linkOf = (event: Event): Nullable<HTMLAnchorElement> => {
+  const [target] = event.composedPath();
+  const link = isInstanceOf(Element, target) ? target.closest('a') : null;
+  return isInstanceOf(HTMLAnchorElement, link) ? link : null;
+};
 
 // a primary-button click without modifiers: the others open tabs and windows
 const isPlainClick = (event: MouseEvent): boolean =>
@@ -26,7 +30,7 @@ export const takeOverLinks = (
   root.addEventListener(
     'click',
     (event) => {
-      const link = isInstanceOf(MouseEvent, event) && isPlainClick(event) ? linkOf(event.target) : null;
+      const link = isInstanceOf(MouseEvent, event) && isPlainClick(event) ? linkOf(event) : null;
       if (!isNil(link) && opensHere(link) && follow(link)) {
         event.preventDefault();
       }
