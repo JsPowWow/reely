@@ -67,7 +67,7 @@ const stopRace = withOwner((dispose) => {
 stopRace(); // the effect unsubscribes and the timer stops
 ```
 
-Each run of an effect has its own owner: `onCleanup` inside it runs before the next run and when the effect is disposed, and the effects it created go with it. `getOwner()` captures the running owner, for code that runs later to pass to `withOwner(fn, owner)`.
+Each run of an effect has its own owner: `onCleanup` inside it runs before the next run and when the effect is disposed, and the effects it created go with it. `getOwner()` captures the running owner, for code that runs later to pass to `withOwner(fn, owner)`; an owner is opaque, only `withOwner` takes it. A disposed owner holds nothing: what is registered with it later is released at once (an `onCleanup` runs, an effect never runs). Outside any owner, `onCleanup` is held by nothing and never runs, and an effect lives until its own `dispose`.
 
 ```ts
 import { effect, onCleanup, signal } from '@reely/signals';

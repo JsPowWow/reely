@@ -85,13 +85,33 @@ describe('withOwner', () => {
     expect(released).toEqual(['late row']);
   });
 
-  it('forgets an effect disposed before its owner', () => {
-    const held = withOwner(() => {
-      effect(() => undefined)();
-      return getOwner()?.cleanups.size;
-    }, null);
+  it('releases at once what is registered with it after it was disposed; an effect never runs', () => {
+    const lap = signal(1);
+    const released: string[] = [];
+    const seen: number[] = [];
+    const owner = withOwner((dispose) => {
+      dispose();
+      effect(() => void seen.push(lap.value));
+      onCleanup(() => released.push('timer'));
+      return getOwner();
+    });
 
-    expect(held).toBe(0);
+    withOwner(() => {
+      effect(() => void seen.push(lap.value));
+      onCleanup(() => released.push('late row'));
+    }, owner);
+    lap.value = 2;
+
+    expect(released).toEqual(['timer', 'late row']);
+    expect(seen).toEqual([]);
+    expect(subscriberCount(lap)).toBe(0);
+  });
+
+  it('keeps what it holds out of reach: only `withOwner` takes an owner', () => {
+    withOwner(() => {
+      // @ts-expect-error an owner is opaque
+      expect(getOwner()?.cleanups).toBeUndefined();
+    });
   });
 });
 

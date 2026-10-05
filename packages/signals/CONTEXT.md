@@ -33,5 +33,5 @@ _Avoid_: transaction
 ## Releasing
 
 **Owner**:
-What a piece of work registers its effects, `onCleanup` callbacks and nested owners with; `dispose` releases all of them, the last registered first.
+What a piece of work registers its effects, `onCleanup` callbacks and nested owners with; `dispose` releases all of them, the last registered first. A disposed owner releases at once whatever is registered with it later.
 _Avoid_: scope, context
