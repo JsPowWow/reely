@@ -11,4 +11,4 @@ paths:
 - Specs: `test.each` tables covering primitives, wrappers, `null`/`undefined`, edge cases (see `hasSome.spec.ts`).
 - `utils` is private (not published). A published package that imports it must not leak `@reely/utils` into its emitted JS/`.d.ts` — it bundles it. A helper brought to production level moves to the published `@reely/basics` (see its rule), and utils re-exports it.
 - Don't touch `lib/utils.ts` `validateType` without the author — `strings` depends on it.
-- Logger: `scopedLogger(scope)` is a per-scope singleton; `default` is always on, others need `.setEnabled(true)`. Known bug to fix with a test: `error` calls `console.warn`.
+- Logger: `scopedLogger(scope)` is a per-scope singleton; `default` is always on, others need `.setEnabled(true)`.
