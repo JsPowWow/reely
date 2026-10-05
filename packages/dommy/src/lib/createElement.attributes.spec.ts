@@ -1,4 +1,4 @@
-import { createElement } from '../index';
+import { createElement, signal } from '../index';
 
 describe('createElement: properties and attributes', () => {
   it('sets string props as attributes', () => {
@@ -39,6 +39,19 @@ describe('createElement: properties and attributes', () => {
     expect(enabled.hasAttribute('disabled')).toBe(false);
     expect(disabled.getAttribute('disabled')).toBe('');
     expect(disabled.disabled).toBe(true);
+  });
+
+  it('sets any boolean prop through its property, or as an attribute without one: `false` leaves none', () => {
+    const validated = signal(true);
+    const video = createElement('video', { autoplay: false, loop: true });
+    const form = createElement('form', { noValidate: validated });
+    const panel = createElement('div', { inert: false, title: 'race' });
+
+    validated.value = false;
+
+    expect([video.hasAttribute('autoplay'), video.hasAttribute('loop'), video.loop]).toEqual([false, true, true]);
+    expect(form.hasAttribute('novalidate')).toBe(false);
+    expect(panel.outerHTML).toBe('<div title="race"></div>');
   });
 
   it('selects the option a `select` value names, set once its options are in place', () => {

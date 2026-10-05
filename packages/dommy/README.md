@@ -160,7 +160,7 @@ const progress = (
 );
 ```
 
-A function child renders text; to switch between nodes, use `Show` or `Keyed`. To toggle one class among static ones, bind the whole `className`: `className={() => (flash.value ? 'cell flash' : 'cell')}`, still one attribute write per change. A bound `null` or `undefined` removes the attribute; boolean props such as `hidden` or `disabled` take `true` and `false`.
+A function child renders text; to switch between nodes, use `Show` or `Keyed`. To toggle one class among static ones, bind the whole `className`: `className={() => (flash.value ? 'cell flash' : 'cell')}`, still one attribute write per change. A bound `null` or `undefined` removes the attribute; every boolean prop (`hidden`, `disabled`, `autoplay`, `noValidate`) takes `true` and `false`, set through the element's property, or as an attribute present or absent where the element has no such property.
 
 ## Lists
 

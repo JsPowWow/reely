@@ -1,8 +1,8 @@
-import { isInstanceOf, isNil } from '@reely/utils';
+import { isBoolean, isInstanceOf, isNil } from '@reely/utils';
 
 import { getDommyLogger } from '../config';
 import { isSafeAttributeEntry, removeAttribute, setAttribute } from './attributes/element.attributes';
-import { isBooleanAttribute, setBoolAttribute } from './attributes/element.bool.attributes';
+import { hasBooleanProperty, setBooleanProperty, setBoolAttribute } from './attributes/element.bool.attributes';
 import { isDataAttribute } from './attributes/element.data.attributes';
 import { isLiveProperty, setLiveProperty } from './attributes/element.live.properties';
 import { toAttributeName } from './attributes/element.mapped.attributes';
@@ -23,13 +23,18 @@ export const assignProperty = <Element extends DommyElement>(
     case isLiveProperty(property): {
       return setLiveProperty(element, property, value);
     }
-    case isBooleanAttribute(attributeName): {
-      return setBoolAttribute(element, attributeName, Boolean(value));
-    }
     case isNil(value): {
       return removeAttribute(element, attributeName);
     }
-    case isDataAttribute(property):
+    case isBoolean(value) && hasBooleanProperty(element, property): {
+      return setBooleanProperty(element, property, value);
+    }
+    case isDataAttribute(property): {
+      return setAttribute(element, attributeName, String(value));
+    }
+    case isBoolean(value) && isSafeAttributeEntry(attributeName, value): {
+      return setBoolAttribute(element, attributeName, value);
+    }
     case isSafeAttributeEntry(attributeName, value): {
       return setAttribute(element, attributeName, String(value));
     }
