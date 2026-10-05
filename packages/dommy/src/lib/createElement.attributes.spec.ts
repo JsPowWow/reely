@@ -91,6 +91,19 @@ describe('createElement: properties and attributes', () => {
       expect(textarea.value).toBe('draft');
     });
 
+    it('clears it for `null` and `undefined`: an empty `value`, unchecked', () => {
+      const draft = signal<string | undefined>('lap 3');
+      const done = signal<boolean | null>(true);
+      const empty = createElement('input', { value: undefined });
+      const field = createElement('input', { value: draft });
+      const box = createElement('input', { type: 'checkbox', checked: done });
+
+      draft.value = undefined;
+      done.value = null;
+
+      expect([empty.value, field.value, box.checked]).toEqual(['', '', false]);
+    });
+
     it('sets `indeterminate`, which has no attribute', () => {
       const input = createElement('input', { type: 'checkbox', indeterminate: true });
 
