@@ -391,19 +391,14 @@ export const write = <T>(read: ReactiveValue<T>, value: T): void => {
   }
 };
 
-/** Runs `fn` now and again after every change of what it read. Returns `dispose`; creation that throws leaves nothing subscribed. */
+/**
+ * Runs `fn` now and again after every change of what it read. Returns `dispose`; a first run that
+ * throws leaves nothing subscribed. Inside a `batch`, the effects that run triggers run when it ends.
+ */
 export const effect = (fn: () => void): (() => void) => {
   const node = new Effect(fn);
   try {
-    batch(() => {
-      try {
-        node.run();
-      } catch (error) {
-        // before the flush that ends the batch, so it never runs an effect whose creation threw
-        node.dispose();
-        throw error;
-      }
-    });
+    node.run();
   } catch (error) {
     node.dispose();
     throw error;
@@ -418,15 +413,17 @@ export const effect = (fn: () => void): (() => void) => {
 export const subscribe = <T>(read: ReactiveValue<T>, cb: (value: T, prevValue?: T) => void): (() => void) => {
   let last: T | undefined;
   let started = false;
-  return effect(() => {
-    const value = read();
-    const previous = last;
-    last = value;
-    if (started || !Object.is(value, undefined)) {
-      untracked(() => cb(value, previous));
-    }
-    started = true;
-  });
+  return batch(() =>
+    effect(() => {
+      const value = read();
+      const previous = last;
+      last = value;
+      if (started || !Object.is(value, undefined)) {
+        untracked(() => cb(value, previous));
+      }
+      started = true;
+    })
+  );
 };
 
 const endBatch = (): void => {

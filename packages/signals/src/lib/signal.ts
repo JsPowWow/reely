@@ -103,18 +103,22 @@ export const effect = (fn: () => void): (() => void) => {
   };
 
   parent?.cleanups.add(dispose);
-  try {
-    const release = reelx.effect(run);
+  // what the first run triggers runs after it; an error of those effects leaves this one alive
+  reelx.batch(() => {
+    let release: () => void;
+    try {
+      release = reelx.effect(run);
+    } catch (error) {
+      dispose();
+      throw error;
+    }
     // the first run may have disposed the effect before its subscription existed
     if (disposed) {
       release();
     } else {
       unsubscribe = release;
     }
-  } catch (error) {
-    dispose();
-    throw error;
-  }
+  });
   return dispose;
 };
 

@@ -1,6 +1,7 @@
 // What reely's signals guarantee beyond the tests ported from Preact: the contract any core under them keeps.
 import { noop } from '@reely/utils';
 
+import { withOwner } from './owner';
 import { subscriberCount } from './reelx.core';
 import { batch, computed, effect, signal, untracked } from './signal';
 
@@ -116,11 +117,15 @@ describe('the signal contract', () => {
       ping.value = pong.value + other.value + 1;
     });
     effect(spy);
-    expect(() =>
-      effect(() => {
-        pong.value = ping.value + 1;
-      })
-    ).toThrow(/cycle/);
+    const stopPong = withOwner((dispose) => {
+      expect(() =>
+        effect(() => {
+          pong.value = ping.value + 1;
+        })
+      ).toThrow(/cycle/);
+      return dispose;
+    });
+    stopPong();
     const runs = spy.mock.calls.length;
 
     other.value = 99;
@@ -159,6 +164,32 @@ describe('the signal contract', () => {
     expect(() => effect(broken)).toThrow('broken');
 
     expect(broken).toHaveBeenCalledOnce();
+  });
+
+  it('keeps an effect whose first run succeeded when another one throws in the flush after it, until its owner goes', () => {
+    const lap = signal(0);
+    const crashed = signal(false);
+    const seen: number[] = [];
+    const dispose = withOwner((dispose) => {
+      effect(() => {
+        if (crashed.value) {
+          throw new Error('board broke');
+        }
+      });
+      expect(() =>
+        effect(() => {
+          seen.push(lap.value);
+          crashed.value = true;
+        })
+      ).toThrow('board broke');
+      return dispose;
+    });
+
+    lap.value = 1;
+    dispose();
+
+    expect(seen).toStrictEqual([0, 1]);
+    expect(subscriberCount(lap)).toBe(0);
   });
 
   it('reads a chain of a thousand computeds', () => {
@@ -316,17 +347,20 @@ describe('the signal contract', () => {
     expect(spy).toHaveBeenCalledOnce();
   });
 
-  it('leaves nothing subscribed when an effect is created into a cycle', () => {
+  it('releases an effect created into a cycle with its owner', () => {
     const ping = signal(0);
     const pong = signal(0);
-    const stop = effect(() => {
-      ping.value = pong.value + 1;
-    });
-    expect(() =>
+    const stop = withOwner((dispose) => {
       effect(() => {
-        pong.value = ping.value + 1;
-      })
-    ).toThrow(/cycle/);
+        ping.value = pong.value + 1;
+      });
+      expect(() =>
+        effect(() => {
+          pong.value = ping.value + 1;
+        })
+      ).toThrow(/cycle/);
+      return dispose;
+    });
 
     stop();
 
