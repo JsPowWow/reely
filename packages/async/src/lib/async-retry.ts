@@ -121,7 +121,8 @@ export async function retry<T>(fn: RetryTask<T>, options: RetryOptions = {}): Pr
         throw signal.reason;
       }
       const failure = toErrorWithMessage(error);
-      if (attempt >= retries || !shouldRetry(failure, attempt)) {
+      const retriesLeft = attempt < retries;
+      if (!retriesLeft || !shouldRetry(failure, attempt)) {
         throw error;
       }
       onRetry?.(failure, attempt, currentDelay);

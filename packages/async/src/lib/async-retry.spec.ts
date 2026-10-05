@@ -80,6 +80,7 @@ describe('async-retry', () => {
       { retries: -1, attempts: 1 },
       { retries: 0.5, attempts: 2 },
       { retries: 1.5, attempts: 3 },
+      { retries: Number.NaN, attempts: 1 },
     ])('stops after $attempts attempts for $retries retries', async ({ retries, attempts }) => {
       const task = vi.fn().mockRejectedValue(new Error('offline'));
       const promise = retry(task, { retries, delay: 10 });
