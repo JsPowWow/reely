@@ -1,6 +1,21 @@
-/* The game takes the wider column of the opening band: it is the page's demo and its point. */
+/* The game takes the wider column of the opening band, near the top: it is the page's demo and its point.
+   Stacked, it comes right after the title, before the credits. */
 .start {
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  grid-template: 'intro play' auto 'about play' 1fr / minmax(0, 5fr) minmax(0, 7fr);
+  padding-top: clamp(1.5rem, 4vw, 3rem);
+}
+
+.intro {
+  grid-area: intro;
+}
+
+.play {
+  grid-area: play;
+}
+
+.about {
+  grid-area: about;
+  align-content: start;
 }
 
 .credits {
@@ -29,6 +44,14 @@
 
 @media (max-width: 68.75em) {
   .start {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template: 'intro' 'play' 'about' / minmax(0, 1fr);
+    row-gap: 1.5rem;
   }
+}
+
+/* A keyword named in a figure's label is code, set as code. */
+.keyword {
+  color: var(--asphalt);
+  font-family: var(--mono);
+  font-size: 0.9em;
 }

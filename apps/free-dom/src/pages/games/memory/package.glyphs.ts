@@ -2,14 +2,17 @@ import { circle, ellipse, line, path, polyline, rect, svg } from '@reely/dommy';
 
 import type { SitePackage } from '../../../site/site.packages';
 
-// a picture of what each package does, drawn on a 24-unit grid in one 2-unit stroke
+// a picture of what each package does, drawn on a 24-unit grid in one 2-unit
+// stroke
 const shapes = {
   basics: (): SVGElement[] => [
     rect({ x: 3, y: 13, width: 8, height: 8 }),
     rect({ x: 13, y: 13, width: 8, height: 8 }),
     rect({ x: 8, y: 3, width: 8, height: 8 }),
   ],
-  signals: (): SVGElement[] => [polyline({ points: '2 12 7 12 10 4 14 20 17 12 22 12' })],
+  signals: (): SVGElement[] => [
+    polyline({ points: '2 12 7 12 10 4 14 20 17 12 22 12' }),
+  ],
   router: (): SVGElement[] => [
     path({ d: 'M6 21V3' }),
     path({ d: 'M6 14c0-4 3-6 7-6h7' }),
@@ -57,7 +60,10 @@ const shapes = {
     line({ x1: 8, y1: 12, x2: 16, y2: 12 }),
     line({ x1: 8, y1: 17, x2: 13, y2: 17 }),
   ],
-  async: (): SVGElement[] => [circle({ cx: 12, cy: 12, r: 9 }), polyline({ points: '12 7 12 12 15.5 14' })],
+  async: (): SVGElement[] => [
+    circle({ cx: 12, cy: 12, r: 9 }),
+    polyline({ points: '12 7 12 12 15.5 14' }),
+  ],
   colors: (): SVGElement[] => [
     circle({ cx: 9, cy: 9, r: 5 }),
     circle({ cx: 15, cy: 9, r: 5 }),
@@ -70,7 +76,10 @@ const shapes = {
   ],
 } satisfies Record<SitePackage, () => SVGElement[]>;
 
-/** The picture on the face of a package's card; decorative, since the card names the package. */
+/**
+ * The picture on the face of a package's card; decorative, since the card names
+ * the package.
+ */
 export const packageGlyph = (name: SitePackage): SVGSVGElement =>
   svg(
     {

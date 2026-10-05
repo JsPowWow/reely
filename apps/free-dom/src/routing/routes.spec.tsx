@@ -2,6 +2,7 @@ import { mount } from '@reely/dommy';
 import { isNil } from '@reely/utils';
 
 import { siteRoutes } from './routes';
+import { stubDialogs } from '../testing/dom.testing';
 
 const renderAt = async (pathname: string): Promise<Element> => {
   const page = await siteRoutes(pathname);
@@ -17,6 +18,7 @@ const headingAt = async (pathname: string): Promise<string | null | undefined> =
   (await renderAt(pathname)).querySelector('h1')?.textContent;
 
 describe('routes', () => {
+  beforeAll(stubDialogs);
   it('opens the home page, the way into every package, at the root', async () => {
     expect(await headingAt('/')).toBe('reely — small TypeScript packages, no dependencies');
   });

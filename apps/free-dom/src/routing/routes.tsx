@@ -6,6 +6,7 @@ import { NotFoundPage } from '../site/not-found.page';
 import { pagedPackageOf } from '../site/site.packages';
 import { sitePaths } from '../site/site.paths';
 
+// the home page comes with the site; every other page is its own chunk, loaded when first opened
 export const siteRoutes = defineRoutes({
   [sitePaths.home]: () => HomePage,
   [sitePaths.dommy]: () => dommyChunk(({ DommyPage }) => <DommyPage />),

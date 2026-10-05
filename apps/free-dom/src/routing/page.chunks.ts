@@ -1,6 +1,6 @@
 import type { Page } from '@reely/dommy/router';
 
-// the home page comes with the site; every other page is its own chunk, loaded when first opened
+/** A page of the site in its own chunk, loaded when first opened. */
 const chunk =
   <M>(load: () => Promise<M>) =>
   (render: (module: M) => Node): Promise<Page> =>

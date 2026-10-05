@@ -1,4 +1,9 @@
-import { formatDay, isMemoryResults, postResult } from './memory.leaderboard';
+import {
+  createLeaderboard,
+  formatDay,
+  isMemoryResults,
+  postResult,
+} from './memory.leaderboard';
 
 import type { MemoryResult } from './memory.leaderboard';
 
@@ -22,7 +27,10 @@ describe('memory leaderboard', () => {
   });
 
   it('keeps the ten best, and gives a result outside them no place', () => {
-    const full = Array.from({ length: 10 }, (_item, index) => ({ moves: 8 + index, at: day('2026-10-01') }));
+    const full = Array.from({ length: 10 }, (_item, index) => ({
+      moves: 8 + index,
+      at: day('2026-10-01'),
+    }));
 
     const worse = postResult(full, { moves: 30, at: day('2026-10-05') });
     const better = postResult(full, { moves: 8, at: day('2026-10-05') });
@@ -58,5 +66,46 @@ describe('memory leaderboard', () => {
     { stored: null, valid: false },
   ])('takes $stored back from storage: $valid', ({ stored, valid }) => {
     expect(isMemoryResults(stored)).toBe(valid);
+  });
+
+  it('reads the board kept in storage, and writes it back on every change', () => {
+    const items = new Map([
+      ['reely.memory.leaderboard', JSON.stringify([{ moves: 9, at: 1 }])],
+    ]);
+    const storage = {
+      getItem: (key: string) => items.get(key) ?? null,
+      setItem: (key: string, value: string) => void items.set(key, value),
+    };
+
+    const leaderboard = createLeaderboard(storage);
+    leaderboard.set(({ board }) => postResult(board, { moves: 8, at: 2 }));
+
+    expect(leaderboard.value).toEqual({
+      board: [
+        { moves: 8, at: 2 },
+        { moves: 9, at: 1 },
+      ],
+      place: 1,
+    });
+    expect(items.get('reely.memory.leaderboard')).toBe(
+      JSON.stringify([
+        { moves: 8, at: 2 },
+        { moves: 9, at: 1 },
+      ])
+    );
+  });
+
+  it('starts empty from a broken record, and keeps working when storage throws', () => {
+    const failing = {
+      getItem: (): string => '{ not json',
+      setItem: (): void => {
+        throw new Error('QuotaExceededError');
+      },
+    };
+
+    const leaderboard = createLeaderboard(failing);
+    leaderboard.set(({ board }) => postResult(board, { moves: 8, at: 2 }));
+
+    expect(leaderboard.value.board).toEqual([{ moves: 8, at: 2 }]);
   });
 });

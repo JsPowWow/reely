@@ -111,3 +111,16 @@
     animation-duration: 1ms;
   }
 }
+
+/* Too narrow for one row: the wordmark and the languages share the first, the sections take the second. */
+@media (max-width: 36em) {
+  .nav {
+    order: 1;
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  .languages {
+    margin-left: auto;
+  }
+}

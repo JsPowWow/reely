@@ -47,3 +47,15 @@ export const mounted = (view: () => Node): Mounted => {
 
 /** Waits for the mutation observers to report what has been written so far. */
 export const flushMutations = (): Promise<void> => new Promise((resolve) => setTimeout(resolve));
+
+/** jsdom has no modal dialogs: they open and close as a browser would, without the top layer. */
+export const stubDialogs = (): void => {
+  HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement): void {
+    this.open = true;
+  };
+  HTMLDialogElement.prototype.close = function (this: HTMLDialogElement): void {
+    const wasOpen = this.open;
+    this.open = false;
+    wasOpen && this.dispatchEvent(new Event('close'));
+  };
+};

@@ -3,6 +3,7 @@ import type { Nullable } from '@reely/utils';
 import { isNil } from '@reely/utils';
 
 import { demoText } from './demo.text';
+import { lineText } from '../highlight/source.regions';
 
 import css from './demo.module.css';
 
@@ -62,8 +63,6 @@ interface SourceViewProps {
   previous?: Nullable<SourceLines>;
 }
 
-const toText = (line: readonly SourceToken[]): string => line.map((token) => token.content).join('');
-
 const renderToken = ({ content, color }: SourceToken): HTMLSpanElement =>
   span(isNil(color) ? null : { styles: { color } }, content);
 
@@ -74,10 +73,10 @@ export const SourceView = ({ source, caption, previous }: SourceViewProps): HTML
   // ids unique per view, for the listing's accessible name
   const titleId = `source-title-${++sourceViews}`;
   const captionId = `source-caption-${sourceViews}`;
-  const lines = source.map(toText);
+  const lines = source.map(lineText);
   const inserted = isNil(previous)
     ? lines.map(() => false)
-    : markBlankLines(lines, markInsertedLines(previous.map(toText), lines));
+    : markBlankLines(lines, markInsertedLines(previous.map(lineText), lines));
   return div(
     { className: css.sourcePanel },
     p(

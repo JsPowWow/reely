@@ -1,7 +1,7 @@
 /* The memory game on the timing screen: graphite backs, white faces, found pairs posted in signal. */
 .game {
   display: grid;
-  max-width: 30rem;
+  max-width: 28rem;
   margin: 0 auto;
   color: var(--graphite);
 }
@@ -16,7 +16,7 @@
 
 .counters {
   display: flex;
-  gap: 1.75rem;
+  gap: 1.25rem;
   margin: 0;
 }
 
@@ -37,7 +37,7 @@
   min-width: 2.5ch;
   margin: 0;
   font-family: var(--display);
-  font-size: 2.75rem;
+  font-size: 2.25rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -144,7 +144,7 @@
 }
 
 .card[data-side='down']:hover .back::before {
-  border-color: var(--signal);
+  border-color: var(--code-text);
 }
 
 .face {
@@ -250,6 +250,22 @@
   line-height: 1;
 }
 
+/* The win's moves and its place on the leaderboard, posted side by side. */
+.score {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.ranked {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  color: var(--slate);
+}
+
 .note {
   margin: 0;
   color: var(--slate);
@@ -285,31 +301,68 @@
   text-align: right;
 }
 
-.results td:nth-child(2) {
+.results td:nth-child(2),
+.results td:nth-child(3) {
   font-family: var(--display);
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 800;
   line-height: 1;
 }
 
-.results tr[aria-current='true'] td {
-  font-weight: 700;
+.results td:nth-child(3) {
+  font-size: 1.0625rem;
 }
 
+.results tr[aria-current='true'] td {
+  background: var(--asphalt);
+}
+
+/* A place plate: square-edged, graphite, the leader's in signal. */
 .place {
   display: inline-grid;
   place-items: center;
   width: 2.5rem;
-  height: 2rem;
-  border-radius: 4px;
+  height: 2.25rem;
   background: var(--graphite);
   color: var(--asphalt);
   font-family: var(--display);
-  font-size: 1.25rem;
+  font-size: 1.75rem;
   font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
+.place[data-place='1'],
 .results tbody tr:first-child .place {
   background: var(--signal);
   color: var(--graphite);
+}
+
+/* The way into the code: a quiet disclosure under the board, its summary underlined while it is open. */
+.code {
+  margin-top: 1rem;
+}
+
+.codeToggle {
+  display: inline-block;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid var(--line);
+  color: var(--slate);
+  font-weight: 700;
+  list-style: none;
+  cursor: pointer;
+}
+
+.codeToggle::-webkit-details-marker {
+  display: none;
+}
+
+.codeToggle:hover,
+.code[open] > .codeToggle {
+  border-bottom-color: var(--signal-ink);
+  color: var(--graphite);
+}
+
+.code[open] > .codeToggle {
+  margin-bottom: 0.75rem;
 }

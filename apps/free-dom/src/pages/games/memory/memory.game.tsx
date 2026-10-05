@@ -1,22 +1,19 @@
-import { batch, computed, effect, For, Keyed, Show, signal } from '@reely/dommy';
-import { later, persisted } from '@reely/dommy-kit';
+import { Keyed, onCleanup, signal } from '@reely/dommy';
 
-import { formatDay, isMemoryResults, postResult } from './memory.leaderboard';
-import { cardAt, dealGame, isLocked, isWon, turnBack, turnCard } from './memory.rules';
-import { Modal } from './modal';
-import { packageGlyph } from './package.glyphs';
+import { MemoryCard } from './memory.card';
+import { BestTen, Victory } from './memory.dialogs';
+import { memoryMachine } from './memory.machine';
+import { MomentCode, momentOf, moments, refused } from './memory.moments';
+import { cardAt, dealGame, isLocked } from './memory.rules';
+import { following, ownedLater } from './memory.wiring';
 import { sitePackages } from '../../../site/site.packages';
 
 import css from './memory.module.css';
 
-import type { MemoryResult } from './memory.leaderboard';
-import type { CardSide, MemoryGame as Game, RandomSource } from './memory.rules';
-import type { SitePackage } from '../../../site/site.packages';
+import type { CodeMoment } from './memory.moments';
+import type { RandomSource } from './memory.rules';
 
 const pairs = 8;
-
-/** How long a wrong pair stays up before it turns back, in ms. */
-export const turnBackAfter = 1000;
 
 interface MemoryGameProps {
   random?: RandomSource;
@@ -25,98 +22,49 @@ interface MemoryGameProps {
   storage?: Pick<Storage, 'getItem' | 'setItem'>;
 }
 
-const CardFace = ({ face }: { face: SitePackage }): Node => (
-  <span className={css.face} aria={{ ariaHidden: 'true' }}>
-    {packageGlyph(face)}
-    <span className={css.scope}>@reely/</span>
-    <span className={css.name}>{face}</span>
-  </span>
-);
-
-const sideLabels = {
-  down: (place: number): string => `Card ${place + 1}, face down`,
-  up: (place: number, face: string): string => `Card ${place + 1}, ${face}`,
-  found: (place: number, face: string): string => `Card ${place + 1}, ${face}, found`,
-} satisfies Record<CardSide, (place: number, face: string) => string>;
-
-const plural = (count: number, one: string): string => `${count} ${one}${count === 1 ? '' : 's'}`;
-
-/** Sixteen cards of eight reely packages: find the pairs in as few moves as you can. */
-export const MemoryGame = ({ random = Math.random, now = Date.now, storage }: MemoryGameProps = {}): Node => {
-  const deal = (): Game<SitePackage> => dealGame(sitePackages, pairs, random);
-  const game = signal(deal());
-  const status = signal('Turn a card.');
-  const leaderboard = persisted<MemoryResult[]>('reely.memory.leaderboard', [], { storage, is: isMemoryResults });
-  const lastWin = signal<{ result: MemoryResult; place: number | undefined } | undefined>(undefined);
-  const victoryOpen = signal(false);
-  const leaderboardOpen = signal(false);
-
-  // a new move or a new game first cancels the timer of the wrong pair before it
-  effect(() => {
-    if (isLocked(game.value)) {
-      later(turnBackAfter, () => game.update(turnBack));
-    }
+/**
+ * Sixteen cards of eight reely packages: find the pairs in as few moves as you
+ * can. A state machine moves the game on, stores hold the table and the best
+ * ten, and signals bound to the DOM draw what the stores hold.
+ */
+export const MemoryGame = ({
+  random = Math.random,
+  now = Date.now,
+  storage,
+}: MemoryGameProps = {}): Node => {
+  const game = memoryMachine({
+    deal: () => dealGame(sitePackages, pairs, random),
+    now,
+    later: ownedLater(),
+    storage,
   });
-
-  const turn = (place: number): void => {
-    const before = game.peek();
-    const after = turnCard(before, place);
-    if (after === before) {
-      return;
-    }
-    const face = after.deck[place] ?? '';
-    batch(() => {
-      game.value = after;
-      if (isWon(after)) {
-        const result = { moves: after.moves, at: now() };
-        const posted = postResult(leaderboard.peek(), result);
-        leaderboard.value = posted.board;
-        lastWin.value = { result, place: posted.place };
-        status.value = `All ${pairs} pairs found in ${plural(after.moves, 'move')}.`;
-        victoryOpen.value = true;
-      } else if (after.found.length > before.found.length) {
-        status.value = `A pair of ${face}.`;
-      } else if (isLocked(after)) {
-        status.value = `${after.open.map((open) => after.deck[open]).join(' and ')} do not match.`;
-      } else {
-        status.value = `${face}: now find its pair.`;
-      }
-    });
-  };
-
-  const newGame = (): void =>
-    batch(() => {
-      game.value = deal();
-      status.value = 'Turn a card.';
-      victoryOpen.value = false;
-    });
-
+  const table = following(game.context.table);
+  const leaderboard = following(game.context.leaderboard);
   // the deck changes only with a new game, which lays out new cards
-  const deck = computed(() => game.value.deck);
+  const deck = following(game.context.table.select(({ deck: cards }) => cards));
 
-  const Card = ({ place, face }: { place: number; face: SitePackage }): Node => {
-    const side = computed(() => cardAt(game.value, place));
-    return (
-      <li>
-        <button
-          type='button'
-          className={css.card}
-          data-side={side}
-          aria={{
-            ariaLabel: () => sideLabels[side.value](place, face),
-            ariaDisabled: () => String(side.value !== 'down'),
-          }}
-          onClick={() => turn(place)}
-        >
-          <span className={css.turn}>
-            <span className={css.back} aria={{ ariaHidden: 'true' }}>
-              r
-            </span>
-            <CardFace face={face} />
-          </span>
-        </button>
-      </li>
-    );
+  const status = signal(moments.deal.status(table.value));
+  const code = signal<CodeMoment>(moments.deal);
+  const victoryOpen = signal(false);
+  const bestTenOpen = signal(false);
+
+  onCleanup(
+    game.on('stateChanged', (change) => {
+      const moment = momentOf(change);
+      status.value = moment.status(change.context.table.value);
+      code.value = moment;
+      victoryOpen.value = change.to === 'won';
+    })
+  );
+
+  // a card never asks whether it may turn: the machine refuses what the rules
+  // do not allow, and the code panel shows where
+  const turn = (place: number): void => {
+    game.send('turn', place).status === 'refused' &&
+      code.set(refused(game.state));
+  };
+  const newGame = (): void => {
+    game.send('deal');
   };
 
   return (
@@ -125,18 +73,18 @@ export const MemoryGame = ({ random = Math.random, now = Date.now, storage }: Me
         <dl className={css.counters}>
           <div>
             <dt>Moves</dt>
-            <dd>{() => game.value.moves}</dd>
+            <dd>{() => table.value.moves}</dd>
           </div>
           <div>
             <dt>Pairs</dt>
-            <dd>{() => `${game.value.found.length}/${pairs}`}</dd>
+            <dd>{() => `${table.value.found.length}/${pairs}`}</dd>
           </div>
         </dl>
         <div className={css.controls}>
           <button type='button' className={css.solid} onClick={newGame}>
             New game
           </button>
-          <button type='button' onClick={() => leaderboardOpen.set(true)}>
+          <button type='button' onClick={() => bestTenOpen.set(true)}>
             Leaderboard
           </button>
         </div>
@@ -146,67 +94,32 @@ export const MemoryGame = ({ random = Math.random, now = Date.now, storage }: Me
       </p>
       <Keyed value={deck}>
         {(cards) => (
-          <ul className={css.board} aria={{ ariaLabel: 'Cards', ariaBusy: () => String(isLocked(game.value)) }}>
+          <ul
+            className={css.board}
+            aria={{
+              ariaLabel: 'Cards',
+              ariaBusy: () => String(isLocked(table.value)),
+            }}
+          >
             {cards.map((face, place) => (
-              <Card place={place} face={face} />
+              <MemoryCard
+                place={place}
+                face={face}
+                side={() => cardAt(table.value, place)}
+                onTurn={turn}
+              />
             ))}
           </ul>
         )}
       </Keyed>
-      <Modal open={victoryOpen} title={`All ${pairs} pairs found`}>
-        <p className={css.posted}>{() => plural(lastWin.value?.result.moves ?? 0, 'move')}</p>
-        <p className={css.note}>
-          {() => {
-            const place = lastWin.value?.place;
-            return place === undefined ? 'Not in the best ten this time.' : `Number ${place} on the leaderboard.`;
-          }}
-        </p>
-        <div className={css.actions}>
-          <button type='button' className={css.solid} onClick={newGame}>
-            New game
-          </button>
-          <button type='button' onClick={() => victoryOpen.set(false)}>
-            Close
-          </button>
-        </div>
-      </Modal>
-      <Modal open={leaderboardOpen} title='Leaderboard'>
-        <Show
-          when={() => leaderboard.value.length > 0}
-          fallback={() => <p className={css.note}>No wins yet. Find all eight pairs to post the first.</p>}
-        >
-          {() => (
-            <table className={css.results}>
-              <caption className='visually-hidden'>The best ten wins, fewest moves first</caption>
-              <thead>
-                <tr>
-                  <th scope='col'>Place</th>
-                  <th scope='col'>Moves</th>
-                  <th scope='col'>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                <For each={leaderboard} by={(result) => `${result.at}:${result.moves}`}>
-                  {(result, index) => (
-                    <tr aria={{ ariaCurrent: () => String(result().at === lastWin.value?.result.at) }}>
-                      <td>
-                        <span className={css.place}>{() => index() + 1}</span>
-                      </td>
-                      <td>{() => result().moves}</td>
-                      <td>{() => formatDay(result().at)}</td>
-                    </tr>
-                  )}
-                </For>
-              </tbody>
-            </table>
-          )}
-        </Show>
-        <div className={css.actions}>
-          <button type='button' onClick={() => leaderboardOpen.set(false)}>
-            Close
-          </button>
-        </div>
-      </Modal>
+      <MomentCode moment={code} />
+      <Victory
+        open={victoryOpen}
+        moves={() => table.value.moves}
+        leaderboard={() => leaderboard.value}
+        onNewGame={newGame}
+      />
+      <BestTen open={bestTenOpen} leaderboard={() => leaderboard.value} />
     </div>
   );
 };
