@@ -21,6 +21,7 @@ interface MemoryCardProps {
   onTurn: (place: number) => void;
 }
 
+// #region card
 /**
  * A card: a button that turns over in place; only its side and its name for a
  * screen reader are bound.
@@ -59,3 +60,4 @@ export const MemoryCard = ({
     </li>
   );
 };
+// #endregion

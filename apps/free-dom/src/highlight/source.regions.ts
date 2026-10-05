@@ -3,13 +3,12 @@ import type { SourceLines, SourceToken } from './source.types';
 /** The text of a source line, without its colors. */
 export const lineText = (line: readonly SourceToken[]): string => line.map((token) => token.content).join('');
 
-const regionStart = (name: string): string => `// #region ${name}`;
-const regionEnd = '// #endregion';
+// a marker is a comment of its own line, `// #region name` or, in CSS,
+// `/* #region name */`; it ends at the next `#endregion`
+const markerOf = (line: readonly SourceToken[]): string | undefined =>
+  /^(?:\/\/|\/\*) (#region \S+|#endregion)(?: \*\/)?$/.exec(lineText(line).trim())?.[1];
 
-const isMarker = (line: readonly SourceToken[]): boolean => {
-  const text = lineText(line).trim();
-  return text.startsWith('// #region ') || text === regionEnd;
-};
+const isMarker = (line: readonly SourceToken[]): boolean => markerOf(line) !== undefined;
 
 const indentOf = (text: string): number => text.length - text.trimStart().length;
 
@@ -24,13 +23,13 @@ const dedent = (line: readonly SourceToken[], width: number): SourceToken[] => {
   });
 };
 
-/** The lines between `// #region <name>` and the next `// #endregion`, with the indent they share taken off. */
+/** The lines between a region's markers, with the indent they share taken off. */
 export const sourceRegion = (source: SourceLines, name: string): SourceLines => {
-  const start = source.findIndex((line) => lineText(line).trim() === regionStart(name));
+  const start = source.findIndex((line) => markerOf(line) === `#region ${name}`);
   if (start === -1) {
     return [];
   }
-  const length = source.slice(start + 1).findIndex((line) => lineText(line).trim() === regionEnd);
+  const length = source.slice(start + 1).findIndex((line) => markerOf(line) === '#endregion');
   const region = source.slice(start + 1, length === -1 ? undefined : start + 1 + length);
   const indents = region
     .map(lineText)

@@ -3,7 +3,6 @@ import type { ReelyNode, Signal } from '@reely/dommy';
 import type { StateMachineChange } from '@reely/state-machine';
 
 import { SourceView } from '../../../demo/source.view';
-import { sourceRegion } from '../../../highlight/source.regions';
 import { pluralOf } from '../../../i18n/plural';
 
 import css from './memory.module.css';
@@ -105,13 +104,13 @@ export const MomentCode = ({
             fallback={() => <p className={css.note}>Loading the code…</p>}
             catch={() => <p className={css.note}>The code failed to load.</p>}
           >
-            {({ machineSource }) => (
+            {({ snippet }) => (
               <Keyed value={moment}>
                 {({ region, caption }) => (
                   <>
                     <p className={css.said}>{withCode(caption)}</p>
                     <SourceView
-                      source={sourceRegion(machineSource, region)}
+                      source={snippet('memory.machine.ts', region)}
                       caption='memory.machine.ts'
                     />
                   </>

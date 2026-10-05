@@ -1,22 +1,17 @@
-import { Await, effect, signal } from '@reely/dommy';
+import { effect, signal } from '@reely/dommy';
 
 import { gamesText, memoryPackages } from './games.text';
 import { MemoryGame } from './memory/memory.game';
+import { MemoryStory } from './memory.story';
 import { MutationMeter } from '../../demo/mutation.meter';
-import { SourceView } from '../../demo/source.view';
 import band from '../../site/band.module.css';
-import exampleCss from '../../site/example.module.css';
 import { describePage } from '../../site/page.description';
 import { SiteHeader } from '../../site/site.header';
 import { packageHref } from '../../site/site.paths';
 
 import css from './games.module.css';
 
-import type { MemoryModule } from './memory/memory.sources';
-
-const modules: readonly MemoryModule[] = ['machine', 'game', 'leaderboard', 'rules', 'moments', 'modal'];
-
-/** The memory game, played on a live write board, then the modules that run it. */
+/** The memory game, played on a live write board, then the story of how it is built. */
 export const MemoryPage = (): Node => {
   // the game plays at once; its highlighted sources, most of the page's weight, follow in a chunk of their own
   const sources = import('./memory/memory.sources');
@@ -67,25 +62,7 @@ export const MemoryPage = (): Node => {
             <p className={band.builtWith}>{() => gamesText().builtWith}</p>
           </div>
         </section>
-        {modules.map((id) => (
-          <section id={id} className={exampleCss.example} aria={{ ariaLabelledby: `${id}-title` }}>
-            <header className={exampleCss.exampleHeading}>
-              <h2 id={`${id}-title`} className={exampleCss.exampleTitle}>
-                {() => gamesText().modules[id].title}
-              </h2>
-              <p className={exampleCss.claim}>{() => gamesText().modules[id].claim}</p>
-            </header>
-            <Await
-              promise={sources}
-              fallback={() => <p className={exampleCss.claim}>{() => gamesText().loadingSource}</p>}
-              catch={() => <p className={exampleCss.claim}>{() => gamesText().sourceFailed}</p>}
-            >
-              {({ memoryListings }) => (
-                <SourceView source={memoryListings[id].source} caption={memoryListings[id].file} />
-              )}
-            </Await>
-          </section>
-        ))}
+        <MemoryStory sources={sources} />
       </main>
     </>
   );

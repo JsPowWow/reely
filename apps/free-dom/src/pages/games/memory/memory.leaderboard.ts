@@ -32,6 +32,7 @@ export interface Leaderboard {
   readonly place: number | undefined;
 }
 
+// #region rank
 /** The board with `result` posted, kept to the best ten, and its place. */
 export const postResult = (
   board: readonly MemoryResult[],
@@ -43,6 +44,7 @@ export const postResult = (
   const place = ranked.indexOf(result) + 1;
   return { board: ranked, place: place === 0 ? undefined : place };
 };
+// #endregion
 
 // a German day is written DD.MM.YYYY, as the leaderboard wants it
 const dayFormat = new Intl.DateTimeFormat('de-DE', {
@@ -83,6 +85,7 @@ const load = (storage: Pick<Storage, 'getItem'>): MemoryResult[] =>
  * change of its board. A storage that is missing or throws (a private window, a
  * full quota) leaves it working for this page only.
  */
+// #region store
 export const createLeaderboard = (
   storage?: Pick<Storage, 'getItem' | 'setItem'>
 ): ObjectStore<Leaderboard> => {
@@ -97,3 +100,4 @@ export const createLeaderboard = (
     );
   return leaderboard;
 };
+// #endregion

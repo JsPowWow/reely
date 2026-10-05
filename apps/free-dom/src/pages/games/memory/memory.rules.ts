@@ -4,6 +4,7 @@ import { Maybe } from '@reely/utils';
  * A game of memory: the deck as laid out, the cards turned up and not yet
  * matched, the faces found.
  */
+// #region state
 export interface MemoryState<Face extends string = string> {
   readonly deck: readonly Face[];
   /**
@@ -15,12 +16,14 @@ export interface MemoryState<Face extends string = string> {
   /** One per pair of cards turned up, whether they match or not. */
   readonly moves: number;
 }
+// #endregion
 
 export type CardSide = 'down' | 'up' | 'found';
 
 /** A random number in [0, 1), as `Math.random` gives it. */
 export type RandomSource = () => number;
 
+// #region shuffle
 // Fisher and Yates' own method: each card is drawn from those still left, so
 // every order is equally likely
 const shuffled = <Face extends string>(
@@ -32,6 +35,7 @@ const shuffled = <Face extends string>(
     left.splice(Math.floor(random() * left.length), 1)
   );
 };
+// #endregion
 
 /** Picks `pairs` of the faces and lays each out twice, face down. */
 export const dealGame = <Face extends string>(
@@ -63,6 +67,7 @@ export const isLocked = (game: MemoryState): boolean => game.open.length === 2;
 export const isWon = (game: MemoryState): boolean =>
   game.deck.length > 0 && game.found.length * 2 === game.deck.length;
 
+// #region turn-card
 /** A card turns when it lies face down and no wrong pair is waiting. */
 export const canTurn = (game: MemoryState, place: number): boolean =>
   !isLocked(game) &&
@@ -97,6 +102,7 @@ export const turnCard = <Face extends string>(
         () => ({ ...game, open: [place] })
       )
     : game;
+// #endregion
 
 export const turnBack = <Face extends string>(
   game: MemoryState<Face>

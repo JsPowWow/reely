@@ -27,6 +27,7 @@ export const Modal = ({
     {
       className: css.modal,
       aria: { ariaLabel: title },
+      // #region dialog
       // Escape closes the dialog natively; the signal follows
       onClose: () => open.set(false),
       // the dialog has no padding, so a click on the dialog itself landed on
@@ -43,5 +44,6 @@ export const Modal = ({
     box.open || box.showModal();
   };
   effect(() => (open.value ? show() : box.close()));
+  // #endregion
   return box;
 };

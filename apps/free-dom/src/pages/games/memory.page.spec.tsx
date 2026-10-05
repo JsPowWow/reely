@@ -1,6 +1,5 @@
-import { memoryBranches, memoryListings } from './memory/memory.sources';
+import { memoryBranches } from './memory/memory.sources';
 import { MemoryPage } from './memory.page';
-import { lineText } from '../../highlight/source.regions';
 import { chooseLocale } from '../../i18n/locale';
 import { textsLoaded } from '../../i18n/localized';
 import { mounted, stubDialogs } from '../../testing/dom.testing';
@@ -24,45 +23,41 @@ describe('memory page', () => {
     pages.splice(0).forEach((page) => page.dispose());
   });
 
-  it('opens on the game under its write board, then shows the modules that run it', async () => {
+  it('opens on the game under its write board, then tells how it is built', async () => {
     const page = open();
 
     expect(document.title).toBe('Memory game without one if | reely');
     expect(document.head.querySelector('meta[name="description"]')?.getAttribute('content')).toMatch(/^A memory game/);
     expect(page.host.querySelector('header a[href="/games/memory"]')?.getAttribute('aria-current')).toBe('true');
     expect(page.host.querySelectorAll('figure ul button')).toHaveLength(16);
-    expect(texts(page.host, 'main section > header h2')).toEqual([
-      'A state machine moves the game on',
-      'Stores hold it, signals draw it',
-      'The best ten',
-      'The rules, without a page',
-      'The code that just ran',
-      'One dialog for both',
-    ]);
-    expect(page.host.querySelectorAll('main > section > div[class*="sourcePanel"]')).toHaveLength(0);
-    await vi.dynamicImportSettled();
-    expect(texts(page.host, 'main > section > div[class*="sourcePanel"] p span:last-child')).toEqual([
-      'memory.machine.ts',
-      'memory.game.tsx',
-      'memory.leaderboard.ts',
-      'memory.rules.ts',
-      'memory.moments.tsx',
-      'modal.tsx',
+    expect(page.host.querySelector('article h2')?.textContent).toBe('How the game is built');
+    expect(texts(page.host, 'article section h3')).toEqual([
+      'Start with the rules, not the page',
+      'Four moments, one state machine',
+      'The machine keeps no time; the view does',
+      'Stores hold the game, signals draw it',
+      'A card binds two things, and CSS turns it',
+      'The best ten, saved by a listener',
+      'Use the dialog the browser already has',
+      'Proof, not a promise',
     ]);
     expect(
       Array.from(page.host.querySelectorAll('main > section:first-child li a'), (link) => link.getAttribute('href'))
     ).toEqual(['/state-machine', '/simple-store', '/signals', '/dommy', '/dommy-kit', '/logger']);
   });
 
-  it('posts the figures counted from the sources it shows, once they arrive: not one if', async () => {
+  it('quotes real code in every snippet once the sources arrive, and posts not one if', async () => {
     const page = open();
-    const shown = Object.values(memoryListings).flatMap(({ source }) => source.map(lineText));
     expect(texts(page.host, 'main dl dd')[0]).toBe('– if');
+    expect(page.host.querySelectorAll('article pre')).toHaveLength(0);
 
     await vi.dynamicImportSettled();
 
+    const panes = Array.from(page.host.querySelectorAll('article pre'));
+    expect(panes).toHaveLength(16);
+    expect(panes.filter((pane) => (pane.textContent ?? '').trim().length < 40)).toEqual([]);
+    expect(panes.some((pane) => /#(end)?region/.test(pane.textContent ?? ''))).toBe(false);
     expect(memoryBranches).toBe(0);
-    expect(shown.some((line) => /\bif\s*\(|\bswitch\s*\(/.test(line))).toBe(false);
     expect(texts(page.host, 'main dl dd')[0]).toBe('0 if');
   });
 
@@ -78,6 +73,9 @@ describe('memory page', () => {
     expect(page.host.querySelector('h1')?.textContent).toBe('Memory game');
     expect(page.host.querySelector('figure ul button')).toBe(first);
     expect(first?.dataset['side']).toBe('up');
+    expect(page.host.querySelector('article h2')?.textContent).toBe('Как устроена игра');
+    await vi.dynamicImportSettled();
+    expect(page.host.querySelectorAll('article pre')).toHaveLength(16);
   });
 
   it('keeps the best ten in localStorage, where a reload finds them', () => {

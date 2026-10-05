@@ -41,10 +41,12 @@ export const MemoryGame = ({
     now,
     storage,
   });
+  // #region stores
   const table = following(game.context.table);
   const leaderboard = following(game.context.leaderboard);
   // the deck changes only with a new game, which lays out new cards
   const cards = following(game.context.table.select(({ deck }) => deck));
+  // #endregion
 
   const phase = signal(game.state);
   const status = signal(moments.deal.status(table.value));
@@ -62,6 +64,7 @@ export const MemoryGame = ({
     })
   );
 
+  // #region timer
   // the machine keeps no time: a wrong pair turns back a second after it is
   // up; a new game, or the view going, cancels the timer with this effect run
   effect(
@@ -69,6 +72,7 @@ export const MemoryGame = ({
       phase.value === 'wrongPair' &&
       later(turnBackAfter, () => game.send('turnBack'))
   );
+  // #endregion
 
   // a card never asks whether it may turn: the machine refuses what the rules
   // do not allow, and the code panel shows where

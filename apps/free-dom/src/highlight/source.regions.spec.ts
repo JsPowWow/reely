@@ -24,6 +24,13 @@ describe('source regions', () => {
     expect(ready[0]).toEqual([{ content: 'ready', color: '#e4e7eb' }, { content: ': {' }]);
   });
 
+  it('reads the markers of CSS as well', () => {
+    const css = lines('.a {}', '/* #region flip */', '.turn {', '  transform: none;', '}', '/* #endregion */');
+
+    expect(texts(sourceRegion(css, 'flip'))).toEqual(['.turn {', '  transform: none;', '}']);
+    expect(texts(withoutRegions(css))).toEqual(['.a {}', '.turn {', '  transform: none;', '}']);
+  });
+
   it('gives nothing for a region the source does not mark', () => {
     expect(sourceRegion(source, 'won')).toEqual([]);
   });

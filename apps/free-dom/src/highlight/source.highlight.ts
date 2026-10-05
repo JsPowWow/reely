@@ -39,24 +39,49 @@ const theme: ThemeRegistration = {
 };
 
 /** Splits a source into lines of tokens colored with the reely theme. */
-export const highlightSource = async (code: string, lang: 'ts' | 'tsx'): Promise<SourceLines> => {
+export const highlightSource = async (code: string, lang: 'ts' | 'tsx' | 'css'): Promise<SourceLines> => {
   const { tokens } = await codeToTokens(code, { lang, theme });
   return tokens.map((line) => line.map(({ content, color }) => ({ content, color })));
 };
 
 const query = '?highlight';
 
+// a stylesheet's highlighted lines get an id of their own: one that ends in `.css`, or `.css?…`, goes down
+// Vite's and Vitest's CSS pipelines instead
+const cssSuffix = '.css.lines';
+
+const langOf = (file: string): 'ts' | 'tsx' | 'css' => {
+  const extension = file.slice(file.lastIndexOf('.') + 1);
+  return extension === 'tsx' || extension === 'css' ? extension : 'ts';
+};
+
+// the stylesheet behind its own id, or a module behind `?highlight`
+const sourceFile = (id: string): string | undefined => {
+  if (id.endsWith(cssSuffix)) {
+    return `${id.slice(0, -cssSuffix.length)}.css`;
+  }
+  return id.endsWith(query) ? id.slice(0, -query.length) : undefined;
+};
+
 /** Vite plugin: `./step.ts?highlight` is the source as highlighted lines, so the page ships no highlighter. */
 export const sourceHighlight = (): Plugin => ({
   name: 'free-dom:source-highlight',
-  async load(id): Promise<string | null> {
-    if (!id.endsWith(query)) {
+  enforce: 'pre',
+  async resolveId(source, importer): Promise<string | null> {
+    if (!source.endsWith(`.css${query}`)) {
       return null;
     }
-    const file = id.slice(0, -query.length);
+    const resolved = await this.resolve(source.slice(0, -query.length), importer, { skipSelf: true });
+    return resolved ? `${resolved.id.slice(0, -'.css'.length)}${cssSuffix}` : null;
+  },
+  async load(id): Promise<string | null> {
+    const file = sourceFile(id);
+    if (file === undefined) {
+      return null;
+    }
     this.addWatchFile(file);
     const code = (await readFile(file, 'utf8')).trimEnd();
-    const lines = await highlightSource(code, file.endsWith('.tsx') ? 'tsx' : 'ts');
+    const lines = await highlightSource(code, langOf(file));
     return `export default ${JSON.stringify(lines)};`;
   },
 });

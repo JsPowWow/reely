@@ -55,3 +55,93 @@
   font-size: 0.5em;
   font-weight: 400;
 }
+
+/* The story under the game: one reading column on asphalt, prose between the code it quotes. */
+.story {
+  --gutter: clamp(1rem, 4vw, 3rem);
+  display: grid;
+  justify-items: center;
+  padding: clamp(3rem, 7vw, 5.5rem) var(--gutter) clamp(4rem, 9vw, 7rem);
+}
+
+.story > * {
+  width: 100%;
+  max-width: 46rem;
+}
+
+.storyHeader {
+  display: grid;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.storyTitle {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.lede {
+  margin: 0;
+  color: var(--slate);
+  font-size: 1.1875rem;
+  line-height: 1.55;
+}
+
+.chapter {
+  padding-top: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+.chapterTitle {
+  margin: 0 0 1rem;
+  font-family: var(--display);
+  font-size: clamp(1.75rem, 3.2vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.chapter p,
+.ending {
+  max-width: 68ch;
+  margin: 0 0 1rem;
+  line-height: 1.65;
+}
+
+.chapter :is(p, .ending) code,
+.ending code,
+.lede code {
+  padding: 0.05em 0.3em;
+  border-radius: 3px;
+  background: var(--panel);
+  font-family: var(--mono);
+  font-size: 0.85em;
+}
+
+.chapter a,
+.ending a {
+  color: var(--graphite);
+  font-weight: 700;
+  text-decoration-color: var(--signal-ink);
+  text-underline-offset: 0.2em;
+}
+
+/* Code sits a step apart from the prose around it. */
+.snippet {
+  margin: 1.5rem 0 1.75rem;
+}
+
+.pending {
+  min-height: 6rem;
+  margin: 1.5rem 0;
+  color: var(--slate);
+}
+
+.ending {
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--line);
+  margin-top: 2.5rem;
+}
