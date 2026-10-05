@@ -41,7 +41,7 @@
 .cores thead th:last-child {
   color: var(--graphite);
   font-weight: 700;
-  box-shadow: inset 0 -3px var(--signal);
+  border-bottom: 3px solid var(--signal);
 }
 
 /* A row's name keeps a readable width; on a phone the figures scroll past it instead of squeezing it. */

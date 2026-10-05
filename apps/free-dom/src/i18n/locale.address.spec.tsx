@@ -1,4 +1,9 @@
+import { mount } from '@reely/dommy';
+import { defineRoutes, navigate, Router } from '@reely/dommy/router';
 import { withOwner } from '@reely/signals';
+
+import { chooseLocale, localeParam } from './locale';
+import { showLocaleInAddress } from './locale.address';
 
 import type * as LocaleModule from './locale';
 import type * as AddressModule from './locale.address';
@@ -28,6 +33,27 @@ describe('the language in the address', () => {
     chooseLocale('ru');
     expect(location.search).toBe('?sort=moves&lang=ru');
     expect(location.pathname).toBe('/games/memory');
+  });
+
+  it('names the language shown again on a page the reader comes back to', async () => {
+    vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+    chooseLocale('en');
+    history.replaceState(null, '', '/');
+    const routes = defineRoutes({ '/': () => () => 'Home', '/docs': () => () => 'Docs' });
+    const host = document.createElement('main');
+    const dispose = mount(host, () => {
+      showLocaleInAddress();
+      return <Router routes={routes} keep={[localeParam]} catch={() => <p>Lost</p>} />;
+    });
+    navigate('/docs');
+    await vi.waitFor(() => expect(host.textContent).toBe('Docs'));
+    chooseLocale('ru');
+
+    history.back();
+    await vi.waitFor(() => expect(host.textContent).toBe('Home'));
+
+    expect(location.search).toBe('?lang=ru');
+    dispose();
   });
 
   it('keeps the language a shared link names', async () => {

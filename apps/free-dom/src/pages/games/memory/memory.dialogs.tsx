@@ -7,12 +7,12 @@ import { Modal } from './modal';
 
 import css from './memory.module.css';
 
-import type { Leaderboard } from './memory.leaderboard';
+import type { MemoryResult } from './memory.leaderboard';
 
 interface VictoryProps {
   open: Signal<boolean>;
   moves: () => number;
-  leaderboard: () => Leaderboard;
+  place: () => number | undefined;
   onNewGame: VoidFunction;
 }
 
@@ -20,22 +20,22 @@ interface VictoryProps {
 export const Victory = ({
   open,
   moves,
-  leaderboard,
+  place,
   onNewGame,
 }: VictoryProps): Node => (
   <Modal open={open} title='All pairs found'>
     <div className={css.score}>
       <p className={css.posted}>{() => movesOf(moves())}</p>
       <Show
-        when={() => leaderboard().place}
+        when={place}
         fallback={() => (
           <p className={css.note}>Not in the best ten this time.</p>
         )}
       >
-        {(place) => (
+        {(posted) => (
           <p className={css.ranked}>
-            <span className={css.place} data-place={place}>
-              {place}
+            <span className={css.place} data-place={posted}>
+              {posted}
             </span>{' '}
             on the leaderboard
           </p>
@@ -55,14 +55,15 @@ export const Victory = ({
 
 interface BestTenProps {
   open: Signal<boolean>;
-  leaderboard: () => Leaderboard;
+  best: () => readonly MemoryResult[];
+  place: () => number | undefined;
 }
 
 /** The best ten as a timing sheet: the leader's plate in signal, by CSS. */
-export const BestTen = ({ open, leaderboard }: BestTenProps): Node => (
+export const BestTen = ({ open, best, place }: BestTenProps): Node => (
   <Modal open={open} title='Leaderboard'>
     <Show
-      when={() => leaderboard().board.length > 0}
+      when={() => best().length > 0}
       fallback={() => (
         <p className={css.note}>
           No wins yet. Find every pair to post the first.
@@ -82,15 +83,12 @@ export const BestTen = ({ open, leaderboard }: BestTenProps): Node => (
             </tr>
           </thead>
           <tbody>
-            <For
-              each={() => leaderboard().board}
-              by={({ at, moves }) => `${at}:${moves}`}
-            >
+            <For each={best} by={({ at, moves }) => `${at}:${moves}`}>
               {(result, index) => (
                 <tr
                   aria={{
                     ariaCurrent: () =>
-                      String(index() + 1 === leaderboard().place),
+                      index() + 1 === place() ? 'true' : undefined,
                   }}
                 >
                   <td>

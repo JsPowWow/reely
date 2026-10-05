@@ -10,7 +10,8 @@ const fresh = (): MemoryState => ({ deck, open: [], found: [], moves: 0 });
 
 const contextOf = (overrides: Partial<MemoryContext> = {}): MemoryContext => ({
   table: signal(fresh()),
-  leaderboard: signal({ board: [], place: undefined }),
+  best: signal([]),
+  place: signal(undefined),
   deal: fresh,
   now: () => 1_000,
   ...overrides,
@@ -79,17 +80,15 @@ describe('memory machine', () => {
 
     expect(game.state).toBe('won');
     expect(game.send('turn', 0).status).toBe('refused');
-    expect(context.leaderboard.value).toEqual({
-      board: [{ moves: 2, at: 1_000 }],
-      place: 1,
-    });
+    expect(context.best()).toEqual([{ moves: 2, at: 1_000 }]);
+    expect(context.place()).toBe(1);
   });
 
   it('holds its invariants under any order of fast clicks, new games and turn-backs', () => {
     let clock = 0;
     const six = (): MemoryState => ({ deck: ['a', 'b', 'c', 'a', 'b', 'c'], open: [], found: [], moves: 0 });
     const game = memoryMachine(contextOf({ table: signal(six()), deal: six, now: () => ++clock }));
-    const { table, leaderboard } = game.context;
+    const { table, best } = game.context;
     // a seeded pseudo-random walk, so a failure replays the same way
     let seed = 7;
     const next = (): number => {
@@ -114,6 +113,6 @@ describe('memory machine', () => {
       expect(moves).toBeGreaterThanOrEqual(found.length);
     }
     expect(wins).toBeGreaterThan(0);
-    expect(leaderboard.value.board.length).toBe(Math.min(wins, 10));
+    expect(best().length).toBe(Math.min(wins, 10));
   });
 });

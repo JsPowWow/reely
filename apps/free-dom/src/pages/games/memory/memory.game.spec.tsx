@@ -104,7 +104,7 @@ describe('memory game', () => {
     expect(victory?.open).toBe(true);
     expect(victory?.textContent).toContain('9 moves');
     expect(victory?.textContent).toContain('1 on the leaderboard');
-    expect(JSON.parse(storage.items.get('reely.memory.leaderboard') ?? '').board).toEqual([
+    expect(JSON.parse(storage.items.get('reely.memory.leaderboard') ?? '')).toEqual([
       { moves: 9, at: new Date('2026-10-05T12:00:00').getTime() },
     ]);
   });
@@ -161,12 +161,10 @@ describe('memory game', () => {
     const storage = memoryStorage();
     storage.setItem(
       'reely.memory.leaderboard',
-      JSON.stringify({
-        board: [
-          { moves: 9, at: new Date('2026-09-30T10:00:00').getTime() },
-          { moves: 14, at: new Date('2026-10-01T10:00:00').getTime() },
-        ],
-      })
+      JSON.stringify([
+        { moves: 9, at: new Date('2026-09-30T10:00:00').getTime() },
+        { moves: 14, at: new Date('2026-10-01T10:00:00').getTime() },
+      ])
     );
     const game = play(storage);
     turn(game, 0, 1);
@@ -183,6 +181,15 @@ describe('memory game', () => {
       ['3', '14', '01.10.2026'],
     ]);
     expect(dialogs(game)[1]?.querySelector('tr[aria-current="true"] td')?.textContent).toBe('2');
+    expect(dialogs(game)[1]?.querySelectorAll('tr[aria-current]')).toHaveLength(1);
+  });
+
+  it('names each dialog by its own heading', () => {
+    const game = play();
+
+    expect(
+      dialogs(game).map((box) => box.querySelector(`#${box.getAttribute('aria-labelledby') ?? ''}`)?.textContent)
+    ).toEqual(['All pairs found', 'Leaderboard']);
   });
 
   it('shows, when asked, the part of the machine that ran for the last move', async () => {

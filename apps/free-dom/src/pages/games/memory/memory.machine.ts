@@ -10,16 +10,18 @@ import type {
 import { postResult } from './memory.leaderboard';
 import { canTurn, isWon, turnBack, turnCard } from './memory.rules';
 
-import type { Leaderboard } from './memory.leaderboard';
+import type { MemoryResult } from './memory.leaderboard';
 import type { MemoryState } from './memory.rules';
 
 /**
- * What the machine works on: the table and the best ten, in signals the page
- * draws, and the deal and the clock, given so a test brings its own.
+ * What the machine works on: the table, the best ten and the place of the last
+ * win, in signals the page draws, and the deal and the clock, given so a test
+ * brings its own.
  */
 export interface MemoryContext {
   readonly table: Signal<MemoryState>;
-  readonly leaderboard: Signal<Leaderboard>;
+  readonly best: Signal<readonly MemoryResult[]>;
+  readonly place: Signal<number | undefined>;
   readonly deal: () => MemoryState;
   readonly now: () => number;
 }
@@ -105,10 +107,13 @@ export const memoryMachine = (context: MemoryContext): IStateMachine<Memory> =>
         won: {
           entry: [
             turnUp,
-            ({ context: { table, leaderboard, now } }): void => {
-              leaderboard.update(({ board }) =>
-                postResult(board, { moves: table().moves, at: now() })
-              );
+            ({ context: { table, best, place, now } }): void => {
+              const posted = postResult(best(), {
+                moves: table().moves,
+                at: now(),
+              });
+              best.set(posted.board);
+              place.set(posted.place);
             },
           ],
         },

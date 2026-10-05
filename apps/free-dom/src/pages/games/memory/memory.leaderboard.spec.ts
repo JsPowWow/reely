@@ -1,4 +1,4 @@
-import { formatDay, isLeaderboard, postResult } from './memory.leaderboard';
+import { formatDay, isBoard, postResult } from './memory.leaderboard';
 
 import type { MemoryResult } from './memory.leaderboard';
 
@@ -58,12 +58,9 @@ describe('memory leaderboard', () => {
     { stored: [{ moves: 10 }], valid: false },
     { stored: [null], valid: false },
     { stored: { moves: 10, at: 1 }, valid: false },
+    { stored: { board: [] }, valid: false },
     { stored: null, valid: false },
   ])('takes $stored back from storage: $valid', ({ stored, valid }) => {
-    expect(isLeaderboard({ board: stored })).toBe(valid);
-  });
-
-  it.each([null, [], { place: 1 }, 'board'])('drops %j as a leaderboard', (stored) => {
-    expect(isLeaderboard(stored)).toBe(false);
+    expect(isBoard(stored)).toBe(valid);
   });
 });

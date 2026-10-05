@@ -42,7 +42,6 @@ export const MemoryCard = ({
         data-side={lies}
         aria={{
           ariaLabel: () => sideLabels[lies()](place, face),
-          ariaDisabled: () => String(lies() !== 'down'),
         }}
         onClick={() => onTurn(place)}
       >

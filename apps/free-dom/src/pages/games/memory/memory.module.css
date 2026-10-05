@@ -225,7 +225,8 @@
 
 /* A wrong pair waits to turn back as a failure plate. */
 .board[aria-busy='true'] .card[data-side='up'] .face {
-  border: 2px solid var(--graphite);
+  outline: 1px solid var(--graphite);
+  outline-offset: -2px;
 }
 
 /* #region motion */
@@ -244,6 +245,7 @@
 /* #region scroll-lock */
 :root:has(.modal[open]) {
   overflow: hidden;
+  scrollbar-gutter: stable;
 }
 /* #endregion */
 

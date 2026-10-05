@@ -16,11 +16,8 @@ const isOther =
   (other: MemoryResult): boolean =>
     other.moves !== result.moves || other.at !== result.at;
 
-/**
- * The best ten, and the place (from 1) of the last win posted, when it made the
- * board.
- */
-export interface Leaderboard {
+/** The best ten with a win posted, and its place (from 1) when it made them. */
+export interface Posted {
   readonly board: readonly MemoryResult[];
   readonly place: number | undefined;
 }
@@ -30,7 +27,7 @@ export interface Leaderboard {
 export const postResult = (
   board: readonly MemoryResult[],
   result: MemoryResult
-): Leaderboard => {
+): Posted => {
   const ranked = [...board.filter(isOther(result)), result]
     .sort(byRank)
     .slice(0, leaderboardSize);
@@ -55,14 +52,8 @@ const isMemoryResult = (maybeResult: unknown): maybeResult is MemoryResult =>
   isNumber(maybeResult.moves) &&
   isNumber(maybeResult.at);
 
-const isMemoryResults = (
-  maybeResults: unknown
-): maybeResults is MemoryResult[] =>
-  Array.isArray(maybeResults) && maybeResults.every(isMemoryResult);
-
-/** What storage gave back is a leaderboard: anything else is dropped. */
-export const isLeaderboard = (
-  maybeLeaderboard: unknown
-): maybeLeaderboard is Leaderboard =>
-  hasProperty('board', maybeLeaderboard) &&
-  isMemoryResults(maybeLeaderboard.board);
+/** What storage gave back is a board of wins: anything else is dropped. */
+export const isBoard = (
+  maybeBoard: unknown
+): maybeBoard is readonly MemoryResult[] =>
+  Array.isArray(maybeBoard) && maybeBoard.every(isMemoryResult);

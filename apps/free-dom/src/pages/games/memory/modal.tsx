@@ -1,5 +1,6 @@
 import { dialog, effect } from '@reely/dommy';
 import type { ReelyNode, Signal } from '@reely/dommy';
+import { slugify } from '@reely/strings';
 
 import css from './memory.module.css';
 
@@ -23,10 +24,11 @@ export const Modal = ({
   title,
   children,
 }: ModalProps): HTMLDialogElement => {
+  const titleId = `${slugify(title)}-title`;
   const box = dialog(
     {
       className: css.modal,
-      aria: { ariaLabel: title },
+      aria: { ariaLabelledby: titleId },
       // #region dialog
       // Escape closes the dialog natively; the signal follows
       onClose: () => open.set(false),
@@ -36,7 +38,9 @@ export const Modal = ({
         event.target === event.currentTarget && open.set(false),
     },
     <div className={css.modalBody}>
-      <h2 className={css.modalTitle}>{title}</h2>
+      <h2 id={titleId} className={css.modalTitle}>
+        {title}
+      </h2>
       {children}
     </div>
   );

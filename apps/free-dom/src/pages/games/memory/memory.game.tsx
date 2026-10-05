@@ -3,7 +3,7 @@ import { later, persisted } from '@reely/dommy-kit';
 
 import { MemoryCard } from './memory.card';
 import { BestTen, Victory } from './memory.dialogs';
-import { isLeaderboard } from './memory.leaderboard';
+import { isBoard } from './memory.leaderboard';
 import { memoryMachine } from './memory.machine';
 import { MomentCode, momentOf, moments, refused } from './memory.moments';
 import { cardAt, dealGame } from './memory.rules';
@@ -11,7 +11,7 @@ import { sitePackages } from '../../../site/site.packages';
 
 import css from './memory.module.css';
 
-import type { Leaderboard } from './memory.leaderboard';
+import type { MemoryResult } from './memory.leaderboard';
 import type { CodeMoment } from './memory.moments';
 import type { MemoryState, RandomSource } from './memory.rules';
 
@@ -40,12 +40,13 @@ export const MemoryGame = ({
   const deal = (): MemoryState => dealGame(sitePackages, pairs, random);
   const table = signal(deal());
   // kept in localStorage, and in memory alone where storage fails
-  const leaderboard = persisted<Leaderboard>(
+  const best = persisted<readonly MemoryResult[]>(
     'reely.memory.leaderboard',
-    { board: [], place: undefined },
-    { storage, is: isLeaderboard }
+    [],
+    { storage, is: isBoard }
   );
-  const game = memoryMachine({ table, leaderboard, deal, now });
+  const place = signal<number | undefined>(undefined);
+  const game = memoryMachine({ table, best, place, deal, now });
   // the deck changes only with a new game, which lays out new cards
   const cards = computed(() => table().deck);
   // #endregion
@@ -137,10 +138,10 @@ export const MemoryGame = ({
       <Victory
         open={victoryOpen}
         moves={() => table().moves}
-        leaderboard={leaderboard}
+        place={place}
         onNewGame={newGame}
       />
-      <BestTen open={bestTenOpen} leaderboard={leaderboard} />
+      <BestTen open={bestTenOpen} best={best} place={place} />
     </div>
   );
 };

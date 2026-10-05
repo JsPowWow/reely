@@ -89,7 +89,7 @@ describe('memory page', () => {
         [card, cards[faces.indexOf(faces[place], place + 1)]].forEach((one) => one?.click())
     );
 
-    expect(JSON.parse(localStorage.getItem('reely.memory.leaderboard') ?? '{}').board).toEqual([
+    expect(JSON.parse(localStorage.getItem('reely.memory.leaderboard') ?? '[]')).toEqual([
       { moves: 8, at: expect.any(Number) },
     ]);
   });
