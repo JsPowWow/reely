@@ -33,7 +33,6 @@
     "jiti": "2.4.2",
     "jsdom": "~22.1.0",
     "jsonc-eslint-parser": "^2.1.0",
-    "lint-staged": "^16.2.7",
     "nx": "23.2.1",
     "prettier": "^2.6.2",
     "shiki": "4.4.3",
@@ -47,8 +46,6 @@
     "vitest": "4.0.9"
   },
   "optionalDependencies": {
-    "@nx/nx-linux-arm64-gnu": "21.6.10",
-    "@nx/nx-linux-x64-gnu": "21.6.10",
     "@rollup/rollup-linux-x64-gnu": "4.55.1"
   },
   "workspaces": [
