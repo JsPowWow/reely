@@ -14,37 +14,50 @@ const en = {
   labs: {
     dml: {
       title: 'Statements inside markup',
-      Body: ({ markupList, sharedParent }: LabExamples): Node => (
+      Body: ({ ordersDml, panelsDml, panelsInto }: LabExamples): Node => (
         <>
           <p>
-            Can markup take <code>for</code>, <code>if</code> and <code>switch</code> with <code>begin</code>/
-            <code>end</code>, without a change to dommy’s core? The lab tried three shapes:
+            The idea comes from van-dml, an add-on to VanJS: <code>begin(ul())</code> opens a parent, every tag after it
+            lands inside on its own, <code>end()</code> closes it. Between the two you write plain code, so{' '}
+            <code>for</code>, <code>if</code> and <code>switch</code> sit right in the markup. Can dommy do that without
+            a change to its core?
           </p>
-          <ul>
-            <li>
-              A generator, <code>markup(function* () {'{ … }'})</code>: every <code>yield</code> adds a child, and the
-              block closes with its brace.
-            </li>
-            <li>
-              <code>using within(parent)</code>: a current parent that the block closes, even when it throws.
-            </li>
-            <li>
-              <code>begin</code>/<code>end</code> by hand: nothing checks the balance.
-            </li>
-          </ul>
-          <p>The generator needs one line of helper, keeps no state, and runs once, like a component:</p>
-          {markupList}
           <p>
-            The other two share one current parent for the whole module, and that breaks the moment a build awaits. Two
-            panels load side by side; each shows its title, waits for its data, then adds it. Press the button and watch
-            the Inbox get the stand-up while the Calendar gets the unread mail:
+            First, the baseline nobody has to build: a component is a function, so it can loop, branch and{' '}
+            <code>return</code> what it made. Any statement already works there. The question is only whether begin/end
+            reads better.
           </p>
-          {sharedParent}
+          <p>
+            It does read well. Below, a <code>for</code> skips cancelled orders with <code>continue</code>, a{' '}
+            <code>switch</code> picks the line, and an <code>if</code> adds a footer. Each <code>row(…)</code> appends
+            itself to the current <code>ul</code>:
+          </p>
+          {ordersDml}
+          <p>
+            Now the catch. “The current parent” is one stack for the whole module, and an <code>await</code> lets
+            someone else push onto it. Two panels load side by side: each opens its <code>ul</code>, shows a title,
+            awaits its line, then closes. Press the button and look at the result: the Calendar opened while the Inbox
+            was waiting, so it sits inside the Inbox, and the Inbox’s lines landed in whatever was current when they
+            arrived.
+          </p>
+          {panelsDml}
+          <p>
+            The fix is to stop sharing. <code>into(parent, (tags) =&gt; …)</code> hands the block tags that append to{' '}
+            <code>parent</code>, and the closure holds it, so there is nothing current to steal. Same button, two
+            separate lists, each with its own lines:
+          </p>
+          {panelsInto}
+          <p>
+            One more shape was tried: <code>using within(parent)</code>, where the block itself closes the parent, even
+            on a throw. It never forgets an <code>end</code>, but its parent is still module state, so it fails across
+            an <code>await</code> exactly like begin/end.
+          </p>
           <h3>Verdict</h3>
           <p>
-            The generator is the one worth keeping: statements in markup, balanced by syntax, no shared state, no core
-            change. Its cost is a <code>yield</code> per child, and a forgotten <code>yield</code> drops the child
-            silently. <a href={labSource('dml')}>The lab and its specs</a>.
+            begin/end stays out: a shared stack breaks under the first <code>await</code>, and a missing{' '}
+            <code>end()</code> fails silently. A plain <code>return</code> needs nothing and is what dommy already does.{' '}
+            <code>into</code> keeps van-dml’s terseness safely, at the price of one more way to build a tree, so it
+            stays a recipe, not an export. <a href={labSource('dml')}>The lab and its specs</a>.
           </p>
         </>
       ),

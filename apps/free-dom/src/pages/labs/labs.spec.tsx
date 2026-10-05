@@ -1,8 +1,9 @@
 import { mount } from '@reely/dommy';
 
 import { DiamondLog } from './demos/diamond.log';
-import { MarkupList } from './demos/markup.list';
-import { SharedParent } from './demos/shared.parent';
+import { OrdersDml } from './demos/orders.dml';
+import { PanelsDml } from './demos/panels.dml';
+import { PanelsInto } from './demos/panels.into';
 import { LabsPage } from './labs.page';
 import { chooseLocale } from '../../i18n/locale';
 import { textsLoaded } from '../../i18n/localized';
@@ -34,7 +35,7 @@ describe('labs', () => {
       'A signal graph in the shape of Angular’s',
       'Which signal core to ship',
     ]);
-    expect(page.querySelectorAll('figure')).toHaveLength(3);
+    expect(page.querySelectorAll('figure')).toHaveLength(4);
     expect(page.querySelector('header a[href="/labs"]')?.getAttribute('aria-current')).toBe('true');
   });
 
@@ -54,7 +55,7 @@ describe('labs', () => {
     ]);
     expect(texts(page, 'main h3')).toEqual(['Вердикт', 'Вердикт', 'Вердикт']);
     expect(page.querySelector('table caption')?.textContent).toContain('Три ядра');
-    expect(page.querySelectorAll('figure')).toHaveLength(3);
+    expect(page.querySelectorAll('figure')).toHaveLength(4);
     expect(page.querySelector('ol')).toBe(log);
     expect(texts(log ?? page, 'li')).toEqual(['1 / 2', '2 / 4']);
   });
@@ -71,8 +72,8 @@ describe('labs', () => {
     expect(texts(size ?? page, 'td')).toEqual(['1509 B', '1720 B', '1825 B']);
   });
 
-  it('builds children with a loop, a condition and a switch inside JSX', () => {
-    const list = render(MarkupList);
+  it('builds a list with `for`, `continue`, `switch` and `if` between `begin` and `end`', () => {
+    const list = render(OrdersDml);
 
     expect(texts(list, 'li')).toEqual([
       'A-1042: on its way',
@@ -82,15 +83,29 @@ describe('labs', () => {
     ]);
   });
 
-  it('shows two builds that share a parent across an `await` land in the wrong lists', async () => {
-    const host = render(SharedParent);
-
+  const loadBoth = async (host: Element): Promise<void> => {
     click(host, 'Load both panels');
     await new Promise((done) => setTimeout(done, 0));
+  };
+
+  it('shows begin/end across an `await`: the second panel opens inside the first', async () => {
+    const host = render(PanelsDml);
+
+    await loadBoth(host);
+
+    expect(host.querySelector('[class*="status"]')?.innerHTML).toBe(
+      '<ul aria-label="Inbox"><li>Inbox</li><ul aria-label="Calendar"><li>Calendar</li><li>3 unread</li></ul><li>Stand-up at 10:00</li></ul>'
+    );
+  });
+
+  it('keeps each panel’s lines in its own list with `into`', async () => {
+    const host = render(PanelsInto);
+
+    await loadBoth(host);
     const [inbox, calendar] = Array.from(host.querySelectorAll('ul'));
 
-    expect(texts(inbox ?? host, 'li')).toEqual(['Inbox', 'Stand-up at 10:00']);
-    expect(texts(calendar ?? host, 'li')).toEqual(['Calendar', '3 unread']);
+    expect(texts(inbox ?? host, 'li')).toEqual(['Inbox', '3 unread']);
+    expect(texts(calendar ?? host, 'li')).toEqual(['Calendar', 'Stand-up at 10:00']);
   });
 
   it('logs one current pair per change of the diamond', () => {

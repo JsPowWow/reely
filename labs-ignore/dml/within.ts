@@ -3,7 +3,7 @@ import { Fragment } from '@reely/dommy';
 import type { DommyElement, ReelyNode } from '@reely/dommy';
 
 /**
- * Variant B, `begin`/`end` as a `using` declaration: `using _ = within(ul)` makes `ul` the
+ * Variant D, `begin`/`end` as a `using` declaration: `using _ = within(ul)` makes `ul` the
  * current parent until the block closes, and `add(...)` appends to it. The block closes the
  * scope, so `end` is never forgotten; the current parent is module state.
  */
@@ -25,19 +25,3 @@ export const add = (...children: ReelyNode[]): void => {
   }
   parent.append(Fragment({ children }));
 };
-
-/**
- * Variant C, `begin`/`end`: the same stack, closed by hand. Nothing checks the
- * balance: a missing `end` leaves the parent current for everything that follows.
- */
-export const begin = <T extends DommyElement>(parent: T): T => {
-  parents.push(parent);
-  return parent;
-};
-
-export const end = (): void => {
-  parents.pop();
-};
-
-/** For the specs: how deep the stack is now. */
-export const depth = (): number => parents.length;

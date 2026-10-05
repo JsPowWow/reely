@@ -1,182 +1,191 @@
-import { h2, li, mount, section, signal, ul } from '@reely/dommy';
+import { h2, li, mount, p, section, signal, ul } from '@reely/dommy';
 
-import { markup } from './markup';
-import { add, begin, depth, end, within } from './within';
+import { into } from './into';
+import { begin, depth, end, tags } from './van';
+import { add, within } from './within';
 
 import type { ReelyNode } from '@reely/dommy';
 
-interface Car {
-  name: string;
-  out: boolean;
-}
+const orders = [
+  { id: 'A-1042', status: 'shipped' },
+  { id: 'A-1043', status: 'cancelled' },
+  { id: 'A-1044', status: 'packing' },
+] as const;
 
-const grid: Car[] = [
-  { name: 'Car 7', out: false },
-  { name: 'Car 3', out: true },
-  { name: 'Car 1', out: false },
-];
+const said = { shipped: 'on its way', packing: 'being packed' } as const;
 
 const texts = (parent: ParentNode, selector: string): (string | null)[] =>
   Array.from(parent.querySelectorAll(selector), (node) => node.textContent);
 
-describe('Variant A: markup with generators', () => {
-  it('builds children with loops and conditions inside JSX', () => {
-    const board = (
-      <ul>
-        {markup(function* () {
-          for (const [place, car] of grid.entries()) {
-            if (car.out) {
-              continue;
-            }
-            yield <li>{`${place + 1}. ${car.name}`}</li>;
-          }
-          if (grid.some((car) => car.out)) {
-            yield <li>Retired: 1</li>;
-          }
-        })}
-      </ul>
-    );
+const expected = ['A-1042: on its way', 'A-1044: being packed', '1 cancelled, not shown'];
 
-    expect(texts(board as HTMLElement, 'li')).toEqual(['1. Car 7', '3. Car 1', 'Retired: 1']);
-  });
-
-  it('builds children of tag factories too, and composes builders with `yield*`', () => {
-    function* rows(cars: readonly Car[]): Generator<ReelyNode> {
-      for (const car of cars) {
-        yield li(null, car.name);
+describe('Variant A: a function that returns its children', () => {
+  // no helper at all: statements build a list, and the list is the children
+  const rows = (): ReelyNode[] => {
+    const shown: ReelyNode[] = [];
+    for (const { id, status } of orders) {
+      if (status === 'cancelled') {
+        continue;
       }
+      shown.push(<li>{`${id}: ${said[status]}`}</li>);
     }
+    const cancelled = orders.filter(({ status }) => status === 'cancelled').length;
+    if (cancelled > 0) {
+      shown.push(<li>{`${cancelled} cancelled, not shown`}</li>);
+    }
+    return shown;
+  };
 
-    const panel = section(
-      null,
-      ...markup(function* () {
-        yield h2(null, 'Running');
-        yield ul(null, ...markup(() => rows(grid.filter((car) => !car.out))));
-        yield h2(null, 'Out');
-        yield* rows(grid.filter((car) => car.out));
-      })
-    );
+  it('takes every statement, and needs nothing from dommy', () => {
+    expect(texts(ul(null, rows()), 'li')).toEqual(expected);
+  });
+});
 
-    expect(texts(panel, 'h2, li')).toEqual(['Running', 'Car 7', 'Car 1', 'Out', 'Car 3']);
+describe('Variant B: `begin`/`end` with tags that append, as in van-dml', () => {
+  afterEach(() => {
+    while (depth() > 0) {
+      end();
+    }
   });
 
-  it('keeps the bindings inside it reactive: one text node per change', () => {
+  it('reads like markup with statements in it', () => {
+    const { li: row } = tags;
+    const list = begin(ul());
+    for (const { id, status } of orders) {
+      if (status === 'cancelled') {
+        continue;
+      }
+      row(`${id}: ${said[status]}`);
+    }
+    row('1 cancelled, not shown');
+    end();
+
+    expect(texts(list, 'li')).toEqual(expected);
+  });
+
+  it('nests: a `begin` inside a `begin` goes into it', () => {
+    const page = begin(section());
+    tags.h2('Running');
+    begin(ul());
+    tags.li('A-1042');
+    end();
+    end();
+
+    expect(page.outerHTML).toBe('<section><h2>Running</h2><ul><li>A-1042</li></ul></section>');
+  });
+
+  it('leaves the parent current when an `end` is missing', () => {
+    const list = begin(ul());
+    tags.li('A-1042');
+
+    const elsewhere = tags.p('meant for somewhere else');
+
+    expect(elsewhere.parentElement).toBe(list);
+  });
+
+  it('shares the current parent across an `await`: the second panel opens inside the first, and the lines swap', async () => {
+    const panel = async (title: string, load: () => Promise<string>): Promise<HTMLElement> => {
+      const list = begin(ul());
+      tags.li(title);
+      tags.li(await load());
+      end();
+      return list;
+    };
+
+    const [inbox, calendar] = await Promise.all([
+      panel('Inbox', async () => '3 unread'),
+      panel('Calendar', async () => 'Stand-up at 10:00'),
+    ]);
+
+    expect(inbox.outerHTML).toBe(
+      '<ul><li>Inbox</li><ul><li>Calendar</li><li>3 unread</li></ul><li>Stand-up at 10:00</li></ul>'
+    );
+    expect(calendar.parentElement).toBe(inbox);
+  });
+});
+
+describe('Variant C: `into(parent, (tags) => …)`', () => {
+  it('reads like van-dml, with the parent in the closure', () => {
+    const list = into(ul(), ({ li: row }) => {
+      for (const { id, status } of orders) {
+        if (status === 'cancelled') {
+          continue;
+        }
+        row(`${id}: ${said[status]}`);
+      }
+      row('1 cancelled, not shown');
+    });
+
+    expect(texts(list, 'li')).toEqual(expected);
+  });
+
+  it('nests through the tags it is given', () => {
+    const page = into(section(), ({ h2: heading, ul: list }) => {
+      heading('Running');
+      into(list(), ({ li: row }) => row('A-1042'));
+    });
+
+    expect(page.outerHTML).toBe('<section><h2>Running</h2><ul><li>A-1042</li></ul></section>');
+  });
+
+  it('keeps each panel’s lines in its panel across an `await`', async () => {
+    const panel = (title: string, load: () => Promise<string>): Promise<HTMLElement> =>
+      new Promise((done) => {
+        const list = into(ul(), async ({ li: row }) => {
+          row(title);
+          row(await load());
+          done(list);
+        });
+      });
+
+    const [inbox, calendar] = await Promise.all([
+      panel('Inbox', async () => '3 unread'),
+      panel('Calendar', async () => 'Stand-up at 10:00'),
+    ]);
+
+    expect(texts(inbox, 'li')).toEqual(['Inbox', '3 unread']);
+    expect(texts(calendar, 'li')).toEqual(['Calendar', 'Stand-up at 10:00']);
+  });
+
+  it('keeps the bindings inside it point updates', () => {
     const leader = signal('Car 7');
     const host = document.createElement('div');
-    mount(host, () => (
-      <p>
-        {markup(function* () {
-          yield 'Leader: ';
-          yield leader;
-        })}
-      </p>
-    ));
-    const [, text] = Array.from(host.querySelector('p')?.childNodes ?? []);
+    mount(host, () => into(p(), ({ b }) => b(leader)));
+    const text = host.querySelector('b')?.firstChild;
 
     leader.value = 'Car 3';
 
-    expect(host.textContent).toBe('Leader: Car 3');
-    expect(host.querySelector('p')?.childNodes[1]).toBe(text);
+    expect(host.textContent).toBe('Car 3');
+    expect(host.querySelector('b')?.firstChild).toBe(text);
   });
 
-  it('drops a child built without `yield`, and nothing catches it', () => {
-    const list = (
-      <ul>
-        {markup(function* () {
-          yield <li>Car 7</li>;
-          // the forgotten `yield`: the element is built and thrown away
-          <li>Car 3</li>;
-        })}
-      </ul>
-    );
-
-    expect(texts(list as HTMLElement, 'li')).toEqual(['Car 7']);
-  });
-
-  it('lets TypeScript check what is yielded, and keeps the structure static', () => {
-    // @ts-expect-error an object is not a child; TypeScript marks the builder, not the `yield` line
-    markup(function* () {
-      yield { name: 'Car 7' };
+  it('moves a tag of the block that is also given as a child: plain factories are for children', () => {
+    const list = into(ul(), ({ li: row }) => {
+      row(h2(null, 'plain h2 child stays put'));
+      // a block tag as a child is appended to the parent first, then moved into `row`'s li
+      row(row('nested'));
     });
-    const laps = signal(1);
 
-    // @ts-expect-error a getter of children is not a child: a changing structure goes through `For` or `Show`
-    const reactive = <ul>{() => markup(function* () { for (let lap = 0; lap < laps.value; lap += 1) yield <li /> })}</ul>;
-
-    expect(reactive).toBeInstanceOf(HTMLUListElement);
+    expect(texts(list, ':scope > li')).toEqual(['plain h2 child stays put', 'nested']);
+    expect(list.children).toHaveLength(2);
   });
 });
 
-describe('A typed `end` in a generator', () => {
-  const END: unique symbol = Symbol('end');
-
-  it('can be demanded by the return type, yet it only restates the closing brace', () => {
-    function* closed(): Generator<ReelyNode, typeof END> {
-      yield <li>Car 7</li>;
-      return END;
-    }
-    // @ts-expect-error a builder that does not return `END` does not type-check
-    function* open(): Generator<ReelyNode, typeof END> {
-      yield <li>Car 7</li>;
-    }
-
-    expect(texts(ul(null, ...markup(closed)), 'li')).toEqual(['Car 7']);
-    expect(open).toBeTypeOf('function');
-  });
-});
-
-describe('Variant B: `using within(parent)`', () => {
+describe('Variant D: `using within(parent)`', () => {
   it('appends to the current parent and closes with the block, even when it throws', () => {
-    const list = document.createElement('ul');
+    const list = ul();
 
     const build = (): void => {
       using _list = within(list);
-      for (const car of grid) {
-        add(<li>{car.name}</li>);
-        if (car.out) {
+      for (const { id } of orders) {
+        add(li(null, id));
+        if (id === 'A-1043') {
           throw new Error('stop');
         }
       }
     };
 
     expect(build).toThrow('stop');
-    expect(texts(list, 'li')).toEqual(['Car 7', 'Car 3']);
-    expect(depth()).toBe(0);
-  });
-
-  it('shares the current parent across an `await`, so two builds interleave into the wrong parents', async () => {
-    const first = document.createElement('ul');
-    const second = document.createElement('ul');
-    const build = async (list: HTMLElement, name: string): Promise<void> => {
-      using _list = within(list);
-      add(<li>{`${name} 1`}</li>);
-      await Promise.resolve();
-      add(<li>{`${name} 2`}</li>);
-    };
-
-    await Promise.all([build(first, 'A'), build(second, 'B')]);
-
-    expect(texts(first, 'li')).toEqual(['A 1']);
-    expect(texts(second, 'li')).toEqual(['B 1', 'A 2', 'B 2']);
-  });
-});
-
-describe('Variant C: `begin`/`end` by hand', () => {
-  it('leaves the parent current when an `end` is missing', () => {
-    const page = document.createElement('main');
-    const results = document.createElement('ul');
-
-    begin(page);
-    add(results);
-    begin(results);
-    add(<li>Car 7</li>);
-    // the missing end(): the note meant for the page goes into the list
-    add(<p>Lap 5</p>);
-    end();
-    const unbalanced = depth();
-    end();
-
-    expect(unbalanced).toBe(1);
-    expect(texts(page, ':scope > *')).toEqual(['Car 7Lap 5']);
+    expect(texts(list, 'li')).toEqual(['A-1042', 'A-1043']);
   });
 });
