@@ -3,6 +3,8 @@ import { noop } from '@reely/utils';
 
 import { createElement } from '../index';
 
+import type { Component, DOMElementAria, DOMElementStyles, MaybeReactive } from '../index';
+
 describe('createElement', () => {
   it('creates an element with the given tag', () => {
     const element = createElement('section');
@@ -108,5 +110,31 @@ describe('createElement', () => {
     const Card = (props: CardProps): Node => createElement('div', { id: props.id });
 
     expect(createElement(Card, new CardProps())).toHaveProperty('outerHTML', '<div id="card"></div>');
+  });
+
+  it('calls a component whose props are all optional without props, and requires the props of one that has some', () => {
+    const Badge = ({ label = 'new' }: { label?: string }): Node => createElement('span', null, label);
+    const Card = ({ id }: { id: string }): Node => createElement('div', { id });
+
+    expect(createElement(Badge)).toHaveProperty('textContent', 'new');
+    expect(createElement(Badge, null, 'ignored')).toHaveProperty('textContent', 'new');
+    // @ts-expect-error `id` is required
+    expect(() => createElement(Card)).not.toThrow();
+  });
+
+  it('exports the types a wrapper component is typed with', () => {
+    const Field = ({
+      label,
+      styles,
+      aria,
+    }: {
+      label: MaybeReactive<string>;
+      styles?: DOMElementStyles;
+      aria?: DOMElementAria;
+    }): Node => createElement('label', { styles, aria }, label);
+    const component: Component = Field;
+
+    expect(createElement(Field, { label: 'Name', styles: { color: 'red' } })).toHaveProperty('textContent', 'Name');
+    expectTypeOf(component).toBeFunction();
   });
 });

@@ -82,7 +82,7 @@ const Unread = (): ReelyNode => () => `Inbox (${unread.value})`;
 document.body.append(<Link href="/inbox"><Unread /></Link>);
 ```
 
-A component is a plain function, so it can be called as one: `mount(el, () => Card({ file }))` is `<Card file={file} />`.
+A component is a plain function, so it can be called as one: `mount(el, () => Card({ file }))` is `<Card file={file} />`; `createElement(Card)` needs props only when `Card` has a required one. A component that wraps an element types its props with `MaybeReactive<T>` (a value, or a signal or getter of it), `DOMElementStyles` and `DOMElementAria`, and fits the `Component` type.
 
 A fragment, whether from such a component, `<>…</>`, `Show`, `Keyed`, `Await` or `For`, empties into its parent on `append`, so place it once. To move or remove it later, keep it inside an element, or render it with `mount`.
 

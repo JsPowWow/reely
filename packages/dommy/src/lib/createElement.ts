@@ -75,8 +75,10 @@ export function createElement<Tag extends SvgElementTag>(
 ): SvgElement<Tag>;
 export function createElement<Props extends object>(
   component: (props: Props) => ReelyNode,
-  props: Props & { key?: PropertyKey },
-  ...children: ReelyNode[]
+  // props may be left out only when every one is optional
+  ...propsAndChildren: object extends Props
+    ? [props?: Nullable<Props & { key?: PropertyKey }>, ...children: ReelyNode[]]
+    : [props: Props & { key?: PropertyKey }, ...children: ReelyNode[]]
 ): Node;
 export function createElement(
   type: HtmlElementTag | SvgElementTag | Component,
