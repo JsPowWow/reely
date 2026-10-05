@@ -122,7 +122,7 @@ export function withAlpha(color: string, alpha: number): string {
 
 /** Moves each channel toward 0 by `percent` (0–100); the colour a hex or as `parseColor` reads it. */
 export function darken(color: string, percent: number): string {
-    if (percent < 0 || percent > 100) {
+    if (!(percent >= 0 && percent <= 100)) {
         throw new Error('Percent must be between 0 and 100');
     }
 
@@ -138,7 +138,7 @@ export function darken(color: string, percent: number): string {
 
 /** Moves each channel toward 255 by `percent` (0–100); the colour a hex or as `parseColor` reads it. */
 export function lighten(color: string, percent: number): string {
-    if (percent < 0 || percent > 100) {
+    if (!(percent >= 0 && percent <= 100)) {
         throw new Error('Percent must be between 0 and 100');
     }
 

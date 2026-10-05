@@ -195,6 +195,9 @@ describe('colors', () => {
       expect(() => darken('#FF0000', 101)).toThrow(
         'Percent must be between 0 and 100'
       );
+      expect(() => darken('#FF0000', Number.NaN)).toThrow(
+        'Percent must be between 0 and 100'
+      );
     });
 
     it('should throw error for an invalid colour', () => {
@@ -229,6 +232,9 @@ describe('colors', () => {
         'Percent must be between 0 and 100'
       );
       expect(() => lighten('#000000', 101)).toThrow(
+        'Percent must be between 0 and 100'
+      );
+      expect(() => lighten('#000000', Number.NaN)).toThrow(
         'Percent must be between 0 and 100'
       );
     });
