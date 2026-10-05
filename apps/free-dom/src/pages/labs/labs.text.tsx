@@ -35,8 +35,9 @@ const en = {
           <p>The generator needs one line of helper, keeps no state, and runs once, like a component:</p>
           {markupList}
           <p>
-            The other two share one current parent for the whole module. Two builds that wait in the middle put their
-            second items into whichever parent is current by then:
+            The other two share one current parent for the whole module, and that breaks the moment a build awaits. Two
+            panels load side by side; each shows its title, waits for its data, then adds it. Press the button and watch
+            the Inbox get the stand-up while the Calendar gets the unread mail:
           </p>
           {sharedParent}
           <h3>Verdict</h3>
@@ -54,21 +55,26 @@ const en = {
         <>
           <p>
             A <code>signal</code> pushes “dirty” to its consumers, a <code>computed</code> recomputes when read, an{' '}
-            <code>effect</code> runs as soon as it is notified. The lab predates dommy’s signals and stays as the
-            comparison. Its telling case is a diamond: an effect that reads <code>count</code> and{' '}
-            <code>double = count * 2</code>.
+            <code>effect</code> runs as soon as it is notified. The lab predates <code>@reely/signals</code>, and half
+            of it made the cut: its Angular style of reading and writing, <code>count()</code>,{' '}
+            <code>count.set(2)</code> and <code>count.update(fn)</code>, is how you can use the signals today, beside{' '}
+            <code>.value</code>. Its engine did not, and a diamond shows why: an effect that reads <code>count</code>{' '}
+            and <code>double = count * 2</code>.
           </p>
           <p>
             In the lab, a write of 2 runs the effect before <code>double</code> is marked dirty: it logs 2 / 2, a pair
             that never existed, then keeps running itself until something stops it. The spec pins both:
           </p>
           {diamondSpec}
-          <p>The same diamond in dommy logs one current pair per change:</p>
+          <p>
+            The same diamond on <code>@reely/signals</code>, written in the lab’s style, logs one current pair per
+            change:
+          </p>
           {diamondLog}
           <h3>Verdict</h3>
           <p>
-            Kept as a record. A push graph has to mark every dirty node before it runs any effect; running effects
-            during the push is what makes the glitch and the loop.{' '}
+            The style shipped, the engine stays a record. A push graph has to mark every dirty node before it runs any
+            effect; running effects during the push is what makes the glitch and the loop.{' '}
             <a href={labSource('signals-graph')}>The lab and its specs</a>.
           </p>
         </>

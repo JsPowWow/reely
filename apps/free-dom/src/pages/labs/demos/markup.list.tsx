@@ -4,25 +4,33 @@ import type { ReelyNode } from '@reely/dommy';
 const markup = (build: () => Iterable<ReelyNode>): ReelyNode[] =>
   Array.from(build());
 
-const tasks = [
-  { title: 'Write the spec', done: false },
-  { title: 'Make it pass', done: true },
-  { title: 'Ship next.2', done: false },
-];
+const orders = [
+  { id: 'A-1042', status: 'shipped' },
+  { id: 'A-1043', status: 'cancelled' },
+  { id: 'A-1044', status: 'packing' },
+  { id: 'A-1045', status: 'shipped' },
+] as const;
 
-// `for`, `continue` and `if` inside JSX; the builder runs once, like a component.
+// `for`, `continue`, `switch` and `if` inside JSX; the builder runs once, like a component.
 export const MarkupList = (): Node => (
   <ul>
     {markup(function* () {
-      for (const [index, task] of tasks.entries()) {
-        if (task.done) {
+      for (const { id, status } of orders) {
+        if (status === 'cancelled') {
           continue;
         }
-        yield <li>{`${index + 1}. ${task.title}`}</li>;
+        switch (status) {
+          case 'shipped':
+            yield <li>{`${id}: on its way`}</li>;
+            break;
+          case 'packing':
+            yield <li>{`${id}: being packed`}</li>;
+            break;
+        }
       }
-      const done = tasks.filter((task) => task.done).length;
-      if (done > 0) {
-        yield <li>Done: {done}</li>;
+      const cancelled = orders.filter(({ status }) => status === 'cancelled');
+      if (cancelled.length > 0) {
+        yield <li>{`${cancelled.length} cancelled, not shown`}</li>;
       }
     })}
   </ul>

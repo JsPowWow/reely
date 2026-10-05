@@ -14,42 +14,49 @@ const add = (child: Node): void => {
   parents.at(-1)?.append(child);
 };
 
-// Each build adds one item, waits, then adds another. By then the other build's list is current,
-// and each `end` pops the other's parent: every list gets the other build's second item.
-const build = async (list: HTMLElement, name: string): Promise<void> => {
+// A panel shows its title at once, then what its request brings. While the
+// Inbox waits, the Calendar begins and becomes the current parent, so each
+// panel's second line lands in the other one.
+const panel = async (
+  list: HTMLElement,
+  title: string,
+  load: () => Promise<string>
+): Promise<void> => {
   begin(list);
   try {
-    add(<li>{`${name} 1`}</li>);
-    await Promise.resolve();
-    add(<li>{`${name} 2`}</li>);
+    add(<li>{title}</li>);
+    add(<li>{await load()}</li>);
   } finally {
     end();
   }
 };
 
 export const SharedParent = (): Node => {
-  const first = ul({ aria: { ariaLabel: 'Built by A' } });
-  const second = ul({ aria: { ariaLabel: 'Built by B' } });
+  const inbox = ul({ aria: { ariaLabel: 'Inbox' } });
+  const calendar = ul({ aria: { ariaLabel: 'Calendar' } });
 
   return (
     <div className={css.row}>
       <button
         onClick={() => {
-          first.replaceChildren();
-          second.replaceChildren();
-          void Promise.all([build(first, 'A'), build(second, 'B')]);
+          inbox.replaceChildren();
+          calendar.replaceChildren();
+          void Promise.all([
+            panel(inbox, 'Inbox', async () => '3 unread'),
+            panel(calendar, 'Calendar', async () => 'Stand-up at 10:00'),
+          ]);
         }}
       >
-        Build both
+        Load both panels
       </button>
       <p className={css.status}>
-        <b>List A</b>, built by A
+        <b>Inbox</b> panel
       </p>
-      {first}
+      {inbox}
       <p className={css.status}>
-        <b>List B</b>, built by B
+        <b>Calendar</b> panel
       </p>
-      {second}
+      {calendar}
     </div>
   );
 };

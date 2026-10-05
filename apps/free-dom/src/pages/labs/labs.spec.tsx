@@ -71,21 +71,26 @@ describe('labs', () => {
     expect(texts(size ?? page, 'td')).toEqual(['1509 B', '1720 B', '1825 B']);
   });
 
-  it('builds children with a loop and a condition inside JSX', () => {
+  it('builds children with a loop, a condition and a switch inside JSX', () => {
     const list = render(MarkupList);
 
-    expect(texts(list, 'li')).toEqual(['1. Write the spec', '3. Ship next.2', 'Done: 1']);
+    expect(texts(list, 'li')).toEqual([
+      'A-1042: on its way',
+      'A-1044: being packed',
+      'A-1045: on its way',
+      '1 cancelled, not shown',
+    ]);
   });
 
   it('shows two builds that share a parent across an `await` land in the wrong lists', async () => {
     const host = render(SharedParent);
 
-    click(host, 'Build both');
+    click(host, 'Load both panels');
     await new Promise((done) => setTimeout(done, 0));
-    const [first, second] = Array.from(host.querySelectorAll('ul'));
+    const [inbox, calendar] = Array.from(host.querySelectorAll('ul'));
 
-    expect(texts(first ?? host, 'li')).toEqual(['A 1', 'B 2']);
-    expect(texts(second ?? host, 'li')).toEqual(['B 1', 'A 2']);
+    expect(texts(inbox ?? host, 'li')).toEqual(['Inbox', 'Stand-up at 10:00']);
+    expect(texts(calendar ?? host, 'li')).toEqual(['Calendar', '3 unread']);
   });
 
   it('logs one current pair per change of the diamond', () => {
