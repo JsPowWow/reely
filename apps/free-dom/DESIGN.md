@@ -32,17 +32,42 @@ typography:
     fontSize: "1.75rem"
     fontWeight: 800
     lineHeight: 1.1
+  chapter:
+    fontFamily: "'Big Shoulders Display', 'Arial Narrow', sans-serif"
+    fontSize: "clamp(1.75rem, 3.2vw, 2.25rem)"
+    fontWeight: 800
+    lineHeight: 1.05
   readout:
     fontFamily: "'Big Shoulders Display', 'Arial Narrow', sans-serif"
     fontSize: "2.75rem"
     fontWeight: 800
     lineHeight: 1
     fontFeature: "tnum"
+  readout-phone:
+    fontFamily: "'Big Shoulders Display', 'Arial Narrow', sans-serif"
+    fontSize: "2.25rem"
+    fontWeight: 800
+    lineHeight: 1
+    fontFeature: "tnum"
+  card-name:
+    fontFamily: "'Big Shoulders Display', 'Arial Narrow', sans-serif"
+    fontSize: "clamp(0.8125rem, 17cqi, 1.375rem)"
+    fontWeight: 800
+    lineHeight: 1
+  lead:
+    fontFamily: "'Atkinson Hyperlegible', system-ui, sans-serif"
+    fontSize: "1.1875rem"
+    fontWeight: 400
+    lineHeight: 1.55
   body:
     fontFamily: "'Atkinson Hyperlegible', system-ui, sans-serif"
     fontSize: "1.0625rem"
     fontWeight: 400
     lineHeight: 1.5
+  note:
+    fontFamily: "'Atkinson Hyperlegible', system-ui, sans-serif"
+    fontSize: "0.9375rem"
+    fontWeight: 400
   label:
     fontFamily: "'Atkinson Hyperlegible', system-ui, sans-serif"
     fontSize: "0.875rem"
@@ -174,7 +199,7 @@ components:
 
 The whole site reads like a race timing screen: an asphalt ground, graphite ink and bands, white panels where the live demos run, signal yellow for whatever is current, leading or posted, and flag red for the one kind of write that matters most. Every number that the reader might compare (DOM writes, sizes, times, places) is set in a condensed display face with tabular figures, as a timing tower would post it. The world is carried by palette, type and plates, not by a story: headings say plainly what they show. The site is built with the library it documents, so the visual system is there to make each live demo and its write count legible, not to decorate around them.
 
-Density is that of a working tool: a docs rail, a demo beside its source, a write board under each demo. The home page (`/`) opens on a graphite band, its copy set to the top beside the board: the headline of what reely is, a lead, three figures the build measured of every package, the button down to the packages, the credits naming which package draws which part of the board, and a live split-flap scoreboard on a white panel; below it, every package on the same white plate, in the order they stack. Every other package has a page at its name (`/signals`, `/queue`): the same graphite band with the package name, why it exists, its install line and links, beside its measured facts as a timing sheet, then one live example on asphalt with its source, and the names of the values it exports as code chips. The dommy page (`/dommy`) is the same world at a larger scale: a graphite band opens it with the thesis and the first live demo, plain example sections follow on asphalt, and a graphite band of measured figures closes it. A game (`/games/memory`) is a whole small app in the same world: a graphite band with the title, one line, one figure counted from its sources and the credits beside the game on its white panel with the write board under it, then the modules that run it, each a section on asphalt with its source. Nothing is lifted by shadow; depth is the step from asphalt to white panel to graphite band.
+Density is that of a working tool: a docs rail, a demo beside its source, a write board under each demo. The home page (`/`) opens on a graphite band, its copy set to the top beside the board: the headline of what reely is, a lead, three figures the build measured of every package, the button down to the packages, the credits naming which package draws which part of the board, and a live split-flap scoreboard on a white panel; below it, every package on the same white plate, in the order they stack. Every other package has a page at its name (`/signals`, `/queue`): the same graphite band with the package name, why it exists, its install line and links, beside its measured facts as a timing sheet, then one live example on asphalt with its source, and the names of the values it exports as code chips. The dommy page (`/dommy`) is the same world at a larger scale: a graphite band opens it with the thesis and the first live demo, plain example sections follow on asphalt, and a graphite band of measured figures closes it. A game (`/games/memory`) is a whole small app in the same world: a graphite band with the title, one line, one figure counted from its sources and the credits beside the game on its white panel with the write board under it, then the story of how the game is built: an article in one reading column on asphalt, a headline, a lede in slate, eight chapters (rules, machine, time, state, card, leaderboard, dialog, proof), each a title, prose and region-cut code from the running modules, and an ending over a hairline linking to the sources on GitHub. Nothing is lifted by shadow; depth is the step from asphalt to white panel to graphite band.
 
 Motion answers the reader: the write board outlines the nodes a change touched and fades the outline, controls shift colour in 120ms, and a memory card turns over in 360ms. The one thing that moves on its own is the home page's scoreboard, a live race the reader can pause; it stops while off screen or in a hidden tab, and under reduced motion its rows jump and its letters change without turning.
 
@@ -226,8 +251,11 @@ A cool graphite-and-asphalt neutral scale with two race signals: a yellow for st
 - **Headline** (800, clamp(2.5rem, 5vw, 4rem), 1): dommy page example headings, which state the claim the example proves, balanced.
 - **Title** (800, clamp(2rem, 4vw, 3rem), 1.05): docs and evolution page titles; evolution pairs it with a step number at clamp(5rem, 12vw, 8rem).
 - **Subtitle** (800, 1.75rem, 1.1): section headings in docs prose, the guide ending, the wordmark.
-- **Readout** (800, 2.75rem, 1, tabular): write-board figures and a game's counters; 2.25rem on phones (for a game's counters, where its panel is under 24rem). Demo read-out boxes run 3.5rem, the opening demo up to 6rem, result plates 2rem, figures on the graphite band 2 to 3rem in signal.
-- **Body** (400, 1.0625rem, 1.5): prose at 62 to 68ch; leads and claims in slate at 1.125rem, the dommy page's pitch at 1.1875rem.
+- **Chapter** (800, clamp(1.75rem, 3.2vw, 2.25rem), 1.05): chapter titles in the game's article, balanced, 1rem above their prose; the labs' lab titles run the same step at clamp(1.75rem, 3vw, 2.25rem) and 1.1.
+- **Readout** (800, 2.75rem, 1, tabular): write-board figures and a game's counters; the phone readout (2.25rem) takes over for a game's counters where its panel is under 24rem. A memory card's name is its own capped step (800, clamp(0.8125rem, 17cqi, 1.375rem), 1). Demo read-out boxes run 3.5rem, the opening demo up to 6rem, result plates 2rem, figures on the graphite band 2 to 3rem in signal.
+- **Lead** (400, 1.1875rem, 1.55): the game article's lede in slate; the band pitch on a game's or package's opening band shares the size in code-text, at the body line height.
+- **Body** (400, 1.0625rem, 1.5): prose at 62 to 68ch; leads and claims in slate at 1.125rem. Article prose (the game's story) runs at body size with a looser 1.65 line height, 68ch, paragraphs 1rem apart; its inline code sits on a panel-white plate (3px, 0.05em 0.3em) at 0.85em, and its links are bold graphite on a signal-ink underline offset 0.2em.
+- **Note** (400, 0.9375rem): the credits on a graphite band (in code-text) and a game's status line (in slate); one step under body, never under label.
 - **Label** (400, 0.875rem, 1.3): board labels, code captions, table heads, the keyboard hint; slate.
 - **Code** (400, 0.8125rem, 1.6): code panes, 0.75rem on phones; inline code at 0.85em on panel white, and on asphalt where it sits inside a white panel.
 
@@ -242,6 +270,8 @@ A cool graphite-and-asphalt neutral scale with two race signals: a yellow for st
 
 Two frames. Guide pages (docs and evolution) are a 17rem rail beside a main column capped at 76rem, padded 2.5rem on top and by the gutter (clamp(1rem, 4vw, 3rem)) at the sides; the rail sits on a 1px hairline. The dommy page is full-width bands whose content centres in an 80rem measure, each padded vertically by clamp(3rem, 7vw, 5.5rem) or more: a graphite opening band at 7fr to 5fr (thesis beside the first demo), example sections on asphalt divided by hairlines (heading, one paragraph, then demo beside source), and a graphite figures band whose table (max 56rem) carries a visible caption. A game page opens on a graphite band at 5fr to 7fr, the game in the wide column: the title, pitch and figure top left, the credits under them, the game panel beside both; stacked (below 68.75em) the game follows the title, pitch and figure, and the credits come after it.
 
+The story under the game is one reading column on asphalt: every block of the article is centred at a 46rem measure, the column padded clamp(3rem, 7vw, 5.5rem) on top, the gutter at the sides and clamp(4rem, 9vw, 7rem) at the bottom. The headline and lede stand 1.25rem apart, 1rem above the first chapter; each chapter opens clamp(2.5rem, 5vw, 3.5rem) under the one before, its title 1rem above its prose at 68ch. A code pane sits a step apart from the prose around it (1.5rem above, 1.75rem below; a pending source holds 6rem at 1.5rem). The ending stands 2.5rem under a hairline, itself 2.5rem below the last chapter.
+
 A live demo and its source sit side by side at 5fr to 7fr with a 1.5rem gap; the demo is sticky while the source scrolls. Below 68.75em they stack and the dommy page's opening band goes to one column. A game measures its own panel (a container query): where the panel is at least 38rem, the board (up to 28rem) has a side column of readouts, buttons and status, the code disclosure under both; narrower, the readouts and buttons sit in a bar above the board. Below 45em the rail becomes a wrap of 2.75rem chips (evolution) or topic plates (docs) above the page, the demo stage tightens to 1.25rem 1rem, and the main column leaves 5rem at the bottom for the floating Netlify badge. Below 36em the site header wraps to two rows: the wordmark and the languages on the first, the sections on the second.
 
 Rhythm comes from a short set of gaps (0.25, 0.5, 0.75, 1, 1.5, 2rem) and 2rem between page blocks. Prose holds 62 to 68ch; docs headings sit 1rem above their block and closer to it than to what came before.
@@ -255,7 +285,7 @@ The system is flat. There is no box-shadow anywhere in the build; depth is tonal
 
 ## Shapes
 
-Small, even corners: 3px on the smallest plates (inline code, code chips, keys, a card back's frame), 4px on controls, inputs, plates, rail items, list rows and memory cards, 6px on the demo panel, code pane and dialog. Pips on the write board are round, filled for new writes and hollow for moves. Place plates run square-edged inside their 4px row. Bands and sections meet in straight edges. Borders are 1px hairline on light surfaces; state is drawn with heavier strokes: 3px underline for the header's current link, 4px signal-ink underline on an odd count, 4px signal left edge on an added code line, 2px graphite border on a failure plate (and on a wrong pair of cards) and on the current mobile chip, 2px underline on a quiet disclosure, dashed hairline on a pending plate.
+Small, even corners: 3px on the smallest plates (inline code, code chips, keys, a card back's frame), 4px on controls, inputs, plates, rail items, list rows and memory cards, 6px on the demo panel, code pane and dialog. Pips on the write board are round, filled for new writes and hollow for moves. Place plates run square-edged inside their 4px row. Bands and sections meet in straight edges. Borders are 1px hairline on light surfaces; state is drawn with heavier strokes: 3px underline for the header's current link, 4px signal-ink underline on an odd count, 4px signal left edge on an added code line, 2px graphite border on a failure plate and on the current mobile chip, 1px graphite outline inset 2px on a wrong pair of cards, 2px underline on a quiet disclosure, dashed hairline on a pending plate.
 
 ## Components
 
@@ -290,11 +320,17 @@ Graphite, 6px, code-text mono at 0.8125rem/1.6, lines kept on one line and scrol
 
 **The code that just ran:** a native disclosure under a game's board. Its summary is a quiet link: bold slate on a 2px hairline underline, graphite over a signal-ink underline when hovered or open. Open, one sentence above the pane says what the code did, its identifiers as inline code on asphalt (3px); the pane shows only the region that ran, its caption naming only the file.
 
+### Story
+How a game is built, told under it as an article: one reading column (see Layout) on asphalt. The headline is the display face at headline size (800, clamp(2.5rem, 5vw, 4rem), 1), balanced; the lede under it in slate at lead size. Each chapter is a section with a chapter title, prose in article metrics, and the code it quotes: a code pane (the Code Pane above, its slate caption naming only the file) cut from the running module by its region markers, never a tidied copy; while the sources load, a slate line holds the pane's place. Links in the prose are bold graphite on a signal-ink underline; identifiers are inline code on panel white. The ending is a footer over a hairline, linking to the sources on GitHub.
+
+### Credits
+On a game's opening band, under the title and figure: a code-text list at note size (0.9375rem) headed "The game is made with", one line per package in 0.2rem rows, each a bold asphalt link on a signal underline (offset 0.2em) naming the package, then what part of the game it does (the flow, reactive state, the DOM, the timer, error reports). The home band's credits are the same list for the scoreboard.
+
 ### Timing Plates
 Ranked rows (hairline, 4px) lead with a graphite place plate in the display face; the first row's plate is signal, and moves with whichever row leads. Read-out boxes are white with a hairline, display at 3.5rem. A posted result (a preview, a delivery, a rate) is a signal plate with display text at 2rem; not yet settled, it is a dashed hairline with slate text; a failed call is a white plate with a 2px graphite border and bold body text. A game's win posts its moves as a signal result plate (display 2rem) beside its place plate on the leaderboard. Result lists of code chips sit on graphite at 3px in mono.
 
 ### Memory Card
-A card is a square button that turns over in place. The back is a graphite plate (4px) with a slate hairline frame inset at 3px corners and a slate display "r" at weight 800; while a card may be turned, hovering turns its frame code-text. The face is white with a hairline: a graphite pictogram of the package drawn at a 2px round stroke, the slate `@reely/` scope under it, and the package name in the display face at 800. A found pair is posted as a signal plate under graphite text, scope included. A wrong pair waits to turn back as a failure plate, a 2px graphite border, while the board is busy. The turn is a 3D flip of 360ms (cubic-bezier(0.22, 1, 0.36, 1)) and the face changes colour over 240ms, only without reduced motion; under it the card changes side in place.
+A card is a square button that turns over in place. The back is a graphite plate (4px) with a slate hairline frame inset at 3px corners and a slate display "r" at weight 800; while a card may be turned, hovering turns its frame code-text. The face is white with a hairline: a graphite pictogram of the package drawn at a 2px round stroke, the slate `@reely/` scope under it, and the package name in the display face at 800. A found pair is posted as a signal plate under graphite text, scope included. A wrong pair waits to turn back while the board is busy, marked by a 1px graphite outline drawn inside its hairline (offset -2px), so the card keeps its size. The turn is a 3D flip of 360ms (cubic-bezier(0.22, 1, 0.36, 1)) and the face changes colour over 240ms, only without reduced motion; under it the card changes side in place.
 
 ### Dialog
 A native modal dialog: a white panel (6px, hairline), min(30rem, 100% - 2rem) wide, over a scrim of graphite at 0.72; the page behind does not scroll. The title is display 800 at 2rem; actions sit in a row at the bottom, the one the dialog is about solid, the rest demo buttons. Escape, a click on the scrim or a button closes it.
