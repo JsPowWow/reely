@@ -79,6 +79,12 @@ const en = {
             </p>
             <Snippet file='memory.rules.ts' region='shuffle' />
             <p>reely isn’t needed here at all, and that is the point: the rules don’t depend on any framework.</p>
+            <p>
+              Why this pays off in any app: logic kept as plain data and functions is the cheapest code to test and to
+              trust. A test is one line, with no DOM and no mocks, and the same rules could run on a server or in a
+              worker unchanged. Every later step only decides <em>when</em> to call these functions, never <em>what</em>{' '}
+              they do.
+            </p>
           </>
         ),
       },
@@ -108,6 +114,15 @@ const en = {
               That is where the <code>0 if</code> at the top comes from. The decisions haven’t gone anywhere: they sit
               in the machine’s config and a small lookup table, all in one place.
             </p>
+            <p>
+              Why a state machine pays off in any app: it turns “which mix of flags is possible?” into a short list of
+              states and the events each one takes. A mix that makes no sense, say two cards up and the board unlocked,
+              can’t even be written down. Every event in every state has exactly one answer, a move or a refusal, so
+              fast or doubled input can’t slip between two checks. The same shape fits a form that submits and retries,
+              a wizard, a player, a connection. Here it is what lets a test fire five thousand random clicks, new games
+              and turn-backs at the machine and check the rules after each one: a refused event changes nothing, so the
+              rules always hold.
+            </p>
           </>
         ),
       },
@@ -129,6 +144,12 @@ const en = {
             <p>
               The effect reads the phase. When the phase changes, the effect runs again and the timer of its last run is
               cancelled. A new game cancels it, leaving the page cancels it, and there is no id to keep anywhere.
+            </p>
+            <p>
+              Why this pays off in any app: anything that lives for a while, a timer, a listener, a subscription, a
+              request, belongs to the code that started it, and stops with it. In reely that owner is the effect run or
+              the render. You never write the cleanup by hand, so you can’t forget it, and nothing keeps running after
+              its page is gone.
             </p>
           </>
         ),
@@ -158,6 +179,14 @@ const en = {
               <code>computed</code> of the table, and it only reports a change when the deck itself is new. So the
               buttons are built again on a new game, and never on a turn.
             </p>
+            <p>
+              Why signals pay off in any app: a signal knows exactly who read it. When it changes, only those readers
+              run again: no re-render of a whole component, no virtual DOM to compare, no list of dependencies to keep
+              by hand and get wrong. The state lives in one place, and the page is just a view of it. Here a turn
+              changes one signal, and the board under the game shows the price: a couple of attribute writes on one
+              card, nothing else. Writing to storage is the same story: <code>persisted</code> is still a signal, so
+              saving needs no code of its own.
+            </p>
           </>
         ),
       },
@@ -179,6 +208,11 @@ const en = {
             <p>
               The catch: motion makes some people dizzy. So the animation only exists when the system hasn’t asked to
               reduce motion. Everyone else gets the same game, just without the turn.
+            </p>
+            <p>
+              Why this pays off in any app: the code only says what state a thing is in, and CSS decides how it looks
+              and moves. The browser runs the animation on its own, off the main thread where it can, so a busy script
+              doesn’t make it stutter, and a design change never touches the logic.
             </p>
             <Snippet file='memory.module.css' region='motion' />
           </>
@@ -218,6 +252,11 @@ const en = {
               becomes inert, and Escape closes it on its own. Our component is small: whether it is open is a signal,
               and the signal follows the <code>close</code> event. A click outside lands on the dialog itself, because
               the dialog has no padding, and that closes it too.
+            </p>
+            <p>
+              Why this pays off in any app: a native element brings the keyboard, focus and screen reader behaviour that
+              a custom one has to rebuild and then maintain. reely doesn’t wrap it in anything: a signal is bound to the
+              real <code>&lt;dialog&gt;</code>, and the browser does the rest.
             </p>
             <Snippet file='modal.tsx' region='dialog' />
             <p>Keeping the page still is one CSS rule: while a dialog is open, the page doesn’t scroll.</p>
