@@ -2,6 +2,7 @@ import { Await } from '@reely/dommy';
 
 import { gamesText, memoryChapters } from './games.text';
 import { MachineDiagram } from './memory/memory.diagram';
+import { LayersDiagram } from './memory/memory.layers';
 import { SourceView } from '../../demo/source.view';
 import { Localized } from '../../i18n/localized.view';
 
@@ -45,7 +46,14 @@ export const MemoryStory = ({ sources }: { sources: Promise<typeof Sources> }): 
           <h3 id={`${id}-title`} className={css.chapterTitle}>
             {() => gamesText().story.chapters[id].title}
           </h3>
-          <Localized view={() => gamesText().story.chapters[id].Body} props={{ Snippet, Diagram: MachineDiagram }} />
+          <Localized
+            view={() => gamesText().story.chapters[id].Body}
+            props={{
+              Snippet,
+              Diagram: MachineDiagram,
+              Layers: () => <LayersDiagram labels={gamesText().story.layers} />,
+            }}
+          />
         </section>
       ))}
       <footer className={css.ending}>

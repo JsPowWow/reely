@@ -1,5 +1,6 @@
 import { localized } from '../../i18n/localized';
 
+import type { LayersLabels } from './memory/memory.layers';
 import type { SitePackage } from '../../site/site.packages';
 
 /** The packages the memory game is made with; the credits name the part each one does. */
@@ -23,7 +24,7 @@ export type Snippet = (props: { file: string; region: string }) => Node;
 
 interface Chapter {
   title: string;
-  Body: (props: { Snippet: Snippet; Diagram: () => Node }) => Node;
+  Body: (props: { Snippet: Snippet; Diagram: () => Node; Layers: () => Node }) => Node;
 }
 
 const en = {
@@ -46,6 +47,26 @@ const en = {
     'The board under the game counts every DOM write it makes; the code that ran for each move is one click away.',
   story: {
     title: 'How the game is built',
+    layers: {
+      name: 'The memory game as layers: the rules inside the flow, time, storage and the page at the edges',
+      page: 'the page',
+      pageHolds: 'cards, dialogs, CSS',
+      time: 'time',
+      timeHolds: 'the timer',
+      storage: 'storage',
+      storageHolds: 'the best ten',
+      flow: 'the flow',
+      flowDoes: 'what can happen when',
+      rules: 'the rules',
+      rulesAre: 'plain functions over plain data',
+      eventsIn: 'events go in',
+      stateOut: 'state is read out',
+      afterASecond: 'after a second',
+      calls: 'calls',
+      inward: 'nothing inside knows what is outside',
+      sends: 'sends',
+      reads: 'reads',
+    } satisfies LayersLabels,
     Lede: (): Node => (
       <>
         Memory is the first game many of us ever played: sixteen cards face down, flip two, remember where things are.
@@ -267,14 +288,10 @@ const en = {
       },
       wrapUp: {
         title: 'What we ended up with',
-        Body: (): Node => (
+        Body: ({ Layers }): Node => (
           <>
-            <p>
-              Step back and look at the shape of it. In the middle are the rules: plain functions over plain data.
-              Around them is the flow: a state machine that says what can happen when. At the edges are time, storage
-              and the page, each a thin layer that reads the state and sends events. Nothing in the middle knows about
-              the DOM, the clock or <code>localStorage</code>.
-            </p>
+            <p>Step back and look at the whole thing:</p>
+            <Layers />
             <p>
               That is the whole trick, and it isn’t about memory games. Keep decisions where you can see them, push side
               effects to the edges, let one place own the state. Then double clicks, stray timers and a screen out of
