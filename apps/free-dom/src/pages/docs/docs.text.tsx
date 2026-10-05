@@ -489,13 +489,14 @@ const en = {
           <Code caption='derivation.ts' source={derivationSource} />
           <h2>Self-referencing in effects</h2>
           <p>
-            The effect below reads <code>plays</code> and then writes it. A signal an effect reads and then writes stops
-            being its dependency, so its own write does not run it again. Tick Playing: the count goes to 1, once. Press
-            Reset: it goes to 0 and stays there. Untick and tick Playing again: the effect still runs for{' '}
-            <code>playing</code>, which it only reads, and counts 1. The price: an effect cannot clamp a signal it
-            writes; a <code>computed</code> can. Two effects that write what the other reads would run forever; after
-            100 waves of writes the flush throws a cycle error instead, and a <code>computed</code> that reads itself,
-            directly or through others, throws one when it is read.
+            The effect below counts with <code>plays.update</code>, which reads <code>plays</code> untracked, so the
+            effect does not depend on it. Tick Playing: the count goes to 1, once. Press Reset: it goes to 0 and stays
+            there. Untick and tick Playing again: the effect still runs for <code>playing</code>, which it reads, and
+            counts 1. A run never hears what it writes itself, so an effect that reads and writes a signal settles
+            instead of looping; a later write from outside is heard again, so an effect that clamps a signal clamps
+            every write. Two effects that write what the other reads would run forever; after 100 waves of writes the
+            flush throws a cycle error instead, and a <code>computed</code> that reads itself, directly or through
+            others, throws one when it is read.
           </p>
           {playCounter}
           <h2>Releasing bindings</h2>

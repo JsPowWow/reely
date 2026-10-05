@@ -383,7 +383,7 @@ describe('the signal contract', () => {
   });
 
   describe('an effect that writes a signal it read', () => {
-    it('does not see later writes of it (README, Self-referencing in effects)', () => {
+    it('clamps it again after a later write (README, Self-referencing in effects)', () => {
       const laps = signal(0);
       const spy = vi.fn(() => {
         if (laps.value > 10) {
@@ -395,7 +395,7 @@ describe('the signal contract', () => {
       laps.value = 20;
       laps.value = 30;
 
-      expect([spy.mock.calls.length, laps.value]).toStrictEqual([2, 30]);
+      expect([spy.mock.calls.length, laps.value]).toStrictEqual([3, 10]);
     });
 
     it('still hears the other signals of a computed it read', () => {
@@ -415,7 +415,7 @@ describe('the signal contract', () => {
       expect(spy).toHaveBeenCalledTimes(3);
     });
 
-    it('does not see them either when it read the signal through a computed', () => {
+    it('clamps it again after a later write when it read the signal through a computed', () => {
       const laps = signal(0);
       const read = computed(() => laps.value);
       const spy = vi.fn(() => {
@@ -428,7 +428,7 @@ describe('the signal contract', () => {
       laps.value = 20;
       laps.value = 30;
 
-      expect([spy.mock.calls.length, laps.value]).toStrictEqual([2, 30]);
+      expect([spy.mock.calls.length, laps.value]).toStrictEqual([3, 10]);
     });
   });
 

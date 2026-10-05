@@ -2,13 +2,13 @@ import { effect, signal } from '@reely/dommy';
 
 import css from '../demos.module.css';
 
-// The effect reads and writes `plays`; its own write, and the reset, do not run it again.
+// `update` reads `plays` untracked, so the reset does not run the effect again.
 export const PlayCounter = (): Node => {
   const playing = signal(false);
   const plays = signal(0);
   effect(() => {
     if (playing.value) {
-      plays.value += 1;
+      plays.update((count) => count + 1);
     }
   });
 

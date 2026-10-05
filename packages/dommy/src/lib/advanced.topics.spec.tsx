@@ -160,18 +160,17 @@ describe('Self-referencing in effects', () => {
     });
 
     checked.value = true;
-    timesChecked.value = 0;
 
-    expect(timesChecked.value).toBe(0);
+    expect(timesChecked.value).toBe(1);
     expect(runs).toHaveBeenCalledTimes(2);
   });
 
-  it('keeps the effect that writes a signal it read running for the signals it only reads', () => {
+  it('counts with `update`, so a reset from outside does not count again', () => {
     const checked = signal(false);
     const timesChecked = signal(0);
     effect(() => {
       if (checked.value) {
-        timesChecked.value += 1;
+        timesChecked.update((count) => count + 1);
       }
     });
 
@@ -186,19 +185,18 @@ describe('Self-referencing in effects', () => {
     expect(timesChecked.value).toBe(11);
   });
 
-  it('does not see later writes of a signal it wrote, so a clamp belongs in a computed', () => {
-    const laps = signal(12);
+  it('clamps a signal it writes again after a later write from outside', () => {
+    const volume = signal(120);
     effect(() => {
-      if (laps.value > 10) {
-        laps.value = 10;
+      if (volume.value > 100) {
+        volume.value = 100;
       }
     });
-    const clamped = computed(() => Math.min(laps.value, 10));
+    const clamped = volume.value;
 
-    laps.value = 20;
+    volume.value = 130;
 
-    expect(laps.value).toBe(20);
-    expect(clamped.value).toBe(10);
+    expect([clamped, volume.value]).toEqual([100, 100]);
   });
 
   it('stays dependent on a signal it writes first and reads after', () => {

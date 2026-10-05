@@ -32,7 +32,7 @@ Pick the style you like; the two mix freely. A `ReactiveValue<T>` is anything re
 
 Effects run synchronously, and a computed recomputes only when it is read after a change. A write of an equal value (`Object.is`, or the `equals` you pass) changes nothing. A signal holds any value, a function included: `set` and `.value =` store it; `update` calls only the function you pass it.
 
-A batch that puts a signal back where it was reruns nothing that read it before the batch. A run of an effect or computed does not follow a signal it writes itself, so a run that writes what it reads settles instead of looping; effects that keep writing each other's signals stop with an error after 100 waves, and a computed that reads itself throws one.
+A batch that puts a signal back where it was reruns nothing that read it before the batch. A run of an effect or computed does not hear what it writes itself, untracked included, so a run that writes what it reads settles instead of looping; a write from outside the run is heard again, so an effect that clamps `laps` to 10 clamps a later 30 as well; effects that keep writing each other's signals stop with an error after 100 waves, and a computed that reads itself throws one.
 
 ```ts
 import { signal } from '@reely/signals';

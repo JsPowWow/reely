@@ -105,7 +105,7 @@ class Signal<T> implements Source {
     running?.onOwnWrite(this);
     const idle = queue.length === 0;
     for (const observer of this.observers) {
-      observer.mark(this);
+      observer.mark();
     }
     if (idle && queue.length > 0 && batchDepth === 0 && !flushing) {
       flushSync();
@@ -124,7 +124,6 @@ abstract class Computation<T> {
   private runCount = 0;
   private checkedAt = -1;
   private markedAt = -1;
-  private deafTo: Nullable<Set<Source>> = null;
   // checking its sources or computing: a read of it now is a cycle
   private refreshing = false;
 
@@ -133,20 +132,16 @@ abstract class Computation<T> {
   // whether its sources hold it, so that their writes reach it
   protected abstract get linked(): boolean;
 
-  // `written` is the signal whose write this mark carries
-  public mark(written: Source): void {
+  public mark(): void {
     // once per write: a node already marked by an earlier write still passes a new one on
     if (this.markedAt === epoch) {
       return;
     }
     this.markedAt = epoch;
-    // A run does not depend on a signal it writes, read directly or through a computed: its own
-    // write coming back makes it deaf to that signal until it reads it again or runs again.
-    if (this === running) {
-      this.deafTo ??= new Set();
-      this.deafTo.add(written);
-    } else if (!this.deafTo?.has(written)) {
-      this.onMarked(written);
+    // a run does not depend on a signal it writes, read directly or through a computed: its own
+    // write coming back is not heard; a later write is, the run is over
+    if (this !== running) {
+      this.onMarked();
     }
   }
 
@@ -159,7 +154,6 @@ abstract class Computation<T> {
   }
 
   public onRead(source: Source): void {
-    this.deafTo?.delete(source);
     const link = this.sources.get(source);
     if (hasSome(link)) {
       link.version = source.version;
@@ -207,7 +201,6 @@ abstract class Computation<T> {
 
     const { fn } = this;
     this.runCount++;
-    this.deafTo = null;
     const outer = setTracker(this);
     const outerRunning = setRunning(this);
     let next: Outcome<T>;
@@ -249,7 +242,7 @@ abstract class Computation<T> {
     }
   }
 
-  protected abstract onMarked(written: Source): void;
+  protected abstract onMarked(): void;
 }
 
 class Computed<T> extends Computation<T> implements Source {
@@ -283,10 +276,10 @@ class Computed<T> extends Computation<T> implements Source {
     }
   }
 
-  protected onMarked(written: Source): void {
+  protected onMarked(): void {
     this.needsCheck = true;
     for (const observer of this.observers) {
-      observer.mark(written);
+      observer.mark();
     }
   }
 }

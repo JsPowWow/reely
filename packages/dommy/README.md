@@ -467,7 +467,7 @@ A stream of every value (`for await`) is not provided: an effect already sees ev
 
 ### Self-referencing in effects
 
-A signal an effect reads and then writes in the same run stops being its dependency: the write does not run the effect again, so an effect can count plays while it watches playback:
+A run of an effect does not hear what it writes itself: the write does not run the effect again, so an effect that writes a signal it reads settles instead of looping. A later write from outside is heard again, so an effect that clamps `volume` to 100 clamps every later write too. To count without following the count, write it with `update`, which reads it untracked:
 
 ```ts
 import { effect, signal } from '@reely/dommy';
@@ -476,11 +476,11 @@ const playing = signal(false);
 const plays = signal(0);
 
 effect(() => {
-  if (playing.value) plays.value += 1; // resetting `plays` does not re-run it
+  if (playing.value) plays.update((n) => n + 1); // resetting `plays` does not re-run it
 });
 ```
 
-It still runs for the signals it only reads, and a read after the write depends on the signal again. The price: it does not see later writes of a signal it wrote, so an effect that clamps `volume` to 100 stops clamping; derive the clamped value with `computed` instead. To read a signal without depending on it, use `untracked` or `.peek()`. Two effects that each write what the other reads would run forever; after 100 waves of writes the flush stops and throws a cycle error instead of hanging the page.
+To read a signal without depending on it, use `untracked` or `.peek()`. Two effects that each write what the other reads would run forever; after 100 waves of writes the flush stops and throws a cycle error instead of hanging the page.
 
 ### Releasing bindings
 
