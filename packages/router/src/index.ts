@@ -1,6 +1,6 @@
 export { currentPath, pageLoading } from './lib/router.current';
 export { href, type HrefParams } from './lib/router.href';
-export { type RouterHistory } from './lib/router.history';
+export type { RouterHistory, Shown } from './lib/router.history';
 export { followLinks } from './lib/router.links';
 export { memoryHistory } from './lib/router.memory';
 export { navigate, type NavigateOptions } from './lib/router.navigate';

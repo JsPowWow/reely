@@ -7,8 +7,9 @@ import { navigate } from './router.navigate';
 import { defineRoutes } from './router.routes';
 import { startRouter } from './router.start';
 
+import type { Shown } from '../index';
 import type { RouterHistory } from './router.history';
-import type { Router } from './router.start';
+import type { Router, RouterOptions } from './router.start';
 import type { Routes } from './router.types';
 
 type Page = () => Node;
@@ -99,6 +100,10 @@ describe('startRouter', () => {
     scrollTo.mockReset();
     vi.restoreAllMocks();
     Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+  });
+
+  it('names what `show` returns, for an app that writes its own', () => {
+    expectTypeOf<RouterOptions<Page>['show']>().returns.toEqualTypeOf<Shown>();
   });
 
   it('shows the page of the location it starts at', async () => {

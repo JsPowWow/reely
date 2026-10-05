@@ -330,7 +330,7 @@ export const HelpWidget = (): Node => {
 - `currentPath()` and `pageLoading()`: the path the browser's router shows and whether the next page is loading, read like signals.
 - `memoryHistory(start)`: a history in memory, for a router inside part of the page; `path()`, `loading()` and `navigate()` on it.
 - `followLinks(root, navigate)`: sends the plain clicks on the links inside `root` to `navigate`; returns the stop.
-- Types: `Routes`, `RouteTable`, `ParamsOf`, `HrefParams`, `PageOf`, `Router`, `RouterOptions`, `RouterHistory`, `NavigateOptions`.
+- Types: `Routes`, `RouteTable`, `ParamsOf`, `HrefParams`, `PageOf`, `Router`, `RouterOptions`, `Shown`, `RouterHistory`, `NavigateOptions`.
 
 ## License
 
