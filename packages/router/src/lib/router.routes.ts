@@ -20,6 +20,12 @@ export type PageOf<T> = NonNullable<Awaited<T[keyof T]>>;
 
 const segmentsOf = (path: string): string[] => path.split('/').filter((segment) => segment !== '');
 
+// a pattern's literal segments encoded as an address's path arrives (`/café` as `/caf%C3%A9`); params keep their names
+const patternOf = (pattern: string): string[] =>
+  segmentsOf(pattern).map((part) =>
+    part.startsWith(':') || part.startsWith('*') ? part : new URL(`/${part}`, anyOrigin).pathname.slice(1)
+  );
+
 // the params a pattern takes from a pathname's segments, or undefined when it does not match them
 const matchSegments = (pattern: readonly string[], segments: readonly string[]): Params | undefined => {
   const params: Record<string, string> = {};
@@ -48,7 +54,7 @@ export function defineRoutes<T>(table: RouteTable<T>): Routes<PageOf<T>>;
 export function defineRoutes(
   table: Readonly<Record<string, (params: Params, query: URLSearchParams) => unknown>>
 ): Routes<unknown> {
-  const routes = Object.entries(table).map(([pattern, answer]) => ({ pattern: segmentsOf(pattern), answer }));
+  const routes = Object.entries(table).map(([pattern, answer]) => ({ pattern: patternOf(pattern), answer }));
   return async (address) => {
     const { pathname, searchParams } = new URL(address, anyOrigin);
     const segments = segmentsOf(pathname);

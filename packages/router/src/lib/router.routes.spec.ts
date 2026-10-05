@@ -51,6 +51,17 @@ describe('defineRoutes', () => {
     expect(await answerAt(routes, '/')).toBe('missing /');
   });
 
+  it('matches a pattern written in any script, as the address arrives encoded', async () => {
+    const routes = defineRoutes({
+      '/café': () => named('café'),
+      '/о-нас/:part': ({ part }) => named(`о нас: ${part}`),
+    });
+
+    expect(await answerAt(routes, '/café')).toBe('café');
+    expect(await answerAt(routes, '/caf%C3%A9')).toBe('café');
+    expect(await answerAt(routes, '/о-нас/команда')).toBe('о нас: команда');
+  });
+
   it('takes a pathname with or without its trailing slash', async () => {
     const routes = defineRoutes({ '/labs': () => named('labs'), '/docs/:topic': ({ topic }) => named(topic) });
 
