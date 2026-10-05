@@ -100,4 +100,48 @@ describe('memory machine', () => {
       place: 1,
     });
   });
+
+  it('holds its invariants under any order of fast clicks, new games and timers', () => {
+    const { world, timers } = setUp();
+    let clock = 0;
+    const game = memoryMachine({
+      ...world,
+      now: () => ++clock,
+      deal: () => ({
+        deck: ['a', 'b', 'c', 'a', 'b', 'c'],
+        open: [],
+        found: [],
+        moves: 0,
+      }),
+    });
+    const { table, leaderboard } = game.context;
+    // a seeded pseudo-random walk, so a failure replays the same way
+    let seed = 7;
+    const next = (): number => {
+      seed = (seed * 16807) % 2147483647;
+      return seed / 2147483647;
+    };
+    let wins = 0;
+    game.on('stateChanged', ({ to }) => to === 'won' && wins++);
+
+    for (let step = 0; step < 5000; step++) {
+      const roll = next();
+      if (roll < 0.8) game.send('turn', Math.floor(next() * 7) - 1);
+      else if (roll < 0.95) fire(timers);
+      else game.send('deal');
+
+      const { deck, open, found, moves } = table.value;
+      expect(open.length).toBeLessThanOrEqual(2);
+      expect(new Set(open).size).toBe(open.length);
+      expect(new Set(found).size).toBe(found.length);
+      expect(timers.size).toBeLessThanOrEqual(1);
+      expect(timers.size === 1).toBe(game.state === 'wrongPair');
+      expect(open.every((place) => !found.includes(deck[place] ?? ''))).toBe(
+        true
+      );
+      expect(moves).toBeGreaterThanOrEqual(found.length);
+    }
+    expect(wins).toBeGreaterThan(0);
+    expect(leaderboard.value.board.length).toBe(Math.min(wins, 10));
+  });
 });
