@@ -13,6 +13,10 @@ export interface NavigateOptions {
 /** Goes to a URL of this site without loading the document; the router shows its page. */
 export const navigate = (to: string | URL, { replace = false }: NavigateOptions = {}): void => {
   const url = new URL(to, location.href);
+  // replacing the URL shown with itself is bookkeeping, not a move: a failed page is not loaded again
+  if (replace && url.href === location.href) {
+    return;
+  }
   if (replace) {
     // the same page in place keeps what its entry holds, such as where it was scrolled
     history.replaceState(url.pathname === location.pathname ? history.state : null, '', url);

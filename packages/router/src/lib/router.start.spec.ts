@@ -179,6 +179,20 @@ describe('startRouter', () => {
     expect(heading()).toBe('Cart');
   });
 
+  it('follows a link around a shadow host clicked inside its shadow root', async () => {
+    await start();
+    const icon = element('span', {});
+    icon.attachShadow({ mode: 'open' }).append(element('b', {}, '→'));
+    document.body.append(element('a', { href: '/cart' }, icon, 'Cart'));
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true, composed: true, button: 0 });
+
+    icon.shadowRoot?.querySelector('b')?.dispatchEvent(click);
+    await settle();
+
+    expect(click.defaultPrevented).toBe(true);
+    expect(heading()).toBe('Cart');
+  });
+
   it('starts a new page at the top, its heading focused for a screen reader', async () => {
     await start();
 
@@ -504,6 +518,27 @@ describe('startRouter', () => {
     expect([failed, retried]).toEqual(['Offline', 'Cart']);
     expect(history.length).toBe(entries);
     expect(cartLoads).toBe(2);
+  });
+
+  it('loads a failed page once when code only replaces its address with itself', async () => {
+    let cartLoads = 0;
+    await start(
+      defineRoutes({
+        '/': () => pageNamed('Shop'),
+        '/cart': () => {
+          cartLoads++;
+          return Promise.reject(new Error('Offline'));
+        },
+      })
+    );
+
+    navigate('/cart');
+    await settle();
+    navigate(location.href, { replace: true });
+    await settle();
+
+    expect(alert()).toBe('Offline');
+    expect(cartLoads).toBe(1);
   });
 
   it('goes where code sends it, with `navigate` or the router', async () => {

@@ -2,12 +2,9 @@ import { onCleanup } from '@reely/signals';
 import { isInstanceOf, isNil } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
-// the HTML link clicked, inside a shadow root too; an `<a>` of SVG is no link the router follows
-const linkOf = (event: Event): Nullable<HTMLAnchorElement> => {
-  const [target] = event.composedPath();
-  const link = isInstanceOf(Element, target) ? target.closest('a') : null;
-  return isInstanceOf(HTMLAnchorElement, link) ? link : null;
-};
+// the HTML link clicked, across shadow roots either way; an `<a>` of SVG is no link the router follows
+const linkOf = (event: Event): Nullable<HTMLAnchorElement> =>
+  event.composedPath().find((node) => isInstanceOf(HTMLAnchorElement, node)) ?? null;
 
 // a primary-button click without modifiers: the others open tabs and windows
 const isPlainClick = (event: MouseEvent): boolean =>
