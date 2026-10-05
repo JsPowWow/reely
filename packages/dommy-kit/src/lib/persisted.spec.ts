@@ -1,4 +1,4 @@
-import { mount } from '@reely/dommy';
+import { effect, mount } from '@reely/dommy';
 
 import { persisted } from '../index';
 
@@ -128,6 +128,20 @@ describe('persisted', () => {
     expect(followed).toBe('ru');
     expect(lang?.value).toBe('ru');
     expect(setItem).not.toHaveBeenCalled();
+  });
+
+  it('stores a value an effect corrects while following another tab', () => {
+    const lang = persisted('lang', 'en');
+    effect(() => {
+      if (lang.value === 'RU') {
+        lang.value = 'ru';
+      }
+    });
+
+    fromAnotherTab({ key: 'lang', newValue: '"RU"' });
+
+    expect(lang.value).toBe('ru');
+    expect(localStorage.getItem('lang')).toBe('"ru"');
   });
 
   it('resets to the initial value when another tab clears the storage', () => {

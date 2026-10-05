@@ -33,29 +33,26 @@ export const persisted = <T>(key: string, initial: T, ...[options = {}]: Persist
     }).getOrElse(initial);
   const storage = (): Pick<Storage, 'getItem' | 'setItem'> => options.storage ?? localStorage;
 
-  // true while the value is set from what the storage holds, which needs no write back
-  let reading = true;
   const value = signal(parse(Either.tryCatch(() => storage().getItem(key)).getOrElse(null)));
+  // the value as the storage holds it, as far as this tab knows: only a different one is written
+  let known = JSON.stringify(value.peek());
   effect(() => {
-    const next = value.value;
-    if (!reading) {
-      Either.tryCatch(() => storage().setItem(key, JSON.stringify(next)));
+    const text = JSON.stringify(value.value);
+    if (text !== known) {
+      known = text;
+      Either.tryCatch(() => storage().setItem(key, text));
     }
   });
-  reading = false;
 
   listen(window, 'storage', (event) => {
     const ours = Either.tryCatch(() => event.storageArea === storage()).getOrElse(false);
     if (!ours || (event.key !== key && event.key !== null)) {
       return;
     }
-    reading = true;
-    try {
-      // a `null` key is a `clear()`
-      value.value = event.key === null ? initial : parse(event.newValue);
-    } finally {
-      reading = false;
-    }
+    // a `null` key is a `clear()`
+    const next = event.key === null ? initial : parse(event.newValue);
+    known = JSON.stringify(next);
+    value.value = next;
   });
   return value;
 };
