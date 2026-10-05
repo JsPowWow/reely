@@ -43,11 +43,11 @@ That is the whole setup. Links stay plain `<a href="/messages/42">`: the router 
 - A **route** is a path pattern with the function that answers it. `:id` takes one segment, `*rest` the rest of the path; the params arrive decoded and typed from the pattern, so `({ topic })` on `'/messages/:id'` does not compile.
 - A **page** is whatever your app shows: here a function that makes the view, but an element or `{ title, view }` work as well. Its type is inferred from what the routes answer, and `show` and `fail` are checked against it.
 - `show` puts a page on screen and returns the element it is in (or its nodes); after a move, the page's `h1` gets the focus, so a screen reader starts reading the new page.
-- `fail` gives the page for whatever went wrong: a route that throws or fails to load, an address no route answers, a page that throws in `show`.
+- `fail` gives the page for whatever went wrong: a route that throws or fails to load, an address no route answers, a page that throws in `show`. A move to that address again, a click on the same link included, tries its page once more, so a chunk that failed offline loads once the reader is back online.
 
 ## Routes
 
-Routes are tried in order, and one that answers `undefined` passes the address on to the next, so a route can check its params and leave the rest to a page for unknown paths. A route may answer with a promise of its page, so the page behind `import()` ships in its own chunk and loads when it is first opened. The second argument is the query.
+Patterns are absolute paths from the site's root, with no base path, and may be written in any script (`/о-нас`, `/café`). Routes are tried in order, and one that answers `undefined` passes the address on to the next, so a route can check its params and leave the rest to a page for unknown paths. A route may answer with a promise of its page, so the page behind `import()` ships in its own chunk and loads when it is first opened. The second argument is the query.
 
 ```ts
 import { defineRoutes } from '@reely/router';
@@ -84,7 +84,7 @@ export const routes = defineRoutes({
 
 ## Links and moves
 
-A route's pattern is its name. Keep the patterns in one object, and `href` fills one in for a link, typed and encoded, so a link and the route it opens share one path:
+A route's pattern is its name. Keep the patterns in one object, and `href` fills one in for a link, typed and encoded, an absolute path as the pattern is, so a link and the route it opens share one path:
 
 ```ts
 import { href, navigate } from '@reely/router';
@@ -105,7 +105,7 @@ navigate(href(paths.message, { id: '43' }));
 navigate('/login?next=/account', { replace: true });
 ```
 
-- The router takes over a plain left click on a link of this site. A click with a modifier key or another button, a link with `target="_blank"` or `download`, a link marked `rel="external"` (a file or a page the server answers), a link to another site, and a link to a place on the page shown stay the browser's.
+- The router takes over a plain left click on a link of this site, inside an open shadow root too. A click with a modifier key or another button, a link with `target="_blank"` or `download`, a link marked `rel="external"` (a file or a page the server answers), a link to another site, and a link to a place on the page shown stay the browser's.
 - A new query (`?sort=price`) shows the page again; a new `#place` on the page shown only scrolls to it.
 - `navigate` to the URL already shown adds no history entry.
 
@@ -163,6 +163,24 @@ navigate(address, { replace: true });
 ```
 
 The page reads its setting wherever it likes (`new URL(location.href).searchParams.get('lang')`, or a signal it keeps); the router only promises that the address goes on naming it.
+
+`keep` fills in only a setting the address leaves out. Back to an entry made with an older value brings that value back; an app that wants its current one everywhere writes it into the address after each move, as the [free-dom site](https://reely-free-dom.netlify.app) does:
+
+```ts
+import { effect } from '@reely/signals';
+import { currentPath, navigate } from '@reely/router';
+
+declare const language: () => string; // the language shown now, read like a signal
+
+effect(() => {
+  currentPath();
+  const address = new URL(location.href);
+  address.searchParams.set('lang', language());
+  navigate(address, { replace: true });
+});
+```
+
+A move cannot drop a kept setting either: set it to empty (`?lang=`) instead.
 
 ## The path shown, and the page loading
 
@@ -247,7 +265,7 @@ help.navigate(href(paths.topic, { slug: 'returns' })); // from code, the same wa
 console.log(help.path(), help.loading()); // the path shown and the next page loading, read like signals
 ```
 
-After a move, the page's `h1` gets the focus, or its first heading of any level when it has none: a widget's pages start at `h2`.
+After a move, the page's `h1` gets the focus, or its first heading of any level when it has none: a widget's pages start at `h2`. Scrolling is the page's own: a `memoryHistory` scrolls nowhere and ignores a `#place`.
 
 ## Moves from code
 
