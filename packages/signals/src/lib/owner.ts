@@ -2,16 +2,13 @@ import { hasSome } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
 import { isNil } from '@reely/utils';
 
-/**
- * What a piece of work must release when it ends: its effects, cleanups and nested owners. Opaque:
- * `getOwner` captures one for `withOwner`.
- */
-export class Owner {
+// what a piece of work must release when it ends: its effects, cleanups and nested owners
+export class OwnerNode {
   // `null` once disposed: a disposed owner holds nothing, so what it is given later goes at once
   #cleanups: Nullable<Set<() => void>> = new Set();
 
   /** Holds `cleanup` until `owner` is disposed; a disposed owner runs it now, no owner holds nothing. */
-  public static hold(owner: Nullable<Owner>, cleanup: () => void): void {
+  public static hold(owner: Nullable<OwnerNode>, cleanup: () => void): void {
     if (isNil(owner)) {
       return;
     }
@@ -23,14 +20,14 @@ export class Owner {
   }
 
   /** Forgets `cleanup`, released by itself before `owner` goes. */
-  public static drop(owner: Nullable<Owner>, cleanup: () => void): void {
+  public static drop(owner: Nullable<OwnerNode>, cleanup: () => void): void {
     if (hasSome(owner)) {
       owner.#cleanups?.delete(cleanup);
     }
   }
 
   /** Runs every cleanup, the last held first, even when one throws; the first error is rethrown. */
-  public static dispose(owner: Owner): void {
+  public static dispose(owner: OwnerNode): void {
     // reverse order of creation, like a stack of resources
     const cleanups = [...(owner.#cleanups ?? [])].reverse();
     owner.#cleanups = null;
@@ -48,6 +45,12 @@ export class Owner {
   }
 }
 
+/**
+ * What a piece of work must release when it ends: its effects, cleanups and nested owners. Opaque:
+ * `getOwner` captures one for `withOwner`.
+ */
+export type Owner = OwnerNode;
+
 let currentOwner: Nullable<Owner> = null;
 
 /** For code that runs later, such as a callback creating effects, to pass to `withOwner`. */
@@ -55,7 +58,7 @@ export const getOwner = (): Nullable<Owner> => currentOwner;
 
 /** Registers a release in the running owner; outside any owner nothing holds it, and it never runs. */
 export const onCleanup = (cleanup: () => void): void => {
-  Owner.hold(currentOwner, cleanup);
+  OwnerNode.hold(currentOwner, cleanup);
 };
 
 /**
@@ -64,12 +67,12 @@ export const onCleanup = (cleanup: () => void): void => {
  * new owner is disposed at once, and so is everything `fn` registers with it.
  */
 export const withOwner = <T>(fn: (dispose: () => void) => T, parent: Nullable<Owner> = currentOwner): T => {
-  const owner = new Owner();
+  const owner = new OwnerNode();
   const dispose = (): void => {
-    Owner.drop(parent, dispose);
-    Owner.dispose(owner);
+    OwnerNode.drop(parent, dispose);
+    OwnerNode.dispose(owner);
   };
-  Owner.hold(parent, dispose);
+  OwnerNode.hold(parent, dispose);
 
   const previous = currentOwner;
   currentOwner = owner;

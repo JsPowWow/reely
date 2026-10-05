@@ -1,3 +1,4 @@
+import * as signals from '@reely/signals';
 import { batch, computed, effect, onCleanup, signal, untracked, withOwner } from '@reely/signals';
 import { subscriberCount } from '@reely/signals/testing';
 
@@ -25,6 +26,10 @@ batch(() => {
 lap.update((value) => value + untracked(() => 1));
 dispose();
 lap.set(9);
+
+// an owner is opaque: the package exports its type, and nothing to call on it
+// @ts-expect-error `Owner` is no value of the package
+void signals.Owner;
 
 const garage = { cars: ['Volvo'] };
 const always: SignalOptions<typeof garage> = { equals: false };

@@ -1,6 +1,6 @@
 import { noop, setPrototype } from '@reely/utils';
 
-import { getOwner, Owner, withOwner } from './owner';
+import { getOwner, OwnerNode, withOwner } from './owner';
 import * as reelx from './reelx.core';
 
 import type { ReactiveValue, SignalOptions } from './reelx.core';
@@ -60,7 +60,7 @@ export const effect = (fn: (this: { dispose(): void }) => void): (() => void) =>
       return;
     }
     disposed = true;
-    Owner.drop(parent, dispose);
+    OwnerNode.drop(parent, dispose);
     // a kept `dispose` must not keep the body or the effect's last dependencies alive
     body = noop;
     unsubscribe();
@@ -98,7 +98,7 @@ export const effect = (fn: (this: { dispose(): void }) => void): (() => void) =>
     }
   };
 
-  Owner.hold(parent, dispose);
+  OwnerNode.hold(parent, dispose);
   // what the first run triggers runs after it; an error of those effects leaves this one alive
   reelx.batch(() => {
     let release: () => void;
