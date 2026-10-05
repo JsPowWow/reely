@@ -1,4 +1,4 @@
-import { effect, signal } from '@reely/dommy';
+import { effect } from '@reely/dommy';
 
 import { gamesText, memoryPackages } from './games.text';
 import { MemoryGame } from './memory/memory.game';
@@ -15,8 +15,6 @@ import css from './games.module.css';
 export const MemoryPage = (): Node => {
   // the game plays at once; its highlighted sources, most of the page's weight, follow in a chunk of their own
   const sources = import('./memory/memory.sources');
-  const branches = signal<number | undefined>(undefined);
-  void sources.then(({ memoryBranches }) => branches.set(memoryBranches));
 
   effect(() => {
     document.title = gamesText().documentTitle;
@@ -33,14 +31,6 @@ export const MemoryPage = (): Node => {
               {() => gamesText().title}
             </h1>
             <p className={band.pitch}>{() => gamesText().pitch}</p>
-            <dl className={band.facts}>
-              <div>
-                <dt>{() => gamesText().branches}</dt>
-                <dd>
-                  {() => branches() ?? '–'} <code className={css.keyword}>if</code>
-                </dd>
-              </div>
-            </dl>
           </div>
           <div className={css.play}>
             <MutationMeter>

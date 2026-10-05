@@ -14,7 +14,7 @@ export const memoryPackages = [
 type MemoryPackage = (typeof memoryPackages)[number];
 
 /** The chapters of the story under the game, in reading order. */
-export const memoryChapters = ['rules', 'machine', 'time', 'state', 'card', 'leaderboard', 'dialog', 'proof'] as const;
+export const memoryChapters = ['rules', 'state', 'machine', 'time', 'card', 'leaderboard', 'dialog', 'wrapUp'] as const;
 
 export type MemoryChapter = (typeof memoryChapters)[number];
 
@@ -23,16 +23,15 @@ export type Snippet = (props: { file: string; region: string }) => Node;
 
 interface Chapter {
   title: string;
-  Body: (props: { Snippet: Snippet }) => Node;
+  Body: (props: { Snippet: Snippet; Diagram: () => Node }) => Node;
 }
 
 const en = {
-  documentTitle: 'Memory game without one if | reely',
+  documentTitle: 'Memory game, built step by step | reely',
   description:
-    'A memory game in TypeScript with no if in its code: a state machine moves it on over signals the page draws. Play it, then read how it is built.',
+    'A memory game in TypeScript, and how it is built: rules as plain data, a state machine for the flow, signals for the state, time and storage at the edges.',
   title: 'Memory game',
   pitch: 'Sixteen cards, eight reely packages: find every pair in as few moves as you can.',
-  branches: 'in its code, and not one switch either',
   loadingSource: 'Loading the source…',
   sourceFailed: 'The source failed to load; reload the page to try again.',
   madeWith: 'The game is made with',
@@ -49,174 +48,177 @@ const en = {
     title: 'How the game is built',
     Lede: (): Node => (
       <>
-        Here is how this game is made, step by step. At each step: what we want, why we do it this way, where it usually
-        goes wrong, and what reely does to help. All the code below is taken from the game you just played, not from a
-        cleaned-up copy.
+        Memory is the first game many of us ever played: sixteen cards face down, flip two, remember where things are.
+        It is also a perfect little lab. Behind its four rules hide the same troubles as in any real app: clicks that
+        come too fast, timers that outlive their screen, a page that drifts away from the data behind it. Let’s build it
+        step by step and watch a few good habits make those troubles simply not happen. Every piece of code below is the
+        real code of the game above.
       </>
     ),
     chapters: {
       rules: {
-        title: 'Step 1. Rules first, no page yet',
+        title: 'Step 1. Rules first, screen later',
         Body: ({ Snippet }): Node => (
           <>
             <p>
-              We want rules we can check without a browser. So we start with the table, as plain data: the deck as it
-              lies, the cards turned up right now, the pairs found, and the number of moves. No DOM, no timer, no
-              clicks. At most two cards are ever up, and the type says so: <code>open</code> holds none, one or two
-              places, so a third card can’t even be written down.
+              It’s tempting to start with cards on the page. Let’s not. First we describe the game as plain data and
+              call it the table: the deck as it lies, the cards that are up right now, the pairs already found, and the
+              number of moves.
             </p>
             <Snippet file='memory.rules.ts' region='state' />
             <p>
-              Turning a card is a function: it takes the table and gives back the next one. The catch is the clicks that
-              should do nothing: a fast double click, a click on a found card, a click while a wrong pair is still up.
-              Usually each of them needs its own check in the click handler. Here, when a card can’t turn, the function
-              simply returns the same table. Nothing changes, so there is nothing to guard against.
+              Look at <code>open</code>. At most two cards are ever up, and the type says exactly that: none, one or two
+              places. Code that tries to put up a third card won’t even compile, so a whole family of bugs is gone
+              before we’ve written a line of logic.
+            </p>
+            <p>
+              Now the main rule. Turning a card is a function: a table goes in, the next table comes out. The
+              interesting part is what <code>turnCard</code> does when a card can’t turn, because it’s already up,
+              already found, or a wrong pair is still waiting: it returns the very same table. A double click, a click
+              on a found card, a click at the wrong moment all change nothing, and nobody had to write a check for them.
             </p>
             <Snippet file='memory.rules.ts' region='turn-card' />
             <p>
-              Shuffling has a catch too. The popular <code>sort(() =&gt; Math.random() - 0.5)</code> looks fine, but
-              some orders come up more often than others. We use the Fisher–Yates method instead: take a random card
-              from those left, again and again. Every order is equally likely. The random source is a parameter, so a
-              test can deal exactly the deck it needs.
+              One more trap hides in the shuffle. The popular one-liner <code>sort(() =&gt; Math.random() - 0.5)</code>{' '}
+              looks fine, but some orders come up more often than others. <code>shuffled</code> uses the Fisher–Yates
+              method instead: take a random card from those left, again and again, and every order is equally likely.
+              The randomness comes in as a parameter, so a test can deal exactly the deck it wants.
             </p>
             <Snippet file='memory.rules.ts' region='shuffle' />
-            <p>reely isn’t needed here at all, and that is the point: the rules don’t depend on any framework.</p>
             <p>
-              Why this pays off in any app: logic kept as plain data and functions is the cheapest code to test and to
-              trust. A test is one line, with no DOM and no mocks, and the same rules could run on a server or in a
-              worker unchanged. Every later step only decides <em>when</em> to call these functions, never <em>what</em>{' '}
+              Why start here? Data in, data out is the easiest code you will ever test: no browser, no mocks, one line
+              per case. Everything that follows only decides <em>when</em> to call these functions, never <em>what</em>{' '}
               they do.
             </p>
           </>
         ),
       },
-      machine: {
-        title: 'Step 2. Give each moment of the game a name',
+      state: {
+        title: 'Step 2. Keep the state in one place',
         Body: ({ Snippet }): Node => (
           <>
             <p>
-              A click should do the right thing at the right moment. The game has only four moments: no card up, one
-              card up, a wrong pair waiting, all pairs found.
+              The page has to show the table, and never an old one. The classic bug is copying state into the page by
+              hand: you update the move counter, forget the card, and the screen starts to lie.
             </p>
             <p>
-              The usual way is a few flags, like <code>isLocked</code> or <code>firstCard</code>, and an <code>if</code>{' '}
-              in every handler to check them. Forget one <code>if</code>, and fast clicks break the game. With{' '}
-              <code>@reely/state-machine</code> each moment is a state, and the current one comes straight from the
-              table: zero, one or two cards up.
+              So the state lives in signals: small boxes that remember who looked inside. Read one and you are
+              subscribed; change it and exactly those readers update. Here is everything the game remembers:
+            </p>
+            <Snippet file='memory.game.tsx' region='state' />
+            <p>
+              <code>deal</code> lays out a fresh table, and <code>table</code> holds the current one. <code>best</code>{' '}
+              is the ten best wins; <code>persisted</code> keeps them in <code>localStorage</code>, saved on every
+              change, checked when read back, and still working in memory where storage is blocked, as in a private
+              window. <code>place</code> is where the last win landed. <code>game</code> is the state machine of the
+              next step, given all of the above. And <code>cards</code> follows the table but changes only when the deck
+              itself is new, so the sixteen buttons are built again for a new game and never for a simple turn.
+            </p>
+            <p>
+              In any app this is the difference between “the page shows the state” and “the page shows what someone
+              remembered to update”. There is nothing to keep in sync and no list of dependencies to get wrong: the page
+              reads <code>table()</code> wherever it needs it. The board under the game counts every write to the page;
+              play a few moves and see how little each one costs.
+            </p>
+          </>
+        ),
+      },
+      machine: {
+        title: 'Step 3. Give each moment of the game a name',
+        Body: ({ Snippet, Diagram }): Node => (
+          <>
+            <p>
+              Now the clicks. A memory game has only four moments: no card up, one card up, a wrong pair waiting, every
+              pair found. The usual way to handle them is a couple of flags, like <code>isLocked</code> and{' '}
+              <code>firstCard</code>, and an <code>if</code> in every click handler. Forget one <code>if</code> and fast
+              clicks break the game.
+            </p>
+            <p>
+              Instead, the four moments become the four states of a state machine, and each state lists the events it
+              accepts. Here is the whole machine, and its picture:
+            </p>
+            <Snippet file='memory.machine.ts' region='machine' />
+            <Diagram />
+            <p>
+              Read it from the top. A new game, <code>deal</code>, is accepted in any state and leads to{' '}
+              <code>ready</code>. <code>ready</code> and <code>oneUp</code> behave the same, so they share one piece of
+              config, <code>turning</code>. <code>wrongPair</code> has no <code>turn</code> at all: while a wrong pair
+              is up, every click is refused, not because someone remembered a check, but because there is nothing to
+              check. When the pair turns back, its <code>exit</code> puts both cards face down. And <code>won</code>{' '}
+              posts the result to the best ten.
+            </p>
+            <p>
+              Here is <code>turning</code>. Whatever state a <code>turn</code> leads to, its card goes up on the way in:
+            </p>
+            <Snippet file='memory.machine.ts' region='turning' />
+            <p>
+              And where does a <code>turn</code> lead? <code>toward</code> asks the rules. A card that can’t turn has no
+              target, so the machine answers <code>refused</code> and nothing changes. Otherwise it turns the card on
+              paper and looks at the result: zero, one or two cards up, unless every pair is found.
             </p>
             <Snippet file='memory.machine.ts' region='turn' />
             <p>
-              A card only sends <code>turn</code>. It never asks whether it is allowed to. When the rules say no, the
-              machine answers <code>refused</code> and nothing changes. While a wrong pair is waiting, that state simply
-              has no <code>turn</code>, so every click is refused. There is no check to forget, because there is no
-              check.
-            </p>
-            <Snippet file='memory.machine.ts' region='wrongPair' />
-            <p>
-              That is where the <code>0 if</code> at the top comes from. The decisions haven’t gone anywhere: they sit
-              in the machine’s config and a small lookup table, all in one place.
-            </p>
-            <p>
-              Why a state machine pays off in any app: it turns “which mix of flags is possible?” into a short list of
-              states and the events each one takes. A mix that makes no sense, say two cards up and the board unlocked,
-              can’t even be written down. Every event in every state has exactly one answer, a move or a refusal, so
-              fast or doubled input can’t slip between two checks. The same shape fits a form that submits and retries,
-              a wizard, a player, a connection. Here it is what lets a test fire five thousand random clicks, new games
-              and turn-backs at the machine and check the rules after each one: a refused event changes nothing, so the
-              rules always hold.
+              This pays off in any app. A state machine turns “which mix of flags is possible?” into a short list you
+              can read at a glance, and a mix that makes no sense, like two cards up with the board unlocked, can’t even
+              be written down. Every event in every state has exactly one answer, so double clicks and fast taps can’t
+              sneak between two checks. Forms that submit and retry, wizards, players and connections all have this
+              shape. Here it lets a test throw five thousand random clicks, new games and turn-backs at the machine and
+              check the rules after every single one.
             </p>
           </>
         ),
       },
       time: {
-        title: 'Step 3. Turn a wrong pair back after a second',
+        title: 'Step 4. Let time live outside',
         Body: ({ Snippet }): Node => (
           <>
             <p>
-              A wrong pair should stay up for a second, then turn back. The obvious answer is <code>setTimeout</code>,
-              and that is where the trouble starts: a variable for the timer id, cancelling it on a new game, cancelling
-              it when the reader leaves the page. Miss one, and an old timer turns back cards of the next game.
+              A wrong pair should stay up for a second, then turn back. The first idea is a <code>setTimeout</code> in
+              the click handler, and that is where the trouble starts: a variable for the timer, a cancel on a new game,
+              another cancel when the player leaves the page. Miss one, and an old timer flips the cards of the next
+              game.
             </p>
             <p>
-              The machine keeps no clock on purpose: it only reacts to events. So the page sends <code>turnBack</code>,
-              and <code>later</code> from <code>@reely/dommy-kit</code>, inside an <code>effect</code>, is the whole
-              timer.
+              Our machine doesn’t know what time it is, on purpose: it only reacts to events. So the page sends{' '}
+              <code>turnBack</code>, and the whole timer is this:
             </p>
             <Snippet file='memory.game.tsx' region='timer' />
             <p>
-              The effect reads the phase. When the phase changes, the effect runs again and the timer of its last run is
-              cancelled. A new game cancels it, leaving the page cancels it, and there is no id to keep anywhere.
+              The <code>effect</code> runs again whenever the phase changes, and <code>later</code> cancels its timer
+              when it does. A new game changes the phase, and the timer is gone. The page goes away, and the timer is
+              gone. There is no timer id to keep anywhere.
             </p>
             <p>
-              Why this pays off in any app: anything that lives for a while, a timer, a listener, a subscription, a
-              request, belongs to the code that started it, and stops with it. In reely that owner is the effect run or
-              the render. You never write the cleanup by hand, so you can’t forget it, and nothing keeps running after
-              its page is gone.
-            </p>
-          </>
-        ),
-      },
-      state: {
-        title: 'Step 4. Keep the state in signals',
-        Body: ({ Snippet }): Node => (
-          <>
-            <p>
-              The page should always show the table as it is. When you copy state into the DOM by hand, you will sooner
-              or later forget a place, and the screen starts to lie.
-            </p>
-            <p>
-              With <code>@reely/signals</code> the whole state is three signals: the table, the best ten, and the place
-              of the last win. The machine changes them with <code>set</code> and <code>update</code>; the page reads
-              them with a plain call, <code>table()</code>. A signal bound to a node updates that node and nothing else.
-              There is nothing to sync and nothing to subscribe to by hand.
-            </p>
-            <Snippet file='memory.game.tsx' region='state' />
-            <p>
-              The best ten are a <code>persisted</code> signal from <code>@reely/dommy-kit</code>. It is saved to{' '}
-              <code>localStorage</code> on every change, checked when read back, and still works in memory where storage
-              fails, for example in a private window.
-            </p>
-            <p>
-              One more catch: rebuilding all sixteen cards on every turn would be wasteful. The deck is a{' '}
-              <code>computed</code> of the table, and it only reports a change when the deck itself is new. So the
-              buttons are built again on a new game, and never on a turn.
-            </p>
-            <p>
-              Why signals pay off in any app: a signal knows exactly who read it. When it changes, only those readers
-              run again: no re-render of a whole component, no virtual DOM to compare, no list of dependencies to keep
-              by hand and get wrong. The state lives in one place, and the page is just a view of it. Here a turn
-              changes one signal, and the board under the game shows the price: a couple of attribute writes on one
-              card, nothing else. Writing to storage is the same story: <code>persisted</code> is still a signal, so
-              saving needs no code of its own.
+              The general rule: anything that lives for a while, a timer, a listener, a request, belongs to the code
+              that started it and stops together with it. Then cleanup isn’t something you write and forget; it just
+              happens.
             </p>
           </>
         ),
       },
       card: {
-        title: 'Step 5. A card is a button plus CSS',
+        title: 'Step 5. A card is a button and a bit of CSS',
         Body: ({ Snippet }): Node => (
           <>
             <p>
-              A card should flip smoothly and tell a screen reader what it shows. It is a real button, built once. Only
-              two things in it follow the game: <code>data-side</code> and the label a screen reader reads. A turn
-              changes those two attributes on one button, and the board under the game counts them as you play.
+              A card has to flip nicely and tell a screen reader what it shows. It is a real button, built once, and
+              only two things on it follow the game: <code>data-side</code> and its label.
             </p>
             <Snippet file='memory.card.tsx' region='card' />
             <p>
-              The flip isn’t JavaScript. <code>data-side</code> drives a 3D turn in CSS, and each side hides when it
-              faces away.
+              The flip is plain CSS. <code>data-side</code> turns the card in 3D, and each side hides when it faces
+              away:
             </p>
             <Snippet file='memory.module.css' region='flip' />
             <p>
-              The catch: motion makes some people dizzy. So the animation only exists when the system hasn’t asked to
-              reduce motion. Everyone else gets the same game, just without the turn.
-            </p>
-            <p>
-              Why this pays off in any app: the code only says what state a thing is in, and CSS decides how it looks
-              and moves. The browser runs the animation on its own, off the main thread where it can, so a busy script
-              doesn’t make it stutter, and a design change never touches the logic.
+              Motion makes some people feel sick, and their system can say so. So the turn exists only when nobody asked
+              to reduce motion; everyone else plays the same game, just without the spin.
             </p>
             <Snippet file='memory.module.css' region='motion' />
+            <p>
+              The code says what state a card is in; CSS decides how it looks and moves. The browser runs the animation
+              on its own, so a busy script doesn’t make it stutter, and a redesign never touches the logic.
+            </p>
           </>
         ),
       },
@@ -225,61 +227,62 @@ const en = {
         Body: ({ Snippet }): Node => (
           <>
             <p>
-              We want the ten best wins, by moves and then by the earlier day, and the winner’s place in them. This is a
-              pure function again: drop the same result if it is already there, add the new one, sort, keep ten, and say
-              where the new one landed.
+              We want the ten best wins, fewest moves first and the earlier day on a tie, and the place of the new one.
+              That is a pure function again: drop the same result if it is already there, add the new one, sort, keep
+              ten, and say where the new one landed.
             </p>
             <Snippet file='memory.leaderboard.ts' region='rank' />
             <p>
-              The catch: if the place were saved together with the list, a reload or another tab would highlight a win
-              that isn’t yours. So only the list is saved, and the place lives in memory.
-            </p>
-            <p>
-              Nobody calls save. The machine sets the best ten, and <code>persisted</code> writes them down.
+              Two small details. Nobody calls “save”: the machine sets <code>best</code>, and <code>persisted</code>{' '}
+              writes it down. And only the list is saved, not the place; otherwise, after a reload or in another tab,
+              the dialog would proudly highlight a win that isn’t yours.
             </p>
           </>
         ),
       },
       dialog: {
-        title: 'Step 7. Use the browser’s own dialog',
+        title: 'Step 7. Use the dialog the browser already has',
         Body: ({ Snippet }): Node => (
           <>
             <p>
               We need two dialogs, the win and the leaderboard. Each closes with a button, with Escape, or with a click
               outside, and while one is open the page behind it can’t be clicked or scrolled. A hand-made modal means
-              catching focus, Escape, layers and stray clicks yourself.
+              juggling focus, layers and stray clicks yourself.
             </p>
             <p>
-              The native <code>&lt;dialog&gt;</code> with <code>showModal</code> does most of it: the page behind
-              becomes inert, and Escape closes it on its own. Our component is small: whether it is open is a signal,
-              and the signal follows the <code>close</code> event. A click outside lands on the dialog itself, because
-              the dialog has no padding, and that closes it too.
-            </p>
-            <p>
-              Why this pays off in any app: a native element brings the keyboard, focus and screen reader behaviour that
-              a custom one has to rebuild and then maintain. reely doesn’t wrap it in anything: a signal is bound to the
-              real <code>&lt;dialog&gt;</code>, and the browser does the rest.
+              The native <code>&lt;dialog&gt;</code> with <code>showModal</code> does most of it for free: the page
+              behind becomes inert, and Escape closes it. Our component only adds <code>open</code>, a signal that
+              follows the <code>close</code> event. A click outside lands on the dialog itself, which has no padding,
+              and closes it too.
             </p>
             <Snippet file='modal.tsx' region='dialog' />
-            <p>Keeping the page still is one CSS rule: while a dialog is open, the page doesn’t scroll.</p>
+            <p>And keeping the page still is one CSS rule:</p>
             <Snippet file='memory.module.css' region='scroll-lock' />
+            <p>
+              A native element brings keyboard, focus and screen-reader behaviour that a custom one has to rebuild, and
+              then maintain forever.
+            </p>
           </>
         ),
       },
-      proof: {
-        title: 'Step 8. Prove it',
-        Body: ({ Snippet }): Node => (
+      wrapUp: {
+        title: 'What we ended up with',
+        Body: (): Node => (
           <>
             <p>
-              <code>0 if</code> shouldn’t be just a nice line in the header. The page loads the source of every module
-              of the game, strips the comments and counts <code>if</code> and <code>switch</code>. A test fails as soon
-              as one appears. The code in this story is cut from the same files, so what you have read is exactly what
-              runs.
+              Step back and look at the shape of it. In the middle are the rules: plain functions over plain data.
+              Around them is the flow: a state machine that says what can happen when. At the edges are time, storage
+              and the page, each a thin layer that reads the state and sends events. Nothing in the middle knows about
+              the DOM, the clock or <code>localStorage</code>.
             </p>
-            <Snippet file='memory.sources.ts' region='count' />
             <p>
-              You can also watch it live. Open “The code that just ran” under the board, make a move, and see which part
-              of the machine answered.
+              That is the whole trick, and it isn’t about memory games. Keep decisions where you can see them, push side
+              effects to the edges, let one place own the state. Then double clicks, stray timers and a screen out of
+              sync stop being bugs you fix; they become things that can’t happen.
+            </p>
+            <p>
+              Want to see it move? Open “The code that just ran” under the board, make a move, and watch which part of
+              the machine answers.
             </p>
           </>
         ),

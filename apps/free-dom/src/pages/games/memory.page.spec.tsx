@@ -1,4 +1,3 @@
-import { memoryBranches } from './memory/memory.sources';
 import { MemoryPage } from './memory.page';
 import { chooseLocale } from '../../i18n/locale';
 import { textsLoaded } from '../../i18n/localized';
@@ -26,29 +25,28 @@ describe('memory page', () => {
   it('opens on the game under its write board, then tells how it is built', async () => {
     const page = open();
 
-    expect(document.title).toBe('Memory game without one if | reely');
+    expect(document.title).toBe('Memory game, built step by step | reely');
     expect(document.head.querySelector('meta[name="description"]')?.getAttribute('content')).toMatch(/^A memory game/);
     expect(page.host.querySelector('header a[href="/games/memory"]')?.getAttribute('aria-current')).toBe('true');
     expect(page.host.querySelectorAll('figure ul button')).toHaveLength(16);
     expect(page.host.querySelector('article h2')?.textContent).toBe('How the game is built');
     expect(texts(page.host, 'article section h3')).toEqual([
-      'Step 1. Rules first, no page yet',
-      'Step 2. Give each moment of the game a name',
-      'Step 3. Turn a wrong pair back after a second',
-      'Step 4. Keep the state in signals',
-      'Step 5. A card is a button plus CSS',
+      'Step 1. Rules first, screen later',
+      'Step 2. Keep the state in one place',
+      'Step 3. Give each moment of the game a name',
+      'Step 4. Let time live outside',
+      'Step 5. A card is a button and a bit of CSS',
       'Step 6. The best ten',
-      'Step 7. Use the browser’s own dialog',
-      'Step 8. Prove it',
+      'Step 7. Use the dialog the browser already has',
+      'What we ended up with',
     ]);
     expect(
       Array.from(page.host.querySelectorAll('main > section:first-child li a'), (link) => link.getAttribute('href'))
     ).toEqual(['/state-machine', '/signals', '/dommy', '/dommy-kit', '/logger']);
   });
 
-  it('quotes real code in every snippet once the sources arrive, and posts not one if', async () => {
+  it('quotes real code in every snippet once the sources arrive', async () => {
     const page = open();
-    expect(texts(page.host, 'main dl dd')[0]).toBe('– if');
     expect(page.host.querySelectorAll('article pre')).toHaveLength(0);
 
     await vi.dynamicImportSettled();
@@ -57,8 +55,10 @@ describe('memory page', () => {
     expect(panes).toHaveLength(14);
     expect(panes.filter((pane) => (pane.textContent ?? '').trim().length < 40)).toEqual([]);
     expect(panes.some((pane) => /#(end)?region/.test(pane.textContent ?? ''))).toBe(false);
-    expect(memoryBranches).toBe(0);
-    expect(texts(page.host, 'main dl dd')[0]).toBe('0 if');
+    expect(
+      panes.some((pane) => /initial: 'ready'[\s\S]*wrongPair[\s\S]*won[\s\S]*logger/.test(pane.textContent ?? ''))
+    ).toBe(true);
+    expect(page.host.querySelector('article svg[role="img"]')?.getAttribute('aria-label')).toBeTruthy();
   });
 
   it('speaks Russian once it is chosen, and keeps the game as the reader left it', async () => {
@@ -69,7 +69,7 @@ describe('memory page', () => {
     chooseLocale('ru');
     await textsLoaded();
 
-    expect(document.title).toBe('Memory game без единого if | reely');
+    expect(document.title).toBe('Memory game, шаг за шагом | reely');
     expect(page.host.querySelector('h1')?.textContent).toBe('Memory game');
     expect(page.host.querySelector('figure ul button')).toBe(first);
     expect(first?.dataset['side']).toBe('up');

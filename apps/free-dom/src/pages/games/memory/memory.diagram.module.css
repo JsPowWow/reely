@@ -1,0 +1,72 @@
+/* The machine as a figure on the asphalt of the article: its states drawn as the
+   board draws them (a face, a wrong pair waiting, a result posted), the event on
+   every arrow in the code's own face. It scales with the column; its text is sized
+   in drawing units, 1:1 at the figure's full width. */
+.diagram {
+  display: block;
+  width: 100%;
+  max-width: 26.75rem;
+  height: auto;
+  margin: 0 0 1.75rem;
+  overflow: visible;
+  font-family: var(--body);
+}
+
+.plate {
+  fill: var(--panel);
+  stroke: var(--line);
+}
+
+.waiting {
+  stroke: var(--graphite);
+  stroke-width: 2;
+}
+
+.posted {
+  fill: var(--signal);
+  stroke: none;
+}
+
+.state {
+  fill: var(--graphite);
+  font: 400 16px var(--mono);
+  text-anchor: middle;
+}
+
+.edge {
+  fill: none;
+  stroke: var(--graphite);
+  stroke-width: 1.5;
+}
+
+.head {
+  fill: var(--graphite);
+}
+
+.event {
+  fill: var(--graphite);
+  font: 400 15px var(--mono);
+}
+
+.when {
+  fill: var(--slate);
+  font: 400 14px var(--body);
+}
+
+/* An arrow the whole machine takes: said, not stressed. */
+.quiet .edge {
+  stroke: var(--slate);
+  stroke-dasharray: 4 3;
+}
+
+.quietHead {
+  fill: var(--slate);
+}
+
+.quiet .event {
+  fill: var(--slate);
+}
+
+.code {
+  font: 400 14px var(--mono);
+}

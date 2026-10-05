@@ -59,6 +59,7 @@ const toward = ({
     : undefined;
 // #endregion
 
+// #region turning
 // every state a turn leads to turns its card up on entering
 const turnUp = runActionEffect<Memory>().when(
   { type: 'turn' },
@@ -72,7 +73,9 @@ const turning: StateMachineStateConfig<Memory> = {
   entry: turnUp,
   on: { turn: toward },
 };
+// #endregion
 
+// #region machine
 /** A game of memory as a state machine over the signals it is given. */
 export const memoryMachine = (context: MemoryContext): IStateMachine<Memory> =>
   createStateMachine<Memory>(
@@ -123,3 +126,4 @@ export const memoryMachine = (context: MemoryContext): IStateMachine<Memory> =>
     // a failed action is reported, not thrown at the click that sent the event
     { logger: scopedLogger('memory') }
   );
+// #endregion
