@@ -36,6 +36,7 @@ const pageNamed =
       element('a', { href: '/orders/7' }, 'Order 7'),
       element('a', { href: '/orders/7#delivery' }, 'Delivery of order 7'),
       element('a', { href: '#reviews' }, 'Reviews'),
+      element('a', { href: '#' }, 'Top'),
       element('p', { id: 'delivery' }, 'Delivery')
     );
 
@@ -118,7 +119,7 @@ describe('startRouter', () => {
     expect(document.querySelectorAll('section')).toHaveLength(1);
   });
 
-  it('leaves to the browser the clicks that open elsewhere, a link marked `rel="external"`, and a link to a place on the page', async () => {
+  it('leaves to the browser the clicks that open elsewhere, a link marked `rel="external"`, and a link to a place on the page, `#` too', async () => {
     await start();
     const cart = document.querySelector('a[href="/cart"]');
 
@@ -136,8 +137,10 @@ describe('startRouter', () => {
     cart?.setAttribute('href', 'https://example.com/cart');
     const elsewhere = clickLink('Cart');
     const placeOnPage = clickLink('Reviews');
+    const top = clickLink('Top');
 
-    expect([withModifier, middleButton, inNewTab, download, external, elsewhere, placeOnPage]).toEqual([
+    expect([withModifier, middleButton, inNewTab, download, external, elsewhere, placeOnPage, top]).toEqual([
+      false,
       false,
       false,
       false,
