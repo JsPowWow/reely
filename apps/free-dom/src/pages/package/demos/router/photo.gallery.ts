@@ -1,4 +1,10 @@
-import { defineRoutes, followLinks, href, memoryHistory, startRouter } from '@reely/router';
+import {
+  defineRoutes,
+  followLinks,
+  href,
+  memoryHistory,
+  startRouter,
+} from '@reely/router';
 
 import { addressOf, frame } from './frame';
 import { el } from './vanilla.dom';
@@ -10,7 +16,12 @@ type Page = () => Node;
 const paths = { album: '/', photo: '/photos/:id' } as const;
 
 const photos = [
-  { id: 'harbour', title: 'Harbour at dawn', light: '#f6b26b', dark: '#3d5a80' },
+  {
+    id: 'harbour',
+    title: 'Harbour at dawn',
+    light: '#f6b26b',
+    dark: '#3d5a80',
+  },
   { id: 'meadow', title: 'Meadow', light: '#b6d7a8', dark: '#38761d' },
   { id: 'old-town', title: 'Old town', light: '#ead1dc', dark: '#741b47' },
   { id: 'glacier', title: 'Glacier', light: '#cfe2f3', dark: '#0b5394' },
@@ -18,16 +29,22 @@ const photos = [
 ];
 
 // the photo before the first is the last one, and the one after the last the first
-const photoHref = (index: number): string => href(paths.photo, { id: photos.at(index % photos.length)?.id ?? '' });
+const photoHref = (index: number): string =>
+  href(paths.photo, { id: photos.at(index % photos.length)?.id ?? '' });
 
-const tinted = <E extends HTMLElement>(element: E, { light, dark }: { light: string; dark: string }): E => {
+const tinted = <E extends HTMLElement>(
+  element: E,
+  { light, dark }: { light: string; dark: string }
+): E => {
   element.style.setProperty('--light', light);
   element.style.setProperty('--dark', dark);
   return element;
 };
 
 export const PhotoGallery = (): Node => {
-  const { app, address, page } = frame([el('a', { href: href(paths.album) }, 'Album')]);
+  const { app, address, page } = frame([
+    el('a', { href: href(paths.album) }, 'Album'),
+  ]);
   const history = memoryHistory(href(paths.album));
   followLinks(app, history.navigate);
 
@@ -41,7 +58,18 @@ export const PhotoGallery = (): Node => {
           'ul',
           { className: css.tiles },
           ...photos.map((photo) =>
-            el('li', {}, tinted(el('a', { href: href(paths.photo, { id: photo.id }) }, photo.title), photo))
+            el(
+              'li',
+              {},
+              tinted(
+                el(
+                  'a',
+                  { href: href(paths.photo, { id: photo.id }) },
+                  photo.title
+                ),
+                photo
+              )
+            )
           )
         )
       ),
@@ -78,13 +106,20 @@ export const PhotoGallery = (): Node => {
     fail:
       (error): Page =>
       () =>
-        el('div', {}, el('h2', {}, 'No such photo'), el('p', { className: css.failed }, error.message)),
+        el(
+          'div',
+          {},
+          el('h2', {}, 'No such photo'),
+          el('p', { className: css.failed }, error.message)
+        ),
   });
 
   // on a photo, the arrow keys go to the next one and back, and Escape to the album: moves from code
   app.tabIndex = 0;
   app.addEventListener('keydown', (event) => {
-    const index = photos.findIndex(({ id }) => href(paths.photo, { id }) === router.path());
+    const index = photos.findIndex(
+      ({ id }) => href(paths.photo, { id }) === router.path()
+    );
     const moves: Partial<Record<string, string>> = {
       ArrowLeft: photoHref(index - 1),
       ArrowRight: photoHref(index + 1),

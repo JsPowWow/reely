@@ -13,7 +13,9 @@ export const SalePrice = (): Node => {
 
   return (
     <div className={css.row}>
-      <button onClick={() => (onSale.value = !onSale.value)}>{() => (onSale.value ? 'End the sale' : 'Start the sale')}</button>
+      <button onClick={() => (onSale.value = !onSale.value)}>
+        {() => (onSale.value ? 'End the sale' : 'Start the sale')}
+      </button>
       <p className={css.status}>
         Rain jacket, <Price />. Pay <Price /> at checkout.
       </p>

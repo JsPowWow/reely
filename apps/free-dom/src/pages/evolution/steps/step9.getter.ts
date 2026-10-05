@@ -16,6 +16,12 @@ export const Tickets = (): HTMLElement => {
     { className: css.tickets },
     output({ className: css.value, 'data-plan': plan }, tickets),
     button({ onClick: () => (tickets.value += 1) }, '+1'),
-    button({ onClick: () => (tickets.value -= 1), disabled: () => tickets.value === 0 }, '−1')
+    button(
+      {
+        onClick: () => (tickets.value -= 1),
+        disabled: () => tickets.value === 0,
+      },
+      '−1'
+    )
   );
 };

@@ -1,11 +1,4 @@
-import {
-  cardAt,
-  dealGame,
-  isLocked,
-  isWon,
-  turnBack,
-  turnCard,
-} from './memory.rules';
+import { cardAt, dealGame, isLocked, isWon, turnBack, turnCard } from './memory.rules';
 
 import type { MemoryState } from './memory.rules';
 
@@ -24,12 +17,7 @@ describe('memory rules', () => {
     const dealt = dealGame(['signals', 'dommy', 'router'], 2, keepOrder);
 
     expect(dealt.deck).toEqual(['signals', 'dommy', 'signals', 'dommy']);
-    expect(dealt.deck.map((_face, index) => cardAt(dealt, index))).toEqual([
-      'down',
-      'down',
-      'down',
-      'down',
-    ]);
+    expect(dealt.deck.map((_face, index) => cardAt(dealt, index))).toEqual(['down', 'down', 'down', 'down']);
     expect(dealt.moves).toBe(0);
   });
 
@@ -47,11 +35,7 @@ describe('memory rules', () => {
     expect(one.moves).toBe(0);
     expect(cardAt(one, 0)).toBe('up');
     expect(two.moves).toBe(1);
-    expect([cardAt(two, 0), cardAt(two, 2), cardAt(two, 1)]).toEqual([
-      'found',
-      'found',
-      'down',
-    ]);
+    expect([cardAt(two, 0), cardAt(two, 2), cardAt(two, 1)]).toEqual(['found', 'found', 'down']);
     expect(isLocked(two)).toBe(false);
   });
 

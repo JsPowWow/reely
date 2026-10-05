@@ -10,7 +10,13 @@ export const SlideCaption = (): Node => {
 
   const Caption = ({ slide }: { slide: number }): Node => {
     const caption = <output className={css.value}>Slide {slide}</output>;
-    later(0, () => (message.value = `Read from the page: ${caption.isConnected ? caption.textContent : 'not in the document'}`));
+    later(
+      0,
+      () =>
+        (message.value = `Read from the page: ${
+          caption.isConnected ? caption.textContent : 'not in the document'
+        }`)
+    );
     return caption;
   };
 

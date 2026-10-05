@@ -5,8 +5,7 @@ const pagerRels = { ArrowLeft: 'prev', ArrowRight: 'next' } as const;
 const typingTags = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
 
 const isTypingTarget = (target: EventTarget | null): boolean =>
-  isInstanceOf(HTMLElement, target) &&
-  (target.isContentEditable || typingTags.has(target.tagName));
+  isInstanceOf(HTMLElement, target) && (target.isContentEditable || typingTags.has(target.tagName));
 
 /** Follows the pager's `rel="prev"` or `rel="next"` link on ← or →, except with modifiers or in a field. */
 export const followPagerKey = (event: KeyboardEvent): void => {

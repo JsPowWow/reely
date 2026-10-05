@@ -1,8 +1,17 @@
-import { batch, computed, effect, onCleanup, signal, untracked } from '@reely/dommy';
+import {
+  batch,
+  computed,
+  effect,
+  onCleanup,
+  signal,
+  untracked,
+} from '@reely/dommy';
 
 const unread = signal(0);
 const sender = signal('');
-const title = computed(() => (unread.value === 0 ? 'Inbox' : `(${unread.value}) ${sender.value} wrote`));
+const title = computed(() =>
+  unread.value === 0 ? 'Inbox' : `(${unread.value}) ${sender.value} wrote`
+);
 
 // Runs now, and again after every change of what it read.
 const stop = effect(() => {

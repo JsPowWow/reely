@@ -9,7 +9,10 @@ import type { SourceLines } from './source.types';
 
 // colors of the `a` tokens: in JSX both the opening and the closing tag are tags
 const tagColors = (lines: SourceLines): (string | undefined)[] =>
-  lines.flat().filter((token) => token.content === 'a').map((token) => token.color);
+  lines
+    .flat()
+    .filter((token) => token.content === 'a')
+    .map((token) => token.color);
 
 const colorOf = (lines: Awaited<ReturnType<typeof highlightSource>>, content: string): string | undefined =>
   lines.flat().find((token) => token.content.trim() === content)?.color;
@@ -48,7 +51,11 @@ describe('sourceHighlight', () => {
   };
 
   const moduleSource = (code: unknown): SourceLines =>
-    JSON.parse(String(code).replace(/^export default /, '').replace(/;$/, '')) as SourceLines;
+    JSON.parse(
+      String(code)
+        .replace(/^export default /, '')
+        .replace(/;$/, '')
+    ) as SourceLines;
 
   const moduleLines = (code: unknown): string[] =>
     moduleSource(code).map((line) => line.map((token) => token.content).join(''));

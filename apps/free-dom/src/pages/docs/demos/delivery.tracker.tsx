@@ -11,7 +11,11 @@ export const DeliveryTracker = (): Node => {
     <div className={css.row}>
       <Show
         when={deliveredAt}
-        fallback={() => <p className={css.pending}>Out for delivery, {stopsAway} stops away</p>}
+        fallback={() => (
+          <p className={css.pending}>
+            Out for delivery, {stopsAway} stops away
+          </p>
+        )}
       >
         {() => <p className={css.plate}>Delivered at {deliveredAt}</p>}
       </Show>

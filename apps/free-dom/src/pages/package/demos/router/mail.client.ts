@@ -1,4 +1,10 @@
-import { defineRoutes, followLinks, href, memoryHistory, startRouter } from '@reely/router';
+import {
+  defineRoutes,
+  followLinks,
+  href,
+  memoryHistory,
+  startRouter,
+} from '@reely/router';
 import { effect } from '@reely/signals';
 
 import { addressOf, frame, markCurrent } from './frame';
@@ -20,11 +26,35 @@ const paths = {
 
 const mailbox = {
   inbox: [
-    { id: '41', from: 'Courier', subject: 'Your parcel is on its way', body: 'Delivery between 10:00 and 12:00.' },
-    { id: '42', from: 'Ana', subject: 'Lunch on Friday?', body: 'The new ramen place, 13:00?' },
+    {
+      id: '41',
+      from: 'Courier',
+      subject: 'Your parcel is on its way',
+      body: 'Delivery between 10:00 and 12:00.',
+    },
+    {
+      id: '42',
+      from: 'Ana',
+      subject: 'Lunch on Friday?',
+      body: 'The new ramen place, 13:00?',
+    },
   ],
-  sent: [{ id: '7', from: 'You', subject: 'Re: Lunch on Friday?', body: 'Yes! See you there.' }],
-  spam: [{ id: '9', from: 'Prince', subject: 'You have won', body: 'Send your bank details.' }],
+  sent: [
+    {
+      id: '7',
+      from: 'You',
+      subject: 'Re: Lunch on Friday?',
+      body: 'Yes! See you there.',
+    },
+  ],
+  spam: [
+    {
+      id: '9',
+      from: 'Prince',
+      subject: 'You have won',
+      body: 'Send your bank details.',
+    },
+  ],
 };
 
 type Folder = keyof typeof mailbox;
@@ -38,7 +68,16 @@ const folderPage = (folder: Folder): Page => ({
       'ul',
       { className: css.rows },
       ...mailbox[folder].map(({ id, from, subject }) =>
-        el('li', {}, el('a', { href: href(paths.message, { folder, id }) }, subject, el('small', {}, from)))
+        el(
+          'li',
+          {},
+          el(
+            'a',
+            { href: href(paths.message, { folder, id }) },
+            subject,
+            el('small', {}, from)
+          )
+        )
       )
     ),
 });
@@ -55,9 +94,12 @@ export const MailClient = (): Node => {
 
   const routes = defineRoutes({
     // a folder that is not in the mailbox passes on to the page for unknown paths
-    [paths.folder]: ({ folder }) => (isFolder(folder) ? folderPage(folder) : undefined),
+    [paths.folder]: ({ folder }) =>
+      isFolder(folder) ? folderPage(folder) : undefined,
     [paths.message]: ({ folder, id }) => {
-      const message = isFolder(folder) ? mailbox[folder].find((each) => each.id === id) : undefined;
+      const message = isFolder(folder)
+        ? mailbox[folder].find((each) => each.id === id)
+        : undefined;
       return (
         message && {
           title: message.subject,
@@ -66,12 +108,19 @@ export const MailClient = (): Node => {
               'div',
               {},
               el('p', {}, `From ${message.from}: ${message.body}`),
-              el('a', { href: href(paths.folder, { folder }) }, `Back to ${folder}`)
+              el(
+                'a',
+                { href: href(paths.folder, { folder }) },
+                `Back to ${folder}`
+              )
             ),
         }
       );
     },
-    [paths.unknown]: ({ rest }) => ({ title: 'Not found', view: (): Node => el('p', {}, `There is no /${rest}.`) }),
+    [paths.unknown]: ({ rest }) => ({
+      title: 'Not found',
+      view: (): Node => el('p', {}, `There is no /${rest}.`),
+    }),
   });
 
   const router = startRouter(routes, {
@@ -81,7 +130,10 @@ export const MailClient = (): Node => {
       page.replaceChildren(el('h2', {}, title), view());
       return page;
     },
-    fail: (error) => ({ title: 'Something went wrong', view: (): Node => el('p', {}, error.message) }),
+    fail: (error) => ({
+      title: 'Something went wrong',
+      view: (): Node => el('p', {}, error.message),
+    }),
   });
 
   // the menu marks the folder of the page shown: a message is in its folder too

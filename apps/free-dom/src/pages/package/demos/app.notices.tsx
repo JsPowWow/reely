@@ -46,7 +46,10 @@ export const AppNotices = (): Node => {
         <button type='button' onClick={() => announce('Profile saved')}>
           Save the profile
         </button>
-        <button type='button' onClick={() => announce('Connection lost, retrying')}>
+        <button
+          type='button'
+          onClick={() => announce('Connection lost, retrying')}
+        >
           Lose the connection
         </button>
         <span className={own.unread} data-unread=''>

@@ -2,8 +2,19 @@ import { Await, Show, signal } from '@reely/dommy';
 
 import css from '../../../demo/examples.module.css';
 
-const api = ['signal', 'computed', 'effect', 'batch', 'untracked', 'For',
-  'Show', 'Keyed', 'Await', 'mount', 'onCleanup'];
+const api = [
+  'signal',
+  'computed',
+  'effect',
+  'batch',
+  'untracked',
+  'For',
+  'Show',
+  'Keyed',
+  'Await',
+  'mount',
+  'onCleanup',
+];
 
 interface Answer {
   query: string;
@@ -26,7 +37,8 @@ export const ApiSearch = (): Node => {
           late.value += 1;
         }
         const found = api.filter((name) =>
-          name.toLowerCase().includes(text.toLowerCase()));
+          name.toLowerCase().includes(text.toLowerCase())
+        );
         resolve({ query: text, found });
       }, answerDelay(text));
     });
@@ -41,7 +53,12 @@ export const ApiSearch = (): Node => {
           onInput={(event) => (query.value = event.currentTarget.value)}
         />
       </label>
-      <Show when={query} fallback={() => <p className={css.note}>Type to search {api.length} names</p>}>
+      <Show
+        when={query}
+        fallback={() => (
+          <p className={css.note}>Type to search {api.length} names</p>
+        )}
+      >
         {() => (
           <Await
             promise={() => search(query.value)}

@@ -1,9 +1,4 @@
-import {
-  createLeaderboard,
-  formatDay,
-  isMemoryResults,
-  postResult,
-} from './memory.leaderboard';
+import { createLeaderboard, formatDay, isMemoryResults, postResult } from './memory.leaderboard';
 
 import type { MemoryResult } from './memory.leaderboard';
 
@@ -69,9 +64,7 @@ describe('memory leaderboard', () => {
   });
 
   it('reads the board kept in storage, and writes it back on every change', () => {
-    const items = new Map([
-      ['reely.memory.leaderboard', JSON.stringify([{ moves: 9, at: 1 }])],
-    ]);
+    const items = new Map([['reely.memory.leaderboard', JSON.stringify([{ moves: 9, at: 1 }])]]);
     const storage = {
       getItem: (key: string) => items.get(key) ?? null,
       setItem: (key: string, value: string) => void items.set(key, value),

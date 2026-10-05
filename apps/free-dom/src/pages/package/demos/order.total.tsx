@@ -19,7 +19,9 @@ export const OrderTotal = (): Node => {
     saves += 1;
     const off = discount.value > 0 ? `, ${discount.value * 100}% off` : '';
     const line = `${quantity.value} × ${euros(price)}${off}`;
-    saved.value = `Draft saved ${saves} ${saves === 1 ? 'time' : 'times'}: ${line}`;
+    saved.value = `Draft saved ${saves} ${
+      saves === 1 ? 'time' : 'times'
+    }: ${line}`;
   });
 
   const orderForTeam = (): void =>

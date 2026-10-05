@@ -29,7 +29,9 @@ describe('docs', () => {
       const page = renderPage();
 
       expect(page.querySelector('h1')?.textContent).toBe('Getting started');
-      expect(page.querySelector('nav a[href="/dommy/docs/getting-started"]')?.getAttribute('aria-current')).toBe('page');
+      expect(page.querySelector('nav a[href="/dommy/docs/getting-started"]')?.getAttribute('aria-current')).toBe(
+        'page'
+      );
       expect(document.title).toBe('Getting started | reely docs');
     });
 

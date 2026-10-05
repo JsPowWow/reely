@@ -10,11 +10,15 @@ export const CouponHint = (): Node => {
     <div className={css.row}>
       <label className={css.field}>
         Coupon
-        <input onInput={(event) => (coupon.value = event.currentTarget.value)} />
+        <input
+          onInput={(event) => (coupon.value = event.currentTarget.value)}
+        />
       </label>
       <Show
         when={() => coupon.value.trim() !== ''}
-        fallback={() => <p className={css.pending}>Have a coupon? Enter it here.</p>}
+        fallback={() => (
+          <p className={css.pending}>Have a coupon? Enter it here.</p>
+        )}
       >
         {() => (
           <p className={css.plate}>

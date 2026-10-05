@@ -16,7 +16,10 @@ const page =
 const shop = defineRoutes({
   '/': () => page('Shop: 24 products'),
   '/products/:id': ({ id }) => page(`Product #${id}`),
-  '/cart': () => new Promise<Page>((loaded) => setTimeout(() => loaded(page('Cart: 2 items, €38.00')), cartDelay)),
+  '/cart': () =>
+    new Promise<Page>((loaded) =>
+      setTimeout(() => loaded(page('Cart: 2 items, €38.00')), cartDelay)
+    ),
   '/*rest': ({ rest }) => page(`No page at /${rest}`, css.failed),
 });
 

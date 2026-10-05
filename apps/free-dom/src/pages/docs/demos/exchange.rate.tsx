@@ -25,14 +25,21 @@ export const ExchangeRate = (): Node => {
 
   return (
     <div className={css.row}>
-      <Show when={() => request.value > 0} fallback={() => <p className={css.pending}>EUR to USD: not loaded yet</p>}>
+      <Show
+        when={() => request.value > 0}
+        fallback={() => (
+          <p className={css.pending}>EUR to USD: not loaded yet</p>
+        )}
+      >
         {() => (
           <Await
             promise={() => askBank(request.value)}
             fallback={() => <p className={css.pending}>Asking the bank…</p>}
             catch={(error) => <p className={css.failed}>{error.message}</p>}
           >
-            {(rate) => <p className={css.plate}>1 EUR = {rate.toFixed(3)} USD</p>}
+            {(rate) => (
+              <p className={css.plate}>1 EUR = {rate.toFixed(3)} USD</p>
+            )}
           </Await>
         )}
       </Show>

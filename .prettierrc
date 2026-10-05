@@ -7,8 +7,14 @@
   "printWidth": 120,
   "overrides": [
     {
-      "files": "apps/free-dom/src/pages/games/memory/*.{ts,tsx}",
-      "excludeFiles": "*.spec.{ts,tsx}",
+      "files": [
+        "apps/free-dom/src/pages/*/demos/**/*.{ts,tsx}",
+        "apps/free-dom/src/pages/dommy/examples/*.{ts,tsx}",
+        "apps/free-dom/src/pages/docs/snippets/*.{ts,tsx}",
+        "apps/free-dom/src/pages/evolution/steps/*.{ts,tsx}",
+        "apps/free-dom/src/pages/games/memory/*.{ts,tsx}"
+      ],
+      "excludeFiles": "**/*.spec.{ts,tsx}",
       "options": {
         "printWidth": 80
       }

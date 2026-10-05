@@ -13,7 +13,10 @@ export const Tickets = (): HTMLElement => {
     }
     return tickets.value === 1 ? 'single' : 'group';
   });
-  const summary = computed(() => `Tickets in your cart: ${tickets.value}, seats left: ${seatsLeft.value}`);
+  const summary = computed(
+    () =>
+      `Tickets in your cart: ${tickets.value}, seats left: ${seatsLeft.value}`
+  );
 
   const press = (step: number): void => {
     tickets.value += step;
@@ -24,7 +27,10 @@ export const Tickets = (): HTMLElement => {
     { className: css.tickets },
     output({ className: css.value, 'data-plan': plan }, tickets),
     button({ onClick: () => press(1) }, '+1'),
-    button({ onClick: () => press(-1), disabled: () => tickets.value === 0 }, '−1'),
+    button(
+      { onClick: () => press(-1), disabled: () => tickets.value === 0 },
+      '−1'
+    ),
     p({ className: css.summary }, summary)
   );
 };

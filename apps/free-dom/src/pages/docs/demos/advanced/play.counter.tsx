@@ -15,7 +15,11 @@ export const PlayCounter = (): Node => {
   return (
     <div className={css.row}>
       <label className={css.check}>
-        <input type='checkbox' checked={playing} onChange={(event) => (playing.value = event.currentTarget.checked)} />
+        <input
+          type='checkbox'
+          checked={playing}
+          onChange={(event) => (playing.value = event.currentTarget.checked)}
+        />
         Playing
       </label>
       <output className={css.value}>{plays}</output>

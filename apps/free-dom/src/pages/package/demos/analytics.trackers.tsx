@@ -37,7 +37,11 @@ const blocked = (name: string): Tracker => ({
 // the others the order: `forEachSettled` calls every one,
 // then throws the error once each has had its turn.
 export const AnalyticsTrackers = (): Node => {
-  const trackers = [counting('Product analytics'), blocked('Ads pixel'), counting('Data warehouse')];
+  const trackers = [
+    counting('Product analytics'),
+    blocked('Ads pixel'),
+    counting('Data warehouse'),
+  ];
   const problem = signal('');
 
   const placeOrder = (): void => {

@@ -25,5 +25,4 @@ const hasPackagePage = (name: SitePackage): name is PagedPackage => name !== 'do
 export const pagedPackages: readonly PagedPackage[] = sitePackages.filter(hasPackagePage);
 
 /** The package whose page is at `/<name>`, if there is one. */
-export const pagedPackageOf = (name: string): PagedPackage | undefined =>
-  pagedPackages.find((paged) => paged === name);
+export const pagedPackageOf = (name: string): PagedPackage | undefined => pagedPackages.find((paged) => paged === name);

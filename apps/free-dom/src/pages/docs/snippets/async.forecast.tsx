@@ -6,7 +6,9 @@ interface Forecast {
 }
 
 const loadForecast = (city: string): Promise<Forecast> =>
-  fetch(`/api/forecast?city=${encodeURIComponent(city)}`).then((response) => response.json());
+  fetch(`/api/forecast?city=${encodeURIComponent(city)}`).then((response) =>
+    response.json()
+  );
 
 const city = signal('Lisbon');
 
@@ -21,7 +23,11 @@ export const Weather = (): Node => (
     <Await
       promise={() => loadForecast(city.value)}
       fallback={() => <p>Loading {city}…</p>}
-      catch={(error) => <p>{city} did not load: {error.message}</p>}
+      catch={(error) => (
+        <p>
+          {city} did not load: {error.message}
+        </p>
+      )}
     >
       {(forecast) => (
         <p>

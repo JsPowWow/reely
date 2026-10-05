@@ -14,7 +14,11 @@ const Stopwatch = (): Node => {
     clearInterval(timer);
     runningTimers.value -= 1;
   });
-  return <output className={css.value}>{() => (tenths.value / 10).toFixed(1)}</output>;
+  return (
+    <output className={css.value}>
+      {() => (tenths.value / 10).toFixed(1)}
+    </output>
+  );
 };
 
 export const StopwatchSlot = (): Node => {
@@ -41,7 +45,9 @@ export const StopwatchSlot = (): Node => {
           slot = element;
         }}
       />
-      <button onClick={toggle}>{() => (running.value ? 'Stop and unmount' : 'Mount a stopwatch')}</button>
+      <button onClick={toggle}>
+        {() => (running.value ? 'Stop and unmount' : 'Mount a stopwatch')}
+      </button>
       <p className={css.status}>Timers running: {runningTimers}</p>
     </div>
   );

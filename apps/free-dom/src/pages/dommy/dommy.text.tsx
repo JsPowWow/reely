@@ -39,8 +39,8 @@ const en = {
     wholePackage: 'The whole package',
     Note: (): Node => (
       <>
-        Bundled with esbuild. Time a 500-row board in your own browser on <DocLink slug='performance'>Size and speed</DocLink>
-        .
+        Bundled with esbuild. Time a 500-row board in your own browser on{' '}
+        <DocLink slug='performance'>Size and speed</DocLink>.
       </>
     ),
     stepByStep: 'See it built step by step',

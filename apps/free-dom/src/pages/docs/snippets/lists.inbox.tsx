@@ -11,7 +11,11 @@ const inbox = signal<readonly Message[]>([]);
 export const Inbox = (): Node => (
   <ol>
     <For each={inbox} by={(message) => message.id}>
-      {(message, index) => <li className={() => (index() === 0 ? 'newest' : '')}>{() => message().subject}</li>}
+      {(message, index) => (
+        <li className={() => (index() === 0 ? 'newest' : '')}>
+          {() => message().subject}
+        </li>
+      )}
     </For>
   </ol>
 );

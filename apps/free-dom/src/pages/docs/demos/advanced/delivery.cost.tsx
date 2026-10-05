@@ -4,7 +4,8 @@ import css from '../demos.module.css';
 
 type Delivery = 'Courier' | 'Pickup';
 
-const isDelivery = (value: string): value is Delivery => value === 'Courier' || value === 'Pickup';
+const isDelivery = (value: string): value is Delivery =>
+  value === 'Courier' || value === 'Pickup';
 
 // The cost depends on what its last run read: the courier fees or the pickup fees, never all four.
 export const DeliveryCost = (): Node => {
@@ -23,7 +24,9 @@ export const DeliveryCost = (): Node => {
 
   const cost = (): number => {
     runs.data = String(Number(runs.data) + 1);
-    return delivery.value === 'Courier' ? courier.value + evening.value : locker.value + storage.value;
+    return delivery.value === 'Courier'
+      ? courier.value + evening.value
+      : locker.value + storage.value;
   };
 
   return (

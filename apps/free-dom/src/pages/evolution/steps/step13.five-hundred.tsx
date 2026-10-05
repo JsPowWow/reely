@@ -19,11 +19,17 @@ const timingMinimum = 20;
 // three letters per stock, all different: 263 and 26³ share no factor
 const symbolOf = (slot: number): string => {
   const code = (slot * 263 + 1331) % 26 ** 3;
-  return [code / 26 ** 2, code / 26, code].map((digit) => String.fromCharCode(65 + (Math.floor(digit) % 26))).join('');
+  return [code / 26 ** 2, code / 26, code]
+    .map((digit) => String.fromCharCode(65 + (Math.floor(digit) % 26)))
+    .join('');
 };
 
 const marketAtOpen = (size: number): Stock[] =>
-  Array.from({ length: size }, (_, slot) => ({ id: String(slot), symbol: symbolOf(slot), change: 0 }));
+  Array.from({ length: size }, (_, slot) => ({
+    id: String(slot),
+    symbol: symbolOf(slot),
+    change: 0,
+  }));
 
 // Every stock has its own drift, and its own good and bad ticks: a made-up market, the same on every visit.
 const tickMove = (stock: Stock, tick: number): number =>
@@ -31,18 +37,28 @@ const tickMove = (stock: Stock, tick: number): number =>
 
 const priceTick = (market: readonly Stock[], tick: number): Stock[] =>
   market
-    .map((stock) => ({ ...stock, change: stock.change + tickMove(stock, tick) }))
+    .map((stock) => ({
+      ...stock,
+      change: stock.change + tickMove(stock, tick),
+    }))
     .toSorted((first, second) => second.change - first.change);
 
-const formatChange = (change: number): string => `${change < 0 ? '−' : '+'}${(Math.abs(change) / 100).toFixed(2)}%`;
+const formatChange = (change: number): string =>
+  `${change < 0 ? '−' : '+'}${(Math.abs(change) / 100).toFixed(2)}%`;
 
-const formatMs = (ms: number | undefined): string => (ms === undefined ? '–' : `${ms.toFixed(1)} ms`);
+const formatMs = (ms: number | undefined): string =>
+  ms === undefined ? '–' : `${ms.toFixed(1)} ms`;
 
 /** The time below which `share` of the timed updates fall; nothing until enough are timed. */
-const percentile = (timings: readonly number[], share: number): number | undefined =>
+const percentile = (
+  timings: readonly number[],
+  share: number
+): number | undefined =>
   timings.length < timingMinimum
     ? undefined
-    : timings.toSorted((first, second) => first - second)[Math.ceil(share * timings.length) - 1];
+    : timings.toSorted((first, second) => first - second)[
+        Math.ceil(share * timings.length) - 1
+      ];
 
 // Top movers of a whole index: `For` renders a row once per `by` key. A new order moves the rows
 // that changed places, and each row's bindings rewrite only the texts that changed. An update is
@@ -66,7 +82,10 @@ export const Board = (): Node => {
     });
     // reading the height makes the browser lay out the new order now, inside the timing
     void tower?.offsetHeight;
-    timings.value = [...timings.value.slice(1 - timingWindow), performance.now() - start];
+    timings.value = [
+      ...timings.value.slice(1 - timingWindow),
+      performance.now() - start,
+    ];
   };
 
   const stop = (): void => {
@@ -99,7 +118,8 @@ export const Board = (): Node => {
     });
   };
   // `peek` reads without subscribing: the key is read while the list updates, not to update it
-  const keyOf = (stock: Stock): string => (newKeys.peek() ? `${tick.peek()}:${stock.id}` : stock.id);
+  const keyOf = (stock: Stock): string =>
+    newKeys.peek() ? `${tick.peek()}:${stock.id}` : stock.id;
 
   const last = computed(() => formatMs(timings.value.at(-1)));
   const median = computed(() => formatMs(percentile(timings.value, 0.5)));
@@ -128,19 +148,29 @@ export const Board = (): Node => {
         </For>
       </ol>
       <div className={css.controls}>
-        <button onClick={startOrStop}>{() => (running.value ? 'Stop' : 'Start')}</button>
+        <button onClick={startOrStop}>
+          {() => (running.value ? 'Stop' : 'Start')}
+        </button>
         <p className={css.status}>Update {tick}</p>
         <fieldset className={css.sizes}>
           <legend>Stocks</legend>
           {marketSizes.map((option) => (
             <label>
-              <input type='radio' name='market-size' checked={option === size.value} onChange={() => resize(option)} />
+              <input
+                type='radio'
+                name='market-size'
+                checked={option === size.value}
+                onChange={() => resize(option)}
+              />
               {option}
             </label>
           ))}
         </fieldset>
         <label className={css.mode}>
-          <input type='checkbox' onChange={(event) => switchKeys(event.currentTarget.checked)} />
+          <input
+            type='checkbox'
+            onChange={(event) => switchKeys(event.currentTarget.checked)}
+          />
           New keys every update
         </label>
       </div>

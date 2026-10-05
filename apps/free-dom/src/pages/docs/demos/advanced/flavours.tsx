@@ -10,12 +10,17 @@ export const Flavours = (): Node => {
     <div className={css.row}>
       <label className={css.field}>
         Choose a flavour
-        <input list='flavours' onInput={(event) => (choice.value = event.currentTarget.value)} />
+        <input
+          list='flavours'
+          onInput={(event) => (choice.value = event.currentTarget.value)}
+        />
       </label>
       <datalist id='flavours'>
-        {['Chocolate', 'Coconut', 'Mint', 'Strawberry', 'Vanilla'].map((flavour) => (
-          <option value={flavour} />
-        ))}
+        {['Chocolate', 'Coconut', 'Mint', 'Strawberry', 'Vanilla'].map(
+          (flavour) => (
+            <option value={flavour} />
+          )
+        )}
       </datalist>
       <p className={css.status}>
         You chose: <output>{() => choice.value || 'nothing yet'}</output>

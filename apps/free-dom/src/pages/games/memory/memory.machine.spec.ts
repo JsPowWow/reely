@@ -22,8 +22,7 @@ const setUp = (): { world: MemoryWorld; timers: Map<number, VoidFunction> } => {
   return { world, timers };
 };
 
-const fire = (timers: Map<number, VoidFunction>): void =>
-  [...timers.values()].forEach((fn) => fn());
+const fire = (timers: Map<number, VoidFunction>): void => [...timers.values()].forEach((fn) => fn());
 
 describe('memory machine', () => {
   it('turns one card, then keeps a found pair and is ready for the next', () => {
@@ -136,9 +135,7 @@ describe('memory machine', () => {
       expect(new Set(found).size).toBe(found.length);
       expect(timers.size).toBeLessThanOrEqual(1);
       expect(timers.size === 1).toBe(game.state === 'wrongPair');
-      expect(open.every((place) => !found.includes(deck[place] ?? ''))).toBe(
-        true
-      );
+      expect(open.every((place) => !found.includes(deck[place] ?? ''))).toBe(true);
       expect(moves).toBeGreaterThanOrEqual(found.length);
     }
     expect(wins).toBeGreaterThan(0);

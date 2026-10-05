@@ -16,16 +16,25 @@ export const frame = (menu: readonly HTMLAnchorElement[]): Frame => {
     'div',
     { className: css.app },
     address,
-    el('div', { className: css.body }, el('nav', { className: css.menu }, ...menu), page)
+    el(
+      'div',
+      { className: css.body },
+      el('nav', { className: css.menu }, ...menu),
+      page
+    )
   );
   return { app, address, page };
 };
 
 /** An address as the frame prints it: its path and query. */
-export const addressOf = ({ pathname, search }: URL): string => `${pathname}${search}`;
+export const addressOf = ({ pathname, search }: URL): string =>
+  `${pathname}${search}`;
 
 /** Marks the link of the menu that goes to `path` as the page shown, and only that one. */
-export const markCurrent = (menu: readonly HTMLAnchorElement[], path: string): void => {
+export const markCurrent = (
+  menu: readonly HTMLAnchorElement[],
+  path: string
+): void => {
   for (const link of menu) {
     if (link.pathname === path) {
       link.setAttribute('aria-current', 'page');

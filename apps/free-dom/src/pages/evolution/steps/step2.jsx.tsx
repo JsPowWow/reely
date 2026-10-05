@@ -17,7 +17,10 @@ export const ReelyLinks = (): Node => (
       </span>
       <img src={arrowIcon} alt='' />
     </a>
-    <a className={css.link} href='https://github.com/JsPowWow/reely/tree/main/packages/dommy'>
+    <a
+      className={css.link}
+      href='https://github.com/JsPowWow/reely/tree/main/packages/dommy'
+    >
       <img src={docIcon} alt='' />
       <span className={css.text}>
         @reely/dommy

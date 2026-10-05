@@ -1,4 +1,10 @@
-import { defineRoutes, followLinks, href, memoryHistory, startRouter } from '@reely/router';
+import {
+  defineRoutes,
+  followLinks,
+  href,
+  memoryHistory,
+  startRouter,
+} from '@reely/router';
 import { effect, signal } from '@reely/signals';
 
 import { addressOf, frame, markCurrent } from './frame';
@@ -8,7 +14,12 @@ import css from './router.module.css';
 
 type Page = () => Node;
 
-const paths = { home: '/', orders: '/orders', account: '/account', login: '/login' } as const;
+const paths = {
+  home: '/',
+  orders: '/orders',
+  account: '/account',
+  login: '/login',
+} as const;
 
 const page =
   (title: string, ...content: (Node | string)[]): Page =>
@@ -32,19 +43,31 @@ export const AccountGuard = (): Node => {
 
   // a guard is a function around a route's answer: signed out, the reader is sent to sign in, and
   // the page they asked for waits in the address
-  const signedIn = (from: string, answer: (name: string) => Page): Page | undefined => {
+  const signedIn = (
+    from: string,
+    answer: (name: string) => Page
+  ): Page | undefined => {
     const name = user.value;
     if (name !== undefined) {
       return answer(name);
     }
-    history.navigate(`${href(paths.login)}?${new URLSearchParams({ next: from })}`, { replace: true });
+    history.navigate(
+      `${href(paths.login)}?${new URLSearchParams({ next: from })}`,
+      { replace: true }
+    );
     return undefined;
   };
 
   const routes = defineRoutes({
-    [paths.home]: () => page('Welcome', el('p', {}, 'Orders and Account need you to sign in.')),
+    [paths.home]: () =>
+      page('Welcome', el('p', {}, 'Orders and Account need you to sign in.')),
     [paths.orders]: () =>
-      signedIn(paths.orders, (name) => page(`${name}’s orders`, el('p', {}, '#1042, a beech chair, ships on Monday.'))),
+      signedIn(paths.orders, (name) =>
+        page(
+          `${name}’s orders`,
+          el('p', {}, '#1042, a beech chair, ships on Monday.')
+        )
+      ),
     [paths.account]: () =>
       signedIn(paths.account, (name) =>
         page(
@@ -77,7 +100,11 @@ export const AccountGuard = (): Node => {
       place.replaceChildren(view());
       return place;
     },
-    fail: (error) => page('Something went wrong', el('p', { className: css.failed }, error.message)),
+    fail: (error) =>
+      page(
+        'Something went wrong',
+        el('p', { className: css.failed }, error.message)
+      ),
   });
 
   effect(() => markCurrent(menu, router.path()));

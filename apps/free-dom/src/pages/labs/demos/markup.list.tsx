@@ -1,7 +1,8 @@
 import type { ReelyNode } from '@reely/dommy';
 
 // The lab's `markup`, whole: every `yield` of the builder becomes one child.
-const markup = (build: () => Iterable<ReelyNode>): ReelyNode[] => Array.from(build());
+const markup = (build: () => Iterable<ReelyNode>): ReelyNode[] =>
+  Array.from(build());
 
 const tasks = [
   { title: 'Write the spec', done: false },

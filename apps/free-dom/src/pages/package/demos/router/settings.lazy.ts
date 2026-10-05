@@ -1,4 +1,10 @@
-import { defineRoutes, followLinks, href, memoryHistory, startRouter } from '@reely/router';
+import {
+  defineRoutes,
+  followLinks,
+  href,
+  memoryHistory,
+  startRouter,
+} from '@reely/router';
 import { effect } from '@reely/signals';
 
 import { addressOf, frame, markCurrent } from './frame';
@@ -15,7 +21,8 @@ const paths = { tab: '/settings/:tab' } as const;
 const tabs = ['profile', 'billing', 'notifications', 'reports'] as const;
 
 // stands in for `import('./billing.page')`: the chunk arrives after `ms`
-const chunk = <T>(ms: number, page: T): Promise<T> => new Promise((loaded) => setTimeout(loaded, ms, page));
+const chunk = <T>(ms: number, page: T): Promise<T> =>
+  new Promise((loaded) => setTimeout(loaded, ms, page));
 
 const tabPage =
   (title: string, text: string): Page =>
@@ -23,7 +30,9 @@ const tabPage =
     el('div', {}, el('h2', {}, title), el('p', {}, text));
 
 export const LazySettings = (): Node => {
-  const menu = tabs.map((tab) => el('a', { href: href(paths.tab, { tab }) }, tab));
+  const menu = tabs.map((tab) =>
+    el('a', { href: href(paths.tab, { tab }) }, tab)
+  );
   const { app, address, page } = frame(menu);
   const log = el('ol', { className: css.log });
   const note = (line: string): void => void log.append(el('li', {}, line));
@@ -43,11 +52,19 @@ export const LazySettings = (): Node => {
         case 'profile':
           return tabPage('Profile', 'Shipped with the app: no wait.');
         case 'billing':
-          return chunk(1500, tabPage('Billing', 'Its own chunk, 1.5 s away.')).then(loaded(tab));
+          return chunk(
+            1500,
+            tabPage('Billing', 'Its own chunk, 1.5 s away.')
+          ).then(loaded(tab));
         case 'notifications':
-          return chunk(500, tabPage('Notifications', 'Its own chunk, 0.5 s away.')).then(loaded(tab));
+          return chunk(
+            500,
+            tabPage('Notifications', 'Its own chunk, 0.5 s away.')
+          ).then(loaded(tab));
         case 'reports':
-          return chunk(700, undefined).then(() => Promise.reject(new Error('The reports chunk did not load.')));
+          return chunk(700, undefined).then(() =>
+            Promise.reject(new Error('The reports chunk did not load.'))
+          );
         default:
           return undefined;
       }
@@ -65,7 +82,12 @@ export const LazySettings = (): Node => {
     fail:
       (error): Page =>
       () =>
-        el('div', {}, el('h2', {}, 'Could not open the page'), el('p', { className: css.failed }, error.message)),
+        el(
+          'div',
+          {},
+          el('h2', {}, 'Could not open the page'),
+          el('p', { className: css.failed }, error.message)
+        ),
   });
 
   effect(() => markCurrent(menu, router.path()));

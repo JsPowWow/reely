@@ -51,7 +51,6 @@
   font-weight: 700;
 }
 
-
 .stepNumber {
   font-family: var(--display);
   font-size: 1.25rem;
@@ -255,7 +254,6 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
-
 
   /* Room for the Netlify badge, which floats over the bottom of the page. */
   .main {

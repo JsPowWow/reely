@@ -1,4 +1,10 @@
-import { defineRoutes, followLinks, href, memoryHistory, startRouter } from '@reely/router';
+import {
+  defineRoutes,
+  followLinks,
+  href,
+  memoryHistory,
+  startRouter,
+} from '@reely/router';
 
 import { addressOf, frame } from './frame';
 import { el } from './vanilla.dom';
@@ -8,14 +14,33 @@ import css from './router.module.css';
 // a page here is the element itself, made when its route answers
 type Page = HTMLElement;
 
-const paths = { home: '/', search: '/search', product: '/products/:slug' } as const;
+const paths = {
+  home: '/',
+  search: '/search',
+  product: '/products/:slug',
+} as const;
 
 const catalogue = [
   { slug: 'oak-desk-lamp', name: 'Oak desk lamp', kind: 'lamp', price: 59 },
-  { slug: 'brass-floor-lamp', name: 'Brass floor lamp', kind: 'lamp', price: 149 },
-  { slug: 'paper-pendant-lamp', name: 'Paper pendant lamp', kind: 'lamp', price: 35 },
+  {
+    slug: 'brass-floor-lamp',
+    name: 'Brass floor lamp',
+    kind: 'lamp',
+    price: 149,
+  },
+  {
+    slug: 'paper-pendant-lamp',
+    name: 'Paper pendant lamp',
+    kind: 'lamp',
+    price: 35,
+  },
   { slug: 'beech-chair', name: 'Beech chair', kind: 'chair', price: 89 },
-  { slug: 'reading-armchair', name: 'Reading armchair', kind: 'chair', price: 420 },
+  {
+    slug: 'reading-armchair',
+    name: 'Reading armchair',
+    kind: 'chair',
+    price: 420,
+  },
 ];
 
 type Product = (typeof catalogue)[number];
@@ -43,12 +68,27 @@ export const ShopSearch = (): Node => {
   followLinks(app, history.navigate);
 
   const searchForm = (words = '', sort = 'relevance'): HTMLFormElement => {
-    const input = el('input', { type: 'search', name: 'q', value: words, placeholder: 'lamp, chair…' });
+    const input = el('input', {
+      type: 'search',
+      name: 'q',
+      value: words,
+      placeholder: 'lamp, chair…',
+    });
     input.setAttribute('aria-label', 'Search the shop');
-    const order = el('select', { name: 'sort' }, ...sorts.map((each) => el('option', { value: each }, each)));
+    const order = el(
+      'select',
+      { name: 'sort' },
+      ...sorts.map((each) => el('option', { value: each }, each))
+    );
     order.value = sort;
     order.setAttribute('aria-label', 'Sort by');
-    const form = el('form', { className: css.search }, input, order, el('button', { type: 'submit' }, 'Search'));
+    const form = el(
+      'form',
+      { className: css.search },
+      input,
+      order,
+      el('button', { type: 'submit' }, 'Search')
+    );
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       history.navigate(searchHref(input.value.trim(), order.value));
@@ -57,12 +97,15 @@ export const ShopSearch = (): Node => {
   };
 
   const routes = defineRoutes({
-    [paths.home]: (): Page => el('div', {}, el('h2', {}, 'Find something for your home'), searchForm()),
+    [paths.home]: (): Page =>
+      el('div', {}, el('h2', {}, 'Find something for your home'), searchForm()),
     [paths.search]: (_params, query): Page => {
       const words = query.get('q') ?? '';
       const sort = query.get('sort') ?? 'relevance';
       const found = catalogue
-        .filter(({ name, kind }) => `${name} ${kind}`.toLowerCase().includes(words.toLowerCase()))
+        .filter(({ name, kind }) =>
+          `${name} ${kind}`.toLowerCase().includes(words.toLowerCase())
+        )
         .sort(orders[sort] ?? ((): number => 0));
       return el(
         'div',
@@ -73,13 +116,24 @@ export const ShopSearch = (): Node => {
           'p',
           { className: css.sorts },
           'Sort:',
-          ...sorts.map((each) => el('a', { href: searchHref(words, each) }, each))
+          ...sorts.map((each) =>
+            el('a', { href: searchHref(words, each) }, each)
+          )
         ),
         el(
           'ul',
           { className: css.rows },
           ...found.map(({ slug, name, price }) =>
-            el('li', {}, el('a', { href: href(paths.product, { slug }) }, name, el('small', {}, `€${price}`)))
+            el(
+              'li',
+              {},
+              el(
+                'a',
+                { href: href(paths.product, { slug }) },
+                name,
+                el('small', {}, `€${price}`)
+              )
+            )
           )
         )
       );

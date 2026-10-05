@@ -55,7 +55,7 @@ describe('demo', () => {
       Element.prototype.animate = animate;
       const tile = document.createElement('span');
       tile.append('A');
-      const board = (<div {...unflashed}>{tile}</div>);
+      const board = <div {...unflashed}>{tile}</div>;
       const meter = MutationMeter({ children: board });
       await flushMutations();
 

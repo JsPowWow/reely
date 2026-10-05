@@ -1,4 +1,10 @@
-import { defineRoutes, followLinks, href, memoryHistory, Router } from '@reely/dommy/router';
+import {
+  defineRoutes,
+  followLinks,
+  href,
+  memoryHistory,
+  Router,
+} from '@reely/dommy/router';
 import { isNumber } from '@reely/utils';
 
 import css from './router.module.css';
@@ -10,18 +16,25 @@ interface Folder {
 
 const drive: Folder = {
   'Q3 plans': { 'budget.xlsx': 48, 'team offsite.docx': 112 },
-  Photos: { 'Office party': { 'cake.jpg': 2300, 'karaoke.mp4': 48000 }, 'logo draft.png': 640 },
+  Photos: {
+    'Office party': { 'cake.jpg': 2300, 'karaoke.mp4': 48000 },
+    'logo draft.png': 640,
+  },
   'read me.txt': 1,
 };
 
 const paths = { drive: '/drive/*path' } as const;
 
 // `*path` keeps its slashes, and href encodes each segment: `/drive/Q3%20plans/budget.xlsx`
-const driveHref = (...names: string[]): string => href(paths.drive, { path: names.join('/') });
+const driveHref = (...names: string[]): string =>
+  href(paths.drive, { path: names.join('/') });
 
 const itemAt = (names: readonly string[]): Folder | number | undefined =>
   names.reduce<Folder | number | undefined>(
-    (item, name) => (item !== undefined && !isNumber(item) && Object.hasOwn(item, name) ? item[name] : undefined),
+    (item, name) =>
+      item !== undefined && !isNumber(item) && Object.hasOwn(item, name)
+        ? item[name]
+        : undefined,
     drive
   );
 
@@ -38,7 +51,13 @@ const Crumbs = ({ names }: { names: readonly string[] }): Node => (
   </ol>
 );
 
-const FolderView = ({ names, folder }: { names: readonly string[]; folder: Folder }): Node => (
+const FolderView = ({
+  names,
+  folder,
+}: {
+  names: readonly string[];
+  folder: Folder;
+}): Node => (
   <div>
     <Crumbs names={names} />
     <h2>{names.at(-1) ?? 'Drive'}</h2>
@@ -47,7 +66,11 @@ const FolderView = ({ names, folder }: { names: readonly string[]; folder: Folde
         <li>
           <a href={driveHref(...names, name)}>
             {name}
-            <small>{isNumber(item) ? `${item} kB` : `${Object.keys(item).length} items`}</small>
+            <small>
+              {isNumber(item)
+                ? `${item} kB`
+                : `${Object.keys(item).length} items`}
+            </small>
           </a>
         </li>
       ))}
@@ -55,7 +78,13 @@ const FolderView = ({ names, folder }: { names: readonly string[]; folder: Folde
   </div>
 );
 
-const FileView = ({ names, size }: { names: readonly string[]; size: number }): Node => (
+const FileView = ({
+  names,
+  size,
+}: {
+  names: readonly string[];
+  size: number;
+}): Node => (
   <div>
     <Crumbs names={names} />
     <h2>{names.at(-1)}</h2>
@@ -83,7 +112,11 @@ export const FilesBrowser = (): Node => {
     <div className={css.app}>
       <p className={css.address}>{() => files.path()}</p>
       <section className={css.page}>
-        <Router routes={driveRoutes} history={files} catch={(error) => <p className={css.failed}>{error.message}</p>} />
+        <Router
+          routes={driveRoutes}
+          history={files}
+          catch={(error) => <p className={css.failed}>{error.message}</p>}
+        />
       </section>
     </div>
   );

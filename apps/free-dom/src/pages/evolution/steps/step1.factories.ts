@@ -15,19 +15,34 @@ export const ReelyLinks = (): HTMLElement =>
     a(
       { className: css.link, href: 'https://github.com/JsPowWow/reely' },
       img({ src: codeIcon, alt: '' }),
-      span({ className: css.text }, 'reely on GitHub', span({ className: css.hint }, 'Source, tests and issues')),
+      span(
+        { className: css.text },
+        'reely on GitHub',
+        span({ className: css.hint }, 'Source, tests and issues')
+      ),
       img({ src: arrowIcon, alt: '' })
     ),
     a(
-      { className: css.link, href: 'https://github.com/JsPowWow/reely/tree/main/packages/dommy' },
+      {
+        className: css.link,
+        href: 'https://github.com/JsPowWow/reely/tree/main/packages/dommy',
+      },
       img({ src: docIcon, alt: '' }),
-      span({ className: css.text }, '@reely/dommy', span({ className: css.hint }, 'Tag factories, JSX and signals')),
+      span(
+        { className: css.text },
+        '@reely/dommy',
+        span({ className: css.hint }, 'Tag factories, JSX and signals')
+      ),
       img({ src: arrowIcon, alt: '' })
     ),
     a(
       { className: css.link, href: 'https://github.com/JsPowWow/ai-race' },
       img({ src: flagIcon, alt: '' }),
-      span({ className: css.text }, 'ai-race', span({ className: css.hint }, 'The first app built on dommy')),
+      span(
+        { className: css.text },
+        'ai-race',
+        span({ className: css.hint }, 'The first app built on dommy')
+      ),
       img({ src: arrowIcon, alt: '' })
     )
   );
