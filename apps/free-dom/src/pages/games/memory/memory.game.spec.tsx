@@ -1,5 +1,4 @@
-import { MemoryGame } from './memory.game';
-import { turnBackAfter } from './memory.machine';
+import { MemoryGame, turnBackAfter } from './memory.game';
 import { sitePackages } from '../../../site/site.packages';
 import { clickButton, mounted, stubDialogs } from '../../../testing/dom.testing';
 
@@ -200,7 +199,7 @@ describe('memory game', () => {
     expect(caption()).toContain('New game: deal is taken from any state');
 
     turn(game, 0, 1);
-    expect(caption()).toContain('No match: entering wrongPair starts the timer');
+    expect(caption()).toContain('No match: wrongPair refuses every turn');
     expect(code()).toContain('wrongPair: {');
 
     turn(game, 2);

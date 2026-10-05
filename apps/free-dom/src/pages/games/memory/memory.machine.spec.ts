@@ -1,4 +1,4 @@
-import { memoryMachine, turnBackAfter } from './memory.machine';
+import { memoryMachine } from './memory.machine';
 
 import type { MemoryWorld } from './memory.machine';
 import type { MemoryState } from './memory.rules';
@@ -6,27 +6,10 @@ import type { MemoryState } from './memory.rules';
 const deck = ['a', 'b', 'a', 'b'];
 const fresh = (): MemoryState => ({ deck, open: [], found: [], moves: 0 });
 
-const setUp = (): { world: MemoryWorld; timers: Map<number, VoidFunction> } => {
-  const timers = new Map<number, VoidFunction>();
-  let next = 0;
-  const world: MemoryWorld = {
-    deal: fresh,
-    now: () => 1_000,
-    later: (ms: number, fn: VoidFunction): VoidFunction => {
-      const id = ++next;
-      expect(ms).toBe(turnBackAfter);
-      timers.set(id, fn);
-      return () => void timers.delete(id);
-    },
-  };
-  return { world, timers };
-};
-
-const fire = (timers: Map<number, VoidFunction>): void => [...timers.values()].forEach((fn) => fn());
+const world: MemoryWorld = { deal: fresh, now: () => 1_000 };
 
 describe('memory machine', () => {
   it('turns one card, then keeps a found pair and is ready for the next', () => {
-    const { world } = setUp();
     const game = memoryMachine(world);
     const { context } = game;
 
@@ -47,7 +30,6 @@ describe('memory machine', () => {
   });
 
   it('refuses a card that cannot turn: the same card, a found one, any card while a wrong pair is up', () => {
-    const { world } = setUp();
     const game = memoryMachine(world);
     const { context } = game;
 
@@ -59,34 +41,29 @@ describe('memory machine', () => {
     expect(context.table.value.moves).toBe(1);
   });
 
-  it('turns a wrong pair back when its timer fires', () => {
-    const { world, timers } = setUp();
+  it('turns a wrong pair back on `turnBack`, and refuses it anywhere else', () => {
     const game = memoryMachine(world);
     const { context } = game;
     game.send('turn', 0);
     game.send('turn', 1);
 
-    fire(timers);
+    game.send('turnBack');
 
     expect(game.state).toBe('ready');
     expect(context.table.value.open).toEqual([]);
-    expect(timers.size).toBe(0);
   });
 
-  it('deals a new game from any state, cancelling the wrong pair’s timer', () => {
-    const { world, timers } = setUp();
+  it('deals a new game from any state, a wrong pair included', () => {
     const game = memoryMachine(world);
     const { context } = game;
     game.send('turn', 0);
     game.send('turn', 1);
 
     expect(game.send('deal')).toMatchObject({ status: 'done', state: 'ready' });
-    expect(timers.size).toBe(0);
     expect(context.table.value).toEqual(fresh());
   });
 
   it('posts a win once, with its place on the leaderboard', () => {
-    const { world } = setUp();
     const game = memoryMachine(world);
     const { context } = game;
 
@@ -100,8 +77,7 @@ describe('memory machine', () => {
     });
   });
 
-  it('holds its invariants under any order of fast clicks, new games and timers', () => {
-    const { world, timers } = setUp();
+  it('holds its invariants under any order of fast clicks, new games and turn-backs', () => {
     let clock = 0;
     const game = memoryMachine({
       ...world,
@@ -126,15 +102,14 @@ describe('memory machine', () => {
     for (let step = 0; step < 5000; step++) {
       const roll = next();
       if (roll < 0.8) game.send('turn', Math.floor(next() * 7) - 1);
-      else if (roll < 0.95) fire(timers);
+      else if (roll < 0.95) game.send('turnBack');
       else game.send('deal');
 
       const { deck, open, found, moves } = table.value;
       expect(open.length).toBeLessThanOrEqual(2);
       expect(new Set(open).size).toBe(open.length);
       expect(new Set(found).size).toBe(found.length);
-      expect(timers.size).toBeLessThanOrEqual(1);
-      expect(timers.size === 1).toBe(game.state === 'wrongPair');
+      expect(open.length === 2).toBe(game.state === 'wrongPair');
       expect(open.every((place) => !found.includes(deck[place] ?? ''))).toBe(true);
       expect(moves).toBeGreaterThanOrEqual(found.length);
     }

@@ -50,12 +50,12 @@ export const moments: Record<MemoryPhase | 'deal' | 'turnBack', Moment> = {
   },
   wrongPair: {
     region: 'wrongPair',
-    caption: 'No match: entering `wrongPair` starts the timer of `turnBack`.',
+    caption: 'No match: `wrongPair` refuses every `turn` until `turnBack`.',
     status: (table) => `${upFaces(table)} do not match.`,
   },
   turnBack: {
     region: 'wrongPair',
-    caption: 'The timer sent `turnBack`, and `exit` turned the pair down.',
+    caption: 'A second later `turnBack` came, and `exit` turned the pair down.',
     status: nothingUp,
   },
   won: {

@@ -1,11 +1,12 @@
-import { Keyed, onCleanup, signal } from '@reely/dommy';
+import { effect, Keyed, onCleanup, signal } from '@reely/dommy';
+import { later } from '@reely/dommy-kit';
 
 import { MemoryCard } from './memory.card';
 import { BestTen, Victory } from './memory.dialogs';
 import { memoryMachine } from './memory.machine';
 import { MomentCode, momentOf, moments, refused } from './memory.moments';
-import { cardAt, dealGame, isLocked } from './memory.rules';
-import { browserStorage, following, ownedLater } from './memory.wiring';
+import { cardAt, dealGame } from './memory.rules';
+import { browserStorage, following } from './memory.wiring';
 import { sitePackages } from '../../../site/site.packages';
 
 import css from './memory.module.css';
@@ -14,6 +15,9 @@ import type { CodeMoment } from './memory.moments';
 import type { RandomSource } from './memory.rules';
 
 const pairs = 8;
+
+/** How long a wrong pair stays up before it turns back, in ms. */
+export const turnBackAfter = 1000;
 
 interface MemoryGameProps {
   random?: RandomSource;
@@ -35,7 +39,6 @@ export const MemoryGame = ({
   const game = memoryMachine({
     deal: () => dealGame(sitePackages, pairs, random),
     now,
-    later: ownedLater(),
     storage,
   });
   const table = following(game.context.table);
@@ -43,6 +46,7 @@ export const MemoryGame = ({
   // the deck changes only with a new game, which lays out new cards
   const cards = following(game.context.table.select(({ deck }) => deck));
 
+  const phase = signal(game.state);
   const status = signal(moments.deal.status(table.value));
   const code = signal<CodeMoment>(moments.deal);
   const victoryOpen = signal(false);
@@ -51,10 +55,19 @@ export const MemoryGame = ({
   onCleanup(
     game.on('stateChanged', (change) => {
       const moment = momentOf(change);
+      phase.value = change.to;
       status.value = moment.status(change.context.table.value);
       code.value = moment;
       victoryOpen.value = change.to === 'won';
     })
+  );
+
+  // the machine keeps no time: a wrong pair turns back a second after it is
+  // up; a new game, or the view going, cancels the timer with this effect run
+  effect(
+    () =>
+      phase.value === 'wrongPair' &&
+      later(turnBackAfter, () => game.send('turnBack'))
   );
 
   // a card never asks whether it may turn: the machine refuses what the rules
@@ -99,7 +112,7 @@ export const MemoryGame = ({
               className={css.board}
               aria={{
                 ariaLabel: 'Cards',
-                ariaBusy: () => String(isLocked(table.value)),
+                ariaBusy: () => String(phase.value === 'wrongPair'),
               }}
             >
               {deck.map((face, place) => (

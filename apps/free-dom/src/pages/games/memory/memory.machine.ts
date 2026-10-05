@@ -6,16 +6,12 @@ import type {
   StateMachineSelection,
   StateMachineStateConfig,
 } from '@reely/state-machine';
-import { noop } from '@reely/utils';
 
 import { createLeaderboard, postResult } from './memory.leaderboard';
 import { canTurn, isWon, turnBack, turnCard } from './memory.rules';
 
 import type { Leaderboard } from './memory.leaderboard';
 import type { MemoryState } from './memory.rules';
-
-/** How long a wrong pair stays up before it turns back, in ms. */
-export const turnBackAfter = 1000;
 
 /**
  * The world outside the game, reached through parameters, so the machine runs
@@ -25,8 +21,6 @@ export interface MemoryWorld {
   readonly deal: () => MemoryState;
   /** The clock that dates a win. */
   readonly now: () => number;
-  /** Runs `fn` after `ms`; returns the cancel. */
-  readonly later: (ms: number, fn: VoidFunction) => VoidFunction;
   /** Where the best ten are kept; without it they last as long as the page. */
   readonly storage?: Pick<Storage, 'getItem' | 'setItem'>;
 }
@@ -97,14 +91,12 @@ export const memoryMachine = (world: MemoryWorld): IStateMachine<Memory> => {
     table: new ObjectStore(world.deal()),
     leaderboard: createLeaderboard(world.storage),
   };
-  let cancelTurnBack: VoidFunction = noop;
-
   return createStateMachine<Memory>(
     {
       initial: 'ready',
       context,
       // #region deal
-      // from any state: leaving a wrong pair cancels its timer
+      // from any state: leaving a wrong pair turns it down first
       on: {
         deal: {
           target: 'ready',
@@ -118,18 +110,10 @@ export const memoryMachine = (world: MemoryWorld): IStateMachine<Memory> => {
         ready: turning,
         oneUp: turning,
         // #region wrongPair
-        // no `turn` here: a click is refused until the pair turns back
+        // no `turn` here: a click is refused until `turnBack` arrives
         wrongPair: {
-          entry: [
-            turnUp,
-            ({ machine, context: { later } }): void => {
-              cancelTurnBack = later(turnBackAfter, () =>
-                machine.send('turnBack')
-              );
-            },
-          ],
+          entry: turnUp,
           exit: ({ context: { table } }): void => {
-            cancelTurnBack();
             table.value = turnBack(table.value);
           },
           on: { turnBack: 'ready' },

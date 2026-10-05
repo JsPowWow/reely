@@ -9,11 +9,9 @@ interface ModalProps {
    * closes it.
    */
   open: Signal<boolean>;
-  title: ReelyNode;
+  title: string;
   children?: ReelyNode;
 }
-
-let modals = 0;
 
 /**
  * A modal dialog: while it is open the page behind it is dimmed, inert and
@@ -25,11 +23,10 @@ export const Modal = ({
   title,
   children,
 }: ModalProps): HTMLDialogElement => {
-  const titleId = `modal-title-${++modals}`;
   const box = dialog(
     {
       className: css.modal,
-      aria: { ariaLabelledby: titleId },
+      aria: { ariaLabel: title },
       // Escape closes the dialog natively; the signal follows
       onClose: () => open.set(false),
       // the dialog has no padding, so a click on the dialog itself landed on
@@ -38,9 +35,7 @@ export const Modal = ({
         event.target === event.currentTarget && open.set(false),
     },
     <div className={css.modalBody}>
-      <h2 id={titleId} className={css.modalTitle}>
-        {title}
-      </h2>
+      <h2 className={css.modalTitle}>{title}</h2>
       {children}
     </div>
   );
