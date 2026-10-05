@@ -1,5 +1,5 @@
 // A push-pull signal graph: a write marks what may have changed, a read brings a node up to date.
-import { hasSome } from '@reely/basics';
+import { hasSome, reportUncaught } from '@reely/basics';
 import type { Nullable } from '@reely/utils';
 import { isInstanceOf, isNil, noop } from '@reely/utils';
 
@@ -429,19 +429,34 @@ export const subscribe = <T>(read: ReactiveValue<T>, cb: (value: T, prevValue?: 
   });
 };
 
-/** Groups writes: effects run once, when the outermost `batch` ends, even if `fn` throws. */
+const endBatch = (): void => {
+  if (--batchDepth === 0) {
+    const written = batchWrites;
+    batchWrites = [];
+    written.forEach((each) => each.forgetBatch());
+    flushSync();
+  }
+};
+
+/**
+ * Groups writes: effects run once, when the outermost `batch` ends, even if `fn` throws. An error of
+ * `fn` is thrown; one the effects throw after it is reported as uncaught.
+ */
 export const batch = <T>(fn: () => T): T => {
   batchDepth++;
+  let result: T;
   try {
-    return fn();
-  } finally {
-    if (--batchDepth === 0) {
-      const written = batchWrites;
-      batchWrites = [];
-      written.forEach((each) => each.forgetBatch());
-      flushSync();
+    result = fn();
+  } catch (error) {
+    try {
+      endBatch();
+    } catch (flushError) {
+      reportUncaught(flushError);
     }
+    throw error;
   }
+  endBatch();
+  return result;
 };
 
 /** Runs `fn` without subscribing the running effect or computed to what it reads. */

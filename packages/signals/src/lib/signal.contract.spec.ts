@@ -66,6 +66,27 @@ describe('the signal contract', () => {
     expect(sums).toStrictEqual([0, 10]);
   });
 
+  it('throws the error of a batch callback and reports one its flush throws after it', () => {
+    const reportError = vi.fn();
+    vi.stubGlobal('reportError', reportError);
+    onTestFinished(() => void vi.unstubAllGlobals());
+    const lap = signal(0);
+    effect(() => {
+      if (lap.value > 0) {
+        throw new Error('board broke');
+      }
+    });
+
+    expect(() =>
+      batch(() => {
+        lap.value = 1;
+        throw new Error('race stopped');
+      })
+    ).toThrow('race stopped');
+
+    expect(reportError).toHaveBeenCalledWith(new Error('board broke'));
+  });
+
   it('keeps working after it stops a cycle of effects', () => {
     const ping = signal(0);
     const pong = signal(0);
