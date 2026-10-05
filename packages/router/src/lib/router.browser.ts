@@ -34,11 +34,11 @@ export const browserHistory = (keep: readonly string[] = []): RouterHistory => {
           keepScroll();
         }
       };
-      // a link to a place on the page shown is the browser's to follow
+      // a link to a place on the page shown is the browser's to follow, unless a setting changes too
       takeOverLinks(
         document,
         (link) => {
-          if (pageAddress(link, keep) === shown && link.hash !== '') {
+          if (pageAddress(link) === pageAddress(location) && pageAddress(link, keep) === shown && link.hash !== '') {
             return false;
           }
           navigate(link.href);

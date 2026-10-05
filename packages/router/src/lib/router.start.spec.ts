@@ -314,6 +314,16 @@ describe('startRouter', () => {
     expect(alert()).toBeUndefined();
   });
 
+  it('keeps an entry’s scroll on a replace in place, and leaves it behind on a redirect', async () => {
+    await start(shop, '/cart', { reelyScroll: 310 });
+
+    navigate('/cart?sort=price', { replace: true });
+    expect(history.state).toEqual({ reelyScroll: 310 });
+
+    navigate('/orders/7', { replace: true });
+    expect(history.state).toBeNull();
+  });
+
   it('tells a page the path it is shown at while it renders', async () => {
     const seen: string[] = [];
     await start(
@@ -568,10 +578,37 @@ describe('startRouter', () => {
       expect(scrollTo).not.toHaveBeenCalled();
     });
 
+    it('comes back to where the reader had scrolled a page left before the setting was set', async () => {
+      await startKeeping(shop, '/orders/7');
+      vi.spyOn(window, 'scrollY', 'get').mockReturnValue(640);
+      clickLink('Cart');
+      await settle();
+      vi.spyOn(window, 'scrollY', 'get').mockReturnValue(0);
+      navigate('/cart?lang=ru', { replace: true });
+      await settle();
+
+      history.back();
+      await vi.waitFor(() => expect(heading()).toBe('Order 7'));
+
+      expect(location.search).toBe('?lang=ru');
+      expect(scrollTo).toHaveBeenLastCalledWith(0, 640);
+    });
+
     it('leaves a link to a place on the page shown to the browser', async () => {
       await startKeeping(shop, '/?lang=ru');
 
       expect(clickLink('Reviews')).toBe(false);
+    });
+
+    it('takes over a link to a place on the page shown with another setting, which the browser would load anew', async () => {
+      await startKeeping(shop, '/?lang=ru');
+      document.body.append(element('a', { href: '/?lang=en#reviews' }, 'Reviews in English'));
+
+      expect(clickLink('Reviews in English')).toBe(true);
+      await settle();
+
+      expect(location.search).toBe('?lang=en');
+      expect(shows).toHaveBeenCalledTimes(1);
     });
   });
 });

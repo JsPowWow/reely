@@ -324,7 +324,7 @@ export const HelpWidget = (): Node => {
 - `defineRoutes(table)`: the routes of a table of path patterns, `(address) => Promise<Page | undefined>`.
 - `startRouter(routes, { show, fail, history, keep })`: shows the page of the current address and keeps following it; returns `{ path, loading, navigate, stop }`. `keep` names the query params that are settings, not pages.
 - `href(pattern, params)`: a URL from a pattern, typed and encoded.
-- `navigate(to, { replace })`: goes to a URL of this site in the browser.
+- `navigate(to, { replace })`: goes to a URL of this site in the browser; `replace` takes the current entry's place, and on the same path keeps where the page was scrolled.
 - `currentPath()` and `pageLoading()`: the path the browser's router shows and whether the next page is loading, read like signals.
 - `memoryHistory(start)`: a history in memory, for a router inside part of the page; `path()`, `loading()` and `navigate()` on it.
 - `followLinks(root, navigate)`: sends the plain clicks on the links inside `root` to `navigate`; returns the stop.

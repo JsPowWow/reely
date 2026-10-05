@@ -3,7 +3,10 @@ export const leavingEvent = 'reely:leaving';
 export const navigationEvent = 'reely:navigate';
 
 export interface NavigateOptions {
-  /** Takes the place of the current history entry, as a redirect does, instead of adding one. */
+  /**
+   * Takes the place of the current history entry, as a redirect does, instead of adding one; on the
+   * same path the entry keeps its state, such as where the page was scrolled.
+   */
   replace?: boolean;
 }
 
@@ -14,7 +17,8 @@ export const navigate = (to: string | URL, { replace = false }: NavigateOptions 
     return;
   }
   if (replace) {
-    history.replaceState(null, '', url);
+    // the same page in place keeps what its entry holds, such as where it was scrolled
+    history.replaceState(url.pathname === location.pathname ? history.state : null, '', url);
   } else {
     window.dispatchEvent(new Event(leavingEvent));
     history.pushState(null, '', url);
