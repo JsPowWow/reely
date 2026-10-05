@@ -10,7 +10,7 @@ export type LabId = 'dml' | 'signals-graph' | 'signal-cores';
 const en = {
   documentTitle: 'Labs | reely',
   title: 'Labs',
-  lead: 'Experiments around reely that are not shipped. Each lab asks one question, answers it with specs and measurements, and ends on a verdict: what proves itself moves into a package, the rest stays as a record.',
+  lead: 'Experiments around reely that did not ship. Each lab asks one question and answers it with specs and measurements you can run yourself, then ends on a verdict: what proves itself moves into a package, the rest stays here as a record.',
   labs: {
     dml: {
       title: 'Statements inside markup',
@@ -98,8 +98,8 @@ const en = {
       Body: (): Node => (
         <>
           <p>
-            dommy began on a signal core ported from act by artalar. Before it moved into <code>@reely/signals</code>,
-            three cores were brought to the same specs and timed on the same graphs:
+            dommy began on a signal core ported from act by artalar. Before a core moved into{' '}
+            <code>@reely/signals</code>, three candidates were brought to the same specs and timed on the same graphs:
           </p>
           <ul>
             <li>
@@ -127,6 +127,11 @@ const en = {
               churn: 'Churn: 20k effects created and disposed',
             }}
           />
+          <p>
+            Read the table one row at a time: each row is one graph, and the fastest core differs from row to row. To
+            time them on your own machine, the lab’s README has the commands for its specs and its bench; expect the
+            times to move by about ±10% between runs.
+          </p>
           <p>
             Bringing the cores to the same specs found four bugs in act, each fixed with a failing test first: an equal
             write that subscribed the writer, <code>!==</code> where the rest used <code>Object.is</code>, a subscriber
