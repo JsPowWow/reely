@@ -58,8 +58,9 @@ export function addEventListenerHandler(
     return true;
   }
   if (isListenerDescriptor(eventHandler)) {
-    const { handleEvent, signal: handlerSignal, once, capture, passive } = eventHandler;
-    element.addEventListener(eventType, handleEvent, {
+    const { signal: handlerSignal, once, capture, passive } = eventHandler;
+    // the descriptor itself listens, so `handleEvent` is called with it as `this`
+    element.addEventListener(eventType, eventHandler, {
       signal: AbortSignal.any(toNonNullableItems([handlerSignal, eventListenersAbortSignal])),
       once: once ?? undefined,
       capture: capture ?? undefined,
