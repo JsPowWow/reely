@@ -74,6 +74,16 @@ describe('createElement: properties and attributes', () => {
     expect(panel.outerHTML).toBe('<div title="race"></div>');
   });
 
+  it('spells out an enumerated attribute where the element has no property for it', () => {
+    const editor = createElement('div', { spellcheck: false, translate: false, draggable: true });
+
+    expect(['spellcheck', 'translate', 'draggable'].map((name) => editor.getAttribute(name))).toEqual([
+      'false',
+      'no',
+      'true',
+    ]);
+  });
+
   it('selects the option a `select` value names, set once its options are in place', () => {
     const select = createElement(
       'select',
