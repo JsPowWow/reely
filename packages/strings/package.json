@@ -1,7 +1,8 @@
 {
   "name": "@reely/strings",
   "version": "0.0.9",
-  "description": "Capitalize words and make URL slugs.",
+  "description": "Capitalize words and make URL slugs, in any script.",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

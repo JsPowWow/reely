@@ -53,9 +53,11 @@ describe('capitalize', () => {
       expect(capitalize('x-ray')).toBe('X-Ray');
     });
 
-    it('should handle apostrophes', () => {
-      expect(capitalize("it's")).toBe("It'S");
-      expect(capitalize("don't stop")).toBe("Don'T Stop");
+    it('keeps a word whole across an apostrophe', () => {
+      expect(capitalize("it's")).toBe("It's");
+      expect(capitalize("don't stop")).toBe("Don't Stop");
+      expect(capitalize('don’t stop')).toBe('Don’t Stop');
+      expect(capitalize("say 'hello' to ‘em")).toBe("Say 'Hello' To ‘Em");
     });
 
     it('should handle numbers in words', () => {
@@ -121,7 +123,7 @@ describe('capitalize', () => {
     it('should handle names', () => {
       expect(capitalize('john doe')).toBe('John Doe');
       expect(capitalize('mcdonald')).toBe('Mcdonald');
-      expect(capitalize("o'brien")).toBe("O'Brien");
+      expect(capitalize("o'brien")).toBe("O'brien");
     });
 
     it('should handle programming terms', () => {
