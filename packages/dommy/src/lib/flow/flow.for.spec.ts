@@ -11,7 +11,10 @@ interface Racer {
 
 const racer = (id: string, name = id.toUpperCase()): Racer => ({ id, name });
 
-const renderBoard = (racers: Signal<readonly Racer[]>, lap = signal(1)): { board: HTMLUListElement; dispose: VoidFunction } => {
+const renderBoard = (
+  racers: Signal<readonly Racer[]>,
+  lap = signal(1)
+): { board: HTMLUListElement; dispose: VoidFunction } => {
   const board = ul();
   const dispose = mount(board, () =>
     For({
@@ -90,7 +93,15 @@ describe('For', () => {
     const board = ul();
     document.body.append(board);
     mount(board, () =>
-      For({ each: racers, by: (item) => item.id, children: (item) => li(null, button(null, () => item().name)) })
+      For({
+        each: racers,
+        by: (item) => item.id,
+        children: (item) =>
+          li(
+            null,
+            button(null, () => item().name)
+          ),
+      })
     );
     const focused = board.querySelectorAll('button')[1];
     focused?.focus();
@@ -134,6 +145,30 @@ describe('For', () => {
 
     expect(reordered).toBe('bBaA');
     expect(board.textContent).toBe('aA');
+  });
+
+  it('hears its list written by a row while it renders, and every write after', () => {
+    const racers = signal<readonly Racer[]>([racer('a')]);
+    let firstRow = true;
+    const board = ul();
+    mount(board, () =>
+      For({
+        each: racers,
+        by: (item) => item.id,
+        children: (item) => {
+          if (firstRow) {
+            firstRow = false;
+            racers.value = [racer('a'), racer('b')];
+          }
+          return li(() => item().name);
+        },
+      })
+    );
+    const written = textsOf(board);
+
+    racers.value = [racer('c')];
+
+    expect([written, textsOf(board)]).toEqual([['A', 'B'], ['C']]);
   });
 
   it('renders nothing for an empty list, and rows once there are items', () => {

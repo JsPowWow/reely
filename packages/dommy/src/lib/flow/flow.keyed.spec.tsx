@@ -39,6 +39,14 @@ describe('Keyed', () => {
     expect(panel.querySelectorAll('p')).toHaveLength(0);
   });
 
+  it('builds the branch for a first `undefined` too', () => {
+    const reviewer = signal<string | undefined>(undefined);
+    const panel = document.createElement('section');
+    mount(panel, () => <Keyed value={reviewer}>{(name) => <p>Review by {name ?? 'nobody yet'}</p>}</Keyed>);
+
+    expect(panel.textContent).toBe('Review by nobody yet');
+  });
+
   it('follows a getter, and releases the bindings of the branch it replaces', () => {
     const cars = signal([{ id: 7, name: 'Bolt' }]);
     const gap = signal(0.4);

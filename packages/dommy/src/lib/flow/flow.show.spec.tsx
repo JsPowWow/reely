@@ -89,6 +89,31 @@ describe('Show', () => {
     expect(panel.querySelectorAll('p')).toHaveLength(0);
   });
 
+  it('hears `when` written by its own branch while it renders, and every write after', () => {
+    const open = signal(false);
+    let firstRender = true;
+    const panel = document.createElement('section');
+    mount(panel, () => (
+      <Show when={open}>
+        {() => {
+          if (firstRender) {
+            firstRender = false;
+            open.value = false;
+          }
+          return <p>shown</p>;
+        }}
+      </Show>
+    ));
+
+    open.value = true;
+    const closedByBranch = panel.textContent;
+    open.value = true;
+    const openedAgain = panel.textContent;
+    open.value = false;
+
+    expect([closedByBranch, openedAgain, panel.textContent]).toEqual(['', 'shown', '']);
+  });
+
   it('keeps the shown branch while `when` stays truthy', () => {
     const lap = signal(1);
     const renders = vi.fn(() => <p>{lap}</p>);

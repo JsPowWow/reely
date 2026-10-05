@@ -1,4 +1,4 @@
-import { effect, getOwner, signal, untracked, withOwner } from '@reely/signals';
+import { getOwner, signal, subscribe, withOwner } from '@reely/signals';
 import type { Signal } from '@reely/signals';
 import { isInstanceOf, isNil } from '@reely/utils';
 
@@ -127,9 +127,6 @@ export const For = <T>({ each, by, children }: ForProps<T>): DocumentFragment =>
 
   reportIfUnowned();
   // every notification re-reads the list, not only a new array: a list changed in place is diffed too
-  effect(() => {
-    const items = each();
-    untracked(() => update(items));
-  });
+  subscribe(each, update);
   return fragment;
 };
