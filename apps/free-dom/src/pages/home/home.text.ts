@@ -10,7 +10,7 @@ type BoardPackage = (typeof boardPackages)[number];
 const en = {
   documentTitle: 'reely: small TypeScript packages, no dependencies',
   title: 'reely — small TypeScript packages, no dependencies',
-  lead: 'Each one does one job, is typed for your tsc and ships only what you import; none needs anything outside reely. Take one, or let several work together, as on this board.',
+  lead: 'Each package does one job, is typed for your tsc and ships only what you import; none needs anything from outside reely. Use one, or let several work together, as on this race board: when a car passes another, its row slides to its new place, moved and not rebuilt. Pause it to read the times.',
   builtWith: 'This site is built with them.',
   findPackage: 'Find your package',
   facts: {
@@ -21,9 +21,9 @@ const en = {
   board: {
     madeWith: 'The board is made with',
     parts: {
-      signals: 'the standings and the times',
-      dommy: 'the rows and their letters',
-      'dommy-kit': 'the rows’ slide, the letters’ timing, and stillness under reduced motion',
+      signals: 'the race in one signal, the standings computed from it',
+      dommy: 'the rows, kept by key and moved when a car passes',
+      'dommy-kit': 'flip slides the rows, later times the flaps, media keeps them still under reduced motion',
     } satisfies Record<BoardPackage, string>,
   },
   packages: {

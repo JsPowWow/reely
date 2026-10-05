@@ -17,14 +17,14 @@ const en = {
   exportsNote: 'The values you can import; its types are in the README.',
   examples: {
     basics: {
-      title: 'One tracker blocked, the order still reported',
+      title: 'One tracker blocked, the order still counted',
       claim:
-        'forEachSettled calls every analytics tracker even when one throws, then throws that error once each has had its turn; messageOf reads its message whatever was thrown.',
+        'Click Place the order. The Ads pixel throws, as it would behind an ad blocker, and Product analytics and Data warehouse count the event all the same: forEachSettled calls every tracker, then throws the error once each has had its turn. The line under the button is messageOf at work: it reads a message out of whatever was thrown.',
     },
     signals: {
       title: 'Two changes, one save',
       claim:
-        'The total is computed from the quantity and the discount. The bulk order changes both inside one batch, so the effect that saves the draft runs once, as its count shows. The signals know no DOM: dommy binds them here.',
+        'Click One more: the quantity changes, the computed total follows, and the effect saves the draft once more, as its count shows. Now click Order 10 for the team. It sets the quantity and the discount inside one batch, so the effect runs once for both changes and the count goes up by one, not two. The signals know no DOM; dommy binds them here.',
     },
     router: {
       title: 'A mail client where every message has an address',
@@ -74,47 +74,47 @@ const en = {
     'dommy-kit': {
       title: 'A text size that outlives a reload',
       claim:
-        'persisted keeps a signal in localStorage and follows writes from other tabs; media follows a media query. Both stop with the render that made them.',
+        'Pick Large and reload the page: the text comes back large, because persisted keeps the signal in localStorage. Open this page in a second tab, pick Small there, and this tab follows: persisted listens for writes from other tabs. The line at the bottom is media following prefers-color-scheme; switch your system theme and watch it change. Both stop with the render that made them.',
     },
     emitter: {
       title: 'A notice every part of the app hears',
       claim:
-        'Any part of the app emits one typed notice. The chat widget’s listener throws, and the toasts and the unread badge hear it anyway; emit throws the widget’s error once all have run.',
+        'Click Save the profile. The chat widget’s listener throws, yet the toast appears and the unread badge counts one: emit calls every listener on the typed channel and throws the widget’s error only once all have run, as the line at the bottom says. Lose the connection sends another notice the same way; the last three stay on screen.',
     },
     queue: {
       title: 'Two crews, five cars',
       claim:
-        'An AsyncQueue with a concurrency of 2 starts the next car as soon as a crew is free, never three at once, and says drain when the pit lane is empty.',
+        'Click Box all cars and watch the statuses. Never more than two cars are working: an AsyncQueue with a concurrency of 2 starts the next car the moment a crew is free. Falcon is done first, so Lynx goes in while Comet is still being served. When the last car leaves, the queue says drain and the line reads All cars served.',
     },
     'state-machine': {
       title: 'Start lights that cannot be fooled',
       claim:
-        'The buttons send their events without checking the state. The machine times a launch only after the lights go out, turns one under the lights into a jump start, and refuses one on the grid.',
+        'Click Launch on the grid: the machine refuses it and nothing happens. Click Arm the lights: five lights come on a second apart and go out after a hold you cannot guess. Launch while they are lit and it is a jump start; launch after they go out and the machine times your reaction. The buttons send their events without checking the state; the machine alone decides what each one means. Reset puts you back on the grid.',
     },
     'simple-store': {
       title: 'The coupon banner hears only of coupons',
       claim:
-        'No signals here: the badge and the banner subscribe to an ObjectStore by hand. The banner follows a select of the coupon, so adding an item never reaches it, and the same coupon twice is no change at all.',
+        'Click Add an item a few times: the badge hears every change and the coupon banner none, because the banner subscribes to a select of the coupon, not to the whole cart. Apply SPRING10 and both hear it. Apply it again and neither does: the same coupon is no change at all. No signals here; each view subscribes to the ObjectStore by hand.',
     },
     logger: {
       title: 'A checkout you can listen to',
       claim:
-        'A named scope from scopedLogger, checkout here, stays silent until it is enabled, while the default scope always logs. logWith logs a value between two steps of a promise chain and passes it on. What reaches the console is echoed under the demo.',
+        'Click Restore the cart and look at the console under the demo: nothing, because the checkout scope from scopedLogger stays silent until it is enabled. Tick Log the checkout scope, click again, and the line is there. Fail the payment writes through the default scope, which always logs. Work out the total shows logWith: it logs the prices, then the total, between the steps of a promise chain, and passes each value on.',
     },
     async: {
       title: 'Exchange rates on a bad day',
       claim:
-        'The first call fails and the second hangs. retry waits 500 ms, then 1000 ms, cuts the hanging attempt at its 1.5 s timeout, and the third gets the rates; leaving the page cancels whatever is left.',
+        'Click Load the rates and watch the attempts come in. The first fails with HTTP 503, and retry waits 500 ms. The second hangs; retry cuts it at its 1.5 s timeout and waits 1000 ms, twice as long. The third gets the rates. Leave the page while it is still trying, and its signal cancels whatever is left.',
     },
     colors: {
       title: 'A whole button from one brand colour',
       claim:
-        'lighten and darken make the hover and pressed shades; getContrastRatio measures black and white text on the colour, and the demo takes the one that contrasts more and checks it against WCAG AA (4.5:1).',
+        'Pick a brand colour, then hover over Start free trial and press it: lighten and darken made those two shades from your colour. getContrastRatio measures black and white text on it; the button takes whichever contrasts more, and the line under it checks that against the 4.5:1 of WCAG AA. Move the colour towards a pale yellow and the text turns black.',
     },
     strings: {
       title: 'Blog addresses from post titles',
       claim:
-        'capitalize gives every word a capital, in any script; slugify makes the address: a Latin letter loses its accent, Cyrillic stays as it is, anything but letters, digits and hyphens goes.',
+        'Edit the post title. capitalize gives every word a capital, in any script, and slugify makes the address under it: spaces become hyphens, and anything but letters, digits and hyphens goes, the “!” too. Type Café or Łódź and the Latin letters lose their accents; type a title in Cyrillic and it stays Cyrillic.',
     },
   } satisfies Record<PagedPackage, ExampleText> & Record<string, ExampleText>,
 };
