@@ -10,6 +10,7 @@ const loadLocale = async (): Promise<typeof LocaleModule> => {
 
 describe('locale', () => {
   afterEach(() => {
+    history.replaceState(null, '', '/');
     localStorage.clear();
     vi.restoreAllMocks();
   });
@@ -53,6 +54,25 @@ describe('locale', () => {
     vi.spyOn(navigator, 'language', 'get').mockReturnValue('ru-RU');
     await loadLocale();
     vi.spyOn(navigator, 'language', 'get').mockReturnValue('en-US');
+
+    expect((await loadLocale()).locale.value).toBe('en');
+  });
+
+  it('opens in the language a link names, without keeping it as the reader’s choice', async () => {
+    localStorage.setItem(key, JSON.stringify('en'));
+    history.replaceState(null, '', '/games/memory?lang=ru');
+
+    const { chooseLocale, locale } = await loadLocale();
+
+    expect(locale.value).toBe('ru');
+    expect(localStorage.getItem(key)).toBe(JSON.stringify('en'));
+    chooseLocale('en');
+    expect(locale.value).toBe('en');
+  });
+
+  it('ignores a link that names no language of the site', async () => {
+    vi.spyOn(navigator, 'language', 'get').mockReturnValue('en-US');
+    history.replaceState(null, '', '/?lang=fr');
 
     expect((await loadLocale()).locale.value).toBe('en');
   });

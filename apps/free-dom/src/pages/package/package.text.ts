@@ -56,6 +56,11 @@ const en = {
       claim:
         '<Router> takes a history of its own, so the widget has pages and the site’s address stays put; followLinks hands it the widget’s links. The menu’s aria-current binds to path(), and the bar under the address to loading() while the help desk answers. Each page renders under its own owner: vote on Returns, leave and come back, and the vote is gone with the page it belonged to. A topic no route answers lands in catch.',
     },
+    routerKeep: {
+      title: 'With dommy: a setting that stays in the address',
+      claim:
+        'keep names the query params that are settings, not pages. Pick USD, open a lamp, go back: the currency rides along in the address on every move, and no route ever sees it. Type a quantity, then switch the currency: only a setting changed, so the page is not shown again and the number you typed stays.',
+    },
     routerFiles: {
       title: 'With dommy: a drive with folders in the path',
       claim:

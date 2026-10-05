@@ -2,6 +2,8 @@ import { defineDommyConfig, mount } from '@reely/dommy';
 import { pageLoading, Router } from '@reely/dommy/router';
 import { scopedLogger } from '@reely/logger';
 
+import { localeParam } from './i18n/locale';
+import { showLocaleInAddress } from './i18n/locale.address';
 import { textsLoaded } from './i18n/localized';
 import { followPagerKey } from './routing/pager.keys';
 import { siteRoutes } from './routing/routes';
@@ -20,13 +22,14 @@ const failed = (error: Error): Node => {
 };
 
 document.addEventListener('keydown', followPagerKey);
+showLocaleInAddress();
 // a reader who chose Russian last time sees it from the first render, not after a flash of English
 // the page shown stays while the next one's chunk loads: a bar on top says it is coming
 void textsLoaded().then(() =>
   mount(document.body, () => (
     <>
       <div className={css.loading} hidden={() => !pageLoading()} />
-      <Router routes={siteRoutes} catch={failed} />
+      <Router routes={siteRoutes} keep={[localeParam]} catch={failed} />
     </>
   ))
 );

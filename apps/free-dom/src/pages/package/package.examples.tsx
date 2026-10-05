@@ -21,6 +21,8 @@ import { ReaderSettings } from './demos/reader.settings';
 import readerSettingsSource from './demos/reader.settings.tsx?highlight';
 import { AccountGuard } from './demos/router/account.guard';
 import accountGuardSource from './demos/router/account.guard.ts?highlight';
+import { CurrencyPrices } from './demos/router/currency.prices';
+import currencyPricesSource from './demos/router/currency.prices.tsx?highlight';
 import { FilesBrowser } from './demos/router/files.browser';
 import filesBrowserSource from './demos/router/files.browser.tsx?highlight';
 import { HelpWidget } from './demos/router/help.widget';
@@ -61,6 +63,7 @@ export const packageExamples: Readonly<Record<PagedPackage, readonly PackageExam
     { id: 'routerGuard', file: 'account.guard.ts', Demo: AccountGuard, source: accountGuardSource },
     { id: 'routerGallery', file: 'photo.gallery.ts', Demo: PhotoGallery, source: photoGallerySource },
     { id: 'routerHelp', file: 'help.widget.tsx', Demo: HelpWidget, source: helpWidgetSource },
+    { id: 'routerKeep', file: 'currency.prices.tsx', Demo: CurrencyPrices, source: currencyPricesSource },
     { id: 'routerFiles', file: 'files.browser.tsx', Demo: FilesBrowser, source: filesBrowserSource },
     { id: 'routerIssues', file: 'issues.board.tsx', Demo: IssuesBoard, source: issuesBoardSource },
   ],

@@ -1,4 +1,4 @@
-import { computed, effect } from '@reely/dommy';
+import { batch, computed, effect, signal } from '@reely/dommy';
 import { persisted } from '@reely/dommy-kit';
 
 /** The languages the site is written in. */
@@ -13,12 +13,32 @@ const choice = persisted<Locale | null>('reely.locale', null, {
   is: (stored): stored is Locale | null => stored === null || isLocale(stored),
 });
 
-/** The language the site is shown in: the reader's choice, else Russian for a Russian browser, else English. */
-export const locale = computed((): Locale => choice.value ?? (navigator.language.startsWith('ru') ? 'ru' : 'en'));
+/** The query param that names the language; the router keeps it from page to page. */
+export const localeParam = 'lang';
+
+/** The language a query names (`?lang=ru`), if it names one of the site's. */
+export const localeIn = (search: string): Locale | null => {
+  const named = new URLSearchParams(search).get(localeParam);
+  return isLocale(named) ? named : null;
+};
+
+// a link names the language it was shared in: it holds for this visit, and only the switch keeps a choice
+const linked = signal(localeIn(location.search));
+
+/**
+ * The language the site is shown in: the one the link named, else the reader's choice, else Russian for a
+ * Russian browser, else English.
+ */
+export const locale = computed(
+  (): Locale => linked.value ?? choice.value ?? (navigator.language.startsWith('ru') ? 'ru' : 'en')
+);
 
 /** Shows the site in `language` from now on, on this visit and the next ones. */
 export const chooseLocale = (language: Locale): void => {
-  choice.value = language;
+  batch(() => {
+    linked.value = null;
+    choice.value = language;
+  });
 };
 
 effect(() => {

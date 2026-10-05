@@ -45,7 +45,8 @@ describe('routes', () => {
     expect(await headingAt('/emitter')).toBe('@reely/emitter');
     expect(await headingAt('/simple-store')).toBe('@reely/simple-store');
     expect(await headingAt('/nope')).toBe('There is no page at /nope');
-  });
+    // the first package page transforms the highlighted source of every demo it shows
+  }, 15_000);
 
   it('opens the labs', async () => {
     const labs = await renderAt('/labs');
