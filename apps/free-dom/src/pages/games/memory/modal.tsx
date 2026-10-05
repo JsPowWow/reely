@@ -43,7 +43,7 @@ export const Modal = ({
   const show = (): void => {
     box.open || box.showModal();
   };
-  effect(() => (open.value ? show() : box.close()));
+  effect(() => (open() ? show() : box.close()));
   // #endregion
   return box;
 };

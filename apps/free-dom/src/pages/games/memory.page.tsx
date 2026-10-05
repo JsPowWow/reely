@@ -37,7 +37,7 @@ export const MemoryPage = (): Node => {
               <div>
                 <dt>{() => gamesText().branches}</dt>
                 <dd>
-                  {() => branches.value ?? '–'} <code className={css.keyword}>if</code>
+                  {() => branches() ?? '–'} <code className={css.keyword}>if</code>
                 </dd>
               </div>
             </dl>

@@ -47,11 +47,11 @@ export const MemoryGame = ({
   );
   const game = memoryMachine({ table, leaderboard, deal, now });
   // the deck changes only with a new game, which lays out new cards
-  const cards = computed(() => table.value.deck);
+  const cards = computed(() => table().deck);
   // #endregion
 
   const phase = signal(game.state);
-  const status = signal(moments.deal.status(table.value));
+  const status = signal(moments.deal.status(table()));
   const code = signal<CodeMoment>(moments.deal);
   const victoryOpen = signal(false);
   const bestTenOpen = signal(false);
@@ -59,10 +59,10 @@ export const MemoryGame = ({
   onCleanup(
     game.on('stateChanged', (change) => {
       const moment = momentOf(change);
-      phase.value = change.to;
-      status.value = moment.status(table.value);
-      code.value = moment;
-      victoryOpen.value = change.to === 'won';
+      phase.set(change.to);
+      status.set(moment.status(table()));
+      code.set(moment);
+      victoryOpen.set(change.to === 'won');
     })
   );
 
@@ -71,7 +71,7 @@ export const MemoryGame = ({
   // up; a new game, or the view going, cancels the timer with this effect run
   effect(
     () =>
-      phase.value === 'wrongPair' &&
+      phase() === 'wrongPair' &&
       later(turnBackAfter, () => game.send('turnBack'))
   );
   // #endregion
@@ -93,11 +93,11 @@ export const MemoryGame = ({
           <dl className={css.counters}>
             <div>
               <dt>Moves</dt>
-              <dd>{() => table.value.moves}</dd>
+              <dd>{() => table().moves}</dd>
             </div>
             <div>
               <dt>Pairs</dt>
-              <dd>{() => `${table.value.found.length}/${pairs}`}</dd>
+              <dd>{() => `${table().found.length}/${pairs}`}</dd>
             </div>
           </dl>
           <div className={css.controls}>
@@ -118,14 +118,14 @@ export const MemoryGame = ({
               className={css.board}
               aria={{
                 ariaLabel: 'Cards',
-                ariaBusy: () => String(phase.value === 'wrongPair'),
+                ariaBusy: () => String(phase() === 'wrongPair'),
               }}
             >
               {deck.map((face, place) => (
                 <MemoryCard
                   place={place}
                   face={face}
-                  side={() => cardAt(table.value, place)}
+                  side={() => cardAt(table(), place)}
                   onTurn={turn}
                 />
               ))}
@@ -136,7 +136,7 @@ export const MemoryGame = ({
       </div>
       <Victory
         open={victoryOpen}
-        moves={() => table.value.moves}
+        moves={() => table().moves}
         leaderboard={leaderboard}
         onNewGame={newGame}
       />

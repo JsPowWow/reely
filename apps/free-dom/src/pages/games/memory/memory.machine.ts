@@ -52,8 +52,8 @@ const toward = ({
   context: { table },
   event,
 }: StateMachineSelection<Memory, 'sync', 'turn'>): MemoryPhase | undefined =>
-  canTurn(table.value, event.data)
-    ? phaseOf(turnCard(table.value, event.data))
+  canTurn(table(), event.data)
+    ? phaseOf(turnCard(table(), event.data))
     : undefined;
 // #endregion
 
@@ -61,7 +61,7 @@ const toward = ({
 const turnUp = runActionEffect<Memory>().when(
   { type: 'turn' },
   ({ event, context }) => {
-    context.table.value = turnCard(context.table.value, event.data);
+    context.table.update((table) => turnCard(table, event.data));
   }
 );
 
@@ -83,7 +83,7 @@ export const memoryMachine = (context: MemoryContext): IStateMachine<Memory> =>
         deal: {
           target: 'ready',
           actions: ({ context: { table, deal } }): void => {
-            table.value = deal();
+            table.set(deal());
           },
         },
       },
@@ -96,7 +96,7 @@ export const memoryMachine = (context: MemoryContext): IStateMachine<Memory> =>
         wrongPair: {
           entry: turnUp,
           exit: ({ context: { table } }): void => {
-            table.value = turnBack(table.value);
+            table.update(turnBack);
           },
           on: { turnBack: 'ready' },
         },
@@ -106,10 +106,9 @@ export const memoryMachine = (context: MemoryContext): IStateMachine<Memory> =>
           entry: [
             turnUp,
             ({ context: { table, leaderboard, now } }): void => {
-              leaderboard.value = postResult(leaderboard.value.board, {
-                moves: table.value.moves,
-                at: now(),
-              });
+              leaderboard.update(({ board }) =>
+                postResult(board, { moves: table().moves, at: now() })
+              );
             },
           ],
         },
