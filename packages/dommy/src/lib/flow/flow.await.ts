@@ -20,6 +20,16 @@ export interface AwaitProps<T> {
   catch: (error: Error) => ReelyNode;
 }
 
+// `Promise.try` (ES2025), for runtimes without it: the getter runs now, so the binding tracks what
+// it reads, and a getter that throws before it returns a promise fails like a rejected one
+function attempt<T>(get: () => PromiseLike<T>): Promise<T> {
+  try {
+    return Promise.resolve(get());
+  } catch (error) {
+    return Promise.reject(toErrorWithMessage(error));
+  }
+}
+
 /**
  * Shows the fallback while a promise is pending, then its result or its error. Only the latest
  * promise counts: an earlier one, or one settling after disposal, renders nothing.
@@ -52,8 +62,7 @@ export const Await = <T>({ promise, children, fallback, catch: renderError }: Aw
     latest += 1;
   });
   if (isSomeFunction(promise)) {
-    // a getter that throws before it returns a promise fails like a rejected one
-    bindValue(() => Promise.try(promise), wait);
+    bindValue(() => attempt(promise), wait);
   } else {
     wait(promise);
   }
