@@ -31,6 +31,23 @@ describe('source regions', () => {
     expect(texts(withoutRegions(css))).toEqual(['.a {}', '.turn {', '  transform: none;', '}']);
   });
 
+  it('cuts a region around regions of its own, whole and without their markers', () => {
+    const nested = lines(
+      'const config = {',
+      '  // #region machine',
+      '  initial: 1,',
+      '  // #region states',
+      '  states: {},',
+      '  // #endregion',
+      '  on: {},',
+      '  // #endregion',
+      '};'
+    );
+
+    expect(texts(sourceRegion(nested, 'machine'))).toEqual(['initial: 1,', 'states: {},', 'on: {},']);
+    expect(texts(sourceRegion(nested, 'states'))).toEqual(['states: {},']);
+  });
+
   it('gives nothing for a region the source does not mark', () => {
     expect(sourceRegion(source, 'won')).toEqual([]);
   });

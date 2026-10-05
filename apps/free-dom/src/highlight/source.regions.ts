@@ -4,11 +4,15 @@ import type { SourceLines, SourceToken } from './source.types';
 export const lineText = (line: readonly SourceToken[]): string => line.map((token) => token.content).join('');
 
 // a marker is a comment of its own line, `// #region name` or, in CSS,
-// `/* #region name */`; it ends at the next `#endregion`
+// `/* #region name */`; it ends at its own `#endregion`, past the regions inside it
 const markerOf = (line: readonly SourceToken[]): string | undefined =>
   /^(?:\/\/|\/\*) (#region \S+|#endregion)(?: \*\/)?$/.exec(lineText(line).trim())?.[1];
 
 const isMarker = (line: readonly SourceToken[]): boolean => markerOf(line) !== undefined;
+
+// how a line changes the depth of regions: a `#region` opens one, an `#endregion` closes one
+const depthChange = (line: readonly SourceToken[]): number =>
+  markerOf(line) === '#endregion' ? -1 : Number(isMarker(line));
 
 const indentOf = (text: string): number => text.length - text.trimStart().length;
 
@@ -29,8 +33,10 @@ export const sourceRegion = (source: SourceLines, name: string): SourceLines => 
   if (start === -1) {
     return [];
   }
-  const length = source.slice(start + 1).findIndex((line) => markerOf(line) === '#endregion');
-  const region = source.slice(start + 1, length === -1 ? undefined : start + 1 + length);
+  const after = source.slice(start + 1);
+  let depth = 1;
+  const length = after.findIndex((line) => (depth += depthChange(line)) === 0);
+  const region = after.slice(0, length === -1 ? undefined : length).filter((line) => !isMarker(line));
   const indents = region
     .map(lineText)
     .filter((text) => text.trim() !== '')
