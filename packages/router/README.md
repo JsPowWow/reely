@@ -128,6 +128,40 @@ export const routes = defineRoutes({
 });
 ```
 
+## Settings that stay in the address
+
+Some query params aren't pages at all: the language, the currency, a theme. Name them in `keep`, and the router treats them as settings of the app. Routes never see them; a link without one takes it along, so the reader keeps their language from page to page; and a change to one alone is no move, so nothing is shown again, scrolled or refocused.
+
+```ts
+import { defineRoutes, navigate, startRouter } from '@reely/router';
+
+const main = document.querySelector('main') ?? document.body;
+const heading = (text: string): HTMLElement => Object.assign(document.createElement('h1'), { textContent: text });
+
+// `/pricing?lang=de` and a link to `/faq` from it lead to `/faq?lang=de`; no route reads `lang`
+startRouter(
+  defineRoutes({
+    '/pricing': () => () => heading('Pricing'),
+    '/faq': () => () => heading('FAQ'),
+  }),
+  {
+    keep: ['lang'],
+    show: (page) => {
+      main.replaceChildren(page());
+      return main;
+    },
+    fail: (error) => () => heading(error.message),
+  }
+);
+
+// switching the language: the same page, the address now says so, and a copied link opens in German
+const address = new URL(location.href);
+address.searchParams.set('lang', 'de');
+navigate(address, { replace: true });
+```
+
+The page reads its setting wherever it likes (`new URL(location.href).searchParams.get('lang')`, or a signal it keeps); the router only promises that the address goes on naming it.
+
 ## The path shown, and the page loading
 
 `startRouter` returns the router: `path()` and `loading()` read like signals, so an effect that reads them follows every move.
@@ -248,7 +282,7 @@ search?.addEventListener('submit', (event) => {
 
 ## With dommy
 
-[`@reely/dommy/router`](https://www.npmjs.com/package/@reely/dommy) puts this router in a component, and re-exports the rest: `<Router routes={routes} catch={...} />` renders each page under its own owner and takes it down at the next move. Given a `history`, it runs inside a widget:
+[`@reely/dommy/router`](https://www.npmjs.com/package/@reely/dommy) puts this router in a component, and re-exports the rest: `<Router routes={routes} catch={...} />` renders each page under its own owner and takes it down at the next move, and takes `keep` as well. Given a `history`, it runs inside a widget:
 
 ```tsx
 import { defineRoutes, followLinks, href, memoryHistory, Router } from '@reely/dommy/router';
@@ -288,7 +322,7 @@ export const HelpWidget = (): Node => {
 ## API
 
 - `defineRoutes(table)`: the routes of a table of path patterns, `(address) => Promise<Page | undefined>`.
-- `startRouter(routes, { show, fail, history })`: shows the page of the current address and keeps following it; returns `{ path, loading, navigate, stop }`.
+- `startRouter(routes, { show, fail, history, keep })`: shows the page of the current address and keeps following it; returns `{ path, loading, navigate, stop }`. `keep` names the query params that are settings, not pages.
 - `href(pattern, params)`: a URL from a pattern, typed and encoded.
 - `navigate(to, { replace })`: goes to a URL of this site in the browser.
 - `currentPath()` and `pageLoading()`: the path the browser's router shows and whether the next page is loading, read like signals.

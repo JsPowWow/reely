@@ -564,6 +564,7 @@ navigate(href('/messages/:id', { id: '42' }));
 - A route's pattern is its name: `href` fills it in, typed from it, and a plain `<a href>` is all a link needs, since the router takes over every link of the site.
 - A route gets the query after its params, `(params, query)`; a new query (`?sort=price`) shows the page again, a new `#place` only scrolls to it.
 - `navigate(to, { replace: true })` takes the place of the current history entry: a redirect from a guard.
+- `keep={['lang']}` names the query params that are settings, not pages: routes never see them, every move keeps them in the address, and switching one (`navigate(sameUrlWithNewLang, { replace: true })`) shows no new page, so the reader's language or currency stays as they move and a copied link opens the same way.
 - `history={memoryHistory('/help')}` gives a widget pages of its own without touching the address bar; `followLinks(widget, history.navigate)` hands it the widget's links, `history.path()` is the path it shows and `history.loading()` says its next page is loading.
 - `pageLoading()` says the next page is loading, from anywhere in the app: `<progress hidden={() => !pageLoading()} />` in the header; the page shown stays until it has loaded.
 

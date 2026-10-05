@@ -27,49 +27,49 @@ const en = {
         'The total is computed from the quantity and the discount. The bulk order changes both inside one batch, so the effect that saves the draft runs once, as its count shows. The signals know no DOM: dommy binds them here.',
     },
     router: {
-      title: 'A mail client with folders',
+      title: 'A mail client where every message has an address',
       claim:
-        'Every folder and message is an address: /:folder/:id hands its route the params, typed, and href makes the links from the same pattern. A folder the mailbox lacks answers nothing and falls through to the page for unknown paths; the menu follows path(). The history is kept in memory, so the address above is the demo’s, not the site’s.',
+        'Open a folder, then a letter: each is an address, /:folder/:id, and its route gets the params already typed. The links come from href and the same pattern, so renaming a route can’t leave a stale link behind. Try a folder that isn’t there: it answers nothing and drops through to the page for unknown paths. The address bar on top belongs to the demo, whose history lives in memory.',
     },
     routerLazy: {
-      title: 'Settings that load on demand',
+      title: 'Settings that load when you open them',
       claim:
-        'Billing and Notifications are chunks that take their time. The page shown stays until the next one has loaded, the bar under the address follows loading(), and only the latest click counts: open Billing, then Notifications at once, and Billing loads but never shows. Reports fails to load, and fail gives it a page.',
+        'Billing and Notifications are chunks that take their time. Meanwhile the page you’re on stays put, and the bar under the address says something’s coming. Click Billing and then Notifications straight away: Billing still loads, but only the last click wins, so you never see it. Reports never loads at all, and fail gives that a page too.',
     },
     routerSearch: {
-      title: 'A search that lives in the address',
+      title: 'A search you can send as a link',
       claim:
-        'The form goes to /search?q=…&sort=…, and the route reads both from the query it gets after its params, so a link is a search too: Chairs by price, the sort links, More lamps. Each page here is a plain element.',
+        'The form goes to /search?q=…&sort=…, and the route reads both from the query it gets right after its params. So a link is a search: Chairs by price, the sort links and More lamps are plain links. Nothing hides outside the address, and each page is just an element.',
     },
     routerGuard: {
-      title: 'A guard that sends you to sign in',
+      title: 'A guard that sends you to sign in, and back',
       claim:
-        'Orders and Account answer only a signed-in reader. Signed out, the route sends the reader to /login?next=… and answers nothing; signing in goes on to next. Both moves pass { replace: true }, which in the browser keeps the sign-in page out of Back. A guard is a function around a route’s answer, nothing the router has to know of.',
+        'Orders and Account open only for a signed-in reader. Signed out, the route sends you to /login?next=… and answers nothing; signing in takes you on to next. Both moves pass { replace: true }, so the sign-in page never clogs Back. The guard is just a function around the route’s answer: the router doesn’t even know it’s there.',
     },
     routerGallery: {
-      title: 'A photo gallery with keys',
+      title: 'A gallery you can flip with the keyboard',
       claim:
-        'The album and each photo are addresses; Previous and Next are links that wrap round the album. Focus the gallery and the arrow keys move through the photos, Escape goes back to the album: the keys read path() and send the router with navigate, moves from code like any other. A photo the album lacks answers nothing, and fail says so.',
+        'The album and every photo have addresses, and Previous and Next wrap round the album. Focus the gallery and press the arrows: the keys read path() and move with navigate, a move from code like any other. Escape takes you back to the album. A photo that isn’t there answers nothing, and fail says so.',
     },
     routerHelp: {
-      title: 'With dommy: a help widget with pages',
+      title: 'With dommy: a help widget with pages of its own',
       claim:
-        '<Router> takes a history of its own, so the widget has pages and the site’s address stays put; followLinks hands it the widget’s links. The menu’s aria-current binds to path(), and the bar under the address to loading() while the help desk answers. Each page renders under its own owner: vote on Returns, leave and come back, and the vote is gone with the page it belonged to. A topic no route answers lands in catch.',
+        '<Router> gets its own history, so the widget has pages while the site’s address stays put; followLinks hands it the widget’s links. The menu’s aria-current follows path(), and the bar under the address follows loading() while the help desk thinks. Each page lives under its own owner: vote on Returns, leave and come back, and the vote has gone with its page. A topic no route answers lands in catch.',
     },
     routerKeep: {
-      title: 'With dommy: a setting that stays in the address',
+      title: 'With dommy: a currency that rides along',
       claim:
-        'keep names the query params that are settings, not pages. Pick USD, open a lamp, go back: the currency rides along in the address on every move, and no route ever sees it. Type a quantity, then switch the currency: only a setting changed, so the page is not shown again and the number you typed stays.',
+        'keep names the query params that are settings of the app, not pages. Pick USD, open a lamp, head back: the currency travels in the address on every move, and no route ever sees it. Now type a quantity and switch the currency: only a setting changed, so the page isn’t built again and your number stays. This site keeps ?lang the same way, so any address you copy opens in the language you see.',
     },
     routerFiles: {
       title: 'With dommy: a drive with folders in the path',
       claim:
-        '/drive/*path takes the rest of the path, slashes and all, decoded; the route walks the folders and answers a folder or a file, or nothing. The crumbs are links made by href, which encodes each segment and keeps the slashes: see Office%20party above.',
+        '/drive/*path takes the rest of the path, slashes and all, decoded. The route walks the folders and answers with a folder, a file or nothing. The crumbs are links from href, which encodes each segment and keeps the slashes: look at Office%20party in the address.',
     },
     routerIssues: {
-      title: 'With dommy: issue filters in the query',
+      title: 'With dommy: issue filters that are links',
       claim:
-        'State and label live in /issues?state=…&label=…, so each filter is a link that keeps the other. The page binds to a signal of the issues: close one and the open list it goes back to has one fewer, the count and the For list following it without another load.',
+        'State and label live in /issues?state=…&label=…, so each filter is a link that keeps the other one. The page binds to a signal of the issues: close one, go back to the open list, and it’s already one shorter, the count and the For list following the signal without another load.',
     },
     'dommy-kit': {
       title: 'A text size that outlives a reload',

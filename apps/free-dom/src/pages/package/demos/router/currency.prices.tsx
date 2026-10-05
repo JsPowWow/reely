@@ -28,15 +28,15 @@ export const CurrencyPrices = (): Node => {
   const price = (euros: number): string =>
     new Intl.NumberFormat('en', {
       style: 'currency',
-      currency: currency.value,
-    }).format(euros * rates[currency.value]);
+      currency: currency(),
+    }).format(euros * rates[currency()]);
 
   const pay = (next: Currency): void => {
     const address = shop.url();
     address.searchParams.set('currency', next);
     // a setting alone changed: no new page, so what the reader typed stays
     shop.navigate(address, { replace: true });
-    currency.value = next;
+    currency.set(next);
   };
 
   const routes = defineRoutes({
@@ -58,7 +58,7 @@ export const CurrencyPrices = (): Node => {
       return (
         product &&
         ((): Node => {
-          const count = signal(1);
+          const count = signal('1');
           return (
             <div>
               <h2>{product.name}</h2>
@@ -67,13 +67,15 @@ export const CurrencyPrices = (): Node => {
                 <input
                   type='number'
                   min='1'
-                  value={() => String(count.value)}
-                  onInput={(event) =>
-                    count.set(event.currentTarget.valueAsNumber || 1)
-                  }
+                  value={count}
+                  onInput={(event) => count.set(event.currentTarget.value)}
                 />
               </label>
-              <p>{() => `Total: ${price(product.euros * count.value)}`}</p>
+              <p>
+                {() =>
+                  `Total: ${price(product.euros * (Number(count()) || 0))}`
+                }
+              </p>
               <a href={href(paths.shop)}>Back to the shop</a>
             </div>
           );
@@ -85,7 +87,7 @@ export const CurrencyPrices = (): Node => {
   // the address as the frame prints it, after every move and every switch
   const address = computed(() => {
     shop.path();
-    void currency.value;
+    void currency();
     const { pathname, search } = shop.url();
     return `${pathname}${search}`;
   });
@@ -98,7 +100,7 @@ export const CurrencyPrices = (): Node => {
           {currencies.map((each) => (
             <button
               type='button'
-              aria={{ ariaPressed: () => String(currency.value === each) }}
+              aria={{ ariaPressed: () => String(currency() === each) }}
               onClick={() => pay(each)}
             >
               {each.toUpperCase()}

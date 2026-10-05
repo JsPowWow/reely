@@ -11,7 +11,7 @@ const en = {
     basics: 'Typed guards and error helpers: hasSome, isPlainObject, forEachSettled.',
     signals: 'Signals, computed values and effects, with owners that release what they subscribed. No DOM.',
     router:
-      'Typed routes, lazy pages, links and the back button taken over, scroll and focus kept. Any app, no framework.',
+      'Typed routes, lazy pages, links and Back taken over, scroll and focus where the reader expects them, and settings like ?lang that stay in the address. Any app, no framework.',
     dommy: 'Real DOM from tag factories and JSX; a signal updates the one node bound to it.',
     'dommy-kit': 'Browser helpers over signals: media queries, element size, timers, storage, FLIP moves.',
     emitter: 'A typed publish-subscribe channel whose listeners cannot stop each other.',
