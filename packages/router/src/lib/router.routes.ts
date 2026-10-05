@@ -15,8 +15,8 @@ type Params = Readonly<Record<string, string>>;
  */
 export type RouteTable<T> = { [P in keyof T & string]: (params: ParamsOf<P>, query: URLSearchParams) => T[P] };
 
-/** The pages a route table answers with, loaded. */
-export type PageOf<T> = NonNullable<Awaited<T[keyof T]>>;
+/** The pages a route table answers with, loaded; a guard that answers nothing adds none. */
+export type PageOf<T> = NonNullable<Exclude<Awaited<T[keyof T]>, void>>;
 
 const segmentsOf = (path: string): string[] => path.split('/').filter((segment) => segment !== '');
 

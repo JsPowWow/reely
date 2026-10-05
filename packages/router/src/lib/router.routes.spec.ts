@@ -1,3 +1,4 @@
+import { navigate } from './router.navigate';
 import { defineRoutes } from './router.routes';
 
 import type { Routes } from './router.types';
@@ -126,5 +127,17 @@ describe('defineRoutes', () => {
     });
 
     expectTypeOf(routes).returns.resolves.toEqualTypeOf<{ title: string; unread: number } | undefined>();
+  });
+
+  it('types the page apart from a guard that sends the reader elsewhere and answers nothing', () => {
+    const routes = defineRoutes({
+      '/': () => ({ title: 'Inbox' }),
+      '/account': () => {
+        navigate('/login', { replace: true });
+      },
+      '/old': () => Promise.resolve(),
+    });
+
+    expectTypeOf(routes).returns.resolves.toEqualTypeOf<{ title: string } | undefined>();
   });
 });
