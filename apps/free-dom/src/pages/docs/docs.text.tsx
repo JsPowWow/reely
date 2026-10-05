@@ -55,7 +55,7 @@ const en = {
   topics: {
     'getting-started': {
       title: 'Getting started',
-      lead: 'Install @reely/dommy, point JSX at it, and mount a view. The like button below is the whole program: a click edits one text node, and the board under it counts exactly that.',
+      lead: 'Install @reely/dommy, point JSX at it, and mount a view. The like button below is the whole program. Press Like: the board under it counts one text edit, because the number is one text node bound to a signal, and that node is all that changes.',
       Details: (): Node => (
         <>
           <h2>Install</h2>
@@ -76,15 +76,16 @@ const en = {
           <h2>Mount a view</h2>
           <Code caption='main.tsx' source={mountSource} />
           <p>
-            <code>mount</code> renders once. From then on, only the nodes bound to a signal change, and{' '}
-            <code>unmount()</code> removes the view with every binding it made.
+            <code>mount</code> renders once. After that, only the nodes bound to a signal change: in this view, a
+            keystroke rewrites the one text node of the counter and nothing else. <code>unmount()</code> removes the
+            view with every binding it made.
           </p>
         </>
       ),
     },
     elements: {
       title: 'Elements and JSX',
-      lead: 'Every HTML tag is a function that returns a real element: props first, children after. JSX compiles to the same calls, so both build exactly the same nodes, once.',
+      lead: 'Every HTML tag is a function that returns a real element: props first, children after. JSX compiles to the same calls, so both build the same nodes, once. The card below is plain JSX: the board counts the nodes it built at first render, and no writes after that, since nothing in it is bound.',
       Details: (): Node => (
         <>
           <h2>Props are DOM names</h2>
@@ -126,7 +127,7 @@ const en = {
     },
     components: {
       title: 'Components',
-      lead: 'A component is a plain function of props that runs once. There is no re-render to schedule: what changes later changes through bindings, node by node.',
+      lead: 'A component is a plain function of props, and it runs once. There is no re-render to schedule: what changes later changes through bindings, node by node. The card below is the one from Elements and JSX, now built by a LinkItem component called three times. Compare the boards: a component adds no nodes of its own.',
       Details: (): Node => (
         <>
           <h2>What a component returns</h2>
@@ -148,7 +149,7 @@ const en = {
     },
     signals: {
       title: 'Signals',
-      lead: 'A signal is a value that knows who reads it. A computed value derives from signals, an effect re-runs when what it read changes, and all of it happens synchronously.',
+      lead: 'A signal is a value that knows who reads it. A computed value derives from signals, an effect runs again when what it read changes, and all of it happens synchronously. Press +1 three times. The number is one text edit each time. The data-plan attribute follows a computed plan, empty, single or group, so it changes on the first two presses only: on the third, the computed returns group again and passes nothing on.',
       Details: (): Node => (
         <>
           <h2>The API</h2>
@@ -175,7 +176,7 @@ const en = {
     },
     bindings: {
       title: 'Bindings',
-      lead: 'A signal or any function in a child or a prop is bound: when the signals it reads change, dommy writes the new value to that one text node or attribute, and only when the value really differs.',
+      lead: 'A signal or any function in a child or a prop is bound: when the signals it reads change, dommy writes the new value to that one text node or attribute, and only when the value differs. Here a plain getter disables −1 at zero. Press +1: the board counts two attribute edits, data-plan and disabled. Press it again: the getter runs, still answers false, and disabled is not written.',
       Details: (): Node => (
         <>
           <h2>What can be bound</h2>
@@ -202,13 +203,14 @@ const en = {
     },
     batch: {
       title: 'Batch',
-      lead: 'Effects and bindings run synchronously, after every write. batch applies several writes first and runs each binding once when it returns: this summary is written once per click, not twice.',
+      lead: 'Effects and bindings run synchronously, after every write. batch applies several writes first and runs each binding once, when it returns. Press +1: it writes the tickets and the seats left, and the board counts two text edits, the number and the summary. The summary reads both signals, yet it is written once.',
       Details: (): Node => (
         <>
           <h2>When to batch</h2>
           <p>
-            When one action writes several signals that the same view reads. Without <code>batch</code> the view is
-            correct after every write, just written more often; with it, it is written once, with the final values.
+            When one action writes several signals that the same view reads. Without <code>batch</code> this summary
+            would be written twice per press: first with the new tickets and the old seats, then with both new. The view
+            is correct after every write either way; with <code>batch</code> it is written once, with the final values.
           </p>
           <p>
             <code>batch(fn)</code> returns what <code>fn</code> returns. Batches nest: the outermost one runs the
@@ -219,7 +221,7 @@ const en = {
     },
     lists: {
       title: 'Keyed lists',
-      lead: 'For renders one row per key, once. When the items change, a row whose key stays keeps its nodes, and only the rows that changed places are moved: update the prices and count the moves.',
+      lead: 'For renders one row per key, once. When the items change, a row whose key stays keeps its nodes, and only the rows that changed places are moved. Press Update prices: the changed numbers are edited in place, Nodes moved counts only the rows that had to move, and Nodes added or removed stays at zero.',
       Details: (): Node => (
         <>
           <h2>The props</h2>
@@ -239,15 +241,16 @@ const en = {
           <h2>What survives a reorder</h2>
           <p>
             A row that keeps its key keeps its nodes, so focus, text selection and input state inside it survive. New
-            keys get new rows; removed rows go with their bindings. The fewest rows needed are moved: the ones outside
-            the longest run that is already in order.
+            keys get new rows; removed rows go with their bindings. Only the fewest rows needed are moved: the ones
+            outside the longest run that is already in order. That is why a stock that jumps from last to first costs
+            one move, though every rank below it changes.
           </p>
         </>
       ),
     },
     conditions: {
       title: 'Conditions',
-      lead: 'Show renders children while when is truthy and fallback otherwise. A branch is built when it is shown and removed with its bindings when it is hidden; while the truthiness stays, the branch stays and updates itself.',
+      lead: 'Show renders children while when is truthy, and fallback otherwise. A branch is built when it is shown and removed with its bindings when it is hidden; while the truthiness stays, the branch stays and updates itself. Press Next stop a couple of times, then Deliver, and watch the board.',
       Details: (): Node => (
         <>
           <h2>The props</h2>
@@ -262,8 +265,9 @@ const en = {
             </li>
           </ul>
           <p>
-            Press Next stop and count one text edit. Press Deliver and count the nodes: the fallback paragraph goes, the
-            delivery plate comes.
+            Next stop is one text edit: the count of stops changes inside the paragraph that stays. Deliver makes{' '}
+            <code>deliveredAt</code> truthy, so the fallback paragraph goes and the delivery plate comes, two nodes on
+            the board. Send another builds a fresh fallback, which reads five stops again.
           </p>
           <h2>A new branch for a new value</h2>
           <p>
@@ -277,7 +281,7 @@ const en = {
     },
     async: {
       title: 'Async',
-      lead: 'Await shows the fallback while a promise is pending, then its result or its error. Give it a getter and it loads again when a signal it reads changes; only the latest promise ever renders.',
+      lead: 'Await shows the fallback while a promise is pending, then its result or its error. Give it a getter and it loads again when a signal it reads changes; only the latest promise ever renders. Press Refresh the rate: Asking the bank… stays until the answer comes, a little under a second later.',
       Details: (): Node => (
         <>
           <h2>The props</h2>
@@ -310,13 +314,14 @@ const en = {
           <Code caption='forecast.tsx' source={forecastSource} />
           <h2>Only the latest promise</h2>
           <p>
-            Press Refresh the rate twice while the bank answers: the first request never shows, its answer is dropped. A
-            promise that settles after the view is taken down renders nothing either. The third request fails; pressing
-            again is the retry, since the getter reads the request number.
+            Press Refresh the rate twice, quickly, while the bank is still answering: the first of the two never shows,
+            its answer is dropped. A promise that settles after the view is taken down renders nothing either. The third
+            request fails with The bank timed out. Press again, and that is the retry: the getter reads the request
+            number, so a new number is a new request.
           </p>
           <p>
-            Every refresh after the first costs the board 4 nodes: the result goes and the fallback comes, then the
-            other way round.
+            Watch Nodes added or removed: every refresh after the first adds 4, as the result goes and the fallback
+            comes, then the other way round.
           </p>
         </>
       ),
@@ -328,8 +333,9 @@ const en = {
         <>
           <h2>onCleanup</h2>
           <p>
-            Register what the view started: a timer, an animation frame, an observer, an outside subscription. Mount the
-            stopwatch, then unmount it: the timer count goes back to zero because its cleanup ran.
+            Register what the view started: a timer, an animation frame, an observer, an outside subscription. Press
+            Mount a stopwatch: the view starts a timer, and Timers running reads 1. Press Stop and unmount: the count
+            goes back to 0, because the cleanup the stopwatch registered ran and cleared its timer.
           </p>
           <h2>Who takes a view down</h2>
           <ul>
@@ -347,7 +353,7 @@ const en = {
     },
     routing: {
       title: 'Routing',
-      lead: 'defineRoutes turns path patterns into the routes of an app: an address gets the page of the first route that matches and answers. Router, from @reely/dommy/router, shows that page and follows links, back and forward without loading the document. It is @reely/router in a component; that package works in an app without dommy too.',
+      lead: 'defineRoutes turns path patterns into the routes of an app: an address gets the page of the first route that matches and answers. Press the addresses below: /products/42 hands its id to the page, /cart takes a moment, as a page behind import() would, and /orders/7 falls through to /*rest. Router, from @reely/dommy/router, does the same for the address bar: it shows the page and follows links, back and forward, without loading the document. It is @reely/router in a component; that package works in an app without dommy too.',
       Details: (): Node => (
         <>
           <h2>Patterns and params</h2>
@@ -420,7 +426,7 @@ const en = {
     },
     advanced: {
       title: 'Advanced topics',
-      lead: 'The questions that come up once the basics work, each answered with a live demo. First, conditional bindings: a binding depends on what its last run read, so the delivery cost below runs for the courier fees or for the pickup fees, never for all four.',
+      lead: 'The questions that come up once the basics work, each answered with a live demo to try. First, conditional bindings: a binding depends on what its last run read, so the delivery cost below runs again for the courier fees or for the pickup fees, never for all four.',
       Details: ({
         flavours,
         salePrice,
@@ -432,9 +438,10 @@ const en = {
         <>
           <h2>Conditional bindings</h2>
           <p>
-            Change the locker fee while the delivery is by courier: the run count stays. Switch to pickup, and the
-            courier fees stop counting instead. The same holds for a <code>computed</code> and an <code>effect</code>.
-            Every answer on this page is also checked by the specs of @reely/dommy (
+            Change Locker fee while Delivery is Courier: the line “The cost ran … time(s)” keeps its number, because the
+            last run never read the locker fee. Switch Delivery to Pickup, which is one more run, then change Courier
+            fee: now that one leaves the count alone. The same holds for a <code>computed</code> and an{' '}
+            <code>effect</code>. Every answer on this page is also checked by the specs of @reely/dommy (
             <code>advanced.topics.spec.tsx</code>).
           </p>
           <h2>DOM attributes vs. properties</h2>
@@ -442,7 +449,8 @@ const en = {
             Live state (<code>value</code>, <code>checked</code>, <code>selected</code>, <code>indeterminate</code>,{' '}
             <code>muted</code>) is set as a property, so the form shows it. Everything else is an attribute, a read-only{' '}
             <code>list</code> included. A property that takes an object, such as <code>srcObject</code>, goes through{' '}
-            <code>elementRef</code>.
+            <code>elementRef</code>. Start typing in Choose a flavour: the browser suggests the options of the datalist,
+            which the <code>list</code> attribute names by its id.
           </p>
           {flavours}
           <h2>Why can’t a signal hold a DOM node?</h2>
@@ -450,7 +458,8 @@ const en = {
             A bound child is text. A node can stand in one place only, so one node bound in two places would leave the
             first one empty. A signal of nodes does not type-check as a child, and from JavaScript it renders as text
             and the dommy logger reports it. To switch nodes, use <code>Show</code> or <code>Keyed</code>: each place
-            builds its own node.
+            builds its own node. Press Start the sale: both prices turn to €32, and the board counts four nodes added or
+            removed, two for each place.
           </p>
           {salePrice}
           <h2>Signal granularity</h2>
@@ -464,7 +473,8 @@ const en = {
           <p>
             Typing into a field does not rebuild the paragraph that shows it, and there is nothing to arrange for that:
             a function child renders text, and <code>Show</code> keeps its branch while the truthiness of{' '}
-            <code>when</code> stays. Type a coupon code and count one text edit per key; clear it and count the nodes.
+            <code>when</code> stays. Type a coupon code: the first letter swaps the hint for the plate, two nodes, and
+            every letter after it is one text edit. Clear the field, and the hint comes back.
           </p>
           {couponHint}
           <h2>Advanced state derivation</h2>
@@ -480,8 +490,9 @@ const en = {
           <h2>Self-referencing in effects</h2>
           <p>
             The effect below reads <code>plays</code> and then writes it. A signal an effect reads and then writes stops
-            being its dependency, so its own write does not run it again and Reset sets the count to 0 for good. It
-            still runs for <code>playing</code>, which it only reads. The price: an effect cannot clamp a signal it
+            being its dependency, so its own write does not run it again. Tick Playing: the count goes to 1, once. Press
+            Reset: it goes to 0 and stays there. Untick and tick Playing again: the effect still runs for{' '}
+            <code>playing</code>, which it only reads, and counts 1. The price: an effect cannot clamp a signal it
             writes; a <code>computed</code> can. Two effects that write what the other reads would run forever; after
             100 waves of writes the flush throws a cycle error instead, and a <code>computed</code> that reads itself,
             directly or through others, throws one when it is read.
@@ -491,7 +502,7 @@ const en = {
           <p>
             Bindings are released by their owner, not collected as garbage when their nodes leave the document, so a
             view built across an <code>await</code> keeps them. A branch that goes releases the signal, the computed and
-            the subscriptions made in it. Switch the view as often as you like; one stays alive.
+            the subscriptions made in it. Press Switch view a few times: Views built climbs, alive stays at 1.
           </p>
           {addressView}
           <p>
@@ -508,9 +519,10 @@ const en = {
           <p>
             A component runs before its nodes are in the document. What must run once they are, such as focusing a field
             or reading the rendered text, goes in <code>later(0, fn)</code> from <code>@reely/dommy-kit</code>; it is
-            cancelled if the view goes first. Next slide rebuilds the caption, and the message reads it from the
-            document. The other end is <code>onCleanup</code>, run when the owner lets the view go; a node moved out of
-            the document by other code is noticed only by a custom element’s <code>disconnectedCallback</code>.
+            cancelled if the view goes first. Press Next slide: <code>Keyed</code> builds a new caption, and the line
+            under it shows the caption’s text as read from the document. The other end is <code>onCleanup</code>, run
+            when the owner lets the view go; a node moved out of the document by other code is noticed only by a custom
+            element’s <code>disconnectedCallback</code>.
           </p>
           {slideCaption}
         </>
@@ -518,7 +530,7 @@ const en = {
     },
     performance: {
       title: 'Size and speed',
-      lead: 'Five hundred stocks ranked by today’s change, timed in your browser from the write to the finished layout. Then give every row a new key on every update and watch what rebuilding costs instead of moving.',
+      lead: 'Press Start: five hundred stocks rank again by today’s change four times a second, and every update is timed in your browser, from the write to the finished layout. Then tick New keys every update and see what it costs to rebuild every row instead of moving it.',
       Details: (): Node => (
         <>
           <h2>Size</h2>
@@ -554,8 +566,9 @@ const en = {
           </p>
           <h2>Speed</h2>
           <p>
-            The demo above times every price update in your browser, from the write to the finished layout. Its numbers
-            are the ones that count: they come from your machine, not from ours.
+            The demo above times every price update in your browser, from the write to the finished layout. Median and
+            95th percentile appear once twenty updates are timed, and each setting of Stocks and of the keys is timed
+            from scratch. Its numbers are the ones that count: they come from your machine, not from ours.
           </p>
         </>
       ),
