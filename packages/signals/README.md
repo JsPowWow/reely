@@ -83,6 +83,17 @@ effect(() => {
 });
 ```
 
+`subscribe(read, cb)` is an effect that hands `cb` the value: now and after every change, until its owner goes or the returned function is called. `cb` runs untracked and, unlike a run of an effect, what it writes reaches the subscription, so a view that writes the signal it shows is shown again.
+
+```ts
+import { signal, subscribe } from '@reely/signals';
+
+const laps = signal(3);
+const stop = subscribe(laps, (value) => console.log(`${value} laps to go`));
+laps.value = 2; // "2 laps to go"
+stop();
+```
+
 ## Testing
 
 `@reely/signals/testing` counts what still listens to a signal, so a test can check that `dispose` released everything:

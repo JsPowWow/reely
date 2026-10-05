@@ -399,26 +399,6 @@ export const effect = (fn: () => void): (() => void) => {
   return node.dispose;
 };
 
-/**
- * Calls `cb` with the value of `read` and the one before it: now, unless it is `undefined`, then
- * after every change `read` notifies. Returns `unsubscribe`.
- */
-export const subscribe = <T>(read: ReactiveValue<T>, cb: (value: T, prevValue?: T) => void): (() => void) => {
-  let last: T | undefined;
-  let started = false;
-  return batch(() =>
-    effect(() => {
-      const value = read();
-      const previous = last;
-      last = value;
-      if (started || !Object.is(value, undefined)) {
-        untracked(() => cb(value, previous));
-      }
-      started = true;
-    })
-  );
-};
-
 const endBatch = (): void => {
   if (--batchDepth === 0) {
     const written = batchWrites;
@@ -456,6 +436,18 @@ export const untracked = <T>(fn: () => T): T => {
     return fn();
   } finally {
     setTracker(outer);
+  }
+};
+
+/** Runs `fn` as code outside the running effect or computed: untracked, and what it writes is heard by that run too. */
+export const outside = <T>(fn: () => T): T => {
+  const outer = setTracker(null);
+  const outerRunning = setRunning(null);
+  try {
+    return fn();
+  } finally {
+    setTracker(outer);
+    setRunning(outerRunning);
   }
 };
 

@@ -4,5 +4,10 @@
     "code": "import { onCleanup, withOwner } from '@reely/signals'; withOwner((dispose) => { onCleanup(() => console.log('bye')); dispose(); });",
     "absent": ["signalProto", "computedProto"],
     "once": ["withOwner"]
+  },
+  {
+    "name": "a signal alone",
+    "code": "import { signal } from '@reely/signals'; const lap = signal(1); lap.value = 2; console.log(lap());",
+    "absent": ["withOwner", "subscribe", "Owner"]
   }
 ]

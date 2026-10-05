@@ -2,7 +2,7 @@
 import { noop } from '@reely/utils';
 
 import { subscriberCount } from './reelx.core';
-import { batch, computed, effect, signal } from './signal';
+import { batch, computed, effect, signal, subscribe } from './signal';
 
 describe('the signal core', () => {
   it('reads a derived value after a write', () => {
@@ -36,9 +36,9 @@ describe('the signal core', () => {
     const e = computed(() => hard(c() + a() + (d()[0] ?? 0)));
     const f = computed(() => hard((d()[0] ?? 0) && b()));
     const g = computed(() => c() + (c() || e() % 2) + (d()[0] ?? 0) + f());
-    g.subscribe((value) => results.push(hard(value)));
-    g.subscribe((value) => results.push(value));
-    f.subscribe((value) => results.push(hard(value)));
+    subscribe(g, (value) => results.push(hard(value)));
+    subscribe(g, (value) => results.push(value));
+    subscribe(f, (value) => results.push(hard(value)));
 
     results.length = 0;
     batch(() => {
@@ -55,15 +55,18 @@ describe('the signal core', () => {
 
   it('keeps working after a computed throws at its first subscription', () => {
     expect(() =>
-      computed(() => {
-        throw new Error('broken');
-      }).subscribe(noop)
+      subscribe(
+        computed(() => {
+          throw new Error('broken');
+        }),
+        noop
+      )
     ).toThrow('broken');
 
     const a = signal(0);
     const b = computed(() => a());
     const c = computed(() => a());
-    c.subscribe(noop);
+    subscribe(c, noop);
     a.set(1);
 
     expect([a(), b(), c()]).toStrictEqual([1, 1, 1]);

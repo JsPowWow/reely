@@ -4,7 +4,7 @@
 // Symbol brands and the internals (`_start`, `_sources`, `_callback`): API this package does not have.
 import { onCleanup } from './owner';
 import { subscriberCount } from './reelx.core';
-import { batch, computed, type Computed, effect, signal, type Signal, untracked } from './signal';
+import { batch, computed, type Computed, effect, signal, type Signal, subscribe, untracked } from './signal';
 
 describe('signal', () => {
   it('should return value', () => {
@@ -175,30 +175,30 @@ describe('signal', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
   });
-  describe('.subscribe()', () => {
+  describe('subscribe()', () => {
     it('should subscribe to a signal', () => {
       const spy = vi.fn();
       const a = signal(1);
 
-      a.subscribe(spy);
-      expect(spy).toHaveBeenCalledWith(1, undefined);
+      subscribe(a, spy);
+      expect(spy).toHaveBeenCalledWith(1);
     });
 
     it('should run the callback when the signal value changes', () => {
       const spy = vi.fn();
       const a = signal(1);
 
-      a.subscribe(spy);
-      expect(spy).toHaveBeenNthCalledWith(1, 1, undefined);
+      subscribe(a, spy);
+      expect(spy).toHaveBeenNthCalledWith(1, 1);
       a.value = 2;
-      expect(spy).toHaveBeenNthCalledWith(2, 2, 1);
+      expect(spy).toHaveBeenNthCalledWith(2, 2);
     });
 
     it('should unsubscribe from a signal', () => {
       const spy = vi.fn();
       const a = signal(1);
 
-      const dispose = a.subscribe(spy);
+      const dispose = subscribe(a, spy);
       dispose();
       spy.mockClear();
 
@@ -211,7 +211,7 @@ describe('signal', () => {
       const a = signal(0);
       const b = signal(0);
 
-      a.subscribe(() => {
+      subscribe(a, () => {
         b.value;
         spy();
       });
@@ -228,7 +228,7 @@ describe('signal', () => {
       const b = signal(0);
 
       effect(() => {
-        a.subscribe(() => {
+        subscribe(a, () => {
           b.value;
         });
         spy();
@@ -2243,7 +2243,10 @@ describe('reentrancy and errors', () => {
     const a = signal(0);
     const b = signal(0);
     const spy = vi.fn(() => {
-      computed(() => a.value).subscribe(() => undefined);
+      subscribe(
+        computed(() => a.value),
+        () => undefined
+      );
       b.value;
     });
     effect(spy);
@@ -2260,11 +2263,11 @@ describe('reentrancy and errors', () => {
   it('should accept `undefined` as a new value', () => {
     const s = signal<string | undefined>('x');
     const spy = vi.fn();
-    s.subscribe(spy);
+    subscribe(s, spy);
 
     s.value = undefined;
 
     expect(s.value).toBeUndefined();
-    expect(spy).toHaveBeenLastCalledWith(undefined, 'x');
+    expect(spy).toHaveBeenLastCalledWith(undefined);
   });
 });

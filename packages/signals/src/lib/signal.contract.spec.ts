@@ -1,9 +1,9 @@
 // What reely's signals guarantee beyond the tests ported from Preact: the contract any core under them keeps.
 import { noop } from '@reely/utils';
 
-import { withOwner } from './owner';
+import { onCleanup, withOwner } from './owner';
 import { subscriberCount } from './reelx.core';
-import { batch, computed, effect, signal, untracked } from './signal';
+import { batch, computed, effect, signal, subscribe, untracked } from './signal';
 
 import type { Signal } from './signal';
 
@@ -207,26 +207,51 @@ describe('the signal contract', () => {
     expect(seen).toStrictEqual([1000, 1001]);
   });
 
-  it('tells a subscriber the new value and the one before it', () => {
-    const lap = signal(1);
-    const calls: unknown[][] = [];
-    lap.subscribe((...args) => void calls.push(args));
+  it('tells a subscriber the value now, `undefined` included, and after every change', () => {
+    const lap = signal<number | undefined>(undefined);
+    const heard: unknown[] = [];
+    subscribe(lap, (value) => void heard.push(value));
 
     lap.value = 2;
     lap.value = 3;
 
-    expect(calls).toStrictEqual([
-      [1, undefined],
-      [2, 1],
-      [3, 2],
-    ]);
+    expect(heard).toStrictEqual([undefined, 2, 3]);
+  });
+
+  it('hears what its own callback writes, unlike a run of an effect', () => {
+    const open = signal(true);
+    const heard: boolean[] = [];
+    subscribe(open, (value) => {
+      heard.push(value);
+      open.value = false;
+    });
+
+    open.value = true;
+
+    expect(heard).toStrictEqual([true, false, true, false]);
+  });
+
+  it('releases a subscription with its owner, and the cleanups of a call before the next call', () => {
+    const lap = signal(1);
+    const released: number[] = [];
+    const stop = withOwner((dispose) => {
+      subscribe(lap, (value) => onCleanup(() => released.push(value)));
+      return dispose;
+    });
+
+    lap.value = 2;
+    stop();
+    lap.value = 3;
+
+    expect(released).toStrictEqual([1, 2]);
+    expect(subscriberCount(lap)).toBe(0);
   });
 
   it('tells a subscriber of a computed nothing when the new value is the same by `Object.is`, `NaN` included', () => {
     const lap = signal(1);
     const ratio = computed(() => (lap.value > 0 ? Number.NaN : 0));
     const heard = vi.fn();
-    ratio.subscribe(heard);
+    subscribe(ratio, heard);
 
     lap.value = 2;
 
@@ -247,7 +272,7 @@ describe('the signal contract', () => {
   it('releases a signal read through a computed that a subscriber and an effect share, once both are gone', () => {
     const lap = signal(0);
     const double = computed(() => lap.value * 2);
-    const unsubscribe = double.subscribe(noop); // as a binding does
+    const unsubscribe = subscribe(double, noop); // as a binding does
     const tick = signal(0);
     const stop = effect(() => void (tick.value, double.value));
     lap.value = 1; // the effect reads `double` in the same flush as the subscriber
@@ -276,21 +301,11 @@ describe('the signal contract', () => {
     const lap = signal(1);
     const other = signal(0);
     const heard = vi.fn((value: number) => value + other.value);
-    lap.subscribe(heard);
+    subscribe(lap, heard);
 
     other.value = 1;
 
     expect(heard).toHaveBeenCalledOnce();
-  });
-
-  it('tells a subscriber nothing at once when the value is `undefined`, then every change', () => {
-    const lap = signal<number | undefined>(undefined);
-    const calls: unknown[][] = [];
-    lap.subscribe((...args) => void calls.push(args));
-
-    lap.value = 1;
-
-    expect(calls).toStrictEqual([[1, undefined]]);
   });
 
   it("runs the effects an effect's first run triggers after that run", () => {
@@ -492,7 +507,7 @@ describe('the signal contract', () => {
       const garage = { cars: ['Volvo'] };
       const state = signal(garage, { equals });
       const counts: number[] = [];
-      state.subscribe((value) => counts.push(value.cars.length));
+      subscribe(state, (value) => counts.push(value.cars.length));
 
       garage.cars.push('Saab');
       state.set(garage);

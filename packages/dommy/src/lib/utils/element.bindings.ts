@@ -1,5 +1,5 @@
 import { isSomeFunction } from '@reely/basics';
-import { computed, onCleanup } from '@reely/signals';
+import { computed, subscribe } from '@reely/signals';
 import { isInstanceOf } from '@reely/utils';
 
 import { getDommyLogger } from '../config';
@@ -10,7 +10,7 @@ import type { ReactiveReelyNode, ReactiveValue, SingleReelyNode } from '../types
 
 export const bindValue = <T>(read: ReactiveValue<T>, write: (value: T) => void): void => {
   reportIfUnowned();
-  onCleanup(computed(read).subscribe(write));
+  subscribe(computed(read), write);
 };
 
 export const applyValue = (value: unknown, write: (value: unknown) => void): void => {

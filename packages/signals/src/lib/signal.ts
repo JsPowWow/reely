@@ -7,11 +7,7 @@ import type { ReactiveValue, SignalOptions } from './reelx.core';
 
 export { batch, untracked, type ReactiveValue, type SignalOptions } from './reelx.core';
 
-interface Subscribable<T> {
-  subscribe(cb: (value: T, prevValue?: T) => void): () => void;
-}
-
-export interface Signal<T> extends Subscribable<T> {
+export interface Signal<T> {
   (): T;
   get value(): T;
   set value(value: T);
@@ -23,7 +19,7 @@ export interface Signal<T> extends Subscribable<T> {
   peek(): T;
 }
 
-export interface Computed<T> extends Subscribable<T> {
+export interface Computed<T> {
   (): T;
   get value(): T;
   /** Reads the value without subscribing the running effect or computed to it. */
@@ -122,15 +118,23 @@ export const effect = (fn: () => void): (() => void) => {
   return dispose;
 };
 
+/**
+ * Calls `cb` with the value of `read` now and after every change it notifies, until disposed with
+ * its owner or by the returned function. `cb` runs untracked, under an owner released before the next
+ * call, and what it writes reaches the subscription, unlike a write of an effect's own run.
+ */
+export const subscribe = <T>(read: ReactiveValue<T>, cb: (value: T) => void): (() => void) =>
+  effect(() => {
+    const value = read();
+    reelx.outside(() => cb(value));
+  });
+
 const computedProto: ThisType<ReactiveValue<unknown>> = {
   get value(): unknown {
     return this();
   },
   peek(): unknown {
     return reelx.untracked(this);
-  },
-  subscribe(cb: (value: unknown, prevValue?: unknown) => void): () => void {
-    return reelx.subscribe(this, cb);
   },
   toString(): string {
     return String(reelx.untracked(this));
