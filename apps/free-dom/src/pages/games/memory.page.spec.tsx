@@ -32,14 +32,14 @@ describe('memory page', () => {
     expect(page.host.querySelectorAll('figure ul button')).toHaveLength(16);
     expect(page.host.querySelector('article h2')?.textContent).toBe('How the game is built');
     expect(texts(page.host, 'article section h3')).toEqual([
-      'Start with the rules, not the page',
-      'Four moments, one state machine',
-      'The machine keeps no time; the view does',
-      'One state, in signals',
-      'A card binds two things, and CSS turns it',
-      'The best ten, as a pure function',
-      'Use the dialog the browser already has',
-      'Proof, not a promise',
+      'Step 1. Rules first, no page yet',
+      'Step 2. Give each moment of the game a name',
+      'Step 3. Turn a wrong pair back after a second',
+      'Step 4. Keep the state in signals',
+      'Step 5. A card is a button plus CSS',
+      'Step 6. The best ten',
+      'Step 7. Use the browser’s own dialog',
+      'Step 8. Prove it',
     ]);
     expect(
       Array.from(page.host.querySelectorAll('main > section:first-child li a'), (link) => link.getAttribute('href'))
