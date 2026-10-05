@@ -110,7 +110,7 @@ export async function retry<T>(fn: RetryTask<T>, options: RetryOptions = {}): Pr
     signal,
   } = options;
 
-  let currentDelay = delay;
+  let currentDelay = Math.min(delay, maxDelay);
 
   for (let attempt = 0; ; attempt++) {
     signal?.throwIfAborted();
@@ -121,7 +121,7 @@ export async function retry<T>(fn: RetryTask<T>, options: RetryOptions = {}): Pr
         throw signal.reason;
       }
       const failure = toErrorWithMessage(error);
-      if (attempt === retries || !shouldRetry(failure, attempt)) {
+      if (attempt >= retries || !shouldRetry(failure, attempt)) {
         throw error;
       }
       onRetry?.(failure, attempt, currentDelay);
@@ -153,10 +153,7 @@ const together = async <T, R>(
 export function createRetry(
   defaultOptions: RetryOptions = {}
 ): <T>(fn: RetryTask<T>, overrides?: RetryOptions) => Promise<T> {
-  return <T>(
-    fn: RetryTask<T>,
-    overrides: RetryOptions = {}
-  ): Promise<T> => {
+  return <T>(fn: RetryTask<T>, overrides: RetryOptions = {}): Promise<T> => {
     return retry(fn, { ...defaultOptions, ...overrides });
   };
 }
@@ -164,11 +161,10 @@ export function createRetry(
 /**
  * Wrap a function to always retry on failure
  */
-export function withRetry<T extends (...args: any[]) => Promise<any>>(fn: T, options?: RetryOptions): T;
-export function withRetry(
-  fn: (...args: unknown[]) => Promise<unknown>,
+export function withRetry<A extends unknown[], R>(
+  fn: (...args: A) => Promise<R>,
   options: RetryOptions = {}
-): (...args: unknown[]) => Promise<unknown> {
+): (...args: A) => Promise<R> {
   return (...args) => retry(() => fn(...args), options);
 }
 
@@ -176,10 +172,7 @@ export function withRetry(
  * Retries each task on its own and resolves with every result; once one fails for good, rejects with
  * its error and stops the others.
  */
-export async function retryAll<T>(
-  fns: Array<RetryTask<T>>,
-  options: RetryOptions = {}
-): Promise<T[]> {
+export async function retryAll<T>(fns: Array<RetryTask<T>>, options: RetryOptions = {}): Promise<T[]> {
   return together(fns, options, (runs) => Promise.all(runs));
 }
 
@@ -187,10 +180,7 @@ export async function retryAll<T>(
  * Resolves with the first task to succeed after its retries; rejects with an `AggregateError` of
  * every task's error once all fail.
  */
-export async function retryRace<T>(
-  fns: Array<RetryTask<T>>,
-  options: RetryOptions = {}
-): Promise<T> {
+export async function retryRace<T>(fns: Array<RetryTask<T>>, options: RetryOptions = {}): Promise<T> {
   return together(fns, options, (runs) => Promise.any(runs));
 }
 

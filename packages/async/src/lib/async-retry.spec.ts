@@ -1,14 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, expectTypeOf, vi, beforeEach, afterEach } from 'vitest';
 
-import {
-  retry,
-  createRetry,
-  withRetry,
-  retryAll,
-  retryRace,
-  retryAllSettled,
-  TimeoutError,
-} from './async-retry.js';
+import { retry, createRetry, withRetry, retryAll, retryRace, retryAllSettled, TimeoutError } from './async-retry.js';
 
 describe('async-retry', () => {
   beforeEach(() => {
@@ -83,21 +75,41 @@ describe('async-retry', () => {
       expect(fn).toHaveBeenCalledWith(1, expect.any(AbortSignal));
       expect(fn).toHaveBeenCalledWith(2, expect.any(AbortSignal));
     });
+
+    it.each([
+      { retries: -1, attempts: 1 },
+      { retries: 0.5, attempts: 2 },
+      { retries: 1.5, attempts: 3 },
+    ])('stops after $attempts attempts for $retries retries', async ({ retries, attempts }) => {
+      const task = vi.fn().mockRejectedValue(new Error('offline'));
+      const promise = retry(task, { retries, delay: 10 });
+      const settled = expect(promise).rejects.toThrow('offline');
+
+      await vi.runAllTimersAsync();
+      await settled;
+
+      expect(task).toHaveBeenCalledTimes(attempts);
+    });
+
+    it('caps the first wait at maxDelay too', async () => {
+      const onRetry = vi.fn();
+      const task = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue('online');
+      const promise = retry(task, { delay: 1000, maxDelay: 100, onRetry });
+
+      await vi.advanceTimersByTimeAsync(100);
+
+      await expect(promise).resolves.toBe('online');
+      expect(onRetry).toHaveBeenCalledWith(expect.any(Error), 0, 100);
+    });
   });
 
   describe('createRetry', () => {
     it('should create a reusable retry function with default options', async () => {
       const retryWithDefaults = createRetry({ retries: 2, delay: 50 });
 
-      const fn1 = vi
-        .fn()
-        .mockRejectedValueOnce(new Error('fail'))
-        .mockResolvedValue('success1');
+      const fn1 = vi.fn().mockRejectedValueOnce(new Error('fail')).mockResolvedValue('success1');
 
-      const fn2 = vi
-        .fn()
-        .mockRejectedValueOnce(new Error('fail'))
-        .mockResolvedValue('success2');
+      const fn2 = vi.fn().mockRejectedValueOnce(new Error('fail')).mockResolvedValue('success2');
 
       const promise1 = retryWithDefaults(fn1);
       const promise2 = retryWithDefaults(fn2);
@@ -112,10 +124,7 @@ describe('async-retry', () => {
     it('should allow overriding default options', async () => {
       const retryWithDefaults = createRetry({ retries: 2, delay: 100 });
 
-      const fn = vi
-        .fn()
-        .mockRejectedValueOnce(new Error('fail'))
-        .mockResolvedValue('success');
+      const fn = vi.fn().mockRejectedValueOnce(new Error('fail')).mockResolvedValue('success');
 
       const promise = retryWithDefaults(fn, { delay: 50 });
 
@@ -128,10 +137,7 @@ describe('async-retry', () => {
 
   describe('withRetry', () => {
     it('should wrap a function to automatically retry', async () => {
-      const originalFn = vi
-        .fn()
-        .mockRejectedValueOnce(new Error('fail'))
-        .mockResolvedValue('success');
+      const originalFn = vi.fn().mockRejectedValueOnce(new Error('fail')).mockResolvedValue('success');
 
       const wrappedFn = withRetry(originalFn, { retries: 2, delay: 50 });
 
@@ -151,19 +157,19 @@ describe('async-retry', () => {
       expect(result).toBe('42-test');
       expect(originalFn).toHaveBeenCalledWith(42, 'test');
     });
+
+    it('keeps the parameters and the result in its type', () => {
+      const lapTime = async (driver: string, lap: number): Promise<number> => driver.length + lap;
+
+      expectTypeOf(withRetry(lapTime)).toEqualTypeOf<(driver: string, lap: number) => Promise<number>>();
+    });
   });
 
   describe('retryAll', () => {
     it('should retry all functions and return all results', async () => {
-      const fn1 = vi
-        .fn()
-        .mockRejectedValueOnce(new Error('fail'))
-        .mockResolvedValue('result1');
+      const fn1 = vi.fn().mockRejectedValueOnce(new Error('fail')).mockResolvedValue('result1');
 
-      const fn2 = vi
-        .fn()
-        .mockRejectedValueOnce(new Error('fail'))
-        .mockResolvedValue('result2');
+      const fn2 = vi.fn().mockRejectedValueOnce(new Error('fail')).mockResolvedValue('result2');
 
       const fn3 = vi.fn().mockResolvedValue('result3');
 
@@ -181,7 +187,11 @@ describe('async-retry', () => {
       const failing = vi.fn().mockRejectedValue(new Error('quota'));
       const retrying = vi.fn().mockRejectedValue(new Error('busy'));
 
-      const promise = retryAll([failing, retrying], { retries: 3, delay: 10, shouldRetry: (error) => error.message !== 'quota' });
+      const promise = retryAll([failing, retrying], {
+        retries: 3,
+        delay: 10,
+        shouldRetry: (error) => error.message !== 'quota',
+      });
       await expect(promise).rejects.toThrow('quota');
       await vi.advanceTimersByTimeAsync(10_000);
 
@@ -362,10 +372,7 @@ describe('async-retry', () => {
 
   describe('retryAllSettled', () => {
     it('should retry before settling', async () => {
-      const fn1 = vi
-        .fn()
-        .mockRejectedValueOnce(new Error('fail'))
-        .mockResolvedValue('retry-success');
+      const fn1 = vi.fn().mockRejectedValueOnce(new Error('fail')).mockResolvedValue('retry-success');
 
       const fn2 = vi.fn().mockRejectedValue(new Error('persistent-fail'));
 
