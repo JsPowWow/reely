@@ -4,6 +4,7 @@ import { createStateMachine, runActionEffect } from '@reely/state-machine';
 import type {
   IStateMachine,
   StateMachineSelection,
+  StateMachineStateConfig,
 } from '@reely/state-machine';
 import { noop } from '@reely/utils';
 
@@ -54,10 +55,13 @@ export type MemoryPhase = Memory['state'];
 // #region turn
 // the table tells the phase: no card up, one, or a wrong pair, unless all are
 // found
+const byCardsUp: Record<number, MemoryPhase> = {
+  0: 'ready',
+  1: 'oneUp',
+  2: 'wrongPair',
+};
 const phaseOf = (table: MemoryState): MemoryPhase =>
-  isWon(table)
-    ? 'won'
-    : (['ready', 'oneUp', 'wrongPair'] as const)[table.open.length] ?? 'ready';
+  isWon(table) ? 'won' : byCardsUp[table.open.length] ?? 'ready';
 
 // a card that cannot turn has no target: the send is refused, nothing changes
 const toward = ({
@@ -76,6 +80,12 @@ const turnUp = runActionEffect<Memory>().when(
     context.table.value = turnCard(context.table.value, event.data);
   }
 );
+
+// no card up or one: the next card turns, if it can
+const turning: StateMachineStateConfig<Memory> = {
+  entry: turnUp,
+  on: { turn: toward },
+};
 
 /**
  * A game of memory as a state machine, with stores of its own for the table and
@@ -98,13 +108,15 @@ export const memoryMachine = (world: MemoryWorld): IStateMachine<Memory> => {
       on: {
         deal: {
           target: 'ready',
-          actions: ({ context: { table, deal } }) => (table.value = deal()),
+          actions: ({ context: { table, deal } }): void => {
+            table.value = deal();
+          },
         },
       },
       // #endregion
       states: {
-        ready: { entry: turnUp, on: { turn: toward } },
-        oneUp: { entry: turnUp, on: { turn: toward } },
+        ready: turning,
+        oneUp: turning,
         // #region wrongPair
         // no `turn` here: a click is refused until the pair turns back
         wrongPair: {
@@ -116,12 +128,10 @@ export const memoryMachine = (world: MemoryWorld): IStateMachine<Memory> => {
               );
             },
           ],
-          exit: [
-            (): void => cancelTurnBack(),
-            ({ context: { table } }): void => {
-              table.value = turnBack(table.value);
-            },
-          ],
+          exit: ({ context: { table } }): void => {
+            cancelTurnBack();
+            table.value = turnBack(table.value);
+          },
           on: { turnBack: 'ready' },
         },
         // #endregion

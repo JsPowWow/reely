@@ -49,9 +49,9 @@
   }
 }
 
-/* A keyword named in a figure's label is code, set as code. */
+/* The keyword the figure counts is code, posted beside its count. */
 .keyword {
-  color: var(--asphalt);
   font-family: var(--mono);
-  font-size: 0.9em;
+  font-size: 0.5em;
+  font-weight: 400;
 }

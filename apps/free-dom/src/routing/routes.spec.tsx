@@ -38,7 +38,7 @@ describe('routes', () => {
   });
 
   it('opens the memory game under the games', async () => {
-    expect(await headingAt('/games/memory')).toBe('Memory');
+    expect(await headingAt('/games/memory')).toBe('Memory game');
   });
 
   it('opens the page of every package but dommy at its name', async () => {

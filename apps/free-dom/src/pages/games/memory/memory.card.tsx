@@ -1,4 +1,5 @@
 import { computed } from '@reely/dommy';
+import { mapNullable } from '@reely/utils';
 
 import { packageGlyph } from './package.glyphs';
 import { sitePackages } from '../../../site/site.packages';
@@ -49,7 +50,7 @@ export const MemoryCard = ({
             r
           </span>
           <span className={css.face} aria={{ ariaHidden: 'true' }}>
-            {name === undefined ? null : packageGlyph(name)}
+            {mapNullable(packageGlyph, name)}
             <span className={css.scope}>@reely/</span>
             <span className={css.name}>{face}</span>
           </span>

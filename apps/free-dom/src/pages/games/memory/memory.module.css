@@ -1,17 +1,41 @@
 /* The memory game on the timing screen: graphite backs, white faces, found pairs posted in signal. */
+/* The game measures its own panel: where it fits, the readouts and controls
+   stand in a column beside the board, the code under both. */
 .game {
-  display: grid;
-  max-width: 28rem;
-  margin: 0 auto;
+  container-type: inline-size;
   color: var(--graphite);
 }
 
+.table {
+  display: grid;
+  grid-template-areas: 'bar' 'board' 'code';
+  gap: 1rem 1.5rem;
+}
+
 .bar {
+  grid-area: bar;
   display: flex;
   flex-wrap: wrap;
   align-items: end;
   justify-content: space-between;
   gap: 1rem 1.5rem;
+}
+
+@container (min-width: 38rem) {
+  .table {
+    grid-template: 'board bar' auto 'code code' auto / minmax(0, 28rem) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .bar {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: start;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
 }
 
 .counters {
@@ -37,10 +61,16 @@
   min-width: 2.5ch;
   margin: 0;
   font-family: var(--display);
-  font-size: 2.25rem;
+  font-size: 2.75rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+}
+
+@container (max-width: 24rem) {
+  .counters dd {
+    font-size: 2.25rem;
+  }
 }
 
 .controls,
@@ -62,13 +92,15 @@
 }
 
 .status {
+  flex-basis: 100%;
   min-height: 1.5em;
-  margin: 0.75rem 0 1rem;
+  margin: 0;
   color: var(--slate);
   font-size: 0.9375rem;
 }
 
 .board {
+  grid-area: board;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.5rem;
@@ -210,7 +242,7 @@
 }
 
 .modal {
-  width: min(26rem, 100% - 2rem);
+  width: min(30rem, 100% - 2rem);
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -340,7 +372,7 @@
 
 /* The way into the code: a quiet disclosure under the board, its summary underlined while it is open. */
 .code {
-  margin-top: 1rem;
+  grid-area: code;
 }
 
 .codeToggle {
@@ -365,4 +397,17 @@
 
 .code[open] > .codeToggle {
   margin-bottom: 0.75rem;
+}
+
+/* What the code just did, above the code: identifiers set as code. */
+.said {
+  margin: 0 0 0.5rem;
+}
+
+.said code {
+  padding: 0.05em 0.3em;
+  border-radius: 3px;
+  background: var(--asphalt);
+  font-family: var(--mono);
+  font-size: 0.85em;
 }

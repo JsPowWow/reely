@@ -9,21 +9,19 @@ export const memoryPackages = [
   'simple-store',
   'signals',
   'dommy',
+  'dommy-kit',
+  'logger',
 ] as const satisfies readonly SitePackage[];
 
 type MemoryPackage = (typeof memoryPackages)[number];
 
 const en = {
-  documentTitle: 'Memory, a game without one if | reely',
+  documentTitle: 'Memory game without one if | reely',
   description:
     'A memory game in TypeScript with no if in its code: a state machine moves it on, stores hold it, signals draw it. Play it, then read the code that just ran.',
-  title: 'Memory',
+  title: 'Memory game',
   pitch: 'Sixteen cards, eight reely packages: find every pair in as few moves as you can.',
-  facts: {
-    ifs: ' in its code: a state machine decides',
-    lines: 'lines of code, counted on this page',
-    modules: 'modules, the main six shown below',
-  },
+  branches: 'in its code, and not one switch either',
   loadingSource: 'Loading the source…',
   sourceFailed: 'The source failed to load; reload the page to try again.',
   madeWith: 'The game is made with',
@@ -32,6 +30,8 @@ const en = {
     'simple-store': 'the table and the best ten, saved on every change',
     signals: 'what the page draws, following the stores',
     dommy: 'the cards, the counters and both dialogs',
+    'dommy-kit': 'the second before a wrong pair turns back, stopped with the page',
+    logger: 'where a failed transition is reported',
   } satisfies Record<MemoryPackage, string>,
   builtWith:
     'The board under the game counts every DOM write it makes; the code that ran for each move is one click away.',

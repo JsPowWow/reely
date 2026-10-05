@@ -44,6 +44,9 @@ export const Modal = ({
       {children}
     </div>
   );
-  effect(() => (open.value ? box.open || box.showModal() : box.close()));
+  const show = (): void => {
+    box.open || box.showModal();
+  };
+  effect(() => (open.value ? show() : box.close()));
   return box;
 };

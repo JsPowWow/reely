@@ -5,7 +5,7 @@ import { BestTen, Victory } from './memory.dialogs';
 import { memoryMachine } from './memory.machine';
 import { MomentCode, momentOf, moments, refused } from './memory.moments';
 import { cardAt, dealGame, isLocked } from './memory.rules';
-import { following, ownedLater } from './memory.wiring';
+import { browserStorage, following, ownedLater } from './memory.wiring';
 import { sitePackages } from '../../../site/site.packages';
 
 import css from './memory.module.css';
@@ -30,7 +30,7 @@ interface MemoryGameProps {
 export const MemoryGame = ({
   random = Math.random,
   now = Date.now,
-  storage,
+  storage = browserStorage(),
 }: MemoryGameProps = {}): Node => {
   const game = memoryMachine({
     deal: () => dealGame(sitePackages, pairs, random),
@@ -41,7 +41,7 @@ export const MemoryGame = ({
   const table = following(game.context.table);
   const leaderboard = following(game.context.leaderboard);
   // the deck changes only with a new game, which lays out new cards
-  const deck = following(game.context.table.select(({ deck: cards }) => cards));
+  const cards = following(game.context.table.select(({ deck }) => deck));
 
   const status = signal(moments.deal.status(table.value));
   const code = signal<CodeMoment>(moments.deal);
@@ -69,57 +69,59 @@ export const MemoryGame = ({
 
   return (
     <div className={css.game}>
-      <div className={css.bar}>
-        <dl className={css.counters}>
-          <div>
-            <dt>Moves</dt>
-            <dd>{() => table.value.moves}</dd>
+      <div className={css.table}>
+        <div className={css.bar}>
+          <dl className={css.counters}>
+            <div>
+              <dt>Moves</dt>
+              <dd>{() => table.value.moves}</dd>
+            </div>
+            <div>
+              <dt>Pairs</dt>
+              <dd>{() => `${table.value.found.length}/${pairs}`}</dd>
+            </div>
+          </dl>
+          <div className={css.controls}>
+            <button type='button' className={css.solid} onClick={newGame}>
+              New game
+            </button>
+            <button type='button' onClick={() => bestTenOpen.set(true)}>
+              Leaderboard
+            </button>
           </div>
-          <div>
-            <dt>Pairs</dt>
-            <dd>{() => `${table.value.found.length}/${pairs}`}</dd>
-          </div>
-        </dl>
-        <div className={css.controls}>
-          <button type='button' className={css.solid} onClick={newGame}>
-            New game
-          </button>
-          <button type='button' onClick={() => bestTenOpen.set(true)}>
-            Leaderboard
-          </button>
+          <p className={css.status} aria={{ ariaLive: 'polite' }}>
+            {status}
+          </p>
         </div>
+        <Keyed value={cards}>
+          {(deck) => (
+            <ul
+              className={css.board}
+              aria={{
+                ariaLabel: 'Cards',
+                ariaBusy: () => String(isLocked(table.value)),
+              }}
+            >
+              {deck.map((face, place) => (
+                <MemoryCard
+                  place={place}
+                  face={face}
+                  side={() => cardAt(table.value, place)}
+                  onTurn={turn}
+                />
+              ))}
+            </ul>
+          )}
+        </Keyed>
+        <MomentCode moment={code} />
       </div>
-      <p className={css.status} aria={{ ariaLive: 'polite' }}>
-        {status}
-      </p>
-      <Keyed value={deck}>
-        {(cards) => (
-          <ul
-            className={css.board}
-            aria={{
-              ariaLabel: 'Cards',
-              ariaBusy: () => String(isLocked(table.value)),
-            }}
-          >
-            {cards.map((face, place) => (
-              <MemoryCard
-                place={place}
-                face={face}
-                side={() => cardAt(table.value, place)}
-                onTurn={turn}
-              />
-            ))}
-          </ul>
-        )}
-      </Keyed>
-      <MomentCode moment={code} />
       <Victory
         open={victoryOpen}
         moves={() => table.value.moves}
-        leaderboard={() => leaderboard.value}
+        leaderboard={leaderboard}
         onNewGame={newGame}
       />
-      <BestTen open={bestTenOpen} leaderboard={() => leaderboard.value} />
+      <BestTen open={bestTenOpen} leaderboard={leaderboard} />
     </div>
   );
 };

@@ -1,5 +1,11 @@
 import { ObjectStore } from '@reely/simple-store';
-import { Either, hasProperty, isNumber } from '@reely/utils';
+import {
+  Either,
+  hasProperty,
+  isNumber,
+  mapNullable,
+  withDefault,
+} from '@reely/utils';
 
 /** One win: how many moves it took, and when it ended (ms since the epoch). */
 export interface MemoryResult {
@@ -12,10 +18,10 @@ export const leaderboardSize = 10;
 const byRank = (one: MemoryResult, other: MemoryResult): number =>
   one.moves - other.moves || one.at - other.at;
 
-const isSameResult =
+const isOther =
   (result: MemoryResult) =>
   (other: MemoryResult): boolean =>
-    other.moves === result.moves && other.at === result.at;
+    other.moves !== result.moves || other.at !== result.at;
 
 /**
  * The best ten, and the place (from 1) of the last win posted, when it made the
@@ -31,23 +37,22 @@ export const postResult = (
   board: readonly MemoryResult[],
   result: MemoryResult
 ): Leaderboard => {
-  const posted = board.some(isSameResult(result))
-    ? [...board]
-    : [...board, result];
-  const ranked = posted.sort(byRank).slice(0, leaderboardSize);
-  const index = ranked.findIndex(isSameResult(result));
-  return { board: ranked, place: index === -1 ? undefined : index + 1 };
+  const ranked = [...board.filter(isOther(result)), result]
+    .sort(byRank)
+    .slice(0, leaderboardSize);
+  const place = ranked.indexOf(result) + 1;
+  return { board: ranked, place: place === 0 ? undefined : place };
 };
 
-const twoDigits = (value: number): string => String(value).padStart(2, '0');
+// a German day is written DD.MM.YYYY, as the leaderboard wants it
+const dayFormat = new Intl.DateTimeFormat('de-DE', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+});
 
 /** The day of `at` in the reader's time zone, as DD.MM.YYYY. */
-export const formatDay = (at: number): string => {
-  const date = new Date(at);
-  return `${twoDigits(date.getDate())}.${twoDigits(
-    date.getMonth() + 1
-  )}.${date.getFullYear()}`;
-};
+export const formatDay = (at: number): string => dayFormat.format(at);
 
 const isMemoryResult = (maybeResult: unknown): maybeResult is MemoryResult =>
   hasProperty('moves', maybeResult) &&
@@ -82,7 +87,7 @@ export const createLeaderboard = (
   storage?: Pick<Storage, 'getItem' | 'setItem'>
 ): ObjectStore<Leaderboard> => {
   const leaderboard = new ObjectStore<Leaderboard>({
-    board: storage ? load(storage) : [],
+    board: withDefault([], mapNullable(load, storage)),
     place: undefined,
   });
   leaderboard

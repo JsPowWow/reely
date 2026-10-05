@@ -1,4 +1,4 @@
-import { memoryFacts, memoryListings } from './memory/memory.sources';
+import { memoryBranches, memoryListings } from './memory/memory.sources';
 import { MemoryPage } from './memory.page';
 import { lineText } from '../../highlight/source.regions';
 import { chooseLocale } from '../../i18n/locale';
@@ -27,7 +27,7 @@ describe('memory page', () => {
   it('opens on the game under its write board, then shows the modules that run it', async () => {
     const page = open();
 
-    expect(document.title).toBe('Memory, a game without one if | reely');
+    expect(document.title).toBe('Memory game without one if | reely');
     expect(document.head.querySelector('meta[name="description"]')?.getAttribute('content')).toMatch(/^A memory game/);
     expect(page.host.querySelector('header a[href="/games/memory"]')?.getAttribute('aria-current')).toBe('true');
     expect(page.host.querySelectorAll('figure ul button')).toHaveLength(16);
@@ -51,19 +51,19 @@ describe('memory page', () => {
     ]);
     expect(
       Array.from(page.host.querySelectorAll('main > section:first-child li a'), (link) => link.getAttribute('href'))
-    ).toEqual(['/state-machine', '/simple-store', '/signals', '/dommy']);
+    ).toEqual(['/state-machine', '/simple-store', '/signals', '/dommy', '/dommy-kit', '/logger']);
   });
 
   it('posts the figures counted from the sources it shows, once they arrive: not one if', async () => {
     const page = open();
     const shown = Object.values(memoryListings).flatMap(({ source }) => source.map(lineText));
-    expect(texts(page.host, 'main dl dd').slice(0, 3)).toEqual(['–', '–', '–']);
+    expect(texts(page.host, 'main dl dd')[0]).toBe('– if');
 
     await vi.dynamicImportSettled();
 
-    expect(memoryFacts.ifs).toBe(0);
+    expect(memoryBranches).toBe(0);
     expect(shown.some((line) => /\bif\s*\(|\bswitch\s*\(/.test(line))).toBe(false);
-    expect(texts(page.host, 'main dl dd').slice(0, 3)).toEqual(['0', String(memoryFacts.lines), '10']);
+    expect(texts(page.host, 'main dl dd')[0]).toBe('0 if');
   });
 
   it('speaks Russian once it is chosen, and keeps the game as the reader left it', async () => {
@@ -74,10 +74,26 @@ describe('memory page', () => {
     chooseLocale('ru');
     await textsLoaded();
 
-    expect(document.title).toBe('Мемори, игра без единого if | reely');
-    expect(page.host.querySelector('h1')?.textContent).toBe('Мемори');
+    expect(document.title).toBe('Memory game без единого if | reely');
+    expect(page.host.querySelector('h1')?.textContent).toBe('Memory game');
     expect(page.host.querySelector('figure ul button')).toBe(first);
     expect(first?.dataset['side']).toBe('up');
+  });
+
+  it('keeps the best ten in localStorage, where a reload finds them', () => {
+    localStorage.clear();
+    const page = open();
+    const cards = Array.from(page.host.querySelectorAll<HTMLButtonElement>('figure ul button'));
+    const faces = cards.map((card) => card.querySelector('[class*="name"]')?.textContent);
+    cards.forEach(
+      (card, place) =>
+        card.dataset['side'] === 'down' &&
+        [card, cards[faces.indexOf(faces[place], place + 1)]].forEach((one) => one?.click())
+    );
+
+    expect(JSON.parse(localStorage.getItem('reely.memory.leaderboard') ?? '[]')).toEqual([
+      { moves: 8, at: expect.any(Number) },
+    ]);
   });
 
   it('takes its description away when the page goes', () => {

@@ -12,7 +12,7 @@ import { packageHref } from '../../site/site.paths';
 
 import css from './games.module.css';
 
-import type { MemoryFacts, MemoryModule } from './memory/memory.sources';
+import type { MemoryModule } from './memory/memory.sources';
 
 const modules: readonly MemoryModule[] = ['machine', 'game', 'leaderboard', 'rules', 'moments', 'modal'];
 
@@ -20,8 +20,8 @@ const modules: readonly MemoryModule[] = ['machine', 'game', 'leaderboard', 'rul
 export const MemoryPage = (): Node => {
   // the game plays at once; its highlighted sources, most of the page's weight, follow in a chunk of their own
   const sources = import('./memory/memory.sources');
-  const facts = signal<MemoryFacts | undefined>(undefined);
-  void sources.then(({ memoryFacts }) => facts.set(memoryFacts));
+  const branches = signal<number | undefined>(undefined);
+  void sources.then(({ memoryBranches }) => branches.set(memoryBranches));
 
   effect(() => {
     document.title = gamesText().documentTitle;
@@ -40,19 +40,10 @@ export const MemoryPage = (): Node => {
             <p className={band.pitch}>{() => gamesText().pitch}</p>
             <dl className={band.facts}>
               <div>
-                <dt>
-                  <code className={css.keyword}>if</code>
-                  {() => gamesText().facts.ifs}
-                </dt>
-                <dd>{() => facts.value?.ifs ?? '–'}</dd>
-              </div>
-              <div>
-                <dt>{() => gamesText().facts.lines}</dt>
-                <dd>{() => facts.value?.lines ?? '–'}</dd>
-              </div>
-              <div>
-                <dt>{() => gamesText().facts.modules}</dt>
-                <dd>{() => facts.value?.modules ?? '–'}</dd>
+                <dt>{() => gamesText().branches}</dt>
+                <dd>
+                  {() => branches.value ?? '–'} <code className={css.keyword}>if</code>
+                </dd>
               </div>
             </dl>
           </div>

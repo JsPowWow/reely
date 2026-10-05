@@ -17,12 +17,17 @@ interface VictoryProps {
 }
 
 /** The win, posted: its moves, and its place when it made the best ten. */
-export const Victory = (props: VictoryProps): Node => (
-  <Modal open={props.open} title='All pairs found'>
+export const Victory = ({
+  open,
+  moves,
+  leaderboard,
+  onNewGame,
+}: VictoryProps): Node => (
+  <Modal open={open} title='All pairs found'>
     <div className={css.score}>
-      <p className={css.posted}>{() => movesOf(props.moves())}</p>
+      <p className={css.posted}>{() => movesOf(moves())}</p>
       <Show
-        when={() => props.leaderboard().place}
+        when={() => leaderboard().place}
         fallback={() => (
           <p className={css.note}>Not in the best ten this time.</p>
         )}
@@ -38,10 +43,10 @@ export const Victory = (props: VictoryProps): Node => (
       </Show>
     </div>
     <div className={css.actions}>
-      <button type='button' className={css.solid} onClick={props.onNewGame}>
+      <button type='button' className={css.solid} onClick={onNewGame}>
         New game
       </button>
-      <button type='button' onClick={() => props.open.set(false)}>
+      <button type='button' onClick={() => open.set(false)}>
         Close
       </button>
     </div>
@@ -60,7 +65,7 @@ export const BestTen = ({ open, leaderboard }: BestTenProps): Node => (
       when={() => leaderboard().board.length > 0}
       fallback={() => (
         <p className={css.note}>
-          No wins yet. Find all eight pairs to post the first.
+          No wins yet. Find every pair to post the first.
         </p>
       )}
     >

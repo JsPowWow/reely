@@ -226,7 +226,7 @@ describe('memory game', () => {
         (line) => line.textContent
       ).join('\n');
     const caption = (): string | null | undefined =>
-      game.host.querySelector('pre')?.previousElementSibling?.textContent;
+      game.host.querySelector('details p')?.textContent;
 
     const details = game.host.querySelector('details');
     expect(game.host.querySelector('pre')).toBeNull();

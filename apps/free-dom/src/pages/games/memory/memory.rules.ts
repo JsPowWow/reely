@@ -16,16 +16,13 @@ export interface MemoryState<Face extends string = string> {
   readonly moves: number;
 }
 
-/** How a card lies. */
 export type CardSide = 'down' | 'up' | 'found';
 
 /** A random number in [0, 1), as `Math.random` gives it. */
 export type RandomSource = () => number;
 
-/**
- * Fisher and Yates' own method: each card is drawn at random from those still
- * left, so every order is equally likely.
- */
+// Fisher and Yates' own method: each card is drawn from those still left, so
+// every order is equally likely
 const shuffled = <Face extends string>(
   items: readonly Face[],
   random: RandomSource
@@ -101,7 +98,6 @@ export const turnCard = <Face extends string>(
       )
     : game;
 
-/** Turns a wrong pair back down. */
 export const turnBack = <Face extends string>(
   game: MemoryState<Face>
 ): MemoryState<Face> => (isLocked(game) ? { ...game, open: [] } : game);

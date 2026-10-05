@@ -1,5 +1,5 @@
 import { Await, Keyed, Show, signal } from '@reely/dommy';
-import type { Signal } from '@reely/dommy';
+import type { ReelyNode, Signal } from '@reely/dommy';
 import type { StateMachineChange } from '@reely/state-machine';
 
 import { SourceView } from '../../../demo/source.view';
@@ -26,6 +26,7 @@ const pluralEn = pluralOf('en');
 export const movesOf = (count: number): string =>
   `${count} ${pluralEn(count, { one: 'move', other: 'moves' })}`;
 
+const nothingUp = (): string => 'Turn a card.';
 const upFaces = ({ deck, open }: MemoryState): string =>
   open.map((place) => deck[place]).join(' and ');
 
@@ -33,32 +34,33 @@ const upFaces = ({ deck, open }: MemoryState): string =>
 export const moments: Record<MemoryPhase | 'deal' | 'turnBack', Moment> = {
   deal: {
     region: 'deal',
-    caption: 'New game: deal is taken from any state; exit stops the timer.',
-    status: () => 'Turn a card.',
+    caption:
+      'New game: `deal` is taken from any state; `exit` stops the timer.',
+    status: nothingUp,
   },
   oneUp: {
     region: 'turn',
-    caption: 'The first card: one card up is oneUp, whose entry turns it.',
+    caption: 'The first card: one card up is `oneUp`, whose `entry` turns it.',
     status: (table) => `${upFaces(table)}: now find its pair.`,
   },
   ready: {
     region: 'turn',
-    caption: 'A pair: no card is left up, so the game is ready again.',
+    caption: 'A pair: no card is left up, so the game is `ready` again.',
     status: ({ found }) => `A pair of ${found.at(-1)}.`,
   },
   wrongPair: {
     region: 'wrongPair',
-    caption: 'No match: entering wrongPair starts the timer of turnBack.',
+    caption: 'No match: entering `wrongPair` starts the timer of `turnBack`.',
     status: (table) => `${upFaces(table)} do not match.`,
   },
   turnBack: {
     region: 'wrongPair',
-    caption: 'The timer sent turnBack: exit turned the pair down.',
-    status: () => 'Turn a card.',
+    caption: 'The timer sent `turnBack`, and `exit` turned the pair down.',
+    status: nothingUp,
   },
   won: {
     region: 'won',
-    caption: 'Every pair found: won posts the result to the leaderboard.',
+    caption: 'Every pair found: `won` posts the result to the leaderboard.',
     status: ({ found, moves }) =>
       `All ${found.length} pairs found in ${movesOf(moves)}.`,
   },
@@ -68,17 +70,16 @@ export const momentOf = ({ event, to }: StateMachineChange<Memory>): Moment =>
   moments[event.type === 'turn' ? to : event.type];
 
 /** A turn the machine refused: the state it was in has no target for it. */
-const regionOf: Record<MemoryPhase, CodeMoment['region']> = {
-  ready: 'turn',
-  oneUp: 'turn',
-  wrongPair: 'wrongPair',
-  won: 'won',
-};
-
 export const refused = (state: MemoryPhase): CodeMoment => ({
-  region: regionOf[state],
-  caption: `Refused: ${state} takes this card nowhere, so nothing changes.`,
+  region: moments[state].region,
+  caption: `Refused: \`${state}\` takes this card nowhere, so nothing changes.`,
 });
+
+// the names in backticks are code: every other piece of the split
+const withCode = (text: string): ReelyNode[] =>
+  text
+    .split('`')
+    .map((part, index) => (index % 2 ? <code>{part}</code> : part));
 
 /**
  * Out of the way until asked for: a disclosure under the board that shows the
@@ -107,10 +108,13 @@ export const MomentCode = ({
             {({ machineSource }) => (
               <Keyed value={moment}>
                 {({ region, caption }) => (
-                  <SourceView
-                    source={sourceRegion(machineSource, region)}
-                    caption={`memory.machine.ts: ${caption}`}
-                  />
+                  <>
+                    <p className={css.said}>{withCode(caption)}</p>
+                    <SourceView
+                      source={sourceRegion(machineSource, region)}
+                      caption='memory.machine.ts'
+                    />
+                  </>
                 )}
               </Keyed>
             )}

@@ -22,42 +22,33 @@ export type MemoryModule =
 
 export const machineSource = sourceOf('memory.machine.ts');
 
+const listing = (file: string): { file: string; source: SourceLines } => ({
+  file,
+  source: sourceOf(file),
+});
+
 /** Their files and highlighted sources, a chunk the game does not wait for. */
 export const memoryListings: Record<
   MemoryModule,
   { file: string; source: SourceLines }
 > = {
   machine: { file: 'memory.machine.ts', source: withoutRegions(machineSource) },
-  game: { file: 'memory.game.tsx', source: sourceOf('memory.game.tsx') },
-  leaderboard: {
-    file: 'memory.leaderboard.ts',
-    source: sourceOf('memory.leaderboard.ts'),
-  },
-  rules: { file: 'memory.rules.ts', source: sourceOf('memory.rules.ts') },
-  moments: {
-    file: 'memory.moments.tsx',
-    source: sourceOf('memory.moments.tsx'),
-  },
-  modal: { file: 'modal.tsx', source: sourceOf('modal.tsx') },
+  game: listing('memory.game.tsx'),
+  leaderboard: listing('memory.leaderboard.ts'),
+  rules: listing('memory.rules.ts'),
+  moments: listing('memory.moments.tsx'),
+  modal: listing('modal.tsx'),
 };
 
-/** Figures of the game's code: its `if` statements, its lines, its modules. */
-export interface MemoryFacts {
-  readonly ifs: number;
-  readonly lines: number;
-  readonly modules: number;
-}
-
-const lines = Object.values(highlighted).flatMap((source) =>
-  source.map(lineText)
+// what a comment says is not code
+const code = Object.values(highlighted).flatMap((source) =>
+  source.map((line) => lineText(line).split('//')[0] ?? '')
 );
 
 /**
- * Counted from the sources, not typed by hand: the code on the page is the
- * code that runs.
+ * The `if` and `switch` statements in every module of the game, counted from
+ * the sources, not typed by hand: the code on the page is the code that runs.
  */
-export const memoryFacts: MemoryFacts = {
-  ifs: lines.filter((line) => /\bif\s*\(/.test(line)).length,
-  lines: lines.filter((line) => line.trim() !== '').length,
-  modules: Object.keys(highlighted).length,
-};
+export const memoryBranches = code.filter((line) =>
+  /\b(if|switch)\s*\(/.test(line)
+).length;
