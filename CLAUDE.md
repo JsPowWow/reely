@@ -35,7 +35,7 @@ Every new module, fix and refactor follows these; a fix that has to cross a boun
 
 ## Commands
 
-Always through Nx (caching, `^build` deps): `npx nx test dommy`, `npx nx lint dommy`, `npx nx typecheck dommy`, `npx nx build dommy`; before a commit — `npx nx affected -t lint test typecheck build`. Node ≥ 22.12 (`.nvmrc`).
+Always through Nx (caching, `^build` deps): `npx nx test dommy`, `npx nx lint dommy`, `npx nx typecheck dommy`, `npx nx build dommy`; before a commit — `npx nx affected -t lint test typecheck build`. Node 24 LTS (`.nvmrc`).
 
 ## Rules that must not break
 
