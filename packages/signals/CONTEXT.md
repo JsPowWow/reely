@@ -23,8 +23,12 @@ _Avoid_: accessor, reader
 ## Following
 
 **Effect**:
-Code that runs now and again after every change of what it read, until disposed.
+Code that runs now and again after every change of what it read, until disposed. A run does not hear what it writes itself; a later write from outside it does.
 _Avoid_: watcher, reaction, autorun
+
+**Subscription**:
+An effect that hands a callback the value of a reactive value, now and after every change; what the callback writes is heard, unlike a run's own write.
+_Avoid_: listener, observer, watch
 
 **Batch**:
 Writes grouped so that effects run once, when the outermost batch ends.
