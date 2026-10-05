@@ -17,6 +17,11 @@ export interface RouterOptions<Page> {
   fail: (error: Error) => Page;
   /** Where the addresses come from: the browser's history when left out, or a `memoryHistory`. */
   history?: RouterHistory;
+  /**
+   * Query params that are settings of the app, not pages, such as `lang`: routes never see them, a
+   * change to one is no move, and every move keeps them in the address.
+   */
+  keep?: readonly string[];
 }
 
 export interface Router {
@@ -37,17 +42,20 @@ export interface Router {
  */
 export const startRouter = <Page>(
   routes: Routes<Page>,
-  { show, fail, history = browserHistory() }: RouterOptions<NoInfer<Page>>
+  { show, fail, keep = [], history = browserHistory(keep) }: RouterOptions<NoInfer<Page>>
 ): Router => {
+  const addressOf = (url: URL): string => pageAddress(url, keep);
+  // the address followed last, with its settings and its place
+  let last = history.url();
   let latest = 0;
-  let requested = pageAddress(history.url());
+  let requested = addressOf(last);
   let shown = '';
   let onScreen: Shown = [];
 
   const failure = (error: unknown): Page => fail(toErrorWithMessage(error));
 
   const display = (page: Page, url: URL, moved: boolean): void => {
-    shown = pageAddress(url);
+    shown = addressOf(url);
     batch(() => {
       history.loads(false);
       history.showing();
@@ -66,7 +74,7 @@ export const startRouter = <Page>(
     history.loads(true);
     // a route that throws rejects like one whose page fails to load
     Promise.resolve()
-      .then(() => routes(pageAddress(url)))
+      .then(() => routes(addressOf(url)))
       .then((page) => page ?? Promise.reject(new Error(`No route answers ${url.pathname}`)))
       .then(identity, failure)
       .then((page) => {
@@ -84,7 +92,20 @@ export const startRouter = <Page>(
   };
 
   const move = (): void => {
-    const address = pageAddress(history.url());
+    const url = history.url();
+    // a move that leaves a setting out takes it along: settings stay from page to page
+    const dropped = keep.filter((name) => !url.searchParams.has(name) && last.searchParams.has(name));
+    if (dropped.length > 0) {
+      dropped.forEach((name) => url.searchParams.set(name, last.searchParams.get(name) ?? ''));
+      history.navigate(url, { replace: true });
+      return;
+    }
+    const address = addressOf(url);
+    const settingOnly = address === addressOf(last) && url.hash === last.hash;
+    last = url;
+    if (settingOnly) {
+      return;
+    }
     if (address === shown) {
       // back on the page shown, or a new place on it: a load still pending for another is dropped
       latest += 1;

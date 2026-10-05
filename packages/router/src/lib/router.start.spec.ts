@@ -512,6 +512,68 @@ describe('startRouter', () => {
     expect(left).toHaveBeenCalledOnce();
     expect(clickLink('Cart')).toBe(false);
   });
+  describe('with settings kept in the address', () => {
+    const shows = vi.fn();
+
+    const startKeeping = async (routes: Routes<Page>, at: string): Promise<Router> => {
+      history.replaceState(null, '', at);
+      document.body.replaceChildren(outlet);
+      router = startRouter(routes, {
+        keep: ['lang'],
+        show: (page) => {
+          shows();
+          outlet.replaceChildren(page());
+          return outlet;
+        },
+        fail: (error) => () => element('p', { role: 'alert' }, error.message),
+      });
+      await settle();
+      return router;
+    };
+
+    afterEach(() => shows.mockReset());
+
+    it('takes a setting along on every move, out of the routes’ sight', async () => {
+      const queries: string[] = [];
+      const routes = defineRoutes({
+        '/': () => pageNamed('Shop'),
+        '/cart': (_params, query) => {
+          queries.push(query.toString());
+          return pageNamed('Cart');
+        },
+      });
+      await startKeeping(routes, '/?lang=ru');
+
+      clickLink('Cart');
+      await settle();
+      navigate('/cart?sort=price');
+      await settle();
+
+      expect(heading()).toBe('Cart');
+      expect(location.search).toBe('?sort=price&lang=ru');
+      expect(queries).toEqual(['', 'sort=price']);
+    });
+
+    it('shows no new page when only a setting changes', async () => {
+      await startKeeping(shop, '/cart?lang=en');
+      const page = document.querySelector('section');
+      scrollTo.mockReset();
+
+      navigate('/cart?lang=ru', { replace: true });
+      await settle();
+
+      expect(location.search).toBe('?lang=ru');
+      expect(shows).toHaveBeenCalledTimes(1);
+      expect(document.querySelector('section')).toBe(page);
+      expect(scrollTo).not.toHaveBeenCalled();
+    });
+
+    it('leaves a link to a place on the page shown to the browser', async () => {
+      await startKeeping(shop, '/?lang=ru');
+
+      expect(clickLink('Reviews')).toBe(false);
+    });
+  });
 });
 
 describe('memoryHistory', () => {

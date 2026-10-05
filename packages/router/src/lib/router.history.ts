@@ -26,8 +26,22 @@ export interface RouterHistory {
   arrive: (shown: Shown, moved: boolean) => void;
 }
 
-// routes answer a path and its query; a new query is a new page as well, a new place on it is not
-export const pageAddress = ({ pathname, search }: URL | Location | HTMLAnchorElement): string => `${pathname}${search}`;
+/**
+ * The address of a page: its path and query, a new query being a new page and a new place on it not;
+ * the settings in `keep` are no part of it.
+ */
+export const pageAddress = (
+  { pathname, search }: URL | Location | HTMLAnchorElement,
+  keep: readonly string[] = []
+): string => {
+  if (keep.length === 0) {
+    return `${pathname}${search}`;
+  }
+  const query = new URLSearchParams(search);
+  keep.forEach((name) => query.delete(name));
+  const rest = query.toString();
+  return rest === '' ? pathname : `${pathname}?${rest}`;
+};
 
 /** Any address parses against it where only its path and query matter, never its origin. */
 export const anyOrigin = 'https://reely.invalid';

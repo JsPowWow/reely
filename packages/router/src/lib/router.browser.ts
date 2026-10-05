@@ -12,9 +12,9 @@ import type { RouterHistory } from './router.history';
 /**
  * The browser's own history: links of this site anywhere in the document, back and forward, and
  * `navigate`; each page opens where the reader had scrolled it, at the place its URL names, or at
- * the top.
+ * the top. The query params in `keep` are settings, no part of a page.
  */
-export const browserHistory = (): RouterHistory => {
+export const browserHistory = (keep: readonly string[] = []): RouterHistory => {
   let shown = '';
 
   return {
@@ -30,7 +30,7 @@ export const browserHistory = (): RouterHistory => {
       let saving: ReturnType<typeof setTimeout> | undefined;
       // the page shown keeps where it is scrolled, for a reload and for the way back to it
       const saveScroll = (): void => {
-        if (pageAddress(location) === shown) {
+        if (pageAddress(location, keep) === shown) {
           keepScroll();
         }
       };
@@ -38,7 +38,7 @@ export const browserHistory = (): RouterHistory => {
       takeOverLinks(
         document,
         (link) => {
-          if (pageAddress(link) === shown && link.hash !== '') {
+          if (pageAddress(link, keep) === shown && link.hash !== '') {
             return false;
           }
           navigate(link.href);
@@ -67,7 +67,7 @@ export const browserHistory = (): RouterHistory => {
       };
     },
     showing: (): void => {
-      shown = pageAddress(location);
+      shown = pageAddress(location, keep);
       showPath(location.pathname);
     },
     arrive: (page, moved): void => {
