@@ -10,15 +10,23 @@ This repository is a production-ready TypeScript monorepo powered by [Nx](https:
 - **rss-async-race**: A web application (internal project).
 
 ### Packages (`packages/`)
-- **@reely/dommy**: A custom, lightweight UI and DOM manipulation library featuring:
-    - JSX support and tag-based element creation.
-    - Built-in reactivity system (signals, computed, effects).
-    - Async routing capabilities.
-- **@reely/async**: Asynchronous utility functions with advanced retry logic.
-- **@reely/strings**: Comprehensive string manipulation utilities.
-- **@reely/colors**: Color conversion, manipulation, and analysis tools.
-- **@reely/logger**: Standardized logging utilities for the monorepo.
-- **@reely/utils**: Shared internal utilities (private, not published).
+
+From each `packages/*/package.json`:
+
+- **@reely/async** (published): Retry an async task with exponential backoff, one task or several at once.
+- **@reely/basics** (published): Small general helpers for TypeScript: typed, total over their inputs, tree-shakeable, no dependencies.
+- **@reely/colors** (published): Convert, mix, lighten and darken colours (hex or CSS rgb()), give them an alpha, and check the contrast between two.
+- **@reely/dommy** (published): DOM elements from tag factories and JSX, bound to signals: no virtual DOM, one DOM node updated per change.
+- **@reely/dommy-kit** (published): Browser helpers over @reely/signals: media queries, element size, throttling, storage, listeners, timers and FLIP moves, each stopping with the render that created it.
+- **@reely/emitter** (published): A typed publish-subscribe channel: events by name, listeners that unsubscribe, errors that do not stop the others.
+- **@reely/logger** (published): Scoped console loggers that stay silent until enabled, with a pass-through `logWith` for pipelines.
+- **@reely/queue** (published): Task queues: a sync one that runs tasks to completion, and an async one with a concurrency limit.
+- **@reely/router** (published): A small typed router for any web app: routes from path patterns, lazy pages, links and history taken over, scroll and focus kept, no framework.
+- **@reely/signals** (published): Signals, computed values and effects: a push-pull graph with owners that release what a piece of work subscribed. No DOM.
+- **@reely/simple-store** (published): Two tiny stores you subscribe to explicitly: a value, and a plain object changed a few fields at a time, with selections of their parts.
+- **@reely/state-machine** (published): A finite state machine with a config that reads like XState's: sync by default, async on request, one transition at a time.
+- **@reely/strings** (published): Capitalize words and make URL slugs.
+- **@reely/utils** (private, not published): The monorepo's own helpers: type guards, `pipe` and `flow`, `Either` and `Maybe`, nullable helpers, errors and shared types.
 
 ## 🛠️ Tech Stack & Architecture
 
@@ -44,7 +52,7 @@ Always use `npx nx` to run tasks to benefit from caching and dependency graph aw
 
 ### Project-Specific Commands
 - **Serve star-battle**: `npx nx serve star-battle`
-- **Build a package**: `npx nx build <package-name>` (e.g., `npx nx build dommy`)
+- **Build a package**: `npx nx build <project>` (e.g., `npx nx build @reely/dommy`)
 - **Test a package**: `npx nx test <package-name>`
 
 ### Release & Publishing
