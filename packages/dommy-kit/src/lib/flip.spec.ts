@@ -46,4 +46,35 @@ describe('flip', () => {
     expect(kept.animate).not.toHaveBeenCalled();
     expect(added.animate).not.toHaveBeenCalled();
   });
+
+  it('measures nothing under reduced motion', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    const list = document.createElement('ol');
+    const row = document.createElement('li');
+    list.append(row);
+    const measure = vi.spyOn(row, 'getBoundingClientRect');
+    const change = vi.fn();
+
+    flip(list, change);
+
+    expect(change).toHaveBeenCalledOnce();
+    expect(measure).not.toHaveBeenCalled();
+  });
+
+  it('moves a child without `animate` (jsdom) to its place without an animation', () => {
+    const list = document.createElement('ol');
+    const [first, second] = [document.createElement('li'), document.createElement('li')];
+    list.append(first, second);
+    place(first, 0);
+    place(second, 40);
+
+    expect(() =>
+      flip(list, () => {
+        list.append(first);
+        place(first, 40);
+        place(second, 0);
+      })
+    ).not.toThrow();
+    expect(list.firstElementChild).toBe(second);
+  });
 });

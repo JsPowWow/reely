@@ -12,16 +12,17 @@ export const flip = (
   change: VoidFunction,
   options: KeyframeAnimationOptions = { duration: 250, easing: 'ease-out' }
 ): void => {
-  const before = new Map(Array.from(container.children, (child) => [child, child.getBoundingClientRect()]));
-  change();
   if (reducedMotion()) {
+    change();
     return;
   }
+  const before = new Map(Array.from(container.children, (child) => [child, child.getBoundingClientRect()]));
+  change();
   for (const child of Array.from(container.children)) {
     const from = before.get(child);
     const to = child.getBoundingClientRect();
     const [dx, dy] = from ? [from.left - to.left, from.top - to.top] : [0, 0];
-    if (dx !== 0 || dy !== 0) {
+    if ((dx !== 0 || dy !== 0) && isSomeFunction(child.animate)) {
       child.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], options);
     }
   }
