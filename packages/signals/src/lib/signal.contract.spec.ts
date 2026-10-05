@@ -218,6 +218,21 @@ describe('the signal contract', () => {
     expect(heard).toStrictEqual([undefined, 2, 3]);
   });
 
+  it('tells a subscriber the value before, `undefined` on the first call', () => {
+    const lap = signal(1);
+    const heard: [number, number | undefined][] = [];
+    subscribe(lap, (value, previous) => void heard.push([value, previous]));
+
+    lap.value = 2;
+    lap.value = 3;
+
+    expect(heard).toStrictEqual([
+      [1, undefined],
+      [2, 1],
+      [3, 2],
+    ]);
+  });
+
   it('hears what its own callback writes, unlike a run of an effect', () => {
     const open = signal(true);
     const heard: boolean[] = [];

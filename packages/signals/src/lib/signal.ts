@@ -119,15 +119,20 @@ export const effect = (fn: (this: { dispose(): void }) => void): (() => void) =>
 };
 
 /**
- * Calls `cb` with the value of `read` now and after every change it notifies, until disposed with
- * its owner or by the returned function. `cb` runs untracked, under an owner released before the next
- * call, and what it writes reaches the subscription, unlike a write of an effect's own run.
+ * Calls `cb` with the value of `read` and the one before it (`undefined` the first time): now and
+ * after every change it notifies, until disposed with its owner or by the returned function. `cb`
+ * runs untracked, under an owner released before the next call, and what it writes reaches the
+ * subscription, unlike a write of an effect's own run.
  */
-export const subscribe = <T>(read: ReactiveValue<T>, cb: (value: T) => void): (() => void) =>
-  effect(() => {
+export const subscribe = <T>(read: ReactiveValue<T>, cb: (value: T, previous: T | undefined) => void): (() => void) => {
+  let previous: T | undefined;
+  return effect(() => {
     const value = read();
-    reelx.outside(() => cb(value));
+    const before = previous;
+    previous = value;
+    reelx.outside(() => cb(value, before));
   });
+};
 
 const computedProto: ThisType<ReactiveValue<unknown>> = {
   get value(): unknown {

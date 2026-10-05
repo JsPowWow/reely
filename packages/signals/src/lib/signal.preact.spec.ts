@@ -181,7 +181,7 @@ describe('signal', () => {
       const a = signal(1);
 
       subscribe(a, spy);
-      expect(spy).toHaveBeenCalledWith(1);
+      expect(spy).toHaveBeenCalledWith(1, undefined);
     });
 
     it('should run the callback when the signal value changes', () => {
@@ -189,9 +189,9 @@ describe('signal', () => {
       const a = signal(1);
 
       subscribe(a, spy);
-      expect(spy).toHaveBeenNthCalledWith(1, 1);
+      expect(spy).toHaveBeenNthCalledWith(1, 1, undefined);
       a.value = 2;
-      expect(spy).toHaveBeenNthCalledWith(2, 2);
+      expect(spy).toHaveBeenNthCalledWith(2, 2, 1);
     });
 
     it('should unsubscribe from a signal', () => {
@@ -2268,6 +2268,6 @@ describe('reentrancy and errors', () => {
     s.value = undefined;
 
     expect(s.value).toBeUndefined();
-    expect(spy).toHaveBeenLastCalledWith(undefined);
+    expect(spy).toHaveBeenLastCalledWith(undefined, 'x');
   });
 });
