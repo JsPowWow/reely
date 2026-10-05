@@ -1,11 +1,11 @@
 import { isSomeFunction } from '@reely/basics';
 import type { Nil } from '@reely/utils';
-import { isInstanceOf, isNil, isPrimitiveValue } from '@reely/utils';
+import { isBoolean, isInstanceOf, isNil, isPrimitiveValue } from '@reely/utils';
 
 import type { SingleReelyNode } from '../types/dommy.types';
 
-// `null`, `undefined` and `false` render nothing; `0` and `''` do render
-export const isSkippedChild = (child: unknown): child is Nil | false => isNil(child) || child === false;
+// `null`, `undefined` and booleans render nothing; `0` and `''` do render
+export const isSkippedChild = (child: unknown): child is Nil | boolean => isNil(child) || isBoolean(child);
 
 export const isValidChildDOMNode = (child: unknown): child is SingleReelyNode =>
   isInstanceOf(Node, child) || isPrimitiveValue(child) || isSomeFunction(child);

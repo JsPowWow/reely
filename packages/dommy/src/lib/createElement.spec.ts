@@ -44,11 +44,11 @@ describe('createElement', () => {
       expect(element.childNodes).toHaveLength(4);
     });
 
-    it('skips null, undefined and false', () => {
-      const element = createElement('p', null, null, 'a', undefined, false, 'b');
+    it('skips null, undefined and booleans, bound ones included', () => {
+      const element = createElement('p', null, null, 'a', undefined, false, true, 'b', () => true);
 
       expect(element.textContent).toBe('ab');
-      expect(element.childNodes).toHaveLength(2);
+      expect(element.childNodes).toHaveLength(3);
     });
 
     it('takes children from props when none are passed as arguments', () => {
