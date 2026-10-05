@@ -130,9 +130,10 @@ const en = {
         Body: ({ Snippet }): Node => (
           <>
             <p>
-              The whole state of the game is two signals: the table, and the best ten. The machine writes them, the page
-              reads them, and a signal bound to a node updates exactly that node, so there is nothing to sync and
-              nothing to subscribe by hand.
+              The whole state of the game is two signals: the table, and the best ten. The machine writes them with{' '}
+              <code>set</code> and <code>update</code>, the page reads them as plain calls, <code>table()</code>, and a
+              signal bound to a node updates exactly that node, so there is nothing to sync and nothing to subscribe by
+              hand.
             </p>
             <Snippet file='memory.game.tsx' region='state' />
             <p>
@@ -179,8 +180,7 @@ const en = {
             </p>
             <Snippet file='memory.leaderboard.ts' region='rank' />
             <p>
-              Nobody calls save: the machine assigns the result to the leaderboard signal, and <code>persisted</code>{' '}
-              writes it down.
+              Nobody calls save: the machine updates the leaderboard signal, and <code>persisted</code> writes it down.
             </p>
           </>
         ),

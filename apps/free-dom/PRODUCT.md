@@ -29,7 +29,7 @@ Small packages that each do one thing for a consumer who uses no other `@reely` 
 
 - Documentation topics: getting started, elements and JSX, components, signals, bindings, `batch`, keyed lists (`For`), conditions (`Show`), async (`Await`), mount and cleanup, performance.
 - reely evolution keeps the chain: markup (tag factories, the same markup in JSX, components from data), then interactivity (a ticket picker by hand, signals, bindings, derived values, `batch`), then keyed lists and a five-hundred-stock board of top movers; each step marks the lines that are new since the previous step.
-- Copy in English and Russian, switched on reely's own signals; code and comments are English.
+- Copy in English and Russian, switched on reely's own signals; the address names the language shown (`?lang=ru`), so a copied link opens in it; code and comments are English.
 - The whole site uses only `@reely/*` packages at runtime: no other UI framework or runtime dependency.
 - The repo principle applies to the site as well: minimal, yet mature.
 - Only published packages appear, with plain versions: `npm i @reely/<package>` installs the API the site shows. A change to a package's API updates its page and demos in the same change.
