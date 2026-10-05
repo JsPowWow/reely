@@ -415,6 +415,21 @@ describe('the signal contract', () => {
       expect(leaders).toStrictEqual(['Ada', 'Grace']);
     });
 
+    it('keeps the value from before a batch that puts it back by its own `equals`', () => {
+      const first = { leader: 'Ada', lap: 3 };
+      const standings = signal(first, { equals: (previous, next) => previous.leader === next.leader });
+      const leaders: string[] = [];
+      effect(() => void leaders.push(standings.value.leader));
+
+      batch(() => {
+        standings.value = { leader: 'Grace', lap: 4 };
+        standings.value = { leader: 'Ada', lap: 5 };
+      });
+
+      expect(standings.peek()).toBe(first);
+      expect(leaders).toStrictEqual(['Ada']);
+    });
+
     it.each([
       ['false', false],
       ['() => false', (): boolean => false],

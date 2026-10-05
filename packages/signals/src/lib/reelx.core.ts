@@ -100,7 +100,7 @@ class Signal<T> implements Source {
     // a batch that puts the value back changes nothing for what read it before the batch
     const reverted = hasSome(beforeBatch) && equals !== false && equals(beforeBatch.value, value);
     epoch++;
-    this.value = value;
+    this.value = reverted ? beforeBatch.value : value;
     this.version = reverted ? beforeBatch.version : epoch;
     running?.onOwnWrite(this);
     const idle = queue.length === 0;
