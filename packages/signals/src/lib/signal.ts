@@ -40,7 +40,7 @@ export const computed = <T>(fn: () => T): Computed<T> => setPrototype<Computed<T
  * Runs `fn` now and after every change of what it reads; what a run registers is released before
  * the next one. Returns `dispose`, also reachable as `this.dispose()` inside `fn`.
  */
-export const effect = (fn: () => void): (() => void) => {
+export const effect = (fn: (this: { dispose(): void }) => void): (() => void) => {
   const parent = getOwner();
   let disposeRun: () => void = noop;
   let running = false;

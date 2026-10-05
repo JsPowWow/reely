@@ -336,7 +336,7 @@ describe('effect()', () => {
     const spy = vi.fn(() => {
       return a.value + ' ' + b.value;
     });
-    effect(function (this: { dispose: () => void }) {
+    effect(function () {
       spy();
       if (a.value === 'aa') {
         this.dispose();
@@ -358,7 +358,7 @@ describe('effect()', () => {
     const spy = vi.fn(() => {
       a.value + ' ' + b.value;
     });
-    effect(function (this: { dispose: () => void }) {
+    effect(function () {
       spy();
       this.dispose();
     });
@@ -377,7 +377,7 @@ describe('effect()', () => {
     const spy = vi.fn(() => {
       return a.value + ' ' + b.value;
     });
-    const dispose = effect(function (this: { dispose: () => void }) {
+    const dispose = effect(function () {
       spy();
       if (a.value === 'aa') {
         this.dispose();
@@ -398,7 +398,7 @@ describe('effect()', () => {
     const spy = vi.fn(() => {
       a.value + ' ' + b.value;
     });
-    effect(function (this: { dispose: () => void }) {
+    effect(function () {
       this.dispose();
       spy();
     });
@@ -418,7 +418,7 @@ describe('effect()', () => {
     const spy = vi.fn(() => {
       a.value + ' ' + b.value;
     });
-    const dispose = effect(function (this: { dispose: () => void }) {
+    const dispose = effect(function () {
       spy();
       this.dispose();
     });
