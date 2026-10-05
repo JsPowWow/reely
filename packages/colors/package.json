@@ -25,9 +25,16 @@
   },
   "files": [
     "dist",
-    "!**/*.tsbuildinfo"
+    "!**/*.tsbuildinfo",
+    "LICENSE"
   ],
+  "scripts": {
+    "prepack": "node ../../scripts/license.mjs"
+  },
   "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
     "@reely/basics": "^0.1.1"
   },

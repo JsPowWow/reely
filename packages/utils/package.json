@@ -1,6 +1,7 @@
 {
   "name": "@reely/utils",
   "version": "0.0.1",
+  "description": "The monorepo's own helpers: type guards, `pipe` and `flow`, `Either` and `Maybe`, nullable helpers, errors and shared types.",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",

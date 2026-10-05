@@ -60,3 +60,6 @@ vitest.config.*.timestamp*
 **/.impeccable/questions/
 **/.impeccable/review/
 *.tsbuildinfo
+
+# copied from the root LICENSE by each package's `prepack` (scripts/license.mjs)
+packages/*/LICENSE

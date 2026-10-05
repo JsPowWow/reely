@@ -1,6 +1,7 @@
 {
   "name": "@reely/strings",
   "version": "0.0.9",
+  "description": "Capitalize words and make URL slugs.",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -23,9 +24,16 @@
   },
   "files": [
     "dist",
-    "!**/*.tsbuildinfo"
+    "!**/*.tsbuildinfo",
+    "LICENSE"
   ],
+  "scripts": {
+    "prepack": "node ../../scripts/license.mjs"
+  },
   "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
     "@reely/basics": "^0.1.0"
   },

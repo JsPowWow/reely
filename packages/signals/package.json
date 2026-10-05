@@ -5,6 +5,9 @@
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -30,8 +33,12 @@
   },
   "files": [
     "dist",
-    "!**/*.tsbuildinfo"
+    "!**/*.tsbuildinfo",
+    "LICENSE"
   ],
+  "scripts": {
+    "prepack": "node ../../scripts/license.mjs"
+  },
   "nx": {
     "tags": [
       "scope:shared"
