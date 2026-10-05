@@ -147,6 +147,23 @@ components:
     typography: "{typography.body}"
     rounded: "{rounded.md}"
     padding: "0.55rem 0.7rem"
+  memory-card-back:
+    backgroundColor: "{colors.graphite}"
+    textColor: "{colors.slate}"
+    rounded: "{rounded.md}"
+  memory-card-face:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.graphite}"
+    rounded: "{rounded.md}"
+  memory-card-found:
+    backgroundColor: "{colors.signal}"
+    textColor: "{colors.graphite}"
+  dialog:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.graphite}"
+    rounded: "{rounded.lg}"
+    padding: "1.75rem 1.5rem 1.5rem"
+    width: "min(30rem, 100% - 2rem)"
 ---
 
 # Design System: reely
@@ -157,9 +174,9 @@ components:
 
 The whole site reads like a race timing screen: an asphalt ground, graphite ink and bands, white panels where the live demos run, signal yellow for whatever is current, leading or posted, and flag red for the one kind of write that matters most. Every number that the reader might compare (DOM writes, sizes, times, places) is set in a condensed display face with tabular figures, as a timing tower would post it. The world is carried by palette, type and plates, not by a story: headings say plainly what they show. The site is built with the library it documents, so the visual system is there to make each live demo and its write count legible, not to decorate around them.
 
-Density is that of a working tool: a docs rail, a demo beside its source, a write board under each demo. The home page (`/`) opens on a graphite band, its copy set to the top beside the board: the headline of what reely is, a lead, three figures the build measured of every package, the button down to the packages, the credits naming which package draws which part of the board, and a live split-flap scoreboard on a white panel; below it, every package on the same white plate, in the order they stack. Every other package has a page at its name (`/signals`, `/queue`): the same graphite band with the package name, why it exists, its install line and links, beside its measured facts as a timing sheet, then one live example on asphalt with its source, and the names of the values it exports as code chips. The dommy page (`/dommy`) is the same world at a larger scale: a graphite band opens it with the thesis and the first live demo, plain example sections follow on asphalt, and a graphite band of measured figures closes it. Nothing is lifted by shadow; depth is the step from asphalt to white panel to graphite band.
+Density is that of a working tool: a docs rail, a demo beside its source, a write board under each demo. The home page (`/`) opens on a graphite band, its copy set to the top beside the board: the headline of what reely is, a lead, three figures the build measured of every package, the button down to the packages, the credits naming which package draws which part of the board, and a live split-flap scoreboard on a white panel; below it, every package on the same white plate, in the order they stack. Every other package has a page at its name (`/signals`, `/queue`): the same graphite band with the package name, why it exists, its install line and links, beside its measured facts as a timing sheet, then one live example on asphalt with its source, and the names of the values it exports as code chips. The dommy page (`/dommy`) is the same world at a larger scale: a graphite band opens it with the thesis and the first live demo, plain example sections follow on asphalt, and a graphite band of measured figures closes it. A game (`/games/memory`) is a whole small app in the same world: a graphite band with the title, one line, one figure counted from its sources and the credits beside the game on its white panel with the write board under it, then the modules that run it, each a section on asphalt with its source. Nothing is lifted by shadow; depth is the step from asphalt to white panel to graphite band.
 
-Motion answers the reader: the write board outlines the nodes a change touched and fades the outline, and controls shift colour in 120ms. The one thing that moves on its own is the home page's scoreboard, a live race the reader can pause; it stops while off screen or in a hidden tab, and under reduced motion its rows jump and its letters change without turning.
+Motion answers the reader: the write board outlines the nodes a change touched and fades the outline, controls shift colour in 120ms, and a memory card turns over in 360ms. The one thing that moves on its own is the home page's scoreboard, a live race the reader can pause; it stops while off screen or in a hidden tab, and under reduced motion its rows jump and its letters change without turning.
 
 **Key Characteristics:**
 - Asphalt ground, white demo panels, graphite bands and code panes; flat, bordered with 1px hairlines.
@@ -173,7 +190,7 @@ Motion answers the reader: the write board outlines the nodes a change touched a
 A cool graphite-and-asphalt neutral scale with two race signals: a yellow for state and a red for node writes.
 
 ### Primary
-- **Signal Yellow** (signal): the current page plate in the rails, the leader's place plate, a posted result plate in a demo (the preview a field writes, a delivery, a rate), the lines added since the previous step in a code pane, the primary action button, and figures or rules on graphite bands. On light surfaces it is a fill under graphite text, never a text colour.
+- **Signal Yellow** (signal): the current page plate in the rails, the leader's place plate, a posted result plate in a demo (the preview a field writes, a delivery, a rate), the lines added since the previous step in a code pane, a found pair of memory cards, the primary action button, and figures or rules on graphite bands. On light surfaces it is a fill under graphite text, never a text colour.
 - **Signal Ink** (signal-ink): signal yellow darkened for marks on light surfaces (4.6:1 on the panel): the text-edit and attribute-edit pips and deltas on the write board, the outline that flashes on an edited or moved node, the odd-count mark in an evolution demo, list markers in docs prose.
 
 ### Secondary
@@ -181,8 +198,8 @@ A cool graphite-and-asphalt neutral scale with two race signals: a yellow for st
 
 ### Neutral
 - **Asphalt** (asphalt): the page ground, text on graphite bands, the primary button's hover fill.
-- **Panel White** (panel): demo panels, read-out boxes, inputs, failure plates, inline code, mobile rail chips.
-- **Graphite** (graphite): body text on light surfaces, the site header, the dommy page's opening and figures bands, code panes, place plates, the solid button, the hollow pip and delta of moved nodes, the border of a failure plate, the focus ring on light surfaces.
+- **Panel White** (panel): demo panels, dialogs, memory card faces, read-out boxes, inputs, failure plates, inline code, mobile rail chips.
+- **Graphite** (graphite): body text on light surfaces, the site header, the dommy page's opening and figures bands, code panes, memory card backs, the dialog scrim (at 0.72), place plates, the solid button, the hollow pip and delta of moved nodes, the border of a failure plate, the focus ring on light surfaces.
 - **Slate** (slate): secondary text on light surfaces (leads, claims, captions, board labels, idle rail links, placeholders), input borders, hover of solid graphite controls, row rules on graphite bands.
 - **Hairline** (line): every 1px border and rule on light surfaces, and the dashed outline of a pending plate.
 - **Code Text** (code-text): text in code panes and code chips, and quiet prose on graphite (header links, pitch, table captions and notes).
@@ -209,10 +226,10 @@ A cool graphite-and-asphalt neutral scale with two race signals: a yellow for st
 - **Headline** (800, clamp(2.5rem, 5vw, 4rem), 1): dommy page example headings, which state the claim the example proves, balanced.
 - **Title** (800, clamp(2rem, 4vw, 3rem), 1.05): docs and evolution page titles; evolution pairs it with a step number at clamp(5rem, 12vw, 8rem).
 - **Subtitle** (800, 1.75rem, 1.1): section headings in docs prose, the guide ending, the wordmark.
-- **Readout** (800, 2.75rem, 1, tabular): write-board figures; 2.25rem on phones. Demo read-out boxes run 3.5rem, the opening demo up to 6rem, result plates 2rem, figures on the graphite band 2 to 3rem in signal.
+- **Readout** (800, 2.75rem, 1, tabular): write-board figures and a game's counters; 2.25rem on phones (for a game's counters, where its panel is under 24rem). Demo read-out boxes run 3.5rem, the opening demo up to 6rem, result plates 2rem, figures on the graphite band 2 to 3rem in signal.
 - **Body** (400, 1.0625rem, 1.5): prose at 62 to 68ch; leads and claims in slate at 1.125rem, the dommy page's pitch at 1.1875rem.
 - **Label** (400, 0.875rem, 1.3): board labels, code captions, table heads, the keyboard hint; slate.
-- **Code** (400, 0.8125rem, 1.6): code panes, 0.75rem on phones; inline code at 0.85em on panel white.
+- **Code** (400, 0.8125rem, 1.6): code panes, 0.75rem on phones; inline code at 0.85em on panel white, and on asphalt where it sits inside a white panel.
 
 ### Named Rules
 **The Posted Number Rule.** Any figure that changes or is compared (writes, sizes, times, places, step numbers) is set in the display face at 800 with tabular figures.
@@ -223,22 +240,22 @@ A cool graphite-and-asphalt neutral scale with two race signals: a yellow for st
 
 ## Layout
 
-Two frames. Guide pages (docs and evolution) are a 17rem rail beside a main column capped at 76rem, padded 2.5rem on top and by the gutter (clamp(1rem, 4vw, 3rem)) at the sides; the rail sits on a 1px hairline. The dommy page is full-width bands whose content centres in an 80rem measure, each padded vertically by clamp(3rem, 7vw, 5.5rem) or more: a graphite opening band at 7fr to 5fr (thesis beside the first demo), example sections on asphalt divided by hairlines (heading, one paragraph, then demo beside source), and a graphite figures band whose table (max 56rem) carries a visible caption.
+Two frames. Guide pages (docs and evolution) are a 17rem rail beside a main column capped at 76rem, padded 2.5rem on top and by the gutter (clamp(1rem, 4vw, 3rem)) at the sides; the rail sits on a 1px hairline. The dommy page is full-width bands whose content centres in an 80rem measure, each padded vertically by clamp(3rem, 7vw, 5.5rem) or more: a graphite opening band at 7fr to 5fr (thesis beside the first demo), example sections on asphalt divided by hairlines (heading, one paragraph, then demo beside source), and a graphite figures band whose table (max 56rem) carries a visible caption. A game page opens on a graphite band at 5fr to 7fr, the game in the wide column: the title, pitch and figure top left, the credits under them, the game panel beside both; stacked (below 68.75em) the game follows the title, pitch and figure, and the credits come after it.
 
-A live demo and its source sit side by side at 5fr to 7fr with a 1.5rem gap; the demo is sticky while the source scrolls. Below 68.75em they stack and the dommy page's opening band goes to one column. Below 45em the rail becomes a wrap of 2.75rem chips (evolution) or topic plates (docs) above the page, the demo stage tightens to 1.25rem 1rem, and the main column leaves 5rem at the bottom for the floating Netlify badge.
+A live demo and its source sit side by side at 5fr to 7fr with a 1.5rem gap; the demo is sticky while the source scrolls. Below 68.75em they stack and the dommy page's opening band goes to one column. A game measures its own panel (a container query): where the panel is at least 38rem, the board (up to 28rem) has a side column of readouts, buttons and status, the code disclosure under both; narrower, the readouts and buttons sit in a bar above the board. Below 45em the rail becomes a wrap of 2.75rem chips (evolution) or topic plates (docs) above the page, the demo stage tightens to 1.25rem 1rem, and the main column leaves 5rem at the bottom for the floating Netlify badge. Below 36em the site header wraps to two rows: the wordmark and the languages on the first, the sections on the second.
 
 Rhythm comes from a short set of gaps (0.25, 0.5, 0.75, 1, 1.5, 2rem) and 2rem between page blocks. Prose holds 62 to 68ch; docs headings sit 1rem above their block and closer to it than to what came before.
 
 ## Elevation & Depth
 
-The system is flat. There is no box-shadow anywhere in the build; depth is tonal: asphalt ground, white panels on it with a 1px hairline, graphite bands and code panes as the darkest layer. The only gradients are functional: the scroll cue at the edges of a code pane.
+The system is flat. There is no box-shadow anywhere in the build; depth is tonal: asphalt ground, white panels on it with a 1px hairline, graphite bands and code panes as the darkest layer. The only gradients are functional: the scroll cue at the edges of a code pane. A dialog does not lift either: it is a white panel on a graphite scrim (graphite at 0.72), the page behind held still.
 
 ### Named Rules
 **The Flat Screen Rule.** Surfaces never lift. To separate, change the tone (asphalt, panel, graphite) or draw a hairline; never add a shadow.
 
 ## Shapes
 
-Small, even corners: 3px on the smallest plates (inline code, code chips, keys), 4px on controls, inputs, plates, rail items and list rows, 6px on the demo panel and code pane. Pips on the write board are round, filled for new writes and hollow for moves. Place plates run square-edged inside their 4px row. Bands and sections meet in straight edges. Borders are 1px hairline on light surfaces; state is drawn with heavier strokes: 3px underline for the header's current link, 4px signal-ink underline on an odd count, 4px signal left edge on an added code line, 2px graphite border on a failure plate and on the current mobile chip, dashed hairline on a pending plate.
+Small, even corners: 3px on the smallest plates (inline code, code chips, keys, a card back's frame), 4px on controls, inputs, plates, rail items, list rows and memory cards, 6px on the demo panel, code pane and dialog. Pips on the write board are round, filled for new writes and hollow for moves. Place plates run square-edged inside their 4px row. Bands and sections meet in straight edges. Borders are 1px hairline on light surfaces; state is drawn with heavier strokes: 3px underline for the header's current link, 4px signal-ink underline on an odd count, 4px signal left edge on an added code line, 2px graphite border on a failure plate (and on a wrong pair of cards) and on the current mobile chip, 2px underline on a quiet disclosure, dashed hairline on a pending plate.
 
 ## Components
 
@@ -259,7 +276,7 @@ Plain and firm: a filled or outlined plate with bold text, no icon.
 The `npm i @reely/dommy` command: mono at 0.9375rem, asphalt on graphite, a 1px slate border at 4px, selectable in one click.
 
 ### Navigation
-- **Header:** a graphite strip with the display wordmark at 1.75rem and bold code-text links (Packages, Labs, GitHub); hover lightens to asphalt over a slate 3px underline, the current part of the site gets a signal underline.
+- **Header:** a graphite strip with the display wordmark at 1.75rem and bold code-text links (Packages, Games, Labs, GitHub); hover lightens to asphalt over a slate 3px underline, the current part of the site gets a signal underline. Below 36em it wraps to two rows: the wordmark and the language plates on the first, the sections on the second.
 - **Package strip:** under the header on a package with several pages (dommy: overview, docs, evolution), a white strip on a hairline: the package name in bold graphite, then slate bold links; hover graphite over a hairline 3px underline, the current page graphite over a signal-ink underline. Focus is the global graphite ring.
 - **Rail:** idle links in slate, hover graphite, the current page a signal plate with graphite bold text. Docs groups are headed in slate display at 1.125rem; evolution steps carry a display number in a 2rem column.
 - **Mobile:** rail items become white chips with a hairline; the current chip is signal with a 2px graphite border.
@@ -271,8 +288,16 @@ The signature component. A white panel (6px, hairline) with the live demo on a s
 ### Code Pane
 Graphite, 6px, code-text mono at 0.8125rem/1.6, lines kept on one line and scrolled horizontally with a light edge showing where a line runs on. Lines added since the previous step get a 4px signal left edge and a 14% signal wash. A slate caption names the module above it.
 
+**The code that just ran:** a native disclosure under a game's board. Its summary is a quiet link: bold slate on a 2px hairline underline, graphite over a signal-ink underline when hovered or open. Open, one sentence above the pane says what the code did, its identifiers as inline code on asphalt (3px); the pane shows only the region that ran, its caption naming only the file.
+
 ### Timing Plates
-Ranked rows (hairline, 4px) lead with a graphite place plate in the display face; the first row's plate is signal, and moves with whichever row leads. Read-out boxes are white with a hairline, display at 3.5rem. A posted result (a preview, a delivery, a rate) is a signal plate with display text at 2rem; not yet settled, it is a dashed hairline with slate text; a failed call is a white plate with a 2px graphite border and bold body text. Result lists of code chips sit on graphite at 3px in mono.
+Ranked rows (hairline, 4px) lead with a graphite place plate in the display face; the first row's plate is signal, and moves with whichever row leads. Read-out boxes are white with a hairline, display at 3.5rem. A posted result (a preview, a delivery, a rate) is a signal plate with display text at 2rem; not yet settled, it is a dashed hairline with slate text; a failed call is a white plate with a 2px graphite border and bold body text. A game's win posts its moves as a signal result plate (display 2rem) beside its place plate on the leaderboard. Result lists of code chips sit on graphite at 3px in mono.
+
+### Memory Card
+A card is a square button that turns over in place. The back is a graphite plate (4px) with a slate hairline frame inset at 3px corners and a slate display "r" at weight 800; while a card may be turned, hovering turns its frame code-text. The face is white with a hairline: a graphite pictogram of the package drawn at a 2px round stroke, the slate `@reely/` scope under it, and the package name in the display face at 800. A found pair is posted as a signal plate under graphite text, scope included. A wrong pair waits to turn back as a failure plate, a 2px graphite border, while the board is busy. The turn is a 3D flip of 360ms (cubic-bezier(0.22, 1, 0.36, 1)) and the face changes colour over 240ms, only without reduced motion; under it the card changes side in place.
+
+### Dialog
+A native modal dialog: a white panel (6px, hairline), min(30rem, 100% - 2rem) wide, over a scrim of graphite at 0.72; the page behind does not scroll. The title is display 800 at 2rem; actions sit in a row at the bottom, the one the dialog is about solid, the rest demo buttons. Escape, a click on the scrim or a button closes it.
 
 ### Package Plates
 On the home page each package is one white plate (6px, hairline) that opens the package's page: the name in the display face at 1.75rem with a slate `@reely/` scope, the version in slate tabular figures, one line on why it exists, then over a hairline its gzip size as a display figure at 1.75rem with a slate label, and what reely packages it is built on in slate. The plates fill a grid of columns at least 17rem wide, one column on a phone. Hover turns the border graphite; a plate reached by its anchor from the credits gets a 2px signal-ink outline at 2px offset. No plate is featured.
@@ -281,7 +306,7 @@ On the home page each package is one white plate (6px, hairline) that opens the 
 On a package's opening band, beside the name: a timing sheet of version, size and the packages it is built on. Labels in code-text, figures in signal at display 800 (clamp(2rem, 4vw, 3rem)), one slate rule per row; the packages it is built on are bold asphalt links to their pages. The name runs at display size with the `@reely/` scope stepped back above it in code-text at 0.4em. README and npm are links with a slate 2px underline that turns signal on hover, beside the install line.
 
 ### Home Figures
-Under the lead on the home band, three figures the build measured across all packages (how many, dependencies from outside reely, the lightest gzip size): a figure in signal at display 800 (clamp(2.25rem, 4vw, 3.25rem)), its label under it in code-text at up to 14ch. They stand in one row of three down to a phone, where their labels wrap; no rules and no caption, since they lead the page rather than tabulate a package.
+Under the lead on the home band, three figures the build measured across all packages (how many, dependencies from outside reely, the lightest gzip size): a figure in signal at display 800 (clamp(2.25rem, 4vw, 3.25rem)), its label under it in code-text at up to 14ch. They stand in one row of three down to a phone, where their labels wrap; no rules and no caption, since they lead the page rather than tabulate a package. A game's band posts one such figure, counted from its sources: "0 if", the count in signal with the keyword it counts in mono at 0.5em, weight 400, since the keyword is code.
 
 ### Console Echo
 Under the logger's example, what reached the console is shown again as code on a graphite plate (6px), its last four lines in mono, under a small code-text title.
@@ -290,7 +315,7 @@ Under the logger's example, what reached the console is shown again as code on a
 A split-flap board on graphite (6px) inside the opening band's white panel: a slate header row in the body face, then rows of a slate place plate (the leader's in signal), a car's colour bar, its name and its time on tiles. A tile is a 0.95rem by 1.6rem plate of two graphite halves split by a dark hinge line, the letter in the display face at 800, uppercase, tabular figures. A changed letter turns through two drum letters, 55ms apart, each tile a little after the one before it; when a car passes another its row slides to its new place over 600ms, and the place plates follow the positions, the leader's in signal. A race runs ten minutes, then the next one starts. A bordered pause button sits above the board and names what it will do (Pause, Resume). The board's own writes are counted by the write board but not outlined, since its letters already show each change.
 
 ### Timing Sheet
-Figures tables (docs sizes, the dommy page's size and speed band, the labs' comparison of signal cores): a visible caption, tabular figures right-aligned in the display face, one rule per row, labels left in body weight 400. Where a table compares candidates, the column that won has its head in bold graphite over a 3px signal underline; a table wider than a phone scrolls inside its own box, its caption held still.
+Figures tables (docs sizes, the dommy page's size and speed band, the labs' comparison of signal cores): a visible caption, tabular figures right-aligned in the display face, one rule per row, labels left in body weight 400. Where a table compares candidates, the column that won has its head in bold graphite over a 3px signal underline; a table wider than a phone scrolls inside its own box, its caption held still. A game's leaderboard is the same sheet in a dialog: slate label heads, square-edged place plates (2.5rem by 2.25rem, display 1.75rem, the leader's in signal by CSS), moves right-aligned in display at 1.75rem, the date in display at body size (1.0625rem), the row of the win just posted on an asphalt wash.
 
 ## Do's and Don'ts
 
