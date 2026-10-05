@@ -60,15 +60,17 @@ const en = {
         Body: ({ Snippet }): Node => (
           <>
             <p>
-              We want rules we can check without a browser. So the game starts as plain data: the deck, the cards turned
-              up right now, the pairs found, and the number of moves. No DOM, no timer, no clicks.
+              We want rules we can check without a browser. So we start with the table, as plain data: the deck as it
+              lies, the cards turned up right now, the pairs found, and the number of moves. No DOM, no timer, no
+              clicks. At most two cards are ever up, and the type says so: <code>open</code> holds none, one or two
+              places, so a third card can’t even be written down.
             </p>
             <Snippet file='memory.rules.ts' region='state' />
             <p>
-              Turning a card is a function: it takes a game and gives back the next one. The catch is the clicks that
+              Turning a card is a function: it takes the table and gives back the next one. The catch is the clicks that
               should do nothing: a fast double click, a click on a found card, a click while a wrong pair is still up.
               Usually each of them needs its own check in the click handler. Here, when a card can’t turn, the function
-              simply returns the same game. Nothing changes, so there is nothing to guard against.
+              simply returns the same table. Nothing changes, so there is nothing to guard against.
             </p>
             <Snippet file='memory.rules.ts' region='turn-card' />
             <p>
@@ -159,7 +161,7 @@ const en = {
         Body: ({ Snippet }): Node => (
           <>
             <p>
-              The page should always show the game as it is. When you copy state into the DOM by hand, you will sooner
+              The page should always show the table as it is. When you copy state into the DOM by hand, you will sooner
               or later forget a place, and the screen starts to lie.
             </p>
             <p>

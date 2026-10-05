@@ -8,7 +8,7 @@ import { pluralOf } from '../../../i18n/plural';
 import css from './memory.module.css';
 
 import type { Memory, MemoryPhase } from './memory.machine';
-import type { MemoryState } from './memory.rules';
+import type { MemoryTable } from './memory.rules';
 
 /** What the code panel shows: the region of the machine that ran, and why. */
 export interface CodeMoment {
@@ -18,7 +18,7 @@ export interface CodeMoment {
 
 /** A transition taken: the code that ran, and what the player reads then. */
 export interface Moment extends CodeMoment {
-  readonly status: (table: MemoryState) => string;
+  readonly status: (table: MemoryTable) => string;
 }
 
 const pluralEn = pluralOf('en');
@@ -26,7 +26,7 @@ export const movesOf = (count: number): string =>
   `${count} ${pluralEn(count, { one: 'move', other: 'moves' })}`;
 
 const nothingUp = (): string => 'Turn a card.';
-const upFaces = ({ deck, open }: MemoryState): string =>
+const upFaces = ({ deck, open }: MemoryTable): string =>
   open.map((place) => deck[place]).join(' and ');
 
 /** Every transition, by its event, or by the state a turn reached. */

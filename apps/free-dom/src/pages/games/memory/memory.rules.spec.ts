@@ -1,11 +1,11 @@
-import { cardAt, dealGame, isLocked, isWon, turnBack, turnCard } from './memory.rules';
+import { cardAt, dealTable, isLocked, isWon, turnBack, turnCard } from './memory.rules';
 
-import type { MemoryState } from './memory.rules';
+import type { MemoryTable } from './memory.rules';
 
 // a random source that always draws the first card left: the shuffle keeps the order
 const keepOrder = (): number => 0;
 
-const game = (deck: readonly string[]): MemoryState => ({
+const game = (deck: readonly string[]): MemoryTable => ({
   deck,
   open: [],
   found: [],
@@ -13,8 +13,16 @@ const game = (deck: readonly string[]): MemoryState => ({
 });
 
 describe('memory rules', () => {
+  it('holds at most two cards up, by its type', () => {
+    const up: MemoryTable['open'][] = [[], [3], [3, 7]];
+    // @ts-expect-error a third card is never up
+    const three: MemoryTable['open'] = [3, 7, 9];
+
+    expect([...up, three].map((open) => open.length)).toEqual([0, 1, 2, 3]);
+  });
+
   it('deals every face twice, face down, with no moves', () => {
-    const dealt = dealGame(['signals', 'dommy', 'router'], 2, keepOrder);
+    const dealt = dealTable(['signals', 'dommy', 'router'], 2, keepOrder);
 
     expect(dealt.deck).toEqual(['signals', 'dommy', 'signals', 'dommy']);
     expect(dealt.deck.map((_face, index) => cardAt(dealt, index))).toEqual(['down', 'down', 'down', 'down']);
@@ -23,7 +31,7 @@ describe('memory rules', () => {
 
   it('picks its faces and lays out the deck with the random source it is given', () => {
     // 0.5 draws the middle card of those left: a b c → b, then c, then a
-    const dealt = dealGame(['a', 'b', 'c'], 2, () => 0.5);
+    const dealt = dealTable(['a', 'b', 'c'], 2, () => 0.5);
 
     expect(dealt.deck).toEqual(['b', 'c', 'c', 'b']);
   });

@@ -3,10 +3,10 @@ import { signal } from '@reely/dommy';
 import { memoryMachine } from './memory.machine';
 
 import type { MemoryContext } from './memory.machine';
-import type { MemoryState } from './memory.rules';
+import type { MemoryTable } from './memory.rules';
 
 const deck = ['a', 'b', 'a', 'b'];
-const fresh = (): MemoryState => ({ deck, open: [], found: [], moves: 0 });
+const fresh = (): MemoryTable => ({ deck, open: [], found: [], moves: 0 });
 
 const contextOf = (overrides: Partial<MemoryContext> = {}): MemoryContext => ({
   table: signal(fresh()),
@@ -86,7 +86,7 @@ describe('memory machine', () => {
 
   it('holds its invariants under any order of fast clicks, new games and turn-backs', () => {
     let clock = 0;
-    const six = (): MemoryState => ({ deck: ['a', 'b', 'c', 'a', 'b', 'c'], open: [], found: [], moves: 0 });
+    const six = (): MemoryTable => ({ deck: ['a', 'b', 'c', 'a', 'b', 'c'], open: [], found: [], moves: 0 });
     const game = memoryMachine(contextOf({ table: signal(six()), deal: six, now: () => ++clock }));
     const { table, best } = game.context;
     // a seeded pseudo-random walk, so a failure replays the same way

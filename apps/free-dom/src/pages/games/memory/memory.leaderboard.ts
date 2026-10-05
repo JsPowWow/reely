@@ -31,8 +31,10 @@ export const postResult = (
   const ranked = [...board.filter(isOther(result)), result]
     .sort(byRank)
     .slice(0, leaderboardSize);
-  const place = ranked.indexOf(result) + 1;
-  return { board: ranked, place: place === 0 ? undefined : place };
+  return {
+    board: ranked,
+    place: ranked.includes(result) ? ranked.indexOf(result) + 1 : undefined,
+  };
 };
 // #endregion
 

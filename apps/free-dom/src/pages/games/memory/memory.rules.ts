@@ -1,17 +1,18 @@
-import { Maybe } from '@reely/utils';
+import { hasSome } from '@reely/basics';
+import { isNonEmpty, Maybe } from '@reely/utils';
 
 /**
- * A game of memory: the deck as laid out, the cards turned up and not yet
- * matched, the faces found.
+ * The table of a game of memory: the deck as laid out, the cards turned up and
+ * not yet matched, the faces found.
  */
 // #region state
-export interface MemoryState<Face extends string = string> {
+export interface MemoryTable<Face extends string = string> {
   readonly deck: readonly Face[];
   /**
    * Places of the cards turned up in this move: none, one, or a wrong pair
    * waiting to turn back.
    */
-  readonly open: readonly number[];
+  readonly open: readonly [] | readonly [number] | readonly [number, number];
   readonly found: readonly Face[];
   /** One per pair of cards turned up, whether they match or not. */
   readonly moves: number;
@@ -38,11 +39,11 @@ const shuffled = <Face extends string>(
 // #endregion
 
 /** Picks `pairs` of the faces and lays each out twice, face down. */
-export const dealGame = <Face extends string>(
+export const dealTable = <Face extends string>(
   faces: readonly Face[],
   pairs: number,
   random: RandomSource = Math.random
-): MemoryState<Face> => {
+): MemoryTable<Face> => {
   const picked = shuffled(faces, random).slice(0, pairs);
   return {
     deck: shuffled([...picked, ...picked], random),
@@ -52,58 +53,58 @@ export const dealGame = <Face extends string>(
   };
 };
 
-const isFound = (game: MemoryState, place: number): boolean =>
-  game.found.some((face) => face === game.deck[place]);
+const isFound = (table: MemoryTable, place: number): boolean =>
+  table.found.some((face) => face === table.deck[place]);
 
-const upOrDown = (game: MemoryState, place: number): CardSide =>
-  game.open.includes(place) ? 'up' : 'down';
+const upOrDown = (table: MemoryTable, place: number): CardSide =>
+  table.open.some((up) => up === place) ? 'up' : 'down';
 
-export const cardAt = (game: MemoryState, place: number): CardSide =>
-  isFound(game, place) ? 'found' : upOrDown(game, place);
+export const cardAt = (table: MemoryTable, place: number): CardSide =>
+  isFound(table, place) ? 'found' : upOrDown(table, place);
 
 /** A wrong pair is up: no card turns until it turns back. */
-export const isLocked = (game: MemoryState): boolean => game.open.length === 2;
+export const isLocked = (table: MemoryTable): boolean =>
+  table.open.length === 2;
 
-export const isWon = (game: MemoryState): boolean =>
-  game.deck.length > 0 && game.found.length * 2 === game.deck.length;
+export const isWon = (table: MemoryTable): boolean =>
+  isNonEmpty(table.deck) && table.found.length * 2 === table.deck.length;
 
 // #region turn-card
-/** A card turns when it lies face down and no wrong pair is waiting. */
-export const canTurn = (game: MemoryState, place: number): boolean =>
-  !isLocked(game) &&
-  place >= 0 &&
-  place < game.deck.length &&
-  cardAt(game, place) === 'down';
+/** A card turns when it lies there face down and no wrong pair is waiting. */
+export const canTurn = (table: MemoryTable, place: number): boolean =>
+  !isLocked(table) &&
+  hasSome(table.deck[place]) &&
+  cardAt(table, place) === 'down';
 
 // the second card of a move: a pair is found, or both wait to turn back
 const turnSecond = <Face extends string>(
-  game: MemoryState<Face>,
+  table: MemoryTable<Face>,
   first: number,
   place: number
-): MemoryState<Face> => {
-  const moves = game.moves + 1;
-  const face = game.deck[place];
-  return face !== undefined && game.deck[first] === face
-    ? { ...game, open: [], found: [...game.found, face], moves }
-    : { ...game, open: [first, place], moves };
+): MemoryTable<Face> => {
+  const moves = table.moves + 1;
+  const face = table.deck[place];
+  return hasSome(face) && table.deck[first] === face
+    ? { ...table, open: [], found: [...table.found, face], moves }
+    : { ...table, open: [first, place], moves };
 };
 
 /**
- * Turns the card at `place` up; a card that cannot turn leaves the same game,
+ * Turns the card at `place` up; a card that cannot turn leaves the same table,
  * so a repeated click counts nothing.
  */
 export const turnCard = <Face extends string>(
-  game: MemoryState<Face>,
+  table: MemoryTable<Face>,
   place: number
-): MemoryState<Face> =>
-  canTurn(game, place)
-    ? Maybe.from(game.open[0]).unwrap(
-        (first) => turnSecond(game, first, place),
-        () => ({ ...game, open: [place] })
+): MemoryTable<Face> =>
+  canTurn(table, place)
+    ? Maybe.from(table.open[0]).unwrap(
+        (first) => turnSecond(table, first, place),
+        () => ({ ...table, open: [place] })
       )
-    : game;
+    : table;
 // #endregion
 
 export const turnBack = <Face extends string>(
-  game: MemoryState<Face>
-): MemoryState<Face> => (isLocked(game) ? { ...game, open: [] } : game);
+  table: MemoryTable<Face>
+): MemoryTable<Face> => (isLocked(table) ? { ...table, open: [] } : table);

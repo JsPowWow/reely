@@ -1,5 +1,6 @@
 import { For, Show } from '@reely/dommy';
 import type { Signal } from '@reely/dommy';
+import { isNonEmpty } from '@reely/utils';
 
 import { formatDay } from './memory.leaderboard';
 import { movesOf } from './memory.moments';
@@ -63,7 +64,7 @@ interface BestTenProps {
 export const BestTen = ({ open, best, place }: BestTenProps): Node => (
   <Modal open={open} title='Leaderboard'>
     <Show
-      when={() => best().length > 0}
+      when={() => isNonEmpty(best())}
       fallback={() => (
         <p className={css.note}>
           No wins yet. Find every pair to post the first.

@@ -11,7 +11,7 @@ import { postResult } from './memory.leaderboard';
 import { canTurn, isWon, turnBack, turnCard } from './memory.rules';
 
 import type { MemoryResult } from './memory.leaderboard';
-import type { MemoryState } from './memory.rules';
+import type { MemoryTable } from './memory.rules';
 
 /**
  * What the machine works on: the table, the best ten and the place of the last
@@ -19,10 +19,10 @@ import type { MemoryState } from './memory.rules';
  * brings its own.
  */
 export interface MemoryContext {
-  readonly table: Signal<MemoryState>;
+  readonly table: Signal<MemoryTable>;
   readonly best: Signal<readonly MemoryResult[]>;
   readonly place: Signal<number | undefined>;
-  readonly deal: () => MemoryState;
+  readonly deal: () => MemoryTable;
   readonly now: () => number;
 }
 
@@ -41,13 +41,13 @@ export type MemoryPhase = Memory['state'];
 // #region turn
 // the table tells the phase: no card up, one, or a wrong pair, unless all are
 // found
-const byCardsUp: Record<number, MemoryPhase> = {
+const byCardsUp: Record<MemoryTable['open']['length'], MemoryPhase> = {
   0: 'ready',
   1: 'oneUp',
   2: 'wrongPair',
 };
-const phaseOf = (table: MemoryState): MemoryPhase =>
-  isWon(table) ? 'won' : byCardsUp[table.open.length] ?? 'ready';
+const phaseOf = (table: MemoryTable): MemoryPhase =>
+  isWon(table) ? 'won' : byCardsUp[table.open.length];
 
 // a card that cannot turn has no target: the send is refused, nothing changes
 const toward = ({

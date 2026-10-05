@@ -6,14 +6,14 @@ import { BestTen, Victory } from './memory.dialogs';
 import { isBoard } from './memory.leaderboard';
 import { memoryMachine } from './memory.machine';
 import { MomentCode, momentOf, moments, refused } from './memory.moments';
-import { cardAt, dealGame } from './memory.rules';
+import { cardAt, dealTable } from './memory.rules';
 import { sitePackages } from '../../../site/site.packages';
 
 import css from './memory.module.css';
 
 import type { MemoryResult } from './memory.leaderboard';
 import type { CodeMoment } from './memory.moments';
-import type { MemoryState, RandomSource } from './memory.rules';
+import type { MemoryTable, RandomSource } from './memory.rules';
 
 const pairs = 8;
 
@@ -37,7 +37,7 @@ export const MemoryGame = ({
   storage,
 }: MemoryGameProps = {}): Node => {
   // #region state
-  const deal = (): MemoryState => dealGame(sitePackages, pairs, random);
+  const deal = (): MemoryTable => dealTable(sitePackages, pairs, random);
   const table = signal(deal());
   // kept in localStorage, and in memory alone where storage fails
   const best = persisted<readonly MemoryResult[]>(
