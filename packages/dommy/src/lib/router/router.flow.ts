@@ -13,6 +13,8 @@ export interface RouterProps {
   catch: (error: Error) => ReelyNode;
   /** Where the addresses come from: the browser's history when left out, or a `memoryHistory` for a widget with pages. */
   history?: RouterHistory;
+  /** Query params that are settings of the app, not pages, such as `lang`: every move keeps them in the address. */
+  keep?: readonly string[];
 }
 
 /**
@@ -20,10 +22,11 @@ export interface RouterProps {
  * `@reely/router`): each page renders under its own owner and is taken down at the next move, and the
  * router stops with the render that holds it.
  */
-export const Router = ({ routes, catch: renderError, history }: RouterProps): DocumentFragment => {
+export const Router = ({ routes, catch: renderError, history, keep }: RouterProps): DocumentFragment => {
   const slot = createFlowSlot('Router');
   startRouter(routes, {
     history,
+    keep,
     show: (page) => {
       slot.show(page);
       return slot.nodes();
