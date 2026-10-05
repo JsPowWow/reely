@@ -447,10 +447,12 @@ const en = {
           <h2>DOM attributes vs. properties</h2>
           <p>
             Live state (<code>value</code>, <code>checked</code>, <code>selected</code>, <code>indeterminate</code>,{' '}
-            <code>muted</code>) is set as a property, so the form shows it. Everything else is an attribute, a read-only{' '}
-            <code>list</code> included. A property that takes an object, such as <code>srcObject</code>, goes through{' '}
-            <code>elementRef</code>. Start typing in Choose a flavour: the browser suggests the options of the datalist,
-            which the <code>list</code> attribute names by its id.
+            <code>muted</code>) is set as a property, so the form shows it, and so is a boolean (<code>autoplay</code>,{' '}
+            <code>noValidate</code>). Everything else is an attribute, a read-only <code>list</code> included; a
+            property that is no attribute, such as <code>innerHTML</code> or <code>tagName</code>, is no prop. A
+            property that takes an object, such as <code>srcObject</code>, goes through <code>elementRef</code>. Start
+            typing in Choose a flavour: the browser suggests the options of the datalist, which the <code>list</code>{' '}
+            attribute names by its id.
           </p>
           {flavours}
           <h2>Why can’t a signal hold a DOM node?</h2>

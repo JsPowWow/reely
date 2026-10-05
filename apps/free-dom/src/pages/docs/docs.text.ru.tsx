@@ -434,10 +434,12 @@ export const ru: DocsText = {
           <h2>Атрибуты DOM и свойства</h2>
           <p>
             Живое состояние (<code>value</code>, <code>checked</code>, <code>selected</code>, <code>indeterminate</code>
-            , <code>muted</code>) задаётся свойством, поэтому форма его показывает. Всё остальное — атрибуты, в том
-            числе доступный только для чтения <code>list</code>. Свойство, которое принимает объект, например{' '}
-            <code>srcObject</code>, задаётся через <code>elementRef</code>. Начните печатать в «Choose a flavour»:
-            браузер подскажет варианты из datalist, на который атрибут <code>list</code> ссылается по id.
+            , <code>muted</code>) задаётся свойством, поэтому форма его показывает, как и булево значение (
+            <code>autoplay</code>, <code>noValidate</code>). Всё остальное — атрибуты, в том числе доступный только для
+            чтения <code>list</code>; свойство, которое не атрибут, например <code>innerHTML</code> или{' '}
+            <code>tagName</code>, пропсом не бывает. Свойство, которое принимает объект, например <code>srcObject</code>
+            , задаётся через <code>elementRef</code>. Начните печатать в «Choose a flavour»: браузер подскажет варианты
+            из datalist, на который атрибут <code>list</code> ссылается по id.
           </p>
           {flavours}
           <h2>Почему сигнал не может хранить DOM-узел?</h2>

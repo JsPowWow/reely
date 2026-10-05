@@ -379,7 +379,7 @@ The questions that come up once the basics work. Each answer is checked in `src/
 
 ### DOM attributes vs. properties
 
-Live state (`value`, `checked`, `selected`, `indeterminate`, `muted`) is set as a property, so a form shows it and a bound change is not lost to a user edit. Everything else is an attribute (`className` → `class`, `htmlFor` → `for`), a read-only `list` included. A property that has no attribute and takes an object goes through `elementRef`, which gets the element before its props:
+Live state (`value`, `checked`, `selected`, `indeterminate`, `muted`) is set as a property, so a form shows it and a bound change is not lost to a user edit. A boolean goes through the element's property of that name (`autoplay`, `noValidate`). Everything else is an attribute (`className` → `class`, `htmlFor` → `for`), a read-only `list` included. Props take no property that is no attribute: not `textContent` or `innerHTML` (children are the content), not `scrollTop` or a read-only one such as `tagName`. A property that has no attribute and takes an object goes through `elementRef`, which gets the element before its props:
 
 ```tsx
 const stream = await navigator.mediaDevices.getUserMedia({ video: true });

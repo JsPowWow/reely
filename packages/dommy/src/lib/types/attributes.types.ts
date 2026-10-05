@@ -1,4 +1,4 @@
-import type { AnyFunction, Nullable } from '@reely/utils';
+import type { Nullable, PrimitiveValue } from '@reely/utils';
 
 import type { HtmlElementEvent, ReactiveValue } from './dommy.types';
 
@@ -38,19 +38,33 @@ export type DOMElementStyles = {
   [K in `--${string}`]?: MaybeReactive<string>;
 };
 
+// the read-only properties every HTML element has, such as `tagName` or `clientWidth`, found once
+type ReadonlyElementProps = {
+  [K in keyof HTMLElement]-?: (<V>() => V extends Pick<HTMLElement, K> ? 1 : 2) extends <V>() => V extends {
+    -readonly [P in K]: HTMLElement[P];
+  }
+    ? 1
+    : 2
+    ? never
+    : K;
+}[keyof HTMLElement];
+
+/**
+ * DOM properties that are no attributes: `Node`'s, the read-only ones of every element, the text and
+ * HTML inside, the scroll, and the token lists `className` and `rel` already set. A prop that holds an
+ * object (`style`, `dataset`, `srcObject`) is left out by its type.
+ */
 type ExcludedDOMProps =
+  | keyof Node
+  | ReadonlyElementProps
+  | 'innerHTML'
+  | 'outerHTML'
+  | 'innerText'
+  | 'outerText'
+  | 'scrollTop'
+  | 'scrollLeft'
   | 'classList'
-  | 'relList'
-  | 'style'
-  | 'dataset'
-  | 'attributes'
-  | 'children'
-  | 'firstChild'
-  | 'lastChild'
-  | 'parentElement'
-  | 'parentNode'
-  | 'ownerDocument'
-  | 'childNodes';
+  | 'relList';
 
 /**
  * Props the DOM types as the element they point at (`input.list`, `button.form`), while the
@@ -60,11 +74,11 @@ type ExcludedDOMProps =
 type ElementIdReference = 'list' | 'form';
 
 type SafeAttributes<T> = {
-  [K in keyof T as K extends ExcludedDOMProps
+  [K in keyof T as K extends ElementIdReference
+    ? K
+    : K extends ExcludedDOMProps | AriaAttributes
     ? never
-    : K extends AriaAttributes
-    ? never
-    : Extract<T[K], AnyFunction> extends never
+    : T[K] extends Nullable<PrimitiveValue> | DOMTokenList
     ? K
     : never]: K extends ElementIdReference
     ? MaybeReactive<string>

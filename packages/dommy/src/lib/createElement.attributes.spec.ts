@@ -1,5 +1,7 @@
 import { createElement, signal } from '../index';
 
+import type { DOMElementProps } from '../index';
+
 describe('createElement: properties and attributes', () => {
   it('sets string props as attributes', () => {
     const element = createElement('div', { id: 'board', title: 'Race' });
@@ -21,6 +23,24 @@ describe('createElement: properties and attributes', () => {
 
     expect(input.getAttribute('autocomplete')).toBe('username');
     expect(input.hasAttribute('autofocus')).toBe(true);
+  });
+
+  it('takes no DOM property that is no attribute: the tree, text and HTML inside, layout, read-only state', () => {
+    expectTypeOf<DOMElementProps<'div'>>().not.toHaveProperty('innerHTML');
+    expectTypeOf<DOMElementProps<'div'>>().not.toHaveProperty('outerHTML');
+    expectTypeOf<DOMElementProps<'div'>>().not.toHaveProperty('textContent');
+    expectTypeOf<DOMElementProps<'div'>>().not.toHaveProperty('innerText');
+    expectTypeOf<DOMElementProps<'div'>>().not.toHaveProperty('scrollTop');
+    expectTypeOf<DOMElementProps<'div'>>().not.toHaveProperty('tagName');
+    expectTypeOf<DOMElementProps<'div'>>().not.toHaveProperty('clientWidth');
+    expectTypeOf<DOMElementProps<'div'>>().not.toHaveProperty('nodeType');
+    expectTypeOf<DOMElementProps<'div'>>().not.toHaveProperty('offsetParent');
+    expectTypeOf<DOMElementProps<'input'>>().not.toHaveProperty('offsetHeight');
+    expectTypeOf<DOMElementProps<'video'>>().not.toHaveProperty('srcObject');
+    expectTypeOf<DOMElementProps<'input'>>().toHaveProperty('readOnly');
+    expectTypeOf<DOMElementProps<'input'>>().toHaveProperty('list');
+    expectTypeOf<DOMElementProps<'iframe'>>().toHaveProperty('sandbox');
+    expectTypeOf<DOMElementProps<'div'>>().toHaveProperty('className');
   });
 
   it('sets `list` and `form`, element references in the DOM, as the id attributes they are', () => {
