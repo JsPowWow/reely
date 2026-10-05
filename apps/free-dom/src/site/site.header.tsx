@@ -8,10 +8,11 @@ import type { SiteText } from './site.text';
 import type { Locale } from '../i18n/locale';
 
 /** The parts of the site; the header marks the one the page belongs to. */
-export type SiteSection = 'home' | 'packages' | 'labs';
+export type SiteSection = 'home' | 'packages' | 'games' | 'labs';
 
 const sections = [
   { section: 'packages', href: sitePaths.packages },
+  { section: 'games', href: sitePaths.memory },
   { section: 'labs', href: sitePaths.labs },
 ] as const satisfies readonly { section: keyof SiteText['nav'] & SiteSection; href: string }[];
 

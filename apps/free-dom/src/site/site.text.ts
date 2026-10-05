@@ -1,7 +1,7 @@
 import { localized } from '../i18n/localized';
 
 const en = {
-  nav: { label: 'Site', packages: 'Packages', labs: 'Labs' },
+  nav: { label: 'Site', packages: 'Packages', games: 'Games', labs: 'Labs' },
   dommyNav: { overview: 'Overview', docs: 'Docs', evolution: 'Evolution' },
   language: { label: 'Language' },
   pager: { previous: 'Previous', next: 'Next' },

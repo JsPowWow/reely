@@ -12,6 +12,7 @@ export const sitePaths = {
   evolution: '/dommy/evolution',
   evolutionStep: '/dommy/evolution/:step',
   labs: '/labs',
+  memory: '/games/memory',
   package: '/:name',
   unknown: '/*rest',
 } as const;

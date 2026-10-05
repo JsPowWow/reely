@@ -12,7 +12,7 @@ JavaScript and TypeScript developers who meet reely on npm, GitHub or in a talk 
 
 ## Product Purpose
 
-The site is the home and documentation of reely, a family of small TypeScript packages with no dependencies, all on equal terms: `@reely/dommy` (DOM from tag factories and JSX, bound to signals), `@reely/signals`, `@reely/dommy-kit`, `@reely/basics`, `@reely/state-machine`, `@reely/emitter`, `@reely/queue`, `@reely/simple-store`, `@reely/async`, `@reely/colors`, `@reely/strings`, `@reely/logger`. It has a landing page that shows the packages working together and lets a visitor find theirs; a page per package (why it exists, a live example, install, its exports); dommy's documentation by topic and "reely evolution", the same UI rebuilt step by step; and labs, the experiments around reely with their verdicts. Success: a developer leaves the landing page for the page of a package that solves their problem, and can use it after reading that page.
+The site is the home and documentation of reely, a family of small TypeScript packages with no dependencies, all on equal terms: `@reely/dommy` (DOM from tag factories and JSX, bound to signals), `@reely/signals`, `@reely/dommy-kit`, `@reely/basics`, `@reely/state-machine`, `@reely/emitter`, `@reely/queue`, `@reely/simple-store`, `@reely/async`, `@reely/colors`, `@reely/strings`, `@reely/logger`. It has a landing page that shows the packages working together and lets a visitor find theirs; a page per package (why it exists, a live example, install, its exports); dommy's documentation by topic and "reely evolution", the same UI rebuilt step by step; games, whole small apps built with the packages (the memory game, after the RS School task); and labs, the experiments around reely with their verdicts. Success: a developer leaves the landing page for the page of a package that solves their problem, and can use it after reading that page.
 
 ## Positioning
 
@@ -23,7 +23,7 @@ Small packages that each do one thing for a consumer who uses no other `@reely` 
 - Read alone on a laptop, often beside an editor; also shown on a projector or shared screen in talks; checked on a phone.
 - Deployed by Netlify from the repo: `main` to https://reely-free-dom.netlify.app, every pull request to a deploy preview.
 - The site is built with `@reely/dommy` itself; the sources shown on the page are the modules that render the demos (imported with `?highlight`: Shiki colors them at build time, so the page ships no highlighter), so the code on screen is always the code that runs.
-- Routes: the landing page at `/`, a page per package at `/<package>` (`/signals`, `/dommy-kit`, …), dommy's documentation under `/dommy/docs/…` and reely evolution under `/dommy/evolution/…`, labs at `/labs`.
+- Routes: the landing page at `/`, a page per package at `/<package>` (`/signals`, `/dommy-kit`, …), dommy's documentation under `/dommy/docs/…` and reely evolution under `/dommy/evolution/…`, games at `/games/…` (the memory game at `/games/memory`), labs at `/labs`.
 
 ## Capabilities and Constraints
 

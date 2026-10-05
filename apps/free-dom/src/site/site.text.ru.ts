@@ -1,7 +1,7 @@
 import type { SiteText } from './site.text';
 
 export const ru: SiteText = {
-  nav: { label: 'Сайт', packages: 'Пакеты', labs: 'Лаборатория' },
+  nav: { label: 'Сайт', packages: 'Пакеты', games: 'Игры', labs: 'Лаборатория' },
   dommyNav: { overview: 'Обзор', docs: 'Документация', evolution: 'Эволюция' },
   language: { label: 'Язык' },
   pager: { previous: 'Назад', next: 'Дальше' },

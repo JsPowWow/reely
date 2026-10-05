@@ -20,13 +20,13 @@ describe('SiteHeader', () => {
     const unmount = mount(host, () => <SiteHeader current='packages' />);
     const russian = host.querySelector('button[lang="ru"]');
 
-    expect(navLabels(host)).toEqual(['Packages', 'Labs', 'GitHub']);
+    expect(navLabels(host)).toEqual(['Packages', 'Games', 'Labs', 'GitHub']);
     expect(russian?.getAttribute('aria-pressed')).toBe('false');
 
     clickButton(host, 'RU');
     await textsLoaded();
 
-    expect(navLabels(host)).toEqual(['Пакеты', 'Лаборатория', 'GitHub']);
+    expect(navLabels(host)).toEqual(['Пакеты', 'Игры', 'Лаборатория', 'GitHub']);
     expect(russian?.getAttribute('aria-pressed')).toBe('true');
     expect(host.querySelector('[role="group"]')?.getAttribute('aria-label')).toBe('Язык');
     expect(localStorage.getItem('reely.locale')).toBe(JSON.stringify('ru'));

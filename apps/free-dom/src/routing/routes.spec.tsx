@@ -35,6 +35,10 @@ describe('routes', () => {
     expect(await headingAt('/dommy/evolution/jsx')).toMatch(/^Step 2\. /);
   });
 
+  it('opens the memory game under the games', async () => {
+    expect(await headingAt('/games/memory')).toBe('Memory');
+  });
+
   it('opens the page of every package but dommy at its name', async () => {
     expect(await headingAt('/emitter')).toBe('@reely/emitter');
     expect(await headingAt('/simple-store')).toBe('@reely/simple-store');

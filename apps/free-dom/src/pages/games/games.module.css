@@ -1,0 +1,34 @@
+/* The game takes the wider column of the opening band: it is the page's demo and its point. */
+.start {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+}
+
+.credits {
+  color: var(--code-text);
+  font-size: 0.9375rem;
+}
+
+.creditsTitle {
+  margin: 0 0 0.35rem;
+}
+
+.creditList {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.creditList a {
+  color: var(--asphalt);
+  font-weight: 700;
+  text-decoration-color: var(--signal);
+  text-underline-offset: 0.2em;
+}
+
+@media (max-width: 68.75em) {
+  .start {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

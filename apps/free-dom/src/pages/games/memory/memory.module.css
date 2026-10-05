@@ -1,0 +1,315 @@
+/* The memory game on the timing screen: graphite backs, white faces, found pairs posted in signal. */
+.game {
+  display: grid;
+  max-width: 30rem;
+  margin: 0 auto;
+  color: var(--graphite);
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+}
+
+.counters {
+  display: flex;
+  gap: 1.75rem;
+  margin: 0;
+}
+
+.counters > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.counters dt {
+  order: 1;
+  color: var(--slate);
+  font-size: 0.875rem;
+  line-height: 1.3;
+}
+
+.counters dd {
+  min-width: 2.5ch;
+  margin: 0;
+  font-family: var(--display);
+  font-size: 2.75rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.controls,
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* The action a view is about: graphite, where the demo's other buttons are outlined. */
+.game .solid {
+  background: var(--graphite);
+  color: var(--asphalt);
+}
+
+.game .solid:not(:disabled):hover {
+  border-color: var(--slate);
+  background: var(--slate);
+}
+
+.status {
+  min-height: 1.5em;
+  margin: 0.75rem 0 1rem;
+  color: var(--slate);
+  font-size: 0.9375rem;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A card is a button, not one of the demo's outlined ones. */
+.board .card,
+.board .card:not(:disabled):hover {
+  container-type: inline-size;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--graphite);
+  perspective: 40rem;
+}
+
+.card[data-side='down'] {
+  cursor: pointer;
+}
+
+.card:not([data-side='down']) {
+  cursor: default;
+}
+
+.board[aria-busy='true'] .card {
+  cursor: progress;
+}
+
+.turn {
+  position: relative;
+  display: block;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.card:not([data-side='down']) .turn {
+  transform: rotateY(180deg);
+}
+
+.back,
+.face {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  backface-visibility: hidden;
+}
+
+/* The back: a graphite plate with a hairline frame and the site's initial. */
+.back {
+  display: grid;
+  place-items: center;
+  background: var(--graphite);
+  color: var(--slate);
+  font-family: var(--display);
+  font-size: 34cqi;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.back::before {
+  content: '';
+  position: absolute;
+  inset: 7cqi;
+  border: 1px solid var(--slate);
+  border-radius: 3px;
+}
+
+.card[data-side='down']:hover .back::before {
+  border-color: var(--signal);
+}
+
+.face {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  justify-items: center;
+  align-items: center;
+  padding: 9cqi 4cqi 8cqi;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  text-align: center;
+  transform: rotateY(180deg);
+}
+
+.face svg {
+  width: 36cqi;
+  height: 36cqi;
+}
+
+.scope {
+  margin-top: 4cqi;
+  color: var(--slate);
+  font-size: max(0.625rem, 10cqi);
+  line-height: 1.2;
+}
+
+.name {
+  max-width: 100%;
+  font-family: var(--display);
+  font-size: clamp(0.8125rem, 17cqi, 1.375rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* A found pair is posted: signal under graphite. */
+.card[data-side='found'] .face {
+  border-color: var(--signal);
+  background: var(--signal);
+}
+
+.card[data-side='found'] .scope {
+  color: var(--graphite);
+}
+
+/* A wrong pair waits to turn back as a failure plate. */
+.board[aria-busy='true'] .card[data-side='up'] .face {
+  border: 2px solid var(--graphite);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .turn {
+    transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .face {
+    transition: background-color 240ms ease-out, border-color 240ms ease-out;
+  }
+}
+
+/* A dialog over the whole page: a white panel on a graphite scrim; the page behind it holds still. */
+:root:has(.modal[open]) {
+  overflow: hidden;
+}
+
+.modal {
+  width: min(26rem, 100% - 2rem);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--graphite);
+}
+
+.modal::backdrop {
+  background: rgb(31 41 51 / 0.72);
+}
+
+.modalBody {
+  display: grid;
+  justify-items: start;
+  gap: 1rem;
+  padding: 1.75rem 1.5rem 1.5rem;
+}
+
+.modalTitle {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.posted {
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  border-radius: 4px;
+  background: var(--signal);
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.note {
+  margin: 0;
+  color: var(--slate);
+}
+
+.actions {
+  margin-top: 0.5rem;
+}
+
+/* The leaderboard is a timing sheet: place plates, moves in the display face, one rule per row. */
+.results {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.results th {
+  padding: 0 0 0.4rem;
+  color: var(--slate);
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-align: left;
+}
+
+.results td {
+  padding: 0.35rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.results th:nth-child(2),
+.results td:nth-child(2) {
+  padding-right: 1.5rem;
+  text-align: right;
+}
+
+.results td:nth-child(2) {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.results tr[aria-current='true'] td {
+  font-weight: 700;
+}
+
+.place {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2rem;
+  border-radius: 4px;
+  background: var(--graphite);
+  color: var(--asphalt);
+  font-family: var(--display);
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.results tbody tr:first-child .place {
+  background: var(--signal);
+  color: var(--graphite);
+}
