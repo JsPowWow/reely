@@ -23,7 +23,7 @@ Each keystroke changes the text of one text node inside `<output>`; nothing else
 npm i @reely/dommy
 ```
 
-It has no third-party dependencies: its one dependency is `@reely/basics`, small helpers from the same repo. It ships ES modules with TypeScript types.
+It has no third-party dependencies, only packages from the same repo: `@reely/basics` (small helpers), `@reely/router` (behind `@reely/dommy/router`) and, as a peer that npm installs with it, `@reely/signals`, so an app holds one signal graph. It ships ES modules with TypeScript types.
 
 ### JSX setup
 

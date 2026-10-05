@@ -26,10 +26,11 @@ try {
       .split('\n')
       .at(-1);
   const tarball = pack(packageDir);
-  // the published @reely packages dommy depends on, and theirs (signals needs basics)
+  // the published @reely packages dommy depends on or takes as peers, and theirs (signals needs basics)
   const localDependencies = (dir, seen = new Set()) => {
-    const { dependencies = {} } = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
-    for (const name of Object.keys(dependencies).filter((dependency) => dependency.startsWith('@reely/'))) {
+    const { dependencies = {}, peerDependencies = {} } = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
+    const local = Object.keys({ ...dependencies, ...peerDependencies }).filter((name) => name.startsWith('@reely/'));
+    for (const name of local) {
       const dependencyDir = resolve(packageDir, '..', name.slice('@reely/'.length));
       if (!seen.has(dependencyDir)) {
         seen.add(dependencyDir);

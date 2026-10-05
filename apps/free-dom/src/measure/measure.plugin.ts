@@ -11,7 +11,7 @@ export interface PackageFacts {
   readonly version: string;
   /** Everything its entries export, with the reely packages it uses, minified and gzipped. */
   readonly gzipBytes: number;
-  /** The other reely packages it depends on, by directory name. */
+  /** The other reely packages it depends on or takes as peers, by directory name. */
   readonly uses: readonly string[];
   /** Its runtime dependencies from outside reely, by package name. */
   readonly outside: readonly string[];
@@ -63,7 +63,10 @@ const readManifest = async (file: string): Promise<Manifest> => {
   if (!isRecord(manifest) || typeof manifest.version !== 'string') {
     throw new Error(`${file} names no version`);
   }
-  const dependencies = isRecord(manifest.dependencies) ? Object.keys(manifest.dependencies) : [];
+  // a peer (`@reely/signals` of dommy) is used as much as a dependency
+  const dependencies = [manifest.dependencies, manifest.peerDependencies].flatMap((field) =>
+    isRecord(field) ? Object.keys(field) : []
+  );
   const subpaths = isRecord(manifest.exports) ? Object.keys(manifest.exports) : ['.'];
   return { version: manifest.version, dependencies, entries: subpaths.filter((subpath) => !subpath.endsWith('.json')) };
 };

@@ -6,6 +6,8 @@ Browser helpers over [`@reely/signals`](https://www.npmjs.com/package/@reely/sig
 npm i @reely/dommy @reely/dommy-kit
 ```
 
+`@reely/signals` is a peer dependency of both, installed with them: the kit and dommy share one signal graph and one owner.
+
 ```ts
 import { effect, signal } from '@reely/dommy';
 import { flip, later, listen, media, persisted, size, throttled } from '@reely/dommy-kit';

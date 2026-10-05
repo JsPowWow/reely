@@ -1,4 +1,4 @@
-// A package as a consumer gets it: packed with its @reely dependencies, installed in a clean
+// A package as a consumer gets it: packed with its @reely dependencies and peers, installed in a clean
 // project, `consumer/*.ts` compiled (strict, no DOM lib unless `consumer/tsconfig.json` asks for one)
 // and run (with `--readme`, the README's `ts` examples compiled too), then tree shaking checked:
 // a bare import ships nothing, and `consumer/shake.json` names are declared `once` or are `absent`.
@@ -24,8 +24,10 @@ const withLocalDependencies = (dir, seen = new Set()) => {
     return seen;
   }
   seen.add(dir);
-  const { dependencies = {} } = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
-  for (const name of Object.keys(dependencies).filter((dependency) => dependency.startsWith('@reely/'))) {
+  const { dependencies = {}, peerDependencies = {} } = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
+  // a peer (`@reely/signals`: one reactive graph per app) is packed too, never fetched from a registry
+  const local = Object.keys({ ...dependencies, ...peerDependencies }).filter((name) => name.startsWith('@reely/'));
+  for (const name of local) {
     withLocalDependencies(join(packagesDir, name.slice('@reely/'.length)), seen);
   }
   return seen;

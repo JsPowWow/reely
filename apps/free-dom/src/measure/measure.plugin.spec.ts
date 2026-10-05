@@ -7,7 +7,7 @@ import { factsOf, gzipOf, measures } from './measure.plugin';
 const packagesDir = join(import.meta.dirname, '../../../../packages');
 
 describe('factsOf', () => {
-  it('reads the version and the reely packages a package uses', async () => {
+  it('reads the version and the reely packages a package uses, its peers too', async () => {
     const manifest: unknown = JSON.parse(await readFile(join(packagesDir, 'dommy-kit/package.json'), 'utf8'));
 
     const facts = await factsOf(packagesDir, 'dommy-kit');

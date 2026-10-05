@@ -6,6 +6,8 @@ A small typed router for any web app, with no framework: path patterns typed int
 npm i @reely/router
 ```
 
+`@reely/signals` is a peer dependency, which npm installs with it: an app holds one signal graph, shared with `@reely/dommy` and anything else built on it.
+
 ## A vanilla app in one file
 
 ```ts
