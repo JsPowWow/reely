@@ -94,6 +94,7 @@ describe('startRouter', () => {
   afterEach(() => {
     router?.stop();
     router = undefined;
+    vi.useRealTimers();
     scrollTo.mockReset();
     vi.restoreAllMocks();
     Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
@@ -240,6 +241,24 @@ describe('startRouter', () => {
     await vi.waitFor(() => expect(heading()).toBe('Cart'));
 
     expect(scrollTo).toHaveBeenLastCalledWith(0, 0);
+  });
+
+  it('leaves a history state the app stored as it is, and skips a scroll save the browser refuses', async () => {
+    await start(shop, '/cart', ['draft']);
+    vi.useFakeTimers();
+    window.dispatchEvent(new Event('scroll'));
+    vi.advanceTimersByTime(150);
+    const stored: unknown = history.state;
+    history.replaceState(null, '', '/cart');
+    // Safari past 100 calls in 30 seconds
+    vi.spyOn(history, 'replaceState').mockImplementation(() => {
+      throw new DOMException('Too many calls to the history API', 'SecurityError');
+    });
+
+    window.dispatchEvent(new Event('scroll'));
+
+    expect(stored).toEqual(['draft']);
+    expect(() => vi.advanceTimersByTime(150)).not.toThrow();
   });
 
   it('opens a reloaded page where the reader had scrolled it', async () => {

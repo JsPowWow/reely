@@ -1,5 +1,5 @@
 import { isPlainObject } from '@reely/basics';
-import { hasProperty, isNumber } from '@reely/utils';
+import { hasProperty, isNil, isNumber } from '@reely/utils';
 import type { Nullable } from '@reely/utils';
 
 import { decode } from './router.decode';
@@ -13,9 +13,20 @@ export const keptScroll = (): number | undefined => {
   return isNumber(scrolled) ? scrolled : undefined;
 };
 
-/** Keeps where the page of the current history entry is scrolled, and what else its state held. */
+/**
+ * Keeps where the page of the current history entry is scrolled, and what else its state held; a state
+ * the app stored that is no plain object stays as it is.
+ */
 export const keepScroll = (): void => {
-  history.replaceState({ ...(isPlainObject(history.state) ? history.state : {}), [scrollKey]: window.scrollY }, '');
+  const { state } = history;
+  if (!isNil(state) && !isPlainObject(state)) {
+    return;
+  }
+  try {
+    history.replaceState({ ...state, [scrollKey]: window.scrollY }, '');
+  } catch {
+    // Safari refuses past 100 calls in 30 seconds: the next pause in scrolling saves it
+  }
 };
 
 /** The element the hash of the location names. */
