@@ -1,6 +1,6 @@
 {
   "name": "@reely/signals",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Signals, computed values and effects: a push-pull graph with owners that release what a piece of work subscribed. No DOM.",
   "license": "MIT",
   "type": "module",
