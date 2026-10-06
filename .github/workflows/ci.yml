@@ -1,0 +1,44 @@
+name: CI
+
+# Lint, test, typecheck, build and check as a consumer every project a change affects: on a pull
+# request against its base, on main against the last commit whose CI passed.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  # nrwl/nx-set-shas reads past workflow runs to find the last green commit on main
+  actions: read
+
+jobs:
+  affected:
+    name: Affected projects
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set base and head for nx affected
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Lint, test, typecheck, build, consumer
+        run: npx nx affected -t lint test typecheck build consumer
+        env:
+          NX_DAEMON: 'false'

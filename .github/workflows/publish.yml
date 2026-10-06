@@ -52,7 +52,7 @@ jobs:
       - name: Install Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           # no `registry-url`: it writes a placeholder NODE_AUTH_TOKEN that npm sends instead of OIDC
 
       # trusted publishing (OIDC, no token) needs npm 11.5.1 or later
@@ -60,7 +60,7 @@ jobs:
         run: npm install -g npm@^11.5.1 && npm --version
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       # the tarball ships `dist`, built here; each package is installed from its tarball into a
       # clean project and checked there (types, run, tree shaking) first
