@@ -69,13 +69,13 @@
   },
   "devDependencies": {
     "@reely/dommy": "*",
-    "@reely/signals": "^0.1.2",
+    "@reely/signals": "^0.2.0",
     "@reely/utils": "*"
   },
   "dependencies": {
     "@reely/basics": "^0.1.1"
   },
   "peerDependencies": {
-    "@reely/signals": "^0.1.2"
+    "@reely/signals": "^0.2.0"
   }
 }
