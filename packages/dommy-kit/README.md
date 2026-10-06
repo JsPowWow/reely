@@ -32,7 +32,7 @@ effect(() => console.log(phone.value, theme.value, width.value));
 ```
 
 - `media(query)`, `size(element)` and `throttled(source, ms)` give computeds.
-- `persisted(key, initial, { storage, is })` gives a signal, written to the storage only when it changes; what is read back must be of the kind of `initial`, or pass `is` to check it, which a nullable value (`persisted<string | null>('user', null, { is })`) must; a storage that throws leaves it working in memory. It follows writes from other tabs, and resets to `initial` when one clears the storage, only for a real storage area (`localStorage` by default, `sessionStorage`).
+- `persisted(key, initial, { storage, is, onSaveError })` gives a signal, written to the storage only when it changes; what is read back must be of the kind of `initial`, or pass `is` to check it, which a nullable value (`persisted<string | null>('user', null, { is })`) must name; a storage that throws leaves it working in memory, and `onSaveError` hears the error. It follows writes from other tabs, and resets to `initial` when one clears the storage, only for a real storage area (`localStorage` by default, `sessionStorage`). A wrapper of your own that takes an optional `is` can pass it on as `{ is }`; it then answers for a nullable value itself.
 - `listen(target, type, handler, options)` types the event by target and returns the function that removes it.
 - `later(ms, fn)` runs `fn` once after `ms`, unless the view is disposed or the effect runs again first; it returns its own cancel. `later(0, fn)` runs after the render is in the document.
 - `flip(container, change)` animates the children `change` moved, not those it added; nothing moves under reduced motion.
@@ -56,28 +56,20 @@ effect(() => {
 });
 ```
 
-### A storage that reports a failed save
+### Telling the user that saving failed
 
-`persisted` keeps working in memory when the storage throws (a full quota, storage blocked in a private window), and tries it again on the next write. To tell the user, pass a storage that notes the failure in a signal and rethrows the error (a wrapper is not a storage area, so it does not follow other tabs):
+`persisted` keeps working in memory when the storage throws (a full quota, storage blocked in a private window), and tries it again on the next write. `onSaveError` hears the error, so the app can say so; the storage stays `localStorage`, so other tabs are still followed:
 
 ```ts
 import { signal } from '@reely/dommy';
 import { persisted } from '@reely/dommy-kit';
 
-const tabOnly = signal(false); // true while saving fails: say "saved in this tab only"
+const tabOnly = signal(false); // say "saved in this tab only" once saving fails
 
-const reportingStorage: Pick<Storage, 'getItem' | 'setItem'> = {
-  getItem: (key) => localStorage.getItem(key),
-  setItem: (key, value) => {
-    try {
-      localStorage.setItem(key, value);
-      tabOnly.value = false;
-    } catch (error) {
-      tabOnly.value = true;
-      throw error;
-    }
+const garage = persisted('garage', [{ car: 'Volvo 240', laps: 0 }], {
+  onSaveError: (error) => {
+    tabOnly.value = true;
+    console.warn('The garage is not saved:', error);
   },
-};
-
-const garage = persisted('garage', [{ car: 'Volvo 240', laps: 0 }], { storage: reportingStorage });
+});
 ```

@@ -473,8 +473,8 @@ export const ru: DocsText = {
             уже есть в <code>@reely/dommy-kit</code>: <code>persisted</code> сохраняет сигнал в storage,{' '}
             <code>throttled</code> пропускает не больше одного изменения за интервал, а <code>later</code> откладывает
             запись и отменяется следующим изменением, то есть работает как debounce. Заполненная квота не ломает{' '}
-            <code>persisted</code>: значение остаётся в памяти, а на следующей записи хранилище пробуется снова; в
-            README <code>@reely/dommy-kit</code> есть хранилище, которое сообщает о неудачном сохранении.
+            <code>persisted</code>: значение остаётся в памяти, на следующей записи хранилище пробуется снова, а о
+            неудачном сохранении узнаёт <code>onSaveError</code>.
           </p>
           <Code caption='derivation.ts' source={derivationSource} />
           <h2>Самоссылки в эффектах</h2>
@@ -506,7 +506,8 @@ export const ru: DocsText = {
           <p>
             Чтобы найти такой узел, <code>{'defineDommyConfig({ useLogger: true, logger, warnUnowned: true })'}</code>{' '}
             предупреждает о первой привязке, созданной вне владельца. Узел из обработчика события отдаётся владельцу
-            через <code>mount(list, () =&gt; …)</code>: его dispose убирает узел и освобождает привязки.
+            через <code>mount(list, () =&gt; …)</code>: его dispose убирает узел и освобождает привязки; узел уровня
+            модуля — под <code>withOwner(fn)</code>, чей dispose освобождает его привязки.
           </p>
           <h2>Хуки жизненного цикла</h2>
           <p>

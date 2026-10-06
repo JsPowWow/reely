@@ -485,8 +485,7 @@ const en = {
             <code>@reely/dommy-kit</code>: <code>persisted</code> keeps a signal in storage, <code>throttled</code>{' '}
             passes at most one change per interval, and <code>later</code> delays a write and is cancelled by the next
             change, which makes it a debounce. A full quota does not break <code>persisted</code>: it keeps the value in
-            memory and tries the storage again on the next write; the <code>@reely/dommy-kit</code> README has a storage
-            that reports a failed save.
+            memory, tries the storage again on the next write, and tells <code>onSaveError</code> that saving failed.
           </p>
           <Code caption='derivation.ts' source={derivationSource} />
           <h2>Self-referencing in effects</h2>
@@ -516,7 +515,8 @@ const en = {
           <p>
             To find such a node, <code>{'defineDommyConfig({ useLogger: true, logger, warnUnowned: true })'}</code>{' '}
             warns of the first binding made outside any owner. A node made in an event handler goes under an owner with{' '}
-            <code>mount(list, () =&gt; …)</code>, whose dispose takes it out and releases it.
+            <code>mount(list, () =&gt; …)</code>, whose dispose takes it out and releases it; one that lives at module
+            level goes under <code>withOwner(fn)</code>, whose dispose releases it.
           </p>
           <h2>Lifecycle hooks</h2>
           <p>

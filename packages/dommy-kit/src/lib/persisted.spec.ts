@@ -1,4 +1,6 @@
 import { effect, mount } from '@reely/dommy';
+import type { Signal } from '@reely/dommy';
+import { noop } from '@reely/utils';
 
 import { persisted } from '../index';
 
@@ -30,6 +32,7 @@ describe('persisted', () => {
   afterEach(() => {
     localStorage.clear();
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('starts from the stored value and stores every write', () => {
@@ -110,6 +113,54 @@ describe('persisted', () => {
 
     expect(setItem).toHaveBeenCalledTimes(2);
     expect(storage.getItem('garage')).toBe('["Volvo","Saab","Audi"]');
+  });
+
+  it('reports a failed save, and still follows other tabs in the storage it saves to', () => {
+    const quota = new DOMException('Quota exceeded', 'QuotaExceededError');
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw quota;
+    });
+    const onSaveError = vi.fn();
+    const garage = persisted('garage', ['Volvo'], { onSaveError });
+
+    garage.value = ['Volvo', 'Saab'];
+    fromAnotherTab({ key: 'garage', newValue: '["Audi"]' });
+
+    expect(onSaveError).toHaveBeenCalledExactlyOnceWith(quota);
+    expect(garage.value).toEqual(['Audi']);
+  });
+
+  it('reports a throwing `onSaveError` as uncaught, and keeps the value', () => {
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('Quota exceeded', 'QuotaExceededError');
+    });
+    const reportError = vi.fn();
+    vi.stubGlobal('reportError', reportError);
+    const banner = new Error('banner failed');
+    const garage = persisted('garage', ['Volvo'], {
+      onSaveError: () => {
+        throw banner;
+      },
+    });
+
+    const write = (): void => {
+      garage.value = ['Saab'];
+    };
+
+    expect(write).not.toThrow();
+    expect(garage.value).toEqual(['Saab']);
+    expect(reportError).toHaveBeenCalledWith(banner);
+  });
+
+  it('lets a generic wrapper pass `is` on, `undefined` included', () => {
+    const stored = <T>(key: string, initial: T, is?: (value: unknown) => value is T): Signal<T> =>
+      persisted(`app:${key}`, initial, { onSaveError: noop, is });
+
+    const lang = stored('lang', 'en');
+    const user = stored<string | null>('user', null, isNullableString);
+    lang.value = 'ru';
+
+    expect([localStorage.getItem('app:lang'), user.value]).toEqual(['"ru"', null]);
   });
 
   it('follows a write from another tab until its render is disposed, without writing it back', () => {
