@@ -1,6 +1,6 @@
 {
   "name": "@reely/dommy-kit",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Browser helpers over @reely/signals: media queries, element size, throttling, storage, listeners, timers and FLIP moves, each stopping with the render that created it.",
   "license": "MIT",
   "type": "module",
