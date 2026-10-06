@@ -1,6 +1,6 @@
 {
   "name": "@reely/async",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Retry an async task with exponential backoff, one task or several at once.",
   "license": "MIT",
   "type": "module",

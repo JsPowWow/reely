@@ -1,6 +1,6 @@
 {
   "name": "@reely/logger",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Scoped console loggers that stay silent until enabled, with a pass-through `logWith` for pipelines.",
   "license": "MIT",
   "type": "module",

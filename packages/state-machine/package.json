@@ -1,6 +1,6 @@
 {
   "name": "@reely/state-machine",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A finite state machine with a config that reads like XState's: sync by default, async on request, one transition at a time.",
   "license": "MIT",
   "type": "module",
