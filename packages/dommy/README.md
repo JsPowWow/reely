@@ -486,7 +486,7 @@ To read a signal without depending on it, use `untracked` or `.peek()`. Two effe
 
 reely has no garbage collection of bindings, so nothing is dropped behind your back: a view keeps its bindings while it is built, before it is connected, and across an `await`. They are released by the owner instead: `mount` returns the dispose, and a branch of `For`, `Show`, `Keyed` or `Await` releases what was created in it (computeds and effects included) when it goes away.
 
-The cost is the other side: a node built outside any owner (at module level, or in an event handler and appended by hand) keeps its bindings as long as their signals live. Build views inside `mount`, and show nodes that come and go through `Show`, `Keyed`, `For` or `Await`.
+The cost is the other side: a node built outside any owner (at module level, or in an event handler and appended by hand) keeps its bindings as long as their signals live. Build views inside `mount`, and show nodes that come and go through `Show`, `Keyed`, `For` or `Await`; a node that must live at module level goes under `withOwner(fn)`, whose dispose releases it.
 
 To find such a node, ask dommy to warn of the first binding made outside any owner. It is off by default, since a view built at module level and mounted later is a fair case. A node made in an event handler goes under an owner with `mount`, whose dispose takes it out and releases it:
 

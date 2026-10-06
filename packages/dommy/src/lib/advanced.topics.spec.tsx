@@ -1,7 +1,7 @@
 import type { ILogger } from '@reely/logger';
 import { subscriberCount } from '@reely/signals/testing';
 
-import { For, Show, computed, defineDommyConfig, effect, mount, onCleanup, signal } from '../index';
+import { For, Show, computed, defineDommyConfig, effect, mount, onCleanup, signal, withOwner } from '../index';
 
 // The questions that come up once the basics work; README "Advanced topics" explains each one.
 
@@ -345,6 +345,22 @@ describe('Releasing bindings', () => {
       expect(owned).toBe(0);
       expect(warn).toHaveBeenCalledOnce();
       expect(warn.mock.calls[0]?.[0]).toContain('outside any owner');
+    });
+
+    it('warns of none made under `withOwner`, whose dispose releases them', () => {
+      const warn = vi.fn();
+      const label = signal('Code');
+      defineDommyConfig({ useLogger: true, logger: loggerWith(warn), warnUnowned: true });
+
+      const release = withOwner((dispose) => {
+        void (<textarea aria={{ ariaLabel: label }} />);
+        return dispose;
+      });
+      const held = subscriberCount(label);
+      release();
+
+      expect(warn).not.toHaveBeenCalled();
+      expect([held, subscriberCount(label)]).toEqual([1, 0]);
     });
 
     it('warns of a `For` made outside any owner, whose rows nothing releases either', () => {

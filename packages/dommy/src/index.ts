@@ -25,4 +25,5 @@ export {
   batch,
   untracked,
   onCleanup,
+  withOwner,
 } from '@reely/signals';
