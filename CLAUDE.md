@@ -29,7 +29,7 @@ Every new module, fix and refactor follows these; a fix that has to cross a boun
 - `packages/signals` — `@reely/signals`, published (`scope:shared`): `signal`/`computed`/`effect`/`batch`/`untracked` over `reelx`, a push-pull graph, and the owner (`withOwner`, `onCleanup`); no DOM.
 - `packages/router` — `@reely/router`, published (`scope:shared`): typed routes (`defineRoutes`, `href`) and `startRouter` with the browser's history or `memoryHistory`; any page type, no framework.
 - `packages/dommy` — `@reely/dommy`: DOM element factories, JSX runtime, bindings of `@reely/signals` (re-exported), the `Router` component over `@reely/router`. Its real consumer is JsPowWow/ai-race.
-- `packages/dommy-kit` — `@reely/dommy-kit` (`scope:dommy`): browser helpers over signals (`media`, `size`, `throttled`, `persisted`, `listen`, `later`, `flip`), each stopping with the owner (render) that created it.
+- `packages/dommy-kit` — `@reely/dommy-kit` (`scope:dommy`): browser helpers over signals (`media`, `size`, `throttled`, `debounced`, `persisted`, `listen`, `hold`, `later`, `flip`), each stopping with the owner (render) that created it.
 - `packages/async`, `strings`, `colors` — small published helpers (older, looser style — don't copy it).
 - `apps/free-dom` — dommy playground; `apps/star-battle` — canvas game; `labs-ignore/` — experiments, not linted, not shipped.
 

@@ -22,5 +22,32 @@
     "once": [
       "media"
     ]
+  },
+  {
+    "name": "debounced alone",
+    "code": "import { debounced } from '@reely/dommy-kit'; debounced(console.log, 300)('lap');",
+    "absent": [
+      "signalProto",
+      "computedProto",
+      "persisted",
+      "listen"
+    ],
+    "once": [
+      "debounced"
+    ]
+  },
+  {
+    "name": "hold alone",
+    "code": "import { hold } from '@reely/dommy-kit'; hold(document.body, { down: console.log, up: console.log });",
+    "absent": [
+      "signalProto",
+      "computedProto",
+      "persisted",
+      "debounced"
+    ],
+    "once": [
+      "hold",
+      "listen"
+    ]
   }
 ]

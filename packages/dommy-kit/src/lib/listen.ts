@@ -15,24 +15,27 @@ export type EventMapOf<T extends EventTarget> = T extends Window
           : Record<string, Event>;
 
 /**
- * Adds a typed event listener that goes away with the render that added it, or when the returned
- * function or `options.signal` stops it.
+ * Adds a typed event listener, for one type or several (`['pointerup', 'pointercancel']`), that goes
+ * away with the render that added it, or when the returned function or `options.signal` stops it.
  */
 export function listen<T extends EventTarget, K extends keyof EventMapOf<T> & string>(
   target: T,
-  type: K,
+  type: K | readonly K[],
   handler: (event: EventMapOf<T>[K]) => void,
   options?: AddEventListenerOptions
 ): VoidFunction;
 export function listen(
   target: EventTarget,
-  type: string,
+  type: string | readonly string[],
   handler: (event: Event) => void,
   options: AddEventListenerOptions = {}
 ): VoidFunction {
   const controller = new AbortController();
   const signals = hasSome(options.signal) ? [controller.signal, options.signal] : [controller.signal];
-  target.addEventListener(type, handler, { ...options, signal: AbortSignal.any(signals) });
+  const signal = AbortSignal.any(signals);
+  for (const each of [type].flat()) {
+    target.addEventListener(each, handler, { ...options, signal });
+  }
   const stop = (): void => controller.abort();
   onCleanup(stop);
   return stop;

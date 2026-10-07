@@ -29,6 +29,22 @@ describe('listen', () => {
     expect(handler).toHaveBeenCalledOnce();
   });
 
+  it('listens to several types with one handler, the event typed as any of them, and stops them all', () => {
+    const ends: string[] = [];
+    const knob = document.createElement('div');
+    const stop = listen(knob, ['pointerup', 'pointercancel'], (event) => {
+      expectTypeOf(event).toEqualTypeOf<PointerEvent>();
+      ends.push(event.type);
+    });
+
+    knob.dispatchEvent(new Event('pointerup'));
+    knob.dispatchEvent(new Event('pointercancel'));
+    stop();
+    knob.dispatchEvent(new Event('pointerup'));
+
+    expect(ends).toEqual(['pointerup', 'pointercancel']);
+  });
+
   it('stops when the signal from the options aborts', () => {
     const handler = vi.fn();
     const controller = new AbortController();

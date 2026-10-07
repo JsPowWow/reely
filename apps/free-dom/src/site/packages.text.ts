@@ -15,7 +15,7 @@ const en = {
       'Typed routes, lazy pages, links and Back taken over, scroll and focus where the reader expects them, and settings like ?lang that stay in the address. Any app, no framework.',
     dommy: 'Tag factories and JSX that return real DOM nodes; a signal updates only the node bound to it.',
     'dommy-kit':
-      'Browser helpers over signals: media, size, throttled, persisted, listen, later, flip. Each stops with its render.',
+      'Browser helpers over signals: media, size, throttled, debounced, persisted, listen, hold, later, flip. Each stops with its render.',
     emitter: 'A typed event emitter: a listener that throws does not keep the others from hearing.',
     queue: 'Task queues: SyncQueue runs each task to completion, AsyncQueue runs a few at a time.',
     'state-machine':
