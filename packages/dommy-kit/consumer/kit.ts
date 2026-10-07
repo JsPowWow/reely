@@ -15,7 +15,9 @@ export const start = (board: HTMLElement): void => {
   flip(board, () => board.append(...Array.from(board.children).reverse()));
   const save = debounced((width: number) => localStorage.setItem('width', String(width)), 300);
   listen(board, ['pointerup', 'pointercancel'], (event) => save(event.clientX));
-  hold(board, (down) => (down.isPrimary ? { move: (event) => save(event.clientX), up: save.flush } : undefined));
+  hold(board, (down) => (down.isPrimary ? { move: (event) => save(event.clientX), up: save.flush } : undefined), {
+    prevent: true,
+  });
 };
 
 // what a consumer's function returns from the kit must have a type its declarations can name

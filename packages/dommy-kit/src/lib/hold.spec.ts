@@ -65,6 +65,23 @@ describe('hold', () => {
     expect(up).not.toHaveBeenCalled();
   });
 
+  it('with `prevent`, cancels the default of the presses it holds, and only of those', () => {
+    const element = knob();
+    const plain = knob();
+    hold(element, (down) => (down.pointerId === 9 ? undefined : {}), { prevent: true });
+    hold(plain, () => ({}));
+    // `dispatchEvent` answers whether the default still happens
+    const press = (target: Element, pointerId: number): boolean =>
+      target.dispatchEvent(Object.assign(new Event('pointerdown', { cancelable: true }), { pointerId }));
+
+    const left = press(element, 9);
+    const held = press(element, 1);
+    const whileHeld = press(element, 2);
+    const withoutPrevent = press(plain, 1);
+
+    expect([left, held, whileHeld, withoutPrevent]).toEqual([true, false, true, true]);
+  });
+
   it('is not stuck when the capture fails', () => {
     const element = knob();
     element.setPointerCapture = (): void => {

@@ -10,6 +10,12 @@ export interface HeldPress {
   up?: (event: PointerEvent) => void;
 }
 
+/** How `hold` treats the presses it holds. */
+export interface HoldOptions {
+  /** Calls `preventDefault()` on the `pointerdown` of each press it holds, not of those it leaves alone. */
+  prevent?: boolean;
+}
+
 /**
  * Holds a press on `element`: `press` gets the `pointerdown` and returns what this press does, or
  * nothing to leave it alone. The pointer is captured, so its moves and release reach `element` off
@@ -19,7 +25,8 @@ export interface HeldPress {
  */
 export const hold = (
   element: HTMLElement | SVGElement,
-  press: (event: PointerEvent) => HeldPress | void
+  press: (event: PointerEvent) => HeldPress | void,
+  { prevent = false }: HoldOptions = {}
 ): VoidFunction => {
   let held: Nullable<{ readonly pointerId: number; readonly press: HeldPress }> = null;
   const stops = [
@@ -29,6 +36,9 @@ export const hold = (
       }
       const pressed = press(event);
       if (hasSome(pressed)) {
+        if (prevent) {
+          event.preventDefault();
+        }
         element.setPointerCapture(event.pointerId);
         held = { pointerId: event.pointerId, press: pressed };
       }
