@@ -1,4 +1,5 @@
-import { isBoolean, isInstanceOf, isNil } from '@reely/utils';
+import { isBoolean } from '@reely/basics';
+import { isInstanceOf, isNil } from '@reely/utils';
 
 import { getDommyLogger } from '../config';
 import { isSafeAttributeEntry, removeAttribute, setAttribute } from './attributes/element.attributes';

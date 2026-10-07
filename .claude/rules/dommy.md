@@ -27,7 +27,7 @@ Signals bound to the DOM (point updates, no virtual DOM), owner/`dispose`, flow 
 - Unused destructured fields — `_ignored*`.
 
 ## Reuse, don't duplicate
-- Narrowing: `hasSome`, `isSomeFunction`, `isPlainObject` — from `@reely/basics`; `isNil`, `isString`/`isNumber`/`isBoolean`, `isPrimitiveValue`, `hasProperty`, `isInstanceOf`, `isNonEmpty`, `isKeyValueObject` (props: class instances too) — from `@reely/utils`. `switch` over a union ends with `exhaustiveGuard`.
+- Narrowing: `hasSome`, `isSomeFunction`, `isPlainObject`, `isString`, `isBoolean` — from `@reely/basics`; `isNil`, `isNumber`, `isPrimitiveValue`, `hasProperty`, `isInstanceOf`, `isNonEmpty`, `isKeyValueObject` (props: class instances too) — from `@reely/utils`. `switch` over a union ends with `exhaustiveGuard`.
 - Unknown thrown values → `toErrorWithMessage`; risky calls → `Either.tryCatch`; defaults → `withDefault`/`mapNullable`.
 - `noop`/`identity` instead of inline `() => {}` / `(x) => x`.
 - Logging only through the dommy config logger (`getDommyLogger()?.warn(...)`), read **at call time**, never cached at module load. No `console.*`.

@@ -1,4 +1,5 @@
-import { hasProperty, isBoolean, mapNullable } from '@reely/utils';
+import { isBoolean } from '@reely/basics';
+import { hasProperty, mapNullable } from '@reely/utils';
 
 import { removeAttribute, setAttribute } from './element.attributes';
 

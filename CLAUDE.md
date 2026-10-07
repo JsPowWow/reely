@@ -23,7 +23,7 @@ Every new module, fix and refactor follows these; a fix that has to cross a boun
 
 ## Layout
 
-- `packages/basics` — `@reely/basics`, published (`scope:shared`): production-grade helpers promoted from utils (`forEachSettled`, `reportUncaught`, `hasSome`, `isSomeFunction`, `isPlainObject`).
+- `packages/basics` — `@reely/basics`, published (`scope:shared`): production-grade helpers promoted from utils (`forEachSettled`, `reportUncaught`, `hasSome`, `isSomeFunction`, `isPlainObject`, `isString`, `isBoolean`).
 - `packages/utils` — `@reely/utils`, private (`scope:shared`): type guards, fp (`pipe`, `flow`, `Either`, `Maybe`), nullable helpers, errors, shared types. **One function — one file** (`src/lib/<group>/<fnName>.ts`) with a spec next to it.
 - `packages/logger` — `@reely/logger` (`scope:shared`): `scopedLogger(scope)`, `logWith(level, prefix)` for `pipe`, `WithUseLogger<T>`.
 - `packages/signals` — `@reely/signals`, published (`scope:shared`): `signal`/`computed`/`effect`/`batch`/`untracked` over `reelx`, a push-pull graph, and the owner (`withOwner`, `onCleanup`); no DOM.

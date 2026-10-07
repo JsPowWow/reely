@@ -10,7 +10,8 @@
       "isString",
       "messageOf",
       "toErrorWithMessage",
-      "createObjectReference"
+      "createObjectReference",
+      "isBoolean"
     ],
     "once": ["forEachSettled"]
   },
@@ -25,7 +26,8 @@
       "isString",
       "messageOf",
       "toErrorWithMessage",
-      "createObjectReference"
+      "createObjectReference",
+      "isBoolean"
     ],
     "once": ["isSomeFunction"]
   },
@@ -40,7 +42,8 @@
       "isString",
       "messageOf",
       "toErrorWithMessage",
-      "createObjectReference"
+      "createObjectReference",
+      "isBoolean"
     ],
     "once": ["isPlainObject"]
   },
@@ -55,7 +58,8 @@
       "isString",
       "messageOf",
       "toErrorWithMessage",
-      "createObjectReference"
+      "createObjectReference",
+      "isBoolean"
     ],
     "once": ["hasSome"]
   },
@@ -70,7 +74,8 @@
       "hasSome",
       "messageOf",
       "toErrorWithMessage",
-      "createObjectReference"
+      "createObjectReference",
+      "isBoolean"
     ],
     "once": ["isString"]
   },
@@ -97,8 +102,25 @@
       "hasSome",
       "isString",
       "messageOf",
-      "toErrorWithMessage"
+      "toErrorWithMessage",
+      "isBoolean"
     ],
     "once": ["createObjectReference"]
+  },
+  {
+    "name": "isBoolean alone",
+    "code": "import { isBoolean } from '@reely/basics'; console.log(isBoolean(1));",
+    "absent": [
+      "forEachSettled",
+      "reportUncaught",
+      "isSomeFunction",
+      "isPlainObject",
+      "hasSome",
+      "isString",
+      "messageOf",
+      "toErrorWithMessage",
+      "createObjectReference"
+    ],
+    "once": ["isBoolean"]
   }
 ]

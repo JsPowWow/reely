@@ -1,6 +1,6 @@
-import { isSomeFunction } from '@reely/basics';
+import { isBoolean, isSomeFunction } from '@reely/basics';
 import type { Bivariant, Nullable } from '@reely/utils';
-import { hasProperty, isBoolean, isInstanceOf, isNil, isNonEmpty, toNonNullableItems } from '@reely/utils';
+import { hasProperty, isInstanceOf, isNil, isNonEmpty, toNonNullableItems } from '@reely/utils';
 
 import type { DommyElement } from '../types/dommy.types';
 

@@ -9,6 +9,7 @@ export {
   type Ref,
 } from './lib/objects/createObjectReference';
 export { hasSome } from './lib/objects/hasSome';
+export { isBoolean } from './lib/objects/isBoolean';
 export { isPlainObject } from './lib/objects/isPlainObject';
 export { isSomeFunction } from './lib/objects/isSomeFunction';
 export { isString } from './lib/objects/isString';
