@@ -87,7 +87,7 @@
     "@reely/utils": "*"
   },
   "dependencies": {
-    "@reely/basics": "^0.1.2",
+    "@reely/basics": "^0.1.4",
     "@reely/router": "^0.3.0"
   },
   "peerDependencies": {
