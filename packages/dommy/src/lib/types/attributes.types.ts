@@ -24,9 +24,38 @@ type AriaIdReference =
   | 'ariaLabelledby'
   | 'ariaOwns';
 
-/** ARIA values by `ARIAMixin` property name (`ariaLabel`) or ID-reference name (`ariaLabelledby`). */
+/**
+ * ARIA states that take `"true"` or `"false"`, some among other tokens (`ariaChecked: 'mixed'`);
+ * `Pick` refuses a name `ARIAMixin` lacks.
+ */
+type AriaTrueFalse = keyof Pick<
+  ARIAMixin,
+  | 'ariaAtomic'
+  | 'ariaBusy'
+  | 'ariaChecked'
+  | 'ariaCurrent'
+  | 'ariaDisabled'
+  | 'ariaExpanded'
+  | 'ariaHasPopup'
+  | 'ariaHidden'
+  | 'ariaInvalid'
+  | 'ariaModal'
+  | 'ariaMultiLine'
+  | 'ariaMultiSelectable'
+  | 'ariaPressed'
+  | 'ariaReadOnly'
+  | 'ariaRequired'
+  | 'ariaSelected'
+>;
+
+/**
+ * ARIA values by `ARIAMixin` property name (`ariaLabel`) or ID-reference name (`ariaLabelledby`);
+ * a true/false state also takes a boolean (`ariaPressed: on`).
+ */
 export type DOMElementAria = {
-  [K in keyof ARIAMixin as ARIAMixin[K] extends Nullable<string> ? K : never]?: MaybeReactive<string>;
+  [K in keyof ARIAMixin as ARIAMixin[K] extends Nullable<string> ? K : never]?: K extends AriaTrueFalse
+    ? MaybeReactive<string | boolean>
+    : MaybeReactive<string>;
 } & {
   [K in AriaIdReference]?: MaybeReactive<string>;
 };

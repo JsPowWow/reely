@@ -97,10 +97,7 @@ export const HelpWidget = (): Node => {
   const help = memoryHistory(paths.topics);
   const widget = (
     // the topic shown stays while the next answer is on its way: the bar under the address says one is coming
-    <aside
-      className={css.app}
-      aria={{ ariaBusy: () => String(help.loading()) }}
-    >
+    <aside className={css.app} aria={{ ariaBusy: help.loading }}>
       <p className={css.address}>{() => help.path()}</p>
       <div className={css.body}>
         <nav className={css.menu}>

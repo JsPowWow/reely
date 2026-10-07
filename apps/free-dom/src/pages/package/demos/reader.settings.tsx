@@ -29,7 +29,7 @@ export const ReaderSettings = (): Node => {
         {sizes.map((choice) => (
           <button
             type='button'
-            aria={{ ariaPressed: () => String(size.value === choice) }}
+            aria={{ ariaPressed: () => size.value === choice }}
             onClick={() => (size.value = choice)}
           >
             {labels[choice]}

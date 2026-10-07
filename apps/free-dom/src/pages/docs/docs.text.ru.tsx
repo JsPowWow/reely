@@ -85,7 +85,8 @@ export const ru: DocsText = {
             </li>
             <li>
               <code>{"aria={{ role: 'status', ariaLabel: 'Cart total' }}"}</code> задаёт <code>role</code> и{' '}
-              <code>aria-*</code>.
+              <code>aria-*</code>. Состояние «да или нет», например <code>ariaPressed</code>, принимает и булево
+              значение: <code>ariaPressed: on</code>.
             </li>
             <li>
               <code>onClick</code> и любой другой проп <code>on*</code> принимает функцию; событие и{' '}

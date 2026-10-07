@@ -119,7 +119,7 @@ export const MemoryGame = ({
               className={css.board}
               aria={{
                 ariaLabel: 'Cards',
-                ariaBusy: () => String(phase() === 'wrongPair'),
+                ariaBusy: () => phase() === 'wrongPair',
               }}
             >
               {deck.map((face, place) => (

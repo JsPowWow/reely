@@ -44,7 +44,7 @@ export const SiteHeader = ({ current }: { current?: SiteSection }): Node => (
           type='button'
           className={css.language}
           lang={code}
-          aria={{ ariaLabel: `${code.toUpperCase()}, ${name}`, ariaPressed: () => String(locale.value === code) }}
+          aria={{ ariaLabel: `${code.toUpperCase()}, ${name}`, ariaPressed: () => locale.value === code }}
           onClick={() => chooseLocale(code)}
         >
           {code.toUpperCase()}

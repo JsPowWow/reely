@@ -100,7 +100,7 @@ export const CurrencyPrices = (): Node => {
           {currencies.map((each) => (
             <button
               type='button'
-              aria={{ ariaPressed: () => String(currency() === each) }}
+              aria={{ ariaPressed: () => currency() === each }}
               onClick={() => pay(each)}
             >
               {each.toUpperCase()}

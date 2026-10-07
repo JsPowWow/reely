@@ -182,6 +182,22 @@ describe('createElement: properties and attributes', () => {
     expect(listing.getAttribute('aria-describedby')).toBe('hint');
   });
 
+  it('renders a boolean ARIA state as `"true"` or `"false"`, and keeps its other tokens', () => {
+    const pressed = signal(false);
+    const toggle = createElement('button', {
+      aria: { ariaPressed: pressed, ariaExpanded: () => pressed.value, ariaChecked: 'mixed', ariaHidden: false },
+    });
+
+    pressed.value = true;
+
+    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(toggle.getAttribute('aria-checked')).toBe('mixed');
+    expect(toggle.getAttribute('aria-hidden')).toBe('false');
+    // @ts-expect-error a name or a value is never true or false
+    createElement('button', { aria: { ariaLabel: true } });
+  });
+
   it('does not render `children` or `eventsAbortSignal` as attributes', () => {
     const element = createElement('div', {
       children: 'text',

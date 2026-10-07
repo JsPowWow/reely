@@ -100,7 +100,8 @@ const en = {
             </li>
             <li>
               <code>{"aria={{ role: 'status', ariaLabel: 'Cart total' }}"}</code> sets <code>role</code> and{' '}
-              <code>aria-*</code>.
+              <code>aria-*</code>. A true/false state, such as <code>ariaPressed</code>, also takes a boolean:{' '}
+              <code>ariaPressed: on</code>.
             </li>
             <li>
               <code>onClick</code> and every other <code>on*</code> prop takes a function; the event and{' '}
